@@ -524,14 +524,17 @@ public struct GentleTextModifier: ViewModifier {
     @Environment(\.colorScheme) private var colorScheme
 
     private let role: GentleTextRole
+    private let overrideColorRole: GentleColorRole?
 
-    public init(role: GentleTextRole) {
+    public init(role: GentleTextRole, overrideColorRole: GentleColorRole? = nil) {
         self.role = role
+        self.overrideColorRole = overrideColorRole
     }
 
     public func body(content: Content) -> some View {
         let style = theme.textStyle(for: role, sizeCategory: sizeCategory)
-        let color = theme.color(for: style.colorRole, scheme: colorScheme)
+        let resolvedColorRole = overrideColorRole ?? style.colorRole
+        let color = theme.color(for: resolvedColorRole, scheme: colorScheme)
 
         return content
             .font(style.font)
@@ -605,40 +608,41 @@ public struct GentleButtonStyle: ButtonStyle {
         let radii = theme.radii
 
         let backgroundRole: GentleColorRole
-        let foregroundRole: GentleColorRole
+        let labelColorRole: GentleColorRole
         let borderRole: GentleColorRole?
         let textRole: GentleTextRole
 
         switch role {
         case .primary:
             backgroundRole = .primaryCTA
-            foregroundRole = .onPrimaryCTA
+            labelColorRole = .onPrimaryCTA
             borderRole = nil
             textRole = .headline_m
+
         case .secondary:
             backgroundRole = .surface
-            foregroundRole = .textPrimary
+            labelColorRole = .textPrimary
             borderRole = .borderSubtle
             textRole = .headline_m
+
         case .ghost:
             backgroundRole = .background
-            foregroundRole = .textPrimary
+            labelColorRole = .textPrimary
             borderRole = .borderSubtle
             textRole = .body_m
+
         case .destructive:
             backgroundRole = .destructive
-            foregroundRole = .onPrimaryCTA
+            labelColorRole = .onPrimaryCTA
             borderRole = nil
             textRole = .headline_m
         }
 
         let backgroundColor = theme.color(for: backgroundRole, scheme: colorScheme)
-        let foregroundColor = theme.color(for: foregroundRole, scheme: colorScheme)
         let borderColor = borderRole.map { theme.color(for: $0, scheme: colorScheme) }
 
         return configuration.label
-            .gentleText(textRole)
-            .foregroundColor(foregroundColor)
+            .gentleText(textRole, colorRole: labelColorRole)
             .padding(.horizontal, CGFloat(spacing.l))
             .padding(.vertical, CGFloat(spacing.s))
             .background(
@@ -663,8 +667,9 @@ public struct GentleButtonStyle: ButtonStyle {
 // MARK: - View extensions (ergonomic API)
 
 public extension View {
-    func gentleText(_ role: GentleTextRole) -> some View {
-        modifier(GentleTextModifier(role: role))
+    func gentleText(_ role: GentleTextRole,
+                    colorRole: GentleColorRole? = nil) -> some View {
+        modifier(GentleTextModifier(role: role, overrideColorRole: colorRole))
     }
 
     func gentleSurface(_ role: GentleSurfaceRole) -> some View {
