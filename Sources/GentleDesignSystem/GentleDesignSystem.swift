@@ -69,7 +69,7 @@ public enum GentleColorRole: String, Codable, Sendable {
 public enum GentleButtonRole: String, Codable, Sendable {
     case primary
     case secondary
-    case ghost
+    case tertiary
     case destructive
 }
 
@@ -200,7 +200,7 @@ public extension GentleColorTokens {
             // Text
             .textPrimary: .init(lightHex: "#111827", darkHex: "#F9FAFB"),
             .textSecondary: .init(lightHex: "#4B5563", darkHex: "#D1D5DB"),
-            .textTertiary: .init(lightHex: "#9CA3AF", darkHex: "#9CA3AF"),
+            .textTertiary: .init(lightHex: "#6B7280", darkHex: "#9CA3AF"),
 
             // Surfaces
             .background: .init(lightHex: "#FFFFFF", darkHex: "#0B0F19"),
@@ -209,9 +209,9 @@ public extension GentleColorTokens {
             .borderSubtle: .init(lightHex: "#E5E7EB", darkHex: "#374151"),
 
             // Actions / status
-            .primaryCTA: .init(lightHex: "#2563EB", darkHex: "#3B82F6"),
+            .primaryCTA: .init(lightHex: "#4A6EF5", darkHex: "#3B82F6"),
             .onPrimaryCTA: .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
-            .destructive: .init(lightHex: "#DC2626", darkHex: "#F87171")
+            .destructive: .init(lightHex: "#E35D5B", darkHex: "#F87171")
         ]
     )
 }
@@ -621,14 +621,14 @@ public struct GentleButtonStyle: ButtonStyle {
 
         case .secondary:
             backgroundRole = .surface
-            labelColorRole = .textPrimary
-            borderRole = .borderSubtle
+            labelColorRole = .primaryCTA
+            borderRole = .primaryCTA
             textRole = .headline_m
 
-        case .ghost:
+        case .tertiary:
             backgroundRole = .background
-            labelColorRole = .textPrimary
-            borderRole = .borderSubtle
+            labelColorRole = .primaryCTA
+            borderRole = nil
             textRole = .body_m
 
         case .destructive:

@@ -86,11 +86,12 @@ struct ButtonsSection: View {
                 Button("Primary Button") {}
                     .gentleButton(.primary)
 
+                // ✅ Secondary now uses “outline tinted” styling via the design system.
                 Button("Secondary Button") {}
                     .gentleButton(.secondary)
 
-                Button("Ghost Button") {}
-                    .gentleButton(.ghost)
+                Button("Tertiary Button") {}
+                    .gentleButton(.tertiary)
 
                 Button("Destructive Button") {}
                     .gentleButton(.destructive)
@@ -221,8 +222,15 @@ struct ColorSwatch: View {
     }
 }
 
-#Preview {
+#Preview("Light") {
     GentleThemeRoot(theme: .default) {
         ContentView()
+    }
+}
+
+#Preview("Dark") {
+    GentleThemeRoot(theme: .default) {
+        ContentView()
+            .preferredColorScheme(.dark)
     }
 }
