@@ -168,33 +168,56 @@ public extension GentleDesignSystemSpec {
     )
 }
 
-// Colors are stored as hex strings per role
-public struct GentleColorTokens: Codable, Sendable {
-    public var hexByRole: [GentleColorRole: String]
+// MARK: - Colors (Light/Dark pairs)
 
-    public init(hexByRole: [GentleColorRole: String]) {
-        self.hexByRole = hexByRole
+public struct GentleColorPair: Codable, Sendable {
+    public var lightHex: String
+    public var darkHex: String
+
+    public init(lightHex: String, darkHex: String) {
+        self.lightHex = lightHex
+        self.darkHex = darkHex
+    }
+
+    public func hex(for scheme: ColorScheme) -> String {
+        scheme == .dark ? darkHex : lightHex
+    }
+}
+
+public struct GentleColorTokens: Codable, Sendable {
+    public var pairByRole: [GentleColorRole: GentleColorPair]
+
+    public init(pairByRole: [GentleColorRole: GentleColorPair]) {
+        self.pairByRole = pairByRole
     }
 }
 
 public extension GentleColorTokens {
+    /// Defaults chosen to be reasonable, high-contrast, and visually consistent across light/dark.
+    /// You can (and should) tune these as GentleDesign evolves.
     static let gentleDefault: GentleColorTokens = .init(
-        hexByRole: [
-            .textPrimary: "#111827",
-            .textSecondary: "#4B5563",
-            .textTertiary: "#9CA3AF",
-            .onPrimaryCTA: "#FFFFFF",
-            .background: "#FFFFFF",
-            .surface: "#F4F4F7",
-            .surfaceElevated: "#FFFFFF",
-            .borderSubtle: "#E5E7EB",
-            .destructive: "#DC2626",
-            .primaryCTA: "#2563EB"
+        pairByRole: [
+            // Text
+            .textPrimary: .init(lightHex: "#111827", darkHex: "#F9FAFB"),
+            .textSecondary: .init(lightHex: "#4B5563", darkHex: "#D1D5DB"),
+            .textTertiary: .init(lightHex: "#9CA3AF", darkHex: "#9CA3AF"),
+
+            // Surfaces
+            .background: .init(lightHex: "#FFFFFF", darkHex: "#0B0F19"),
+            .surface: .init(lightHex: "#F4F4F7", darkHex: "#111827"),
+            .surfaceElevated: .init(lightHex: "#FFFFFF", darkHex: "#1F2937"),
+            .borderSubtle: .init(lightHex: "#E5E7EB", darkHex: "#374151"),
+
+            // Actions / status
+            .primaryCTA: .init(lightHex: "#2563EB", darkHex: "#3B82F6"),
+            .onPrimaryCTA: .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            .destructive: .init(lightHex: "#DC2626", darkHex: "#F87171")
         ]
     )
 }
 
-// Typography role spec: numeric + string info only (Codable-safe)
+// MARK: - Typography
+
 public struct GentleTypographyRoleSpec: Codable, Sendable {
     public var pointSize: Double
     public var weight: String
@@ -226,7 +249,6 @@ public struct GentleTypographyRoleSpec: Codable, Sendable {
         self.colorRole = colorRole
     }
 
-    // Runtime helpers (not involved in Codable)
     var fontWeight: Font.Weight {
         switch weight.lowercased() {
         case "ultralight": return .ultraLight
@@ -251,7 +273,6 @@ public struct GentleTypographyRoleSpec: Codable, Sendable {
     }
 }
 
-// Typography token set (roles → specs)
 public struct GentleTypographyTokens: Codable, Sendable {
     public var roles: [GentleTextRole: GentleTypographyRoleSpec]
 
@@ -260,13 +281,9 @@ public struct GentleTypographyTokens: Codable, Sendable {
     }
 
     public func roleSpec(for role: GentleTextRole) -> GentleTypographyRoleSpec {
-        if let spec = roles[role] {
-            return spec
-        }
-        // Fallback to body
-        if let body = roles[.body_m] {
-            return body
-        }
+        if let spec = roles[role] { return spec }
+        if let body = roles[.body_m] { return body }
+
         return GentleTypographyRoleSpec(
             pointSize: 17,
             weight: "regular",
@@ -285,111 +302,67 @@ public extension GentleTypographyTokens {
         var dict: [GentleTextRole: GentleTypographyRoleSpec] = [:]
 
         dict[.largeTitle_xxl] = .init(
-            pointSize: 34,
-            weight: "bold",
-            design: "rounded",
-            relativeTo: .largeTitle,
-            lineSpacing: 6,
-            colorRole: .textPrimary
+            pointSize: 34, weight: "bold", design: "rounded",
+            relativeTo: .largeTitle, lineSpacing: 6, colorRole: .textPrimary
         )
         dict[.title_xl] = .init(
-            pointSize: 28,
-            weight: "bold",
-            design: "rounded",
-            relativeTo: .title,
-            lineSpacing: 4,
-            colorRole: .textPrimary
+            pointSize: 28, weight: "bold", design: "rounded",
+            relativeTo: .title, lineSpacing: 4, colorRole: .textPrimary
         )
         dict[.title2_l] = .init(
-            pointSize: 22,
-            weight: "semibold",
-            design: "rounded",
-            relativeTo: .title2,
-            lineSpacing: 3,
-            colorRole: .textPrimary
+            pointSize: 22, weight: "semibold", design: "rounded",
+            relativeTo: .title2, lineSpacing: 3, colorRole: .textPrimary
         )
         dict[.title3_ml] = .init(
-            pointSize: 20,
-            weight: "semibold",
-            design: "rounded",
-            relativeTo: .title3,
-            lineSpacing: 3,
-            colorRole: .textPrimary
+            pointSize: 20, weight: "semibold", design: "rounded",
+            relativeTo: .title3, lineSpacing: 3, colorRole: .textPrimary
         )
         dict[.headline_m] = .init(
-            pointSize: 17,
-            weight: "semibold",
-            design: "default",
-            relativeTo: .headline,
-            colorRole: .textPrimary
+            pointSize: 17, weight: "semibold", design: "default",
+            relativeTo: .headline, colorRole: .textPrimary
         )
+
         dict[.body_m] = .init(
-            pointSize: 17,
-            weight: "regular",
-            design: "default",
-            relativeTo: .body,
-            lineSpacing: 2,
-            colorRole: .textPrimary
+            pointSize: 17, weight: "regular", design: "default",
+            relativeTo: .body, lineSpacing: 2, colorRole: .textPrimary
         )
         dict[.bodySecondary_m] = .init(
-            pointSize: 17,
-            weight: "regular",
-            design: "default",
-            relativeTo: .body,
-            lineSpacing: 2,
-            colorRole: .textSecondary
+            pointSize: 17, weight: "regular", design: "default",
+            relativeTo: .body, lineSpacing: 2, colorRole: .textSecondary
         )
         dict[.monoCode_m] = .init(
-            pointSize: 17,
-            weight: "regular",
-            design: "monospaced",
-            relativeTo: .body,
-            letterSpacing: 0.3, // optional; 0 is totally fine too
-            colorRole: .textPrimary
+            pointSize: 17, weight: "regular", design: "monospaced",
+            relativeTo: .body, letterSpacing: 0.3, colorRole: .textPrimary
         )
+
         dict[.callout_ms] = .init(
-            pointSize: 16,
-            weight: "regular",
-            design: "default",
-            relativeTo: .callout,
-            colorRole: .textSecondary
+            pointSize: 16, weight: "regular", design: "default",
+            relativeTo: .callout, colorRole: .textSecondary
         )
         dict[.subheadline_ms] = .init(
-            pointSize: 15,
-            weight: "regular",
-            design: "default",
-            relativeTo: .subheadline,
-            colorRole: .textSecondary
+            pointSize: 15, weight: "regular", design: "default",
+            relativeTo: .subheadline, colorRole: .textSecondary
         )
+
         dict[.footnote_s] = .init(
-            pointSize: 13,
-            weight: "regular",
-            design: "default",
-            relativeTo: .footnote,
-            colorRole: .textTertiary
+            pointSize: 13, weight: "regular", design: "default",
+            relativeTo: .footnote, colorRole: .textTertiary
         )
         dict[.caption_s] = .init(
-            pointSize: 12,
-            weight: "regular",
-            design: "default",
-            relativeTo: .caption,
-            colorRole: .textTertiary // optional; keep .textSecondary if you prefer
+            pointSize: 12, weight: "regular", design: "default",
+            relativeTo: .caption, colorRole: .textTertiary
         )
         dict[.caption2_s] = .init(
-            pointSize: 11,
-            weight: "regular",
-            design: "default",
-            relativeTo: .caption2,
-            colorRole: .textTertiary // optional; keep .textSecondary if you prefer
+            pointSize: 11, weight: "regular", design: "default",
+            relativeTo: .caption2, colorRole: .textTertiary
         )
 
         return GentleTypographyTokens(roles: dict)
     }()
 }
 
-// Spacing tokens
-// Spacing tokens are intentionally not 1:1 with text ramps.
-// They represent layout rhythm, not typography scale.
+// MARK: - Spacing (layout rhythm)
+
 public struct GentleSpacingTokens: Codable, Sendable {
     public var xs: Double
     public var s: Double
@@ -417,7 +390,8 @@ public extension GentleSpacingTokens {
     static let gentleDefault = GentleSpacingTokens()
 }
 
-// Radii tokens
+// MARK: - Radii
+
 public struct GentleRadiusTokens: Codable, Sendable {
     public var small: Double
     public var medium: Double
@@ -439,7 +413,8 @@ public extension GentleRadiusTokens {
     static let gentleDefault = GentleRadiusTokens()
 }
 
-// Shadow tokens – values are blur radii
+// MARK: - Shadows
+
 public struct GentleShadowTokens: Codable, Sendable {
     public var none: Double
     public var small: Double
@@ -473,11 +448,10 @@ public struct GentleTheme: Sendable {
     public var radii: GentleRadiusTokens { spec.radii }
     public var shadows: GentleShadowTokens { spec.shadows }
 
-    public func color(for role: GentleColorRole) -> Color {
-        guard let hex = spec.colors.hexByRole[role] else {
-            return Color.primary
-        }
-        return Color(gentleHex: hex)
+    /// Resolve a color role for the current color scheme.
+    public func color(for role: GentleColorRole, scheme: ColorScheme) -> Color {
+        guard let pair = spec.colors.pairByRole[role] else { return Color.primary }
+        return Color(gentleHex: pair.hex(for: scheme))
     }
 
     /// Returns a resolved style that respects the current Dynamic Type size category.
@@ -485,7 +459,7 @@ public struct GentleTheme: Sendable {
                           sizeCategory: ContentSizeCategory) -> GentleResolvedTextStyle {
         let roleSpec = spec.typography.roleSpec(for: role)
 
-        // ✅ Option B (working): scale pointSize using UIFontMetrics anchored to a semantic text style.
+        // Scale pointSize using UIFontMetrics anchored to a semantic text style.
         let metrics = UIFontMetrics(forTextStyle: roleSpec.relativeTo.uiKitTextStyle)
         let traits = UITraitCollection(preferredContentSizeCategory: sizeCategory.uiContentSizeCategory)
         let scaledSize = metrics.scaledValue(for: CGFloat(roleSpec.pointSize), compatibleWith: traits)
@@ -506,7 +480,6 @@ public struct GentleTheme: Sendable {
     }
 }
 
-// Internal runtime-only resolved text style
 public struct GentleResolvedTextStyle {
     public let font: Font
     public let colorRole: GentleColorRole
@@ -528,7 +501,6 @@ public extension EnvironmentValues {
     }
 }
 
-// Wrap your app or a subtree with this
 public struct GentleThemeRoot<Content: View>: View {
     private let theme: GentleTheme
     private let content: Content
@@ -546,10 +518,10 @@ public struct GentleThemeRoot<Content: View>: View {
 
 // MARK: - Modifiers
 
-// Text: single modifier to set font + weight + color + spacing
 public struct GentleTextModifier: ViewModifier {
     @Environment(\.gentleTheme) private var theme
     @Environment(\.sizeCategory) private var sizeCategory
+    @Environment(\.colorScheme) private var colorScheme
 
     private let role: GentleTextRole
 
@@ -559,7 +531,7 @@ public struct GentleTextModifier: ViewModifier {
 
     public func body(content: Content) -> some View {
         let style = theme.textStyle(for: role, sizeCategory: sizeCategory)
-        let color = theme.color(for: style.colorRole)
+        let color = theme.color(for: style.colorRole, scheme: colorScheme)
 
         return content
             .font(style.font)
@@ -571,9 +543,10 @@ public struct GentleTextModifier: ViewModifier {
     }
 }
 
-// Surface: background + padding + radius + shadow
 public struct GentleSurfaceModifier: ViewModifier {
     @Environment(\.gentleTheme) private var theme
+    @Environment(\.colorScheme) private var colorScheme
+
     private let role: GentleSurfaceRole
 
     public init(role: GentleSurfaceRole) {
@@ -590,7 +563,7 @@ public struct GentleSurfaceModifier: ViewModifier {
             return AnyView(
                 content
                     .background(
-                        theme.color(for: .background)
+                        theme.color(for: .background, scheme: colorScheme)
                             .ignoresSafeArea()
                     )
             )
@@ -598,18 +571,18 @@ public struct GentleSurfaceModifier: ViewModifier {
             return AnyView(
                 content
                     .padding(CGFloat(spacing.m))
-                    .background(theme.color(for: .surface))
+                    .background(theme.color(for: .surface, scheme: colorScheme))
                     .cornerRadius(CGFloat(radii.large))
                     .overlay(
                         RoundedRectangle(cornerRadius: CGFloat(radii.large))
-                            .stroke(theme.color(for: .borderSubtle), lineWidth: 1)
+                            .stroke(theme.color(for: .borderSubtle, scheme: colorScheme), lineWidth: 1)
                     )
             )
         case .cardElevated:
             return AnyView(
                 content
                     .padding(CGFloat(spacing.m))
-                    .background(theme.color(for: .surfaceElevated))
+                    .background(theme.color(for: .surfaceElevated, scheme: colorScheme))
                     .cornerRadius(CGFloat(radii.large))
                     .shadow(radius: CGFloat(shadows.medium))
             )
@@ -617,9 +590,10 @@ public struct GentleSurfaceModifier: ViewModifier {
     }
 }
 
-// Button style: padding + background + radius + press behavior
 public struct GentleButtonStyle: ButtonStyle {
     @Environment(\.gentleTheme) private var theme
+    @Environment(\.colorScheme) private var colorScheme
+
     private let role: GentleButtonRole
 
     public init(role: GentleButtonRole) {
@@ -658,9 +632,9 @@ public struct GentleButtonStyle: ButtonStyle {
             textRole = .headline_m
         }
 
-        let backgroundColor = theme.color(for: backgroundRole)
-        let foregroundColor = theme.color(for: foregroundRole)
-        let borderColor = borderRole.map { theme.color(for: $0) }
+        let backgroundColor = theme.color(for: backgroundRole, scheme: colorScheme)
+        let foregroundColor = theme.color(for: foregroundRole, scheme: colorScheme)
+        let borderColor = borderRole.map { theme.color(for: $0, scheme: colorScheme) }
 
         return configuration.label
             .gentleText(textRole)
