@@ -2,24 +2,37 @@
 
 import SwiftUI
 import Foundation
+import UIKit
 
 // MARK: - Roles
 
+/** Naming guide (conventions, not strict rules):
+ - Base role: largeTitle, title, headline, body, callout, caption, etc.
+ - Numeric suffixes (2, 3, …) mirror SwiftUI semantics (e.g. title2, title3, caption2).
+ - Order suffixes (Secondary, Tertiary) indicate reduced visual emphasis
+   (typically via color/opacity/weight) without changing the underlying semantic font.
+ - Ramp suffix (_xxl → _s) indicates relative position in the typography scale,
+   not a fixed point size.
+ */
 public enum GentleTextRole: String, Codable, Sendable {
     // Ramp legend:
     // xxl > xl > l > ml > m > ms > s
-    case display_xxl
-    case largeTitle_xl
-    case title_l
-    
-    case headline_ml       // medium → large leaning
-    case subheadline_m
+    case largeTitle_xxl
+    case title_xl
+    case title2_l
+    case title3_ml         // medium → large leaning
+
+    case headline_m
     case body_m
     case bodySecondary_m
-    
-    case caption_ms        // medium → small leaning
-    case monoCode_ms
+    case monoCode_m
+
+    case callout_ms        // medium → small leaning
+    case subheadline_ms
+
     case footnote_s
+    case caption_s
+    case caption2_s
 }
 
 public enum GentleTextRamp: String, Codable, Sendable {
@@ -29,13 +42,13 @@ public enum GentleTextRamp: String, Codable, Sendable {
 public extension GentleTextRole {
     var ramp: GentleTextRamp {
         switch self {
-        case .display_xxl: return .xxl
-        case .largeTitle_xl: return .xl
-        case .title_l: return .l
-        case .headline_ml: return .ml
-        case .subheadline_m, .body_m, .bodySecondary_m: return .m
-        case .caption_ms, .monoCode_ms: return .ms
-        case .footnote_s: return .s
+        case .largeTitle_xxl: return .xxl
+        case .title_xl: return .xl
+        case .title2_l: return .l
+        case .title3_ml: return .ml
+        case .headline_m, .body_m, .bodySecondary_m, .monoCode_m: return .m
+        case .callout_ms, .subheadline_ms: return .ms
+        case .footnote_s, .caption_s, .caption2_s: return .s
         }
     }
 }
@@ -66,6 +79,62 @@ public enum GentleSurfaceRole: String, Codable, Sendable {
     case cardElevated
 }
 
+// MARK: - Dynamic Type anchor (Option B)
+
+/// JSON-friendly semantic anchor for Dynamic Type scaling.
+public enum GentleFontTextStyle: String, Codable, Sendable {
+    case largeTitle
+    case title
+    case title2
+    case title3
+    case headline
+    case body
+    case callout
+    case subheadline
+    case footnote
+    case caption
+    case caption2
+}
+
+public extension GentleFontTextStyle {
+    /// UIKit semantic anchor used by UIFontMetrics for Dynamic Type scaling.
+    var uiKitTextStyle: UIFont.TextStyle {
+        switch self {
+        case .largeTitle: return .largeTitle
+        case .title: return .title1
+        case .title2: return .title2
+        case .title3: return .title3
+        case .headline: return .headline
+        case .body: return .body
+        case .callout: return .callout
+        case .subheadline: return .subheadline
+        case .footnote: return .footnote
+        case .caption: return .caption1
+        case .caption2: return .caption2
+        }
+    }
+}
+
+private extension ContentSizeCategory {
+    var uiContentSizeCategory: UIContentSizeCategory {
+        switch self {
+        case .extraSmall: return .extraSmall
+        case .small: return .small
+        case .medium: return .medium
+        case .large: return .large
+        case .extraLarge: return .extraLarge
+        case .extraExtraLarge: return .extraExtraLarge
+        case .extraExtraExtraLarge: return .extraExtraExtraLarge
+        case .accessibilityMedium: return .accessibilityMedium
+        case .accessibilityLarge: return .accessibilityLarge
+        case .accessibilityExtraLarge: return .accessibilityExtraLarge
+        case .accessibilityExtraExtraLarge: return .accessibilityExtraExtraLarge
+        case .accessibilityExtraExtraExtraLarge: return .accessibilityExtraExtraExtraLarge
+        @unknown default: return .large
+        }
+    }
+}
+
 // MARK: - Codable token structs (JSON-friendly)
 
 // Top-level spec you’ll eventually load/save as JSON
@@ -75,7 +144,7 @@ public struct GentleDesignSystemSpec: Codable, Sendable {
     public var spacing: GentleSpacingTokens
     public var radii: GentleRadiusTokens
     public var shadows: GentleShadowTokens
-    
+
     public init(colors: GentleColorTokens,
                 typography: GentleTypographyTokens,
                 spacing: GentleSpacingTokens,
@@ -102,7 +171,7 @@ public extension GentleDesignSystemSpec {
 // Colors are stored as hex strings per role
 public struct GentleColorTokens: Codable, Sendable {
     public var hexByRole: [GentleColorRole: String]
-    
+
     public init(hexByRole: [GentleColorRole: String]) {
         self.hexByRole = hexByRole
     }
@@ -130,14 +199,19 @@ public struct GentleTypographyRoleSpec: Codable, Sendable {
     public var pointSize: Double
     public var weight: String
     public var design: String
+
+    /// Dynamic Type anchor (semantic style used for scaling).
+    public var relativeTo: GentleFontTextStyle
+
     public var lineSpacing: Double
     public var letterSpacing: Double
     public var isUppercased: Bool
     public var colorRole: GentleColorRole
-    
+
     public init(pointSize: Double,
                 weight: String,
                 design: String,
+                relativeTo: GentleFontTextStyle,
                 lineSpacing: Double = 0,
                 letterSpacing: Double = 0,
                 isUppercased: Bool = false,
@@ -145,12 +219,13 @@ public struct GentleTypographyRoleSpec: Codable, Sendable {
         self.pointSize = pointSize
         self.weight = weight
         self.design = design
+        self.relativeTo = relativeTo
         self.lineSpacing = lineSpacing
         self.letterSpacing = letterSpacing
         self.isUppercased = isUppercased
         self.colorRole = colorRole
     }
-    
+
     // Runtime helpers (not involved in Codable)
     var fontWeight: Font.Weight {
         switch weight.lowercased() {
@@ -165,7 +240,7 @@ public struct GentleTypographyRoleSpec: Codable, Sendable {
         default: return .regular
         }
     }
-    
+
     var fontDesign: Font.Design {
         switch design.lowercased() {
         case "rounded": return .rounded
@@ -179,11 +254,11 @@ public struct GentleTypographyRoleSpec: Codable, Sendable {
 // Typography token set (roles → specs)
 public struct GentleTypographyTokens: Codable, Sendable {
     public var roles: [GentleTextRole: GentleTypographyRoleSpec]
-    
+
     public init(roles: [GentleTextRole: GentleTypographyRoleSpec]) {
         self.roles = roles
     }
-    
+
     public func roleSpec(for role: GentleTextRole) -> GentleTypographyRoleSpec {
         if let spec = roles[role] {
             return spec
@@ -193,9 +268,10 @@ public struct GentleTypographyTokens: Codable, Sendable {
             return body
         }
         return GentleTypographyRoleSpec(
-            pointSize: 15,
+            pointSize: 17,
             weight: "regular",
             design: "default",
+            relativeTo: .body,
             lineSpacing: 2,
             letterSpacing: 0,
             isUppercased: false,
@@ -207,74 +283,106 @@ public struct GentleTypographyTokens: Codable, Sendable {
 public extension GentleTypographyTokens {
     static let gentleDefault: GentleTypographyTokens = {
         var dict: [GentleTextRole: GentleTypographyRoleSpec] = [:]
-        
-        dict[.display_xxl] = .init(
+
+        dict[.largeTitle_xxl] = .init(
             pointSize: 34,
             weight: "bold",
             design: "rounded",
+            relativeTo: .largeTitle,
             lineSpacing: 6,
             colorRole: .textPrimary
         )
-        dict[.largeTitle_xl] = .init(
+        dict[.title_xl] = .init(
             pointSize: 28,
             weight: "bold",
             design: "rounded",
+            relativeTo: .title,
             lineSpacing: 4,
             colorRole: .textPrimary
         )
-        dict[.title_l] = .init(
+        dict[.title2_l] = .init(
             pointSize: 22,
             weight: "semibold",
             design: "rounded",
+            relativeTo: .title2,
             lineSpacing: 3,
             colorRole: .textPrimary
         )
-        dict[.headline_ml] = .init(
+        dict[.title3_ml] = .init(
+            pointSize: 20,
+            weight: "semibold",
+            design: "rounded",
+            relativeTo: .title3,
+            lineSpacing: 3,
+            colorRole: .textPrimary
+        )
+        dict[.headline_m] = .init(
             pointSize: 17,
             weight: "semibold",
             design: "default",
+            relativeTo: .headline,
             colorRole: .textPrimary
         )
-        dict[.subheadline_m] = .init(
-            pointSize: 15,
-            weight: "medium",
-            design: "default",
-            colorRole: .textSecondary
-        )
         dict[.body_m] = .init(
-            pointSize: 15,
+            pointSize: 17,
             weight: "regular",
             design: "default",
+            relativeTo: .body,
             lineSpacing: 2,
             colorRole: .textPrimary
         )
         dict[.bodySecondary_m] = .init(
-            pointSize: 15,
+            pointSize: 17,
             weight: "regular",
             design: "default",
+            relativeTo: .body,
             lineSpacing: 2,
             colorRole: .textSecondary
         )
-        dict[.caption_ms] = .init(
-            pointSize: 13,
+        dict[.monoCode_m] = .init(
+            pointSize: 17,
+            weight: "regular",
+            design: "monospaced",
+            relativeTo: .body,
+            letterSpacing: 0.3, // optional; 0 is totally fine too
+            colorRole: .textPrimary
+        )
+        dict[.callout_ms] = .init(
+            pointSize: 16,
             weight: "regular",
             design: "default",
+            relativeTo: .callout,
+            colorRole: .textSecondary
+        )
+        dict[.subheadline_ms] = .init(
+            pointSize: 15,
+            weight: "regular",
+            design: "default",
+            relativeTo: .subheadline,
             colorRole: .textSecondary
         )
         dict[.footnote_s] = .init(
+            pointSize: 13,
+            weight: "regular",
+            design: "default",
+            relativeTo: .footnote,
+            colorRole: .textTertiary
+        )
+        dict[.caption_s] = .init(
             pointSize: 12,
             weight: "regular",
             design: "default",
-            colorRole: .textTertiary
+            relativeTo: .caption,
+            colorRole: .textTertiary // optional; keep .textSecondary if you prefer
         )
-        dict[.monoCode_ms] = .init(
-            pointSize: 13,
+        dict[.caption2_s] = .init(
+            pointSize: 11,
             weight: "regular",
-            design: "monospaced",
-            letterSpacing: 0.5,
-            colorRole: .textPrimary
+            design: "default",
+            relativeTo: .caption2,
+            colorRole: .textTertiary // optional; keep .textSecondary if you prefer
         )
-        
+
         return GentleTypographyTokens(roles: dict)
     }()
 }
@@ -289,7 +397,7 @@ public struct GentleSpacingTokens: Codable, Sendable {
     public var l: Double
     public var xl: Double
     public var xxl: Double
-    
+
     public init(xs: Double = 4,
                 s: Double = 8,
                 m: Double = 12,
@@ -315,7 +423,7 @@ public struct GentleRadiusTokens: Codable, Sendable {
     public var medium: Double
     public var large: Double
     public var pill: Double
-    
+
     public init(small: Double = 8,
                 medium: Double = 12,
                 large: Double = 20,
@@ -336,7 +444,7 @@ public struct GentleShadowTokens: Codable, Sendable {
     public var none: Double
     public var small: Double
     public var medium: Double
-    
+
     public init(none: Double = 0,
                 small: Double = 2,
                 medium: Double = 6) {
@@ -354,31 +462,40 @@ public extension GentleShadowTokens {
 
 public struct GentleTheme: Sendable {
     public let spec: GentleDesignSystemSpec
-    
+
     public init(spec: GentleDesignSystemSpec = .gentleDefault) {
         self.spec = spec
     }
-    
+
     public static let `default` = GentleTheme(spec: .gentleDefault)
-    
+
     public var spacing: GentleSpacingTokens { spec.spacing }
     public var radii: GentleRadiusTokens { spec.radii }
     public var shadows: GentleShadowTokens { spec.shadows }
-    
+
     public func color(for role: GentleColorRole) -> Color {
         guard let hex = spec.colors.hexByRole[role] else {
             return Color.primary
         }
         return Color(gentleHex: hex)
     }
-    
-    public func textStyle(for role: GentleTextRole) -> GentleResolvedTextStyle {
+
+    /// Returns a resolved style that respects the current Dynamic Type size category.
+    public func textStyle(for role: GentleTextRole,
+                          sizeCategory: ContentSizeCategory) -> GentleResolvedTextStyle {
         let roleSpec = spec.typography.roleSpec(for: role)
+
+        // ✅ Option B (working): scale pointSize using UIFontMetrics anchored to a semantic text style.
+        let metrics = UIFontMetrics(forTextStyle: roleSpec.relativeTo.uiKitTextStyle)
+        let traits = UITraitCollection(preferredContentSizeCategory: sizeCategory.uiContentSizeCategory)
+        let scaledSize = metrics.scaledValue(for: CGFloat(roleSpec.pointSize), compatibleWith: traits)
+
         let font = Font.system(
-            size: CGFloat(roleSpec.pointSize),
+            size: scaledSize,
             weight: roleSpec.fontWeight,
             design: roleSpec.fontDesign
         )
+
         return GentleResolvedTextStyle(
             font: font,
             colorRole: roleSpec.colorRole,
@@ -415,13 +532,13 @@ public extension EnvironmentValues {
 public struct GentleThemeRoot<Content: View>: View {
     private let theme: GentleTheme
     private let content: Content
-    
+
     public init(theme: GentleTheme = .default,
                 @ViewBuilder content: () -> Content) {
         self.theme = theme
         self.content = content()
     }
-    
+
     public var body: some View {
         content.environment(\.gentleTheme, theme)
     }
@@ -432,16 +549,18 @@ public struct GentleThemeRoot<Content: View>: View {
 // Text: single modifier to set font + weight + color + spacing
 public struct GentleTextModifier: ViewModifier {
     @Environment(\.gentleTheme) private var theme
+    @Environment(\.sizeCategory) private var sizeCategory
+
     private let role: GentleTextRole
-    
+
     public init(role: GentleTextRole) {
         self.role = role
     }
-    
+
     public func body(content: Content) -> some View {
-        let style = theme.textStyle(for: role)
+        let style = theme.textStyle(for: role, sizeCategory: sizeCategory)
         let color = theme.color(for: style.colorRole)
-        
+
         return content
             .font(style.font)
             .foregroundColor(color)
@@ -456,16 +575,16 @@ public struct GentleTextModifier: ViewModifier {
 public struct GentleSurfaceModifier: ViewModifier {
     @Environment(\.gentleTheme) private var theme
     private let role: GentleSurfaceRole
-    
+
     public init(role: GentleSurfaceRole) {
         self.role = role
     }
-    
+
     public func body(content: Content) -> some View {
         let spacing = theme.spacing
         let radii = theme.radii
         let shadows = theme.shadows
-        
+
         switch role {
         case .appBackground:
             return AnyView(
@@ -502,31 +621,31 @@ public struct GentleSurfaceModifier: ViewModifier {
 public struct GentleButtonStyle: ButtonStyle {
     @Environment(\.gentleTheme) private var theme
     private let role: GentleButtonRole
-    
+
     public init(role: GentleButtonRole) {
         self.role = role
     }
-    
+
     public func makeBody(configuration: Configuration) -> some View {
         let spacing = theme.spacing
         let radii = theme.radii
-        
+
         let backgroundRole: GentleColorRole
         let foregroundRole: GentleColorRole
         let borderRole: GentleColorRole?
         let textRole: GentleTextRole
-        
+
         switch role {
         case .primary:
             backgroundRole = .primaryCTA
             foregroundRole = .onPrimaryCTA
             borderRole = nil
-            textRole = .headline_ml
+            textRole = .headline_m
         case .secondary:
             backgroundRole = .surface
             foregroundRole = .textPrimary
             borderRole = .borderSubtle
-            textRole = .headline_ml
+            textRole = .headline_m
         case .ghost:
             backgroundRole = .background
             foregroundRole = .textPrimary
@@ -536,13 +655,13 @@ public struct GentleButtonStyle: ButtonStyle {
             backgroundRole = .destructive
             foregroundRole = .onPrimaryCTA
             borderRole = nil
-            textRole = .headline_ml
+            textRole = .headline_m
         }
-        
+
         let backgroundColor = theme.color(for: backgroundRole)
         let foregroundColor = theme.color(for: foregroundRole)
         let borderColor = borderRole.map { theme.color(for: $0) }
-        
+
         return configuration.label
             .gentleText(textRole)
             .foregroundColor(foregroundColor)
@@ -573,11 +692,11 @@ public extension View {
     func gentleText(_ role: GentleTextRole) -> some View {
         modifier(GentleTextModifier(role: role))
     }
-    
+
     func gentleSurface(_ role: GentleSurfaceRole) -> some View {
         modifier(GentleSurfaceModifier(role: role))
     }
-    
+
     func gentleButton(_ role: GentleButtonRole) -> some View {
         buttonStyle(GentleButtonStyle(role: role))
     }
@@ -591,12 +710,12 @@ public extension Color {
         if hexString.hasPrefix("#") {
             hexString.removeFirst()
         }
-        
+
         var hexNumber: UInt64 = 0
         let scanner = Scanner(string: hexString)
-        
+
         let r, g, b, a: Double
-        
+
         if scanner.scanHexInt64(&hexNumber) {
             switch hexString.count {
             case 6:
@@ -615,8 +734,7 @@ public extension Color {
         } else {
             r = 0; g = 0; b = 0; a = 1
         }
-        
+
         self.init(red: r, green: g, blue: b, opacity: a)
     }
 }
-
