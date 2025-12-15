@@ -4,6 +4,9 @@ A lightweight, token-driven SwiftUI design system with built-in dark mode and Dy
 
 **See it in action:** Open `Demo/GentleDesignSystemDemo.xcodeproj` to explore all components.
 
+![GentleDesignSystem demo – page 1](Demo/README_assets/Typography_1.png)
+![GentleDesignSystem demo – page 2](Demo/README_assets/Typography_2.png)
+
 ## Quick Start
 
 ### 1. Add the Package

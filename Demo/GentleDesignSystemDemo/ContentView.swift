@@ -5,14 +5,14 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 32) {
+                VStack(spacing: 20) { // tighter (was 32)
                     TypographySection()
                     ButtonsSection()
                     SurfacesSection()
                     ColorsSection()
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 24)
+                .padding(.horizontal, 12) // tighter (was 16)
+                .padding(.vertical, 16)   // tighter (was 24)
             }
             .gentleSurface(.appBackground)
             .navigationTitle("Design System")
@@ -23,50 +23,44 @@ struct ContentView: View {
 // MARK: - Typography Section
 
 struct TypographySection: View {
+    private let columns = [
+        GridItem(.adaptive(minimum: 120), spacing: 12)
+    ]
+
+    private let styles: [(String, GentleTextRole)] = [
+        ("largeTitle_xxl", .largeTitle_xxl),
+        ("title_xl", .title_xl),
+        ("title2_l", .title2_l),
+        ("title3_ml", .title3_ml),
+        ("headline_m", .headline_m),
+        ("body_m", .body_m),
+        ("bodySecondary_m", .bodySecondary_m),
+        ("monoCode_m", .monoCode_m),
+        ("callout_ms", .callout_ms),
+        ("subheadline_ms", .subheadline_ms),
+        ("footnote_s", .footnote_s),
+        ("caption_s", .caption_s),
+        ("caption2_s", .caption2_s)
+    ]
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("Typography")
                 .gentleText(.title_xl)
 
-            VStack(alignment: .leading, spacing: 12) {
-                Text("largeTitle_xxl")
-                    .gentleText(.largeTitle_xxl)
+            LazyVGrid(columns: columns, alignment: .leading, spacing: 10) {
+                ForEach(styles, id: \.0) { name, role in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(name)
+                            .gentleText(.caption_s)
+                            .opacity(0.75)
 
-                Text("title_xl")
-                    .gentleText(.title_xl)
-
-                Text("title2_l")
-                    .gentleText(.title2_l)
-
-                Text("title3_ml")
-                    .gentleText(.title3_ml)
-
-                Text("headline_m")
-                    .gentleText(.headline_m)
-
-                Text("body_m")
-                    .gentleText(.body_m)
-
-                Text("bodySecondary_m")
-                    .gentleText(.bodySecondary_m)
-
-                Text("monoCode_m")
-                    .gentleText(.monoCode_m)
-
-                Text("callout_ms")
-                    .gentleText(.callout_ms)
-
-                Text("subheadline_ms")
-                    .gentleText(.subheadline_ms)
-
-                Text("footnote_s")
-                    .gentleText(.footnote_s)
-
-                Text("caption_s")
-                    .gentleText(.caption_s)
-
-                Text("caption2_s")
-                    .gentleText(.caption2_s)
+                        Text("Aa Bb")
+                            .gentleText(role)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
+                }
             }
             .gentleSurface(.card)
         }
@@ -77,23 +71,24 @@ struct TypographySection: View {
 // MARK: - Buttons Section
 
 struct ButtonsSection: View {
+    private let columns = [GridItem(.adaptive(minimum: 150), spacing: 12)]
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("Buttons")
                 .gentleText(.title_xl)
 
-            VStack(spacing: 16) {
-                Button("Primary Button") {}
+            LazyVGrid(columns: columns, spacing: 12) {
+                Button("Primary") {}
                     .gentleButton(.primary)
 
-                // ✅ Secondary now uses “outline tinted” styling via the design system.
-                Button("Secondary Button") {}
+                Button("Secondary") {}
                     .gentleButton(.secondary)
 
-                Button("Tertiary Button") {}
+                Button("Tertiary") {}
                     .gentleButton(.tertiary)
 
-                Button("Destructive Button") {}
+                Button("Destructive") {}
                     .gentleButton(.destructive)
             }
             .gentleSurface(.card)
@@ -106,29 +101,42 @@ struct ButtonsSection: View {
 
 struct SurfacesSection: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("Surfaces")
                 .gentleText(.title_xl)
 
-            VStack(alignment: .leading, spacing: 16) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("card")
-                        .gentleText(.headline_m)
-                    Text("Flat surface with subtle border")
-                        .gentleText(.bodySecondary_m)
-                }
-                .gentleSurface(.card)
+            HStack(spacing: 12) {
+                surfaceCard(
+                    title: "card",
+                    subtitle: "Subtle border",
+                    surface: .card
+                )
 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("cardElevated")
-                        .gentleText(.headline_m)
-                    Text("Elevated surface with shadow")
-                        .gentleText(.bodySecondary_m)
-                }
-                .gentleSurface(.cardElevated)
+                surfaceCard(
+                    title: "elevated",
+                    subtitle: "Shadow",
+                    surface: .cardElevated
+                )
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func surfaceCard(
+        title: String,
+        subtitle: String,
+        surface: GentleSurfaceRole
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .gentleText(.headline_m)
+
+            Text(subtitle)
+                .gentleText(.caption_s)
+                .opacity(0.8)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .gentleSurface(surface)
     }
 }
 
@@ -138,61 +146,50 @@ struct ColorsSection: View {
     @Environment(\.gentleTheme) var theme
     @Environment(\.colorScheme) var colorScheme
 
+    private let columns = [
+        GridItem(.adaptive(minimum: 150), spacing: 12)
+    ]
+    
+    private var items: [(String, Color)] {
+        [
+            ("textPrimary", theme.color(for: .textPrimary, scheme: colorScheme)),
+            ("textSecondary", theme.color(for: .textSecondary, scheme: colorScheme)),
+            ("textTertiary", theme.color(for: .textTertiary, scheme: colorScheme)),
+            ("background", theme.color(for: .background, scheme: colorScheme)),
+            ("surface", theme.color(for: .surface, scheme: colorScheme)),
+            ("surfaceElevated", theme.color(for: .surfaceElevated, scheme: colorScheme)),
+            ("borderSubtle", theme.color(for: .borderSubtle, scheme: colorScheme)),
+            ("primaryCTA", theme.color(for: .primaryCTA, scheme: colorScheme)),
+            ("onPrimaryCTA", theme.color(for: .onPrimaryCTA, scheme: colorScheme)),
+            ("destructive", theme.color(for: .destructive, scheme: colorScheme))
+        ]
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("Colors")
                 .gentleText(.title_xl)
 
-            VStack(spacing: 12) {
-                ColorSwatch(
-                    name: "textPrimary",
-                    color: theme.color(for: .textPrimary, scheme: colorScheme)
-                )
+            LazyVGrid(columns: columns, spacing: 10) {
+                ForEach(items, id: \.0) { name, color in
+                    HStack(spacing: 10) {
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(color)
+                            .frame(width: 28, height: 28)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .strokeBorder(Color.gray.opacity(0.25), lineWidth: 1)
+                            )
 
-                ColorSwatch(
-                    name: "textSecondary",
-                    color: theme.color(for: .textSecondary, scheme: colorScheme)
-                )
+                        Text(name)
+                            .gentleText(.caption_s)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.75)
 
-                ColorSwatch(
-                    name: "textTertiary",
-                    color: theme.color(for: .textTertiary, scheme: colorScheme)
-                )
-
-                ColorSwatch(
-                    name: "background",
-                    color: theme.color(for: .background, scheme: colorScheme)
-                )
-
-                ColorSwatch(
-                    name: "surface",
-                    color: theme.color(for: .surface, scheme: colorScheme)
-                )
-
-                ColorSwatch(
-                    name: "surfaceElevated",
-                    color: theme.color(for: .surfaceElevated, scheme: colorScheme)
-                )
-
-                ColorSwatch(
-                    name: "borderSubtle",
-                    color: theme.color(for: .borderSubtle, scheme: colorScheme)
-                )
-
-                ColorSwatch(
-                    name: "primaryCTA",
-                    color: theme.color(for: .primaryCTA, scheme: colorScheme)
-                )
-
-                ColorSwatch(
-                    name: "onPrimaryCTA",
-                    color: theme.color(for: .onPrimaryCTA, scheme: colorScheme)
-                )
-
-                ColorSwatch(
-                    name: "destructive",
-                    color: theme.color(for: .destructive, scheme: colorScheme)
-                )
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.vertical, 6)
+                }
             }
             .gentleSurface(.card)
         }
@@ -200,27 +197,7 @@ struct ColorsSection: View {
     }
 }
 
-struct ColorSwatch: View {
-    let name: String
-    let color: Color
-
-    var body: some View {
-        HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(color)
-                .frame(width: 48, height: 48)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .strokeBorder(Color.gray.opacity(0.3), lineWidth: 1)
-                )
-
-            Text(name)
-                .gentleText(.body_m)
-
-            Spacer()
-        }
-    }
-}
+// MARK: - Previews
 
 #Preview("Light") {
     GentleThemeRoot(theme: .default) {
