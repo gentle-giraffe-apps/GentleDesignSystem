@@ -24,7 +24,7 @@ struct ContentView: View {
 
 struct TypographySection: View {
     private let columns = [
-        GridItem(.adaptive(minimum: 120), spacing: 12)
+        GridItem(.adaptive(minimum: 150), spacing: 12)
     ]
 
     private let styles: [(String, GentleTextRole)] = [
@@ -52,9 +52,8 @@ struct TypographySection: View {
                 ForEach(styles, id: \.0) { name, role in
                     VStack(alignment: .leading, spacing: 4) {
                         Text(name)
-                            .gentleText(.caption_s)
-                            .opacity(0.75)
-
+                            .gentleText(.callout_ms)
+                            .opacity(0.8)
                         Text("Aa Bb")
                             .gentleText(role)
                             .lineLimit(1)

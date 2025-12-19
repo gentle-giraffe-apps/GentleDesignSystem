@@ -204,7 +204,7 @@ public extension GentleColorTokens {
 
             // Surfaces
             .background: .init(lightHex: "#FFFFFF", darkHex: "#0B0F19"),
-            .surface: .init(lightHex: "#F4F4F7", darkHex: "#111827"),
+            .surface: .init(lightHex: "#FAFAFE", darkHex: "#111827"), // F4F4F7
             .surfaceElevated: .init(lightHex: "#FFFFFF", darkHex: "#1F2937"),
             .borderSubtle: .init(lightHex: "#E5E7EB", darkHex: "#374151"),
 
@@ -216,12 +216,77 @@ public extension GentleColorTokens {
     )
 }
 
+// MARK: - Typography axis enums (JSON-friendly)
+
+public enum GentleFontDesignToken: String, Codable, Sendable {
+    case `default`
+    case serif
+    case rounded
+    case monospaced
+
+    var swiftUIDesign: Font.Design {
+        switch self {
+        case .default: return .default
+        case .serif: return .serif
+        case .rounded: return .rounded
+        case .monospaced: return .monospaced
+        }
+    }
+}
+
+/// Note: Font.Width is iOS 17+. We still store it in JSON, but only apply when available.
+public enum GentleFontWidthToken: String, Codable, Sendable {
+    case compressed
+    case condensed
+    case standard
+    case expanded
+
+    @available(iOS 17.0, *)
+    var swiftUIWidth: Font.Width {
+        switch self {
+        case .compressed: return .compressed
+        case .condensed: return .condensed
+        case .standard: return .standard
+        case .expanded: return .expanded
+        }
+    }
+}
+
+public enum GentleFontWeightToken: String, Codable, Sendable {
+    case ultraLight
+    case thin
+    case light
+    case regular
+    case medium
+    case semibold
+    case bold
+    case heavy
+    case black
+
+    var swiftUIWeight: Font.Weight {
+        switch self {
+        case .ultraLight: return .ultraLight
+        case .thin: return .thin
+        case .light: return .light
+        case .regular: return .regular
+        case .medium: return .medium
+        case .semibold: return .semibold
+        case .bold: return .bold
+        case .heavy: return .heavy
+        case .black: return .black
+        }
+    }
+}
+
 // MARK: - Typography
 
 public struct GentleTypographyRoleSpec: Codable, Sendable {
     public var pointSize: Double
-    public var weight: String
-    public var design: String
+    public var weight: GentleFontWeightToken
+    public var design: GentleFontDesignToken
+
+    /// Optional: if nil, we treat as "standard".
+    public var width: GentleFontWidthToken?
 
     /// Dynamic Type anchor (semantic style used for scaling).
     public var relativeTo: GentleFontTextStyle
@@ -232,8 +297,9 @@ public struct GentleTypographyRoleSpec: Codable, Sendable {
     public var colorRole: GentleColorRole
 
     public init(pointSize: Double,
-                weight: String,
-                design: String,
+                weight: GentleFontWeightToken,
+                design: GentleFontDesignToken,
+                width: GentleFontWidthToken? = nil,
                 relativeTo: GentleFontTextStyle,
                 lineSpacing: Double = 0,
                 letterSpacing: Double = 0,
@@ -242,34 +308,12 @@ public struct GentleTypographyRoleSpec: Codable, Sendable {
         self.pointSize = pointSize
         self.weight = weight
         self.design = design
+        self.width = width
         self.relativeTo = relativeTo
         self.lineSpacing = lineSpacing
         self.letterSpacing = letterSpacing
         self.isUppercased = isUppercased
         self.colorRole = colorRole
-    }
-
-    var fontWeight: Font.Weight {
-        switch weight.lowercased() {
-        case "ultralight": return .ultraLight
-        case "thin": return .thin
-        case "light": return .light
-        case "medium": return .medium
-        case "semibold", "semi-bold", "demi-bold": return .semibold
-        case "bold": return .bold
-        case "heavy": return .heavy
-        case "black": return .black
-        default: return .regular
-        }
-    }
-
-    var fontDesign: Font.Design {
-        switch design.lowercased() {
-        case "rounded": return .rounded
-        case "monospaced", "mono": return .monospaced
-        case "serif": return .serif
-        default: return .default
-        }
     }
 }
 
@@ -286,8 +330,9 @@ public struct GentleTypographyTokens: Codable, Sendable {
 
         return GentleTypographyRoleSpec(
             pointSize: 17,
-            weight: "regular",
-            design: "default",
+            weight: .regular,
+            design: .default,
+            width: nil,
             relativeTo: .body,
             lineSpacing: 2,
             letterSpacing: 0,
@@ -302,59 +347,118 @@ public extension GentleTypographyTokens {
         var dict: [GentleTextRole: GentleTypographyRoleSpec] = [:]
 
         dict[.largeTitle_xxl] = .init(
-            pointSize: 34, weight: "bold", design: "rounded",
-            relativeTo: .largeTitle, lineSpacing: 6, colorRole: .textPrimary
+            pointSize: 34,
+            weight: .bold,
+            design: .rounded,
+            width: nil,
+            relativeTo: .largeTitle,
+            lineSpacing: 6,
+            colorRole: .textPrimary
         )
         dict[.title_xl] = .init(
-            pointSize: 28, weight: "bold", design: "rounded",
-            relativeTo: .title, lineSpacing: 4, colorRole: .textPrimary
+            pointSize: 28,
+            weight: .bold,
+            design: .rounded,
+            width: nil,
+            relativeTo: .title,
+            lineSpacing: 4,
+            colorRole: .textPrimary
         )
         dict[.title2_l] = .init(
-            pointSize: 22, weight: "semibold", design: "rounded",
-            relativeTo: .title2, lineSpacing: 3, colorRole: .textPrimary
+            pointSize: 22,
+            weight: .semibold,
+            design: .rounded,
+            width: nil,
+            relativeTo: .title2,
+            lineSpacing: 3,
+            colorRole: .textPrimary
         )
         dict[.title3_ml] = .init(
-            pointSize: 20, weight: "semibold", design: "rounded",
-            relativeTo: .title3, lineSpacing: 3, colorRole: .textPrimary
+            pointSize: 20,
+            weight: .semibold,
+            design: .rounded,
+            width: nil,
+            relativeTo: .title3,
+            lineSpacing: 3,
+            colorRole: .textPrimary
         )
         dict[.headline_m] = .init(
-            pointSize: 17, weight: "semibold", design: "default",
-            relativeTo: .headline, colorRole: .textPrimary
+            pointSize: 17,
+            weight: .semibold,
+            design: .default,
+            width: nil,
+            relativeTo: .headline,
+            colorRole: .textPrimary
         )
 
         dict[.body_m] = .init(
-            pointSize: 17, weight: "regular", design: "default",
-            relativeTo: .body, lineSpacing: 2, colorRole: .textPrimary
+            pointSize: 17,
+            weight: .regular,
+            design: .default,
+            width: nil,
+            relativeTo: .body,
+            lineSpacing: 2,
+            colorRole: .textPrimary
         )
         dict[.bodySecondary_m] = .init(
-            pointSize: 17, weight: "regular", design: "default",
-            relativeTo: .body, lineSpacing: 2, colorRole: .textSecondary
+            pointSize: 17,
+            weight: .regular,
+            design: .default,
+            width: nil,
+            relativeTo: .body,
+            lineSpacing: 2,
+            colorRole: .textSecondary
         )
         dict[.monoCode_m] = .init(
-            pointSize: 17, weight: "regular", design: "monospaced",
-            relativeTo: .body, letterSpacing: 0.3, colorRole: .textPrimary
+            pointSize: 17,
+            weight: .regular,
+            design: .monospaced,
+            width: .condensed,                // <-- nice for code/metrics
+            relativeTo: .body,
+            letterSpacing: 0.3,
+            colorRole: .textPrimary
         )
 
         dict[.callout_ms] = .init(
-            pointSize: 16, weight: "regular", design: "default",
-            relativeTo: .callout, colorRole: .textSecondary
+            pointSize: 16,
+            weight: .regular,
+            design: .default,
+            width: nil,
+            relativeTo: .callout,
+            colorRole: .textSecondary
         )
         dict[.subheadline_ms] = .init(
-            pointSize: 15, weight: "regular", design: "default",
-            relativeTo: .subheadline, colorRole: .textSecondary
+            pointSize: 15,
+            weight: .regular,
+            design: .default,
+            width: nil,
+            relativeTo: .subheadline,
+            colorRole: .textSecondary
         )
 
         dict[.footnote_s] = .init(
-            pointSize: 13, weight: "regular", design: "default",
-            relativeTo: .footnote, colorRole: .textTertiary
+            pointSize: 13,
+            weight: .regular,
+            design: .default,
+            width: nil,
+            relativeTo: .footnote,
+            colorRole: .textTertiary
         )
         dict[.caption_s] = .init(
-            pointSize: 12, weight: "regular", design: "default",
-            relativeTo: .caption, colorRole: .textTertiary
+            pointSize: 12,
+            weight: .regular,
+            design: .default,
+            width: nil,
+            relativeTo: .caption,
+            colorRole: .textTertiary
         )
         dict[.caption2_s] = .init(
-            pointSize: 11, weight: "regular", design: "default",
-            relativeTo: .caption2, colorRole: .textTertiary
+            pointSize: 11,
+            weight: .regular,
+            design: .default,
+            width: nil,
+            relativeTo: .caption2,
+            colorRole: .textTertiary
         )
 
         return GentleTypographyTokens(roles: dict)
@@ -464,14 +568,16 @@ public struct GentleTheme: Sendable {
         let traits = UITraitCollection(preferredContentSizeCategory: sizeCategory.uiContentSizeCategory)
         let scaledSize = metrics.scaledValue(for: CGFloat(roleSpec.pointSize), compatibleWith: traits)
 
-        let font = Font.system(
+        let baseFont = Font.system(
             size: scaledSize,
-            weight: roleSpec.fontWeight,
-            design: roleSpec.fontDesign
+            weight: roleSpec.weight.swiftUIWeight,
+            design: roleSpec.design.swiftUIDesign
         )
 
         return GentleResolvedTextStyle(
-            font: font,
+            font: baseFont,
+            design: roleSpec.design,
+            width: roleSpec.width,
             colorRole: roleSpec.colorRole,
             lineSpacing: CGFloat(roleSpec.lineSpacing),
             letterSpacing: CGFloat(roleSpec.letterSpacing),
@@ -482,6 +588,11 @@ public struct GentleTheme: Sendable {
 
 public struct GentleResolvedTextStyle {
     public let font: Font
+
+    // Keep these so ViewModifiers can apply them cleanly
+    public let design: GentleFontDesignToken
+    public let width: GentleFontWidthToken?
+
     public let colorRole: GentleColorRole
     public let lineSpacing: CGFloat
     public let letterSpacing: CGFloat
@@ -536,13 +647,18 @@ public struct GentleTextModifier: ViewModifier {
         let resolvedColorRole = overrideColorRole ?? style.colorRole
         let color = theme.color(for: resolvedColorRole, scheme: colorScheme)
 
-        return content
+        // Apply font + axes
+        let view = content
             .font(style.font)
+            .gentleFontWidth(style.width)
+            .fontDesign(style.design.swiftUIDesign)
             .foregroundColor(color)
             .lineSpacing(style.lineSpacing)
             .kerning(style.letterSpacing)
             .textCase(style.isUppercased ? .uppercase : .none)
             .minimumScaleFactor(0.9)
+
+        return view
     }
 }
 
@@ -564,13 +680,16 @@ public struct GentleTextFieldModifier: ViewModifier {
         let resolvedColorRole = overrideColorRole ?? style.colorRole
         let color = theme.color(for: resolvedColorRole, scheme: colorScheme)
 
-        // tint (cursor and highlight is set to primaryCTA)
-        return content
+        let view = content
             .font(style.font)
+            .gentleFontWidth(style.width)
+            .fontDesign(style.design.swiftUIDesign)
             .foregroundColor(color)
             .tint(theme.color(for: .primaryCTA, scheme: colorScheme))
-            // intentionally NOT applying:
-            // lineSpacing / kerning / textCase / minimumScaleFactor
+        // intentionally NOT applying:
+        // lineSpacing / kerning / textCase / minimumScaleFactor
+
+        return view
     }
 }
 
@@ -711,6 +830,15 @@ public extension View {
 
     func gentleButton(_ role: GentleButtonRole) -> some View {
         buttonStyle(GentleButtonStyle(role: role))
+    }
+    
+    @ViewBuilder
+    func gentleFontWidth(_ width: GentleFontWidthToken?) -> some View {
+        if let width {
+            self.fontWidth(width.swiftUIWidth)
+        } else {
+            self
+        }
     }
 }
 
