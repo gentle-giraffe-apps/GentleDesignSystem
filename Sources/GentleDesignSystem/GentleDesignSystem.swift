@@ -198,9 +198,9 @@ public extension GentleColorTokens {
     static let gentleDefault: GentleColorTokens = .init(
         pairByRole: [
             // Text
-            .textPrimary: .init(lightHex: "#111827", darkHex: "#F9FAFB"),
-            .textSecondary: .init(lightHex: "#4B5563", darkHex: "#D1D5DB"),
-            .textTertiary: .init(lightHex: "#6B7280", darkHex: "#9CA3AF"),
+            .textPrimary:   .init(lightHex: "#111827", darkHex: "#F9FAFB"),
+            .textSecondary: .init(lightHex: "#8B95A1", darkHex: "#9CA3AF"),
+            .textTertiary:  .init(lightHex: "#9CA3AF", darkHex: "#6B7280"),
 
             // Surfaces
             .background: .init(lightHex: "#FFFFFF", darkHex: "#0B0F19"),
@@ -546,6 +546,34 @@ public struct GentleTextModifier: ViewModifier {
     }
 }
 
+public struct GentleTextFieldModifier: ViewModifier {
+    @Environment(\.gentleTheme) private var theme
+    @Environment(\.sizeCategory) private var sizeCategory
+    @Environment(\.colorScheme) private var colorScheme
+
+    private let role: GentleTextRole
+    private let overrideColorRole: GentleColorRole?
+
+    public init(role: GentleTextRole, overrideColorRole: GentleColorRole? = nil) {
+        self.role = role
+        self.overrideColorRole = overrideColorRole
+    }
+
+    public func body(content: Content) -> some View {
+        let style = theme.textStyle(for: role, sizeCategory: sizeCategory)
+        let resolvedColorRole = overrideColorRole ?? style.colorRole
+        let color = theme.color(for: resolvedColorRole, scheme: colorScheme)
+
+        // tint (cursor and highlight is set to primaryCTA)
+        return content
+            .font(style.font)
+            .foregroundColor(color)
+            .tint(theme.color(for: .primaryCTA, scheme: colorScheme))
+            // intentionally NOT applying:
+            // lineSpacing / kerning / textCase / minimumScaleFactor
+    }
+}
+
 public struct GentleSurfaceModifier: ViewModifier {
     @Environment(\.gentleTheme) private var theme
     @Environment(\.colorScheme) private var colorScheme
@@ -670,6 +698,11 @@ public extension View {
     func gentleText(_ role: GentleTextRole,
                     colorRole: GentleColorRole? = nil) -> some View {
         modifier(GentleTextModifier(role: role, overrideColorRole: colorRole))
+    }
+
+    func gentleTextField(_ role: GentleTextRole,
+                         colorRole: GentleColorRole? = nil) -> some View {
+        modifier(GentleTextFieldModifier(role: role, overrideColorRole: colorRole))
     }
 
     func gentleSurface(_ role: GentleSurfaceRole) -> some View {
