@@ -76,6 +76,7 @@ public enum GentleButtonRole: String, Codable, Sendable {
 public enum GentleSurfaceRole: String, Codable, Sendable {
     case appBackground
     case card
+    case cardChrome // no padding
     case cardElevated
 }
 
@@ -721,6 +722,17 @@ public struct GentleSurfaceModifier: ViewModifier {
             return AnyView(
                 content
                     .padding(CGFloat(spacing.m))
+                    .background(theme.color(for: .surface, scheme: colorScheme))
+                    .cornerRadius(CGFloat(radii.large))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: CGFloat(radii.large))
+                            .stroke(theme.color(for: .borderSubtle, scheme: colorScheme), lineWidth: 1)
+                    )
+            )
+        case .cardChrome:
+            return AnyView(
+                content
+                    // .padding(CGFloat(spacing.m))
                     .background(theme.color(for: .surface, scheme: colorScheme))
                     .cornerRadius(CGFloat(radii.large))
                     .overlay(
