@@ -61,9 +61,14 @@ public enum GentleColorRole: String, Codable, Sendable {
     case background
     case surface
     case surfaceElevated
+    case surfaceOverlay
+    case onSurfaceOverlayPrimary
+    case onSurfaceOverlaySecondary
     case borderSubtle
     case destructive
     case primaryCTA
+    case themePrimary
+    case themeSecondary
 }
 
 public enum GentleButtonRole: String, Codable, Sendable {
@@ -78,6 +83,7 @@ public enum GentleSurfaceRole: String, Codable, Sendable {
     case card
     case cardChrome // no padding
     case cardElevated
+    case surfaceOverlay
 }
 
 // MARK: - Dynamic Type anchor (Option B)
@@ -206,13 +212,20 @@ public extension GentleColorTokens {
             // Surfaces
             .background: .init(lightHex: "#FFFFFF", darkHex: "#0B0F19"),
             .surface: .init(lightHex: "#FAFAFE", darkHex: "#111827"), // F4F4F7
+            .surfaceOverlay: .init(lightHex: "#111827CC", darkHex: "#020617CC"),
+            .onSurfaceOverlayPrimary: .init(lightHex: "#F9FAFB", darkHex: "#F9FAFB"),
+            .onSurfaceOverlaySecondary: .init(lightHex: "#D1D5DB", darkHex:  "#D1D5DB"),
             .surfaceElevated: .init(lightHex: "#FFFFFF", darkHex: "#1F2937"),
             .borderSubtle: .init(lightHex: "#E5E7EB", darkHex: "#374151"),
 
             // Actions / status
             .primaryCTA: .init(lightHex: "#4A6EF5", darkHex: "#3B82F6"),
             .onPrimaryCTA: .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
-            .destructive: .init(lightHex: "#E35D5B", darkHex: "#F87171")
+            .destructive: .init(lightHex: "#E35D5B", darkHex: "#F87171"),
+            
+            // Theme Colors
+            .themePrimary: .init(lightHex: "#4A6EF5", darkHex: "#3B82F6"),
+            .themeSecondary: .init(lightHex: "#8FA2FF", darkHex:  "#93C5FD")
         ]
     )
 }
@@ -718,6 +731,13 @@ public struct GentleSurfaceModifier: ViewModifier {
                             .ignoresSafeArea()
                     )
             )
+        case .surfaceOverlay:
+            return AnyView(
+                content
+                    .background(
+                        theme.color(for: .surfaceOverlay, scheme: colorScheme)
+                    )
+            )
         case .card:
             return AnyView(
                 content
@@ -749,6 +769,26 @@ public struct GentleSurfaceModifier: ViewModifier {
                     .shadow(radius: CGFloat(shadows.medium))
             )
         }
+    }
+}
+
+public struct GentleBackgroundModifier: ViewModifier {
+    @Environment(\.gentleTheme) private var theme
+    @Environment(\.colorScheme) private var colorScheme
+    let role: GentleColorRole
+    let ignoresSafeArea: Bool
+    
+    public func body(content: Content) -> some View {
+        let c = theme.color(for: role, scheme: colorScheme)
+        return content.background(
+            Group {
+                if ignoresSafeArea {
+                    c.ignoresSafeArea()
+                } else {
+                    c
+                }
+            }
+        )
     }
 }
 
@@ -852,6 +892,10 @@ public extension View {
             self
         }
     }
+    
+    func gentleBackground(_ role: GentleColorRole, ignoresSafeArea: Bool = false) -> some View {
+        modifier(GentleBackgroundModifier(role: role, ignoresSafeArea: ignoresSafeArea))
+    }
 }
 
 // MARK: - Color helper (hex → Color)
@@ -890,3 +934,38 @@ public extension Color {
         self.init(red: r, green: g, blue: b, opacity: a)
     }
 }
+
+// MARK: - Property Wrapper (Runtime)
+
+@propertyWrapper
+public struct GentleDesignRuntime: DynamicProperty {
+    @Environment(\.colorScheme) private var colorScheme
+
+    public init() {}
+
+    public var wrappedValue: Resolver {
+        Resolver(colorScheme: colorScheme)
+    }
+
+    public struct Resolver {
+        let colorScheme: ColorScheme
+
+        // Scheme-independent tokens
+        public var spacing: GentleSpacingTokens { GentleTheme.default.spacing }
+        public var radii: GentleRadiusTokens { GentleTheme.default.radii }
+        public var shadows: GentleShadowTokens { GentleTheme.default.shadows }
+
+        // Scheme-dependent colors
+        public func color(_ role: GentleColorRole) -> Color {
+            GentleTheme.default.color(for: role, scheme: colorScheme)
+        }
+
+        // Optional sugar (nice in practice)
+        public var surface: Color { color(.surface) }
+        public var background: Color { color(.background) }
+        public var borderSubtle: Color { color(.borderSubtle) }
+        public var textPrimary: Color { color(.textPrimary) }
+        public var themePrimary: Color { color(.themePrimary) }
+    }
+}
+
