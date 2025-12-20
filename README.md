@@ -4,6 +4,8 @@
 ![SwiftUI](https://img.shields.io/badge/SwiftUI-Required-4A6EF5)
 ![Platform](https://img.shields.io/badge/Platform-iPhone%20%7C%20iPad-lightgrey)
 ![SPM](https://img.shields.io/badge/SPM-Compatible-success)
+
+
 A lightweight, token-driven SwiftUI design system with built-in Dark Mode and Dynamic Type support.
 
 GentleDesignSystem is designed to feel *native*, *predictable*, and *composable*, while still giving you a centralized place to evolve typography, color, spacing, and surface behavior over time.
