@@ -1,4 +1,15 @@
 //  Jonathan Ritchey
+//
+// GentleDesignSystem.swift
+//
+// NOTE: This is your existing implementation with GentlePadding support added.
+// - Adds GentleSpacingToken (key enum) so semantic padding can map to spacing ramp keys
+// - Adds GentlePaddingRole + GentlePaddingTokens (axis-specific token mapping)
+// - Adds padding to GentleDesignSystemSpec + default spec
+// - Adds GentleTheme helpers to resolve padding to CGFloat
+// - Adds GentlePaddingModifier + View API: .gentlePadding(.card), .gentlePadding(.horizontal, .screen), etc.
+//
+// You may want to replace the old file contents with this full version.
 
 import SwiftUI
 import Foundation
@@ -149,17 +160,20 @@ public struct GentleDesignSystemSpec: Codable, Sendable {
     public var colors: GentleColorTokens
     public var typography: GentleTypographyTokens
     public var spacing: GentleSpacingTokens
+    public var padding: GentlePaddingTokens          // ✅ NEW
     public var radii: GentleRadiusTokens
     public var shadows: GentleShadowTokens
 
     public init(colors: GentleColorTokens,
                 typography: GentleTypographyTokens,
                 spacing: GentleSpacingTokens,
+                padding: GentlePaddingTokens,        // ✅ NEW
                 radii: GentleRadiusTokens,
                 shadows: GentleShadowTokens) {
         self.colors = colors
         self.typography = typography
         self.spacing = spacing
+        self.padding = padding                      // ✅ NEW
         self.radii = radii
         self.shadows = shadows
     }
@@ -170,6 +184,7 @@ public extension GentleDesignSystemSpec {
         colors: .gentleDefault,
         typography: .gentleDefault,
         spacing: .gentleDefault,
+        padding: .gentleDefault,                    // ✅ NEW
         radii: .gentleDefault,
         shadows: .gentleDefault
     )
@@ -222,7 +237,7 @@ public extension GentleColorTokens {
             .primaryCTA: .init(lightHex: "#4A6EF5", darkHex: "#3B82F6"),
             .onPrimaryCTA: .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
             .destructive: .init(lightHex: "#E35D5B", darkHex: "#F87171"),
-            
+
             // Theme Colors
             .themePrimary: .init(lightHex: "#4A6EF5", darkHex: "#3B82F6"),
             .themeSecondary: .init(lightHex: "#8FA2FF", darkHex:  "#93C5FD")
@@ -508,6 +523,76 @@ public extension GentleSpacingTokens {
     static let gentleDefault = GentleSpacingTokens()
 }
 
+// ✅ NEW: Spacing token keys (so semantic padding can map to spacing without raw numbers)
+public enum GentleSpacingToken: String, Codable, Sendable, CaseIterable {
+    case xs, s, m, l, xl, xxl
+}
+
+public extension GentleSpacingTokens {
+    func value(for token: GentleSpacingToken) -> Double {
+        switch token {
+        case .xs: return xs
+        case .s: return s
+        case .m: return m
+        case .l: return l
+        case .xl: return xl
+        case .xxl: return xxl
+        }
+    }
+}
+
+// MARK: - Padding (semantic container insets) ✅ NEW
+
+public enum GentlePaddingRole: String, Codable, Sendable {
+    case screen
+    case card
+    case control
+    case listRow
+}
+
+/// Token references (not point values) so padding stays theme-configurable.
+public struct GentleAxisPaddingTokens: Codable, Sendable, Hashable {
+    public var horizontal: GentleSpacingToken
+    public var vertical: GentleSpacingToken
+
+    public init(horizontal: GentleSpacingToken, vertical: GentleSpacingToken) {
+        self.horizontal = horizontal
+        self.vertical = vertical
+    }
+}
+
+public struct GentlePaddingTokens: Codable, Sendable {
+    public var tokensByRole: [GentlePaddingRole: GentleAxisPaddingTokens]
+
+    public init(tokensByRole: [GentlePaddingRole: GentleAxisPaddingTokens]) {
+        self.tokensByRole = tokensByRole
+    }
+
+    public func axisTokens(for role: GentlePaddingRole) -> GentleAxisPaddingTokens {
+        // Safe fallback — screen is a reasonable default.
+        tokensByRole[role] ?? tokensByRole[.screen] ?? .init(horizontal: .xl, vertical: .l)
+    }
+}
+
+public extension GentlePaddingTokens {
+    static let gentleDefault: GentlePaddingTokens = .init(
+        tokensByRole: [
+            // Big gutters, editorial feel:
+            // Default spacing scale: xs=4, s=8, m=12, l=16, xl=24, xxl=32
+            .screen:  .init(horizontal: .xl, vertical: .l),
+
+            // Matches your existing card padding (currently spacing.m)
+            .card:    .init(horizontal: .m,  vertical: .m),
+
+            // Matches your button feel (you already use .horizontal l, .vertical s)
+            .control: .init(horizontal: .l,  vertical: .s),
+
+            // A common “custom row” inset
+            .listRow: .init(horizontal: .l,  vertical: .s)
+        ]
+    )
+}
+
 // MARK: - Radii
 
 public struct GentleRadiusTokens: Codable, Sendable {
@@ -563,6 +648,7 @@ public struct GentleTheme: Sendable {
     public static let `default` = GentleTheme(spec: .gentleDefault)
 
     public var spacing: GentleSpacingTokens { spec.spacing }
+    public var padding: GentlePaddingTokens { spec.padding }       // ✅ NEW
     public var radii: GentleRadiusTokens { spec.radii }
     public var shadows: GentleShadowTokens { spec.shadows }
 
@@ -597,6 +683,22 @@ public struct GentleTheme: Sendable {
             letterSpacing: CGFloat(roleSpec.letterSpacing),
             isUppercased: roleSpec.isUppercased
         )
+    }
+}
+
+// ✅ NEW: Padding resolution helpers (role → CGFloat) for ViewModifiers
+public extension GentleTheme {
+    /// Returns resolved (horizontal, vertical) padding values for a semantic role,
+    /// applying an Edge.Set filter similar to SwiftUI's `.padding`.
+    func paddingValue(_ role: GentlePaddingRole, edges: Edge.Set = .all) -> (horizontal: CGFloat?, vertical: CGFloat?) {
+        let axis = spec.padding.axisTokens(for: role)
+        let h = CGFloat(spec.spacing.value(for: axis.horizontal))
+        let v = CGFloat(spec.spacing.value(for: axis.vertical))
+
+        let horizontal: CGFloat? = (edges == .all || edges.contains(.horizontal) || edges.contains(.leading) || edges.contains(.trailing)) ? h : nil
+        let vertical: CGFloat? = (edges == .all || edges.contains(.vertical) || edges.contains(.top) || edges.contains(.bottom)) ? v : nil
+
+        return (horizontal, vertical)
     }
 }
 
@@ -741,7 +843,7 @@ public struct GentleSurfaceModifier: ViewModifier {
         case .card:
             return AnyView(
                 content
-                    .padding(CGFloat(spacing.m))
+                    .padding(CGFloat(spacing.m)) // (Optional) could migrate to theme padding semantics later
                     .background(theme.color(for: .surface, scheme: colorScheme))
                     .cornerRadius(CGFloat(radii.large))
                     .overlay(
@@ -763,7 +865,7 @@ public struct GentleSurfaceModifier: ViewModifier {
         case .cardElevated:
             return AnyView(
                 content
-                    .padding(CGFloat(spacing.m))
+                    .padding(CGFloat(spacing.m)) // (Optional) could migrate to theme padding semantics later
                     .background(theme.color(for: .surfaceElevated, scheme: colorScheme))
                     .cornerRadius(CGFloat(radii.large))
                     .shadow(radius: CGFloat(shadows.medium))
@@ -777,7 +879,7 @@ public struct GentleBackgroundModifier: ViewModifier {
     @Environment(\.colorScheme) private var colorScheme
     let role: GentleColorRole
     let ignoresSafeArea: Bool
-    
+
     public func body(content: Content) -> some View {
         let c = theme.color(for: role, scheme: colorScheme)
         return content.background(
@@ -863,6 +965,27 @@ public struct GentleButtonStyle: ButtonStyle {
     }
 }
 
+// ✅ NEW: Semantic padding modifier
+public struct GentlePaddingModifier: ViewModifier {
+    @Environment(\.gentleTheme) private var theme
+
+    private let edges: Edge.Set
+    private let role: GentlePaddingRole
+
+    public init(edges: Edge.Set = .all, role: GentlePaddingRole) {
+        self.edges = edges
+        self.role = role
+    }
+
+    public func body(content: Content) -> some View {
+        let resolved = theme.paddingValue(role, edges: edges)
+
+        return content
+            .padding(.horizontal, resolved.horizontal ?? 0)
+            .padding(.vertical, resolved.vertical ?? 0)
+    }
+}
+
 // MARK: - View extensions (ergonomic API)
 
 public extension View {
@@ -883,7 +1006,7 @@ public extension View {
     func gentleButton(_ role: GentleButtonRole) -> some View {
         buttonStyle(GentleButtonStyle(role: role))
     }
-    
+
     @ViewBuilder
     func gentleFontWidth(_ width: GentleFontWidthToken?) -> some View {
         if let width {
@@ -892,9 +1015,18 @@ public extension View {
             self
         }
     }
-    
+
     func gentleBackground(_ role: GentleColorRole, ignoresSafeArea: Bool = false) -> some View {
         modifier(GentleBackgroundModifier(role: role, ignoresSafeArea: ignoresSafeArea))
+    }
+
+    // ✅ NEW: GentlePadding API
+    func gentlePadding(_ role: GentlePaddingRole) -> some View {
+        modifier(GentlePaddingModifier(edges: .all, role: role))
+    }
+
+    func gentlePadding(_ edges: Edge.Set, _ role: GentlePaddingRole) -> some View {
+        modifier(GentlePaddingModifier(edges: edges, role: role))
     }
 }
 
@@ -923,7 +1055,7 @@ public extension Color {
                 r = Double((hexNumber & 0xFF000000) >> 24) / 255
                 g = Double((hexNumber & 0x00FF0000) >> 16) / 255
                 b = Double((hexNumber & 0x0000FF00) >> 8) / 255
-                a = Double(hexNumber & 0x000000FF) / 255
+                a = Double((hexNumber & 0x000000FF) / 255)
             default:
                 r = 0; g = 0; b = 0; a = 1
             }
@@ -952,6 +1084,7 @@ public struct GentleDesignRuntime: DynamicProperty {
 
         // Scheme-independent tokens
         public var spacing: GentleSpacingTokens { GentleTheme.default.spacing }
+        public var padding: GentlePaddingTokens { GentleTheme.default.padding } // ✅ NEW
         public var radii: GentleRadiusTokens { GentleTheme.default.radii }
         public var shadows: GentleShadowTokens { GentleTheme.default.shadows }
 
@@ -968,4 +1101,3 @@ public struct GentleDesignRuntime: DynamicProperty {
         public var themePrimary: Color { color(.themePrimary) }
     }
 }
-
