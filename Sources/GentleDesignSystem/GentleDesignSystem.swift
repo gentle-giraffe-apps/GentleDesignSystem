@@ -1105,29 +1105,28 @@ public extension Color {
 
 @propertyWrapper
 public struct GentleDesignRuntime: DynamicProperty {
+    @Environment(\.gentleTheme) private var theme
     @Environment(\.colorScheme) private var colorScheme
 
     public init() {}
 
     public var wrappedValue: Resolver {
-        Resolver(colorScheme: colorScheme)
+        Resolver(theme: theme, colorScheme: colorScheme)
     }
 
     public struct Resolver {
+        let theme: GentleTheme
         let colorScheme: ColorScheme
 
-        // Scheme-independent tokens
-        public var spacing: GentleSpacingTokens { GentleTheme.default.spacing }
-        public var padding: GentlePaddingTokens { GentleTheme.default.padding }
-        public var radii: GentleRadiusTokens { GentleTheme.default.radii }
-        public var shadows: GentleShadowTokens { GentleTheme.default.shadows }
+        public var spacing: GentleSpacingTokens { theme.spacing }
+        public var padding: GentlePaddingTokens { theme.padding }
+        public var radii: GentleRadiusTokens { theme.radii }
+        public var shadows: GentleShadowTokens { theme.shadows }
 
-        // Scheme-dependent colors
         public func color(_ role: GentleColorRole) -> Color {
-            GentleTheme.default.color(for: role, scheme: colorScheme)
+            theme.color(for: role, scheme: colorScheme)
         }
 
-        // Optional sugar (nice in practice)
         public var surface: Color { color(.surface) }
         public var background: Color { color(.background) }
         public var borderSubtle: Color { color(.borderSubtle) }
