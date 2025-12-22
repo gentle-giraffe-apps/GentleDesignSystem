@@ -9,7 +9,11 @@
 // - Adds GentleTheme helpers to resolve padding to CGFloat
 // - Adds GentlePaddingModifier + View API: .gentlePadding(.card), .gentlePadding(.horizontal, .screen), etc.
 //
-// You may want to replace the old file contents with this full version.
+// Updates in this version:
+// - Adds GentleButtonShape (.rounded, .pill)
+// - Updates GentleButtonStyle to accept shape (default .rounded)
+// - Adds View API: .gentleButton(.primary, shape: .pill)
+// - Fixes 8-digit hex alpha parsing bug
 
 import SwiftUI
 import Foundation
@@ -89,6 +93,14 @@ public enum GentleButtonRole: String, Codable, Sendable {
     case destructive
 }
 
+/// Separates geometry from intent.
+/// - rounded: standard rounded rectangle (default)
+/// - pill: capsule-like button
+public enum GentleButtonShape: String, Codable, Sendable {
+    case rounded
+    case pill
+}
+
 public enum GentleSurfaceRole: String, Codable, Sendable {
     case appBackground
     case card
@@ -160,20 +172,20 @@ public struct GentleDesignSystemSpec: Codable, Sendable {
     public var colors: GentleColorTokens
     public var typography: GentleTypographyTokens
     public var spacing: GentleSpacingTokens
-    public var padding: GentlePaddingTokens          // ✅ NEW
+    public var padding: GentlePaddingTokens
     public var radii: GentleRadiusTokens
     public var shadows: GentleShadowTokens
 
     public init(colors: GentleColorTokens,
                 typography: GentleTypographyTokens,
                 spacing: GentleSpacingTokens,
-                padding: GentlePaddingTokens,        // ✅ NEW
+                padding: GentlePaddingTokens,
                 radii: GentleRadiusTokens,
                 shadows: GentleShadowTokens) {
         self.colors = colors
         self.typography = typography
         self.spacing = spacing
-        self.padding = padding                      // ✅ NEW
+        self.padding = padding
         self.radii = radii
         self.shadows = shadows
     }
@@ -184,7 +196,7 @@ public extension GentleDesignSystemSpec {
         colors: .gentleDefault,
         typography: .gentleDefault,
         spacing: .gentleDefault,
-        padding: .gentleDefault,                    // ✅ NEW
+        padding: .gentleDefault,
         radii: .gentleDefault,
         shadows: .gentleDefault
     )
@@ -523,7 +535,6 @@ public extension GentleSpacingTokens {
     static let gentleDefault = GentleSpacingTokens()
 }
 
-// ✅ NEW: Spacing token keys (so semantic padding can map to spacing without raw numbers)
 public enum GentleSpacingToken: String, Codable, Sendable, CaseIterable {
     case xs, s, m, l, xl, xxl
 }
@@ -541,7 +552,7 @@ public extension GentleSpacingTokens {
     }
 }
 
-// MARK: - Padding (semantic container insets) ✅ NEW
+// MARK: - Padding (semantic container insets)
 
 public enum GentlePaddingRole: String, Codable, Sendable {
     case screen
@@ -648,7 +659,7 @@ public struct GentleTheme: Sendable {
     public static let `default` = GentleTheme(spec: .gentleDefault)
 
     public var spacing: GentleSpacingTokens { spec.spacing }
-    public var padding: GentlePaddingTokens { spec.padding }       // ✅ NEW
+    public var padding: GentlePaddingTokens { spec.padding }
     public var radii: GentleRadiusTokens { spec.radii }
     public var shadows: GentleShadowTokens { spec.shadows }
 
@@ -686,7 +697,6 @@ public struct GentleTheme: Sendable {
     }
 }
 
-// ✅ NEW: Padding resolution helpers (role → CGFloat) for ViewModifiers
 public extension GentleTheme {
     /// Returns resolved (horizontal, vertical) padding values for a semantic role,
     /// applying an Edge.Set filter similar to SwiftUI's `.padding`.
@@ -795,12 +805,18 @@ public struct GentleTextFieldModifier: ViewModifier {
         let style = theme.textStyle(for: role, sizeCategory: sizeCategory)
         let resolvedColorRole = overrideColorRole ?? style.colorRole
         let color = theme.color(for: resolvedColorRole, scheme: colorScheme)
-
+        let spacing = theme.spacing
+        
         let view = content
             .font(style.font)
             .gentleFontWidth(style.width)
             .fontDesign(style.design.swiftUIDesign)
             .foregroundColor(color)
+            .padding(spacing.l) // jritchey
+            .overlay {
+                Capsule()
+                    .strokeBorder(theme.color(for: .borderSubtle, scheme: colorScheme), lineWidth: 1) // jritchey
+            }
             .tint(theme.color(for: .primaryCTA, scheme: colorScheme))
         // intentionally NOT applying:
         // lineSpacing / kerning / textCase / minimumScaleFactor
@@ -820,7 +836,6 @@ public struct GentleSurfaceModifier: ViewModifier {
     }
 
     public func body(content: Content) -> some View {
-        let spacing = theme.spacing
         let radii = theme.radii
         let shadows = theme.shadows
 
@@ -843,7 +858,7 @@ public struct GentleSurfaceModifier: ViewModifier {
         case .card:
             return AnyView(
                 content
-                    .padding(CGFloat(spacing.m)) // (Optional) could migrate to theme padding semantics later
+                    .gentlePadding(.card)
                     .background(theme.color(for: .surface, scheme: colorScheme))
                     .cornerRadius(CGFloat(radii.large))
                     .overlay(
@@ -854,7 +869,6 @@ public struct GentleSurfaceModifier: ViewModifier {
         case .cardChrome:
             return AnyView(
                 content
-                    // .padding(CGFloat(spacing.m))
                     .background(theme.color(for: .surface, scheme: colorScheme))
                     .cornerRadius(CGFloat(radii.large))
                     .overlay(
@@ -865,10 +879,17 @@ public struct GentleSurfaceModifier: ViewModifier {
         case .cardElevated:
             return AnyView(
                 content
-                    .padding(CGFloat(spacing.m)) // (Optional) could migrate to theme padding semantics later
+                    .gentlePadding(.card)
                     .background(theme.color(for: .surfaceElevated, scheme: colorScheme))
                     .cornerRadius(CGFloat(radii.large))
                     .shadow(radius: CGFloat(shadows.medium))
+            )
+        case .surfaceOverlay:
+            return AnyView(
+                content
+                    .background(
+                        theme.color(for: .surfaceOverlay, scheme: colorScheme)
+                    )
             )
         }
     }
@@ -899,9 +920,11 @@ public struct GentleButtonStyle: ButtonStyle {
     @Environment(\.colorScheme) private var colorScheme
 
     private let role: GentleButtonRole
+    private let shape: GentleButtonShape
 
-    public init(role: GentleButtonRole) {
+    public init(role: GentleButtonRole, shape: GentleButtonShape = .rounded) {
         self.role = role
+        self.shape = shape
     }
 
     public func makeBody(configuration: Configuration) -> some View {
@@ -942,18 +965,27 @@ public struct GentleButtonStyle: ButtonStyle {
         let backgroundColor = theme.color(for: backgroundRole, scheme: colorScheme)
         let borderColor = borderRole.map { theme.color(for: $0, scheme: colorScheme) }
 
+        let cornerRadius: CGFloat = {
+            switch shape {
+            case .rounded:
+                return CGFloat(radii.medium)
+            case .pill:
+                return CGFloat(radii.pill) // 999
+            }
+        }()
+
         return configuration.label
             .gentleText(textRole, colorRole: labelColorRole)
-            .padding(.horizontal, CGFloat(spacing.l))
-            .padding(.vertical, CGFloat(spacing.s))
+            .padding(.horizontal, CGFloat(spacing.xxl))
+            .padding(.vertical, CGFloat(spacing.l)) //spacing.s))
             .background(
-                RoundedRectangle(cornerRadius: CGFloat(radii.medium))
+                RoundedRectangle(cornerRadius: cornerRadius)
                     .fill(backgroundColor)
             )
             .overlay(
                 Group {
                     if let borderColor = borderColor {
-                        RoundedRectangle(cornerRadius: CGFloat(radii.medium))
+                        RoundedRectangle(cornerRadius: cornerRadius)
                             .stroke(borderColor, lineWidth: 1)
                     }
                 }
@@ -965,7 +997,6 @@ public struct GentleButtonStyle: ButtonStyle {
     }
 }
 
-// ✅ NEW: Semantic padding modifier
 public struct GentlePaddingModifier: ViewModifier {
     @Environment(\.gentleTheme) private var theme
 
@@ -1004,7 +1035,11 @@ public extension View {
     }
 
     func gentleButton(_ role: GentleButtonRole) -> some View {
-        buttonStyle(GentleButtonStyle(role: role))
+        buttonStyle(GentleButtonStyle(role: role, shape: .rounded))
+    }
+
+    func gentleButton(_ role: GentleButtonRole, shape: GentleButtonShape) -> some View {
+        buttonStyle(GentleButtonStyle(role: role, shape: shape))
     }
 
     @ViewBuilder
@@ -1020,7 +1055,6 @@ public extension View {
         modifier(GentleBackgroundModifier(role: role, ignoresSafeArea: ignoresSafeArea))
     }
 
-    // ✅ NEW: GentlePadding API
     func gentlePadding(_ role: GentlePaddingRole) -> some View {
         modifier(GentlePaddingModifier(edges: .all, role: role))
     }
@@ -1047,15 +1081,15 @@ public extension Color {
         if scanner.scanHexInt64(&hexNumber) {
             switch hexString.count {
             case 6:
-                r = Double((hexNumber & 0xFF0000) >> 16) / 255
-                g = Double((hexNumber & 0x00FF00) >> 8) / 255
-                b = Double(hexNumber & 0x0000FF) / 255
+                r = Double((hexNumber & 0xFF0000) >> 16) / 255.0
+                g = Double((hexNumber & 0x00FF00) >> 8) / 255.0
+                b = Double(hexNumber & 0x0000FF) / 255.0
                 a = 1.0
             case 8:
-                r = Double((hexNumber & 0xFF000000) >> 24) / 255
-                g = Double((hexNumber & 0x00FF0000) >> 16) / 255
-                b = Double((hexNumber & 0x0000FF00) >> 8) / 255
-                a = Double((hexNumber & 0x000000FF) / 255)
+                r = Double((hexNumber & 0xFF000000) >> 24) / 255.0
+                g = Double((hexNumber & 0x00FF0000) >> 16) / 255.0
+                b = Double((hexNumber & 0x0000FF00) >> 8) / 255.0
+                a = Double(hexNumber & 0x000000FF) / 255.0 // ✅ fixed
             default:
                 r = 0; g = 0; b = 0; a = 1
             }
@@ -1084,7 +1118,7 @@ public struct GentleDesignRuntime: DynamicProperty {
 
         // Scheme-independent tokens
         public var spacing: GentleSpacingTokens { GentleTheme.default.spacing }
-        public var padding: GentlePaddingTokens { GentleTheme.default.padding } // ✅ NEW
+        public var padding: GentlePaddingTokens { GentleTheme.default.padding }
         public var radii: GentleRadiusTokens { GentleTheme.default.radii }
         public var shadows: GentleShadowTokens { GentleTheme.default.shadows }
 
