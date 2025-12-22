@@ -1,19 +1,4 @@
 //  Jonathan Ritchey
-//
-// GentleDesignSystem.swift
-//
-// NOTE: This is your existing implementation with GentlePadding support added.
-// - Adds GentleSpacingToken (key enum) so semantic padding can map to spacing ramp keys
-// - Adds GentlePaddingRole + GentlePaddingTokens (axis-specific token mapping)
-// - Adds padding to GentleDesignSystemSpec + default spec
-// - Adds GentleTheme helpers to resolve padding to CGFloat
-// - Adds GentlePaddingModifier + View API: .gentlePadding(.card), .gentlePadding(.horizontal, .screen), etc.
-//
-// Updates in this version:
-// - Adds GentleButtonShape (.rounded, .pill)
-// - Updates GentleButtonStyle to accept shape (default .rounded)
-// - Adds View API: .gentleButton(.primary, shape: .pill)
-// - Fixes 8-digit hex alpha parsing bug
 
 import SwiftUI
 import Foundation
@@ -99,6 +84,22 @@ public enum GentleButtonRole: String, Codable, Sendable {
 public enum GentleButtonShape: String, Codable, Sendable {
     case rounded
     case pill
+}
+
+/// Shape of a standalone text input container (only applies when chrome is `.standalone`).
+public enum GentleTextFieldShape: String, Codable, Sendable {
+    case rounded
+    case pill
+}
+
+/// Controls ownership/strength of input affordances.
+/// - standalone: draws its own container chrome (background, border, shape)
+/// - formRow: assumes container (Form/List row) provides most chrome
+/// - borderless: no container chrome (inline / minimalist)
+public enum GentleTextChrome: Sendable {
+    case standalone(shape: GentleTextFieldShape = .rounded)
+    case formRow
+    case borderless
 }
 
 public enum GentleSurfaceRole: String, Codable, Sendable {
@@ -795,33 +796,84 @@ public struct GentleTextFieldModifier: ViewModifier {
 
     private let role: GentleTextRole
     private let overrideColorRole: GentleColorRole?
+    private let chrome: GentleTextChrome
 
-    public init(role: GentleTextRole, overrideColorRole: GentleColorRole? = nil) {
+    public init(role: GentleTextRole,
+                overrideColorRole: GentleColorRole? = nil,
+                chrome: GentleTextChrome = .standalone(shape: .rounded)) {
         self.role = role
         self.overrideColorRole = overrideColorRole
+        self.chrome = chrome
     }
 
     public func body(content: Content) -> some View {
         let style = theme.textStyle(for: role, sizeCategory: sizeCategory)
         let resolvedColorRole = overrideColorRole ?? style.colorRole
-        let color = theme.color(for: resolvedColorRole, scheme: colorScheme)
+        let textColor = theme.color(for: resolvedColorRole, scheme: colorScheme)
         let spacing = theme.spacing
-        
-        let view = content
+
+        // Standalone chrome colors
+        let fill = theme.color(for: .surface, scheme: colorScheme)
+        let border = theme.color(for: .borderSubtle, scheme: colorScheme)
+
+        let base = content
             .font(style.font)
             .gentleFontWidth(style.width)
             .fontDesign(style.design.swiftUIDesign)
-            .foregroundColor(color)
-            .padding(spacing.l) // jritchey
-            .overlay {
-                Capsule()
-                    .strokeBorder(theme.color(for: .borderSubtle, scheme: colorScheme), lineWidth: 1) // jritchey
-            }
+            .foregroundColor(textColor)
             .tint(theme.color(for: .primaryCTA, scheme: colorScheme))
         // intentionally NOT applying:
         // lineSpacing / kerning / textCase / minimumScaleFactor
 
-        return view
+        switch chrome {
+        case .standalone(let shape):
+            // A standalone input needs clear affordance on plain backgrounds.
+            // Use a light fill + subtle stroke; shape is meaningful here.
+            let horizontal = CGFloat(spacing.l)
+            let vertical = CGFloat(spacing.m)
+
+            return AnyView(
+                base
+                    .padding(.horizontal, horizontal)
+                    .padding(.vertical, vertical)
+                    .background(
+                        Group {
+                            switch shape {
+                            case .rounded:
+                                RoundedRectangle(cornerRadius: CGFloat(theme.radii.medium), style: .continuous)
+                                    .fill(fill)
+                            case .pill:
+                                Capsule()
+                                    .fill(fill)
+                            }
+                        }
+                    )
+                    .overlay(
+                        Group {
+                            switch shape {
+                            case .rounded:
+                                RoundedRectangle(cornerRadius: CGFloat(theme.radii.medium), style: .continuous)
+                                    .strokeBorder(border, lineWidth: 1)
+                            case .pill:
+                                Capsule()
+                                    .strokeBorder(border, lineWidth: 1)
+                            }
+                        }
+                    )
+            )
+
+        case .formRow:
+            // In a Form/List row, the container already provides most chrome.
+            // Keep spacing modest to avoid “double framed” inputs.
+            return AnyView(
+                base
+                    .padding(.vertical, CGFloat(spacing.s))
+            )
+
+        case .borderless:
+            // Inline / minimalist: no container chrome.
+            return AnyView(base)
+        }
     }
 }
 
@@ -1026,8 +1078,9 @@ public extension View {
     }
 
     func gentleTextField(_ role: GentleTextRole,
-                         colorRole: GentleColorRole? = nil) -> some View {
-        modifier(GentleTextFieldModifier(role: role, overrideColorRole: colorRole))
+                         colorRole: GentleColorRole? = nil,
+                         chrome: GentleTextChrome = .standalone(shape: .rounded)) -> some View {
+        modifier(GentleTextFieldModifier(role: role, overrideColorRole: colorRole, chrome: chrome))
     }
 
     func gentleSurface(_ role: GentleSurfaceRole) -> some View {
@@ -1089,7 +1142,7 @@ public extension Color {
                 r = Double((hexNumber & 0xFF000000) >> 24) / 255.0
                 g = Double((hexNumber & 0x00FF0000) >> 16) / 255.0
                 b = Double((hexNumber & 0x0000FF00) >> 8) / 255.0
-                a = Double(hexNumber & 0x000000FF) / 255.0 // ✅ fixed
+                a = Double(hexNumber & 0x000000FF) / 255.0
             default:
                 r = 0; g = 0; b = 0; a = 1
             }
