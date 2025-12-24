@@ -233,9 +233,9 @@ public extension GentleColorTokens {
     static let gentleDefault: GentleColorTokens = .init(
         pairByRole: [
             // Text
-            .textPrimary:   .init(lightHex: "#111827", darkHex: "#F9FAFB"),
-            .textSecondary: .init(lightHex: "#8B95A1", darkHex: "#9CA3AF"),
-            .textTertiary:  .init(lightHex: "#9CA3AF", darkHex: "#6B7280"),
+            .textPrimary:   .init(lightHex: "#1F2933", darkHex: "#F5F7FA"),
+            .textSecondary: .init(lightHex: "#4B5563", darkHex: "#C7CDD4"),
+            .textTertiary:  .init(lightHex: "#6B7280", darkHex: "#9AA0A6"),
 
             // Surfaces
             .background: .init(lightHex: "#FFFFFF", darkHex: "#0B0F19"),
@@ -695,6 +695,32 @@ public struct GentleTheme: Sendable {
             letterSpacing: CGFloat(roleSpec.letterSpacing),
             isUppercased: roleSpec.isUppercased
         )
+    }
+    
+    @MainActor
+    public func applyNavBarTitleColor(colorRole: GentleColorRole) {
+        guard let pair = spec.colors.pairByRole[colorRole] else { return }
+        let dark = UIColor(Color(gentleHex: pair.hex(for: .dark)))
+        let light = UIColor(Color(gentleHex: pair.hex(for: .light)))
+        let dynamicTitleColor = UIColor { trait in
+            trait.userInterfaceStyle == .dark ? dark : light
+        }
+
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithDefaultBackground()
+
+        appearance.largeTitleTextAttributes = [
+            .foregroundColor: dynamicTitleColor
+        ]
+
+        appearance.titleTextAttributes = [
+            .foregroundColor: dynamicTitleColor
+        ]
+
+        let navBar = UINavigationBar.appearance()
+        navBar.standardAppearance = appearance
+        navBar.scrollEdgeAppearance = appearance
+        navBar.compactAppearance = appearance
     }
 }
 
@@ -1168,8 +1194,8 @@ public struct GentleDesignRuntime: DynamicProperty {
     }
 
     public struct Resolver {
-        let theme: GentleTheme
-        let colorScheme: ColorScheme
+        public let theme: GentleTheme
+        public let colorScheme: ColorScheme
 
         public var spacing: GentleSpacingTokens { theme.spacing }
         public var padding: GentlePaddingTokens { theme.padding }
