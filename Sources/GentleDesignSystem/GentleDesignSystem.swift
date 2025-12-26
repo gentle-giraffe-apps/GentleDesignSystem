@@ -168,7 +168,7 @@ private extension ContentSizeCategory {
 
 // MARK: - Codable token structs (JSON-friendly)
 
-// Top-level spec you’ll eventually load/save as JSON
+// Top-level spec: load/save as JSON
 public struct GentleDesignSystemSpec: Codable, Sendable {
     public var colors: GentleColorTokens
     public var typography: GentleTypographyTokens
@@ -219,11 +219,17 @@ public struct GentleColorPair: Codable, Sendable {
     }
 }
 
+/// JSON-facing storage uses String keys (role.rawValue).
 public struct GentleColorTokens: Codable, Sendable {
-    public var pairByRole: [GentleColorRole: GentleColorPair]
+    public var pairByRole: [String: GentleColorPair]
 
-    public init(pairByRole: [GentleColorRole: GentleColorPair]) {
+    public init(pairByRole: [String: GentleColorPair]) {
         self.pairByRole = pairByRole
+    }
+
+    // Typed convenience
+    public func pair(for role: GentleColorRole) -> GentleColorPair? {
+        pairByRole[role.rawValue]
     }
 }
 
@@ -233,27 +239,27 @@ public extension GentleColorTokens {
     static let gentleDefault: GentleColorTokens = .init(
         pairByRole: [
             // Text
-            .textPrimary:   .init(lightHex: "#1F2933", darkHex: "#F5F7FA"),
-            .textSecondary: .init(lightHex: "#4B5563", darkHex: "#C7CDD4"),
-            .textTertiary:  .init(lightHex: "#6B7280", darkHex: "#9AA0A6"),
+            GentleColorRole.textPrimary.rawValue:   .init(lightHex: "#1F2933", darkHex: "#F5F7FA"),
+            GentleColorRole.textSecondary.rawValue: .init(lightHex: "#4B5563", darkHex: "#C7CDD4"),
+            GentleColorRole.textTertiary.rawValue:  .init(lightHex: "#6B7280", darkHex: "#9AA0A6"),
 
             // Surfaces
-            .background: .init(lightHex: "#FFFFFF", darkHex: "#0B0F19"),
-            .surface: .init(lightHex: "#FAFAFE", darkHex: "#111827"), // F4F4F7
-            .surfaceOverlay: .init(lightHex: "#111827CC", darkHex: "#020617CC"),
-            .onSurfaceOverlayPrimary: .init(lightHex: "#F9FAFB", darkHex: "#F9FAFB"),
-            .onSurfaceOverlaySecondary: .init(lightHex: "#D1D5DB", darkHex:  "#D1D5DB"),
-            .surfaceElevated: .init(lightHex: "#FFFFFF", darkHex: "#1F2937"),
-            .borderSubtle: .init(lightHex: "#E5E7EB", darkHex: "#374151"),
+            GentleColorRole.background.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#0B0F19"),
+            GentleColorRole.surface.rawValue: .init(lightHex: "#FAFAFE", darkHex: "#111827"),
+            GentleColorRole.surfaceOverlay.rawValue: .init(lightHex: "#111827CC", darkHex: "#020617CC"),
+            GentleColorRole.onSurfaceOverlayPrimary.rawValue: .init(lightHex: "#F9FAFB", darkHex: "#F9FAFB"),
+            GentleColorRole.onSurfaceOverlaySecondary.rawValue: .init(lightHex: "#D1D5DB", darkHex:  "#D1D5DB"),
+            GentleColorRole.surfaceElevated.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#1F2937"),
+            GentleColorRole.borderSubtle.rawValue: .init(lightHex: "#E5E7EB", darkHex: "#374151"),
 
             // Actions / status
-            .primaryCTA: .init(lightHex: "#4A6EF5", darkHex: "#3B82F6"),
-            .onPrimaryCTA: .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
-            .destructive: .init(lightHex: "#E35D5B", darkHex: "#F87171"),
+            GentleColorRole.primaryCTA.rawValue: .init(lightHex: "#4A6EF5", darkHex: "#3B82F6"),
+            GentleColorRole.onPrimaryCTA.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.destructive.rawValue: .init(lightHex: "#E35D5B", darkHex: "#F87171"),
 
             // Theme Colors
-            .themePrimary: .init(lightHex: "#4A6EF5", darkHex: "#3B82F6"),
-            .themeSecondary: .init(lightHex: "#8FA2FF", darkHex:  "#93C5FD")
+            GentleColorRole.themePrimary.rawValue: .init(lightHex: "#4A6EF5", darkHex: "#3B82F6"),
+            GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#8FA2FF", darkHex:  "#93C5FD")
         ]
     )
 }
@@ -359,16 +365,18 @@ public struct GentleTypographyRoleSpec: Codable, Sendable {
     }
 }
 
+/// JSON-facing storage uses String keys (role.rawValue).
 public struct GentleTypographyTokens: Codable, Sendable {
-    public var roles: [GentleTextRole: GentleTypographyRoleSpec]
+    public var roles: [String: GentleTypographyRoleSpec]
 
-    public init(roles: [GentleTextRole: GentleTypographyRoleSpec]) {
+    public init(roles: [String: GentleTypographyRoleSpec]) {
         self.roles = roles
     }
 
+    // Typed convenience
     public func roleSpec(for role: GentleTextRole) -> GentleTypographyRoleSpec {
-        if let spec = roles[role] { return spec }
-        if let body = roles[.body_m] { return body }
+        if let spec = roles[role.rawValue] { return spec }
+        if let body = roles[GentleTextRole.body_m.rawValue] { return body }
 
         return GentleTypographyRoleSpec(
             pointSize: 17,
@@ -386,9 +394,9 @@ public struct GentleTypographyTokens: Codable, Sendable {
 
 public extension GentleTypographyTokens {
     static let gentleDefault: GentleTypographyTokens = {
-        var dict: [GentleTextRole: GentleTypographyRoleSpec] = [:]
+        var dict: [String: GentleTypographyRoleSpec] = [:]
 
-        dict[.largeTitle_xxl] = .init(
+        dict[GentleTextRole.largeTitle_xxl.rawValue] = .init(
             pointSize: 34,
             weight: .bold,
             design: .rounded,
@@ -397,7 +405,7 @@ public extension GentleTypographyTokens {
             lineSpacing: 6,
             colorRole: .textPrimary
         )
-        dict[.title_xl] = .init(
+        dict[GentleTextRole.title_xl.rawValue] = .init(
             pointSize: 28,
             weight: .bold,
             design: .rounded,
@@ -406,7 +414,7 @@ public extension GentleTypographyTokens {
             lineSpacing: 4,
             colorRole: .textPrimary
         )
-        dict[.title2_l] = .init(
+        dict[GentleTextRole.title2_l.rawValue] = .init(
             pointSize: 22,
             weight: .semibold,
             design: .rounded,
@@ -415,7 +423,7 @@ public extension GentleTypographyTokens {
             lineSpacing: 3,
             colorRole: .textPrimary
         )
-        dict[.title3_ml] = .init(
+        dict[GentleTextRole.title3_ml.rawValue] = .init(
             pointSize: 20,
             weight: .semibold,
             design: .rounded,
@@ -424,7 +432,7 @@ public extension GentleTypographyTokens {
             lineSpacing: 3,
             colorRole: .textPrimary
         )
-        dict[.headline_m] = .init(
+        dict[GentleTextRole.headline_m.rawValue] = .init(
             pointSize: 17,
             weight: .semibold,
             design: .default,
@@ -433,7 +441,7 @@ public extension GentleTypographyTokens {
             colorRole: .textPrimary
         )
 
-        dict[.body_m] = .init(
+        dict[GentleTextRole.body_m.rawValue] = .init(
             pointSize: 17,
             weight: .regular,
             design: .default,
@@ -442,7 +450,7 @@ public extension GentleTypographyTokens {
             lineSpacing: 2,
             colorRole: .textPrimary
         )
-        dict[.bodySecondary_m] = .init(
+        dict[GentleTextRole.bodySecondary_m.rawValue] = .init(
             pointSize: 17,
             weight: .regular,
             design: .default,
@@ -451,17 +459,17 @@ public extension GentleTypographyTokens {
             lineSpacing: 2,
             colorRole: .textSecondary
         )
-        dict[.monoCode_m] = .init(
+        dict[GentleTextRole.monoCode_m.rawValue] = .init(
             pointSize: 17,
             weight: .regular,
             design: .monospaced,
-            width: .condensed,                // <-- nice for code/metrics
+            width: .condensed,
             relativeTo: .body,
             letterSpacing: 0.3,
             colorRole: .textPrimary
         )
 
-        dict[.callout_ms] = .init(
+        dict[GentleTextRole.callout_ms.rawValue] = .init(
             pointSize: 16,
             weight: .regular,
             design: .default,
@@ -469,7 +477,7 @@ public extension GentleTypographyTokens {
             relativeTo: .callout,
             colorRole: .textSecondary
         )
-        dict[.subheadline_ms] = .init(
+        dict[GentleTextRole.subheadline_ms.rawValue] = .init(
             pointSize: 15,
             weight: .regular,
             design: .default,
@@ -478,7 +486,7 @@ public extension GentleTypographyTokens {
             colorRole: .textSecondary
         )
 
-        dict[.footnote_s] = .init(
+        dict[GentleTextRole.footnote_s.rawValue] = .init(
             pointSize: 13,
             weight: .regular,
             design: .default,
@@ -486,7 +494,7 @@ public extension GentleTypographyTokens {
             relativeTo: .footnote,
             colorRole: .textTertiary
         )
-        dict[.caption_s] = .init(
+        dict[GentleTextRole.caption_s.rawValue] = .init(
             pointSize: 12,
             weight: .regular,
             design: .default,
@@ -494,7 +502,7 @@ public extension GentleTypographyTokens {
             relativeTo: .caption,
             colorRole: .textTertiary
         )
-        dict[.caption2_s] = .init(
+        dict[GentleTextRole.caption2_s.rawValue] = .init(
             pointSize: 11,
             weight: .regular,
             design: .default,
@@ -573,16 +581,19 @@ public struct GentleAxisPaddingTokens: Codable, Sendable, Hashable {
     }
 }
 
+/// JSON-facing storage uses String keys (role.rawValue).
 public struct GentlePaddingTokens: Codable, Sendable {
-    public var tokensByRole: [GentlePaddingRole: GentleAxisPaddingTokens]
+    public var tokensByRole: [String: GentleAxisPaddingTokens]
 
-    public init(tokensByRole: [GentlePaddingRole: GentleAxisPaddingTokens]) {
+    public init(tokensByRole: [String: GentleAxisPaddingTokens]) {
         self.tokensByRole = tokensByRole
     }
 
     public func axisTokens(for role: GentlePaddingRole) -> GentleAxisPaddingTokens {
         // Safe fallback — screen is a reasonable default.
-        tokensByRole[role] ?? tokensByRole[.screen] ?? .init(horizontal: .xl, vertical: .l)
+        tokensByRole[role.rawValue]
+        ?? tokensByRole[GentlePaddingRole.screen.rawValue]
+        ?? .init(horizontal: .xl, vertical: .l)
     }
 }
 
@@ -591,16 +602,16 @@ public extension GentlePaddingTokens {
         tokensByRole: [
             // Big gutters, editorial feel:
             // Default spacing scale: xs=4, s=8, m=12, l=16, xl=24, xxl=32
-            .screen:  .init(horizontal: .xl, vertical: .l),
+            GentlePaddingRole.screen.rawValue:  .init(horizontal: .xl, vertical: .l),
 
             // Matches your existing card padding (currently spacing.m)
-            .card:    .init(horizontal: .m,  vertical: .m),
+            GentlePaddingRole.card.rawValue:    .init(horizontal: .m,  vertical: .m),
 
             // Matches your button feel (you already use .horizontal l, .vertical s)
-            .control: .init(horizontal: .l,  vertical: .s),
+            GentlePaddingRole.control.rawValue: .init(horizontal: .l,  vertical: .s),
 
             // A common “custom row” inset
-            .listRow: .init(horizontal: .l,  vertical: .s)
+            GentlePaddingRole.listRow.rawValue: .init(horizontal: .l,  vertical: .s)
         ]
     )
 }
@@ -666,7 +677,7 @@ public struct GentleTheme: Sendable {
 
     /// Resolve a color role for the current color scheme.
     public func color(for role: GentleColorRole, scheme: ColorScheme) -> Color {
-        guard let pair = spec.colors.pairByRole[role] else { return Color.primary }
+        guard let pair = spec.colors.pair(for: role) else { return Color.primary }
         return Color(gentleHex: pair.hex(for: scheme))
     }
 
@@ -695,32 +706,6 @@ public struct GentleTheme: Sendable {
             letterSpacing: CGFloat(roleSpec.letterSpacing),
             isUppercased: roleSpec.isUppercased
         )
-    }
-    
-    @MainActor
-    public func applyNavBarTitleColor(colorRole: GentleColorRole) {
-        guard let pair = spec.colors.pairByRole[colorRole] else { return }
-        let dark = UIColor(Color(gentleHex: pair.hex(for: .dark)))
-        let light = UIColor(Color(gentleHex: pair.hex(for: .light)))
-        let dynamicTitleColor = UIColor { trait in
-            trait.userInterfaceStyle == .dark ? dark : light
-        }
-
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithDefaultBackground()
-
-        appearance.largeTitleTextAttributes = [
-            .foregroundColor: dynamicTitleColor
-        ]
-
-        appearance.titleTextAttributes = [
-            .foregroundColor: dynamicTitleColor
-        ]
-
-        let navBar = UINavigationBar.appearance()
-        navBar.standardAppearance = appearance
-        navBar.scrollEdgeAppearance = appearance
-        navBar.compactAppearance = appearance
     }
 }
 
@@ -962,13 +947,6 @@ public struct GentleSurfaceModifier: ViewModifier {
                     .cornerRadius(CGFloat(radii.large))
                     .shadow(radius: CGFloat(shadows.medium))
             )
-        case .surfaceOverlay:
-            return AnyView(
-                content
-                    .background(
-                        theme.color(for: .surfaceOverlay, scheme: colorScheme)
-                    )
-            )
         }
     }
 }
@@ -1124,7 +1102,11 @@ public extension View {
     @ViewBuilder
     func gentleFontWidth(_ width: GentleFontWidthToken?) -> some View {
         if let width {
-            self.fontWidth(width.swiftUIWidth)
+            if #available(iOS 17.0, *) {
+                self.fontWidth(width.swiftUIWidth)
+            } else {
+                self
+            }
         } else {
             self
         }
@@ -1195,7 +1177,7 @@ public struct GentleDesignRuntime: DynamicProperty {
 
     public struct Resolver {
         public let theme: GentleTheme
-        public let colorScheme: ColorScheme
+        let colorScheme: ColorScheme
 
         public var spacing: GentleSpacingTokens { theme.spacing }
         public var padding: GentlePaddingTokens { theme.padding }
@@ -1211,5 +1193,35 @@ public struct GentleDesignRuntime: DynamicProperty {
         public var borderSubtle: Color { color(.borderSubtle) }
         public var textPrimary: Color { color(.textPrimary) }
         public var themePrimary: Color { color(.themePrimary) }
+    }
+}
+
+// MARK: - UI Kit Theming
+
+public enum GentleUIKitTheming {
+    @MainActor
+    public static func applyNavigationBarTitleColor(theme: GentleTheme, role: GentleColorRole) {
+        guard let pair = theme.spec.colors.pair(for: role) else { return }
+        let dark = UIColor(Color(gentleHex: pair.hex(for: .dark)))
+        let light = UIColor(Color(gentleHex: pair.hex(for: .light)))
+        let dynamicTitleColor = UIColor { trait in
+            trait.userInterfaceStyle == .dark ? dark : light
+        }
+
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithDefaultBackground()
+
+        appearance.largeTitleTextAttributes = [
+            .foregroundColor: dynamicTitleColor
+        ]
+
+        appearance.titleTextAttributes = [
+            .foregroundColor: dynamicTitleColor
+        ]
+
+        let navBar = UINavigationBar.appearance()
+        navBar.standardAppearance = appearance
+        navBar.scrollEdgeAppearance = appearance
+        navBar.compactAppearance = appearance
     }
 }
