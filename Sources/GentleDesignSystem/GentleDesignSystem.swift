@@ -641,7 +641,9 @@ public struct GentleGapScaleFacade: Sendable {
     public var micro: CGFloat { value(.micro) }
     public var tight: CGFloat { value(.tight) }
     public var regular: CGFloat { value(.regular) }
+    public var ample: CGFloat { value(.ample) }
     public var loose: CGFloat { value(.loose) }
+    public var expansive: CGFloat { value(.expansive) }
 }
 
 /// Layout facade designed for call-site clarity:
