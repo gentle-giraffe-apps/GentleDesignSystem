@@ -820,10 +820,10 @@ public struct GentleSurfaceModifier: ViewModifier {
             return AnyView(
                 content.background(theme.color(for: .background, scheme: colorScheme).ignoresSafeArea())
             )
-
+            
         case .surfaceOverlay:
             return AnyView(content.background(theme.color(for: .surfaceOverlay, scheme: colorScheme)))
-
+            
         case .card:
             return AnyView(
                 content
@@ -835,7 +835,7 @@ public struct GentleSurfaceModifier: ViewModifier {
                             .stroke(theme.color(for: .borderSubtle, scheme: colorScheme), lineWidth: 1)
                     )
             )
-
+            
         case .cardChrome:
             return AnyView(
                 content
@@ -846,14 +846,29 @@ public struct GentleSurfaceModifier: ViewModifier {
                             .stroke(theme.color(for: .borderSubtle, scheme: colorScheme), lineWidth: 1)
                     )
             )
-
+            
         case .cardElevated:
             return AnyView(
                 content
-                    .gentleInset(GentleInsetRole.card)
+                    .gentleInset(.card)
                     .background(theme.color(for: .surfaceElevated, scheme: colorScheme))
                     .cornerRadius(CGFloat(radii.large))
-                    .shadow(radius: CGFloat(shadows.medium))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: CGFloat(radii.large))
+                            .stroke(theme.color(for: .borderSubtle, scheme: colorScheme).opacity(0.35), lineWidth: 0.5)
+                    )
+                    .shadow(
+                        color: Color.black.opacity(colorScheme == .dark ? 0.45 : 0.12),
+                        radius: 1,
+                        x: 0,
+                        y: 1
+                    )
+                    .shadow(
+                        color: Color.black.opacity(colorScheme == .dark ? 0.30 : 0.08),
+                        radius: 8,
+                        x: 0,
+                        y: 6
+                    )
             )
         }
     }
