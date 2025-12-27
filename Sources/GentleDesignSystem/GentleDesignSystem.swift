@@ -1,8 +1,11 @@
 //  Jonathan Ritchey
-
 import SwiftUI
 import Foundation
 import UIKit
+
+public enum GentleDesignSystemSpecVersion {
+    public static let current = "0.2.1" // adds gap intents + layout intent facades
+}
 
 // MARK: - Roles
 
@@ -35,9 +38,7 @@ public enum GentleTextRole: String, Codable, Sendable {
     case caption2_s
 }
 
-public enum GentleTextRamp: String, Codable, Sendable {
-    case xxl, xl, l, ml, m, ms, s
-}
+public enum GentleTextRamp: String, Codable, Sendable { case xxl, xl, l, ml, m, ms, s }
 
 public extension GentleTextRole {
     var ramp: GentleTextRamp {
@@ -54,43 +55,25 @@ public extension GentleTextRole {
 }
 
 public enum GentleColorRole: String, Codable, Sendable {
-    case textPrimary
-    case textSecondary
-    case textTertiary
+    case textPrimary, textSecondary, textTertiary
     case onPrimaryCTA
-    case background
-    case surface
-    case surfaceElevated
-    case surfaceOverlay
-    case onSurfaceOverlayPrimary
-    case onSurfaceOverlaySecondary
+    case background, surface, surfaceElevated
+    case surfaceOverlay, onSurfaceOverlayPrimary, onSurfaceOverlaySecondary
     case borderSubtle
     case destructive
     case primaryCTA
-    case themePrimary
-    case themeSecondary
+    case themePrimary, themeSecondary
 }
 
-public enum GentleButtonRole: String, Codable, Sendable {
-    case primary
-    case secondary
-    case tertiary
-    case destructive
-}
+public enum GentleButtonRole: String, Codable, Sendable { case primary, secondary, tertiary, destructive }
 
 /// Separates geometry from intent.
 /// - rounded: standard rounded rectangle (default)
 /// - pill: capsule-like button
-public enum GentleButtonShape: String, Codable, Sendable {
-    case rounded
-    case pill
-}
+public enum GentleButtonShape: String, Codable, Sendable { case rounded, pill }
 
 /// Shape of a standalone text input container (only applies when chrome is `.standalone`).
-public enum GentleTextFieldShape: String, Codable, Sendable {
-    case rounded
-    case pill
-}
+public enum GentleTextFieldShape: String, Codable, Sendable { case rounded, pill }
 
 /// Controls ownership/strength of input affordances.
 /// - standalone: draws its own container chrome (background, border, shape)
@@ -110,21 +93,24 @@ public enum GentleSurfaceRole: String, Codable, Sendable {
     case surfaceOverlay
 }
 
-// MARK: - Dynamic Type anchor (Option B)
+// MARK: - Gap intents
+
+/// High-level intent for spacing between siblings (stacks, lists, grids).
+public enum GentleGapIntent: String, Codable, Sendable, CaseIterable {
+    case none
+    case micro
+    case tight
+    case regular
+    case ample
+    case loose
+    case expansive
+}
+
+// MARK: - Dynamic Type anchor
 
 /// JSON-friendly semantic anchor for Dynamic Type scaling.
 public enum GentleFontTextStyle: String, Codable, Sendable {
-    case largeTitle
-    case title
-    case title2
-    case title3
-    case headline
-    case body
-    case callout
-    case subheadline
-    case footnote
-    case caption
-    case caption2
+    case largeTitle, title, title2, title3, headline, body, callout, subheadline, footnote, caption, caption2
 }
 
 public extension GentleFontTextStyle {
@@ -170,25 +156,31 @@ private extension ContentSizeCategory {
 
 // Top-level spec: load/save as JSON
 public struct GentleDesignSystemSpec: Codable, Sendable {
+    public var specVersion: String
     public var colors: GentleColorTokens
     public var typography: GentleTypographyTokens
-    public var spacing: GentleSpacingTokens
-    public var padding: GentlePaddingTokens
-    public var radii: GentleRadiusTokens
-    public var shadows: GentleShadowTokens
 
-    public init(colors: GentleColorTokens,
+    /// Layout-affecting tokens: gaps, insets, grids, touch targets, etc.
+    public var layout: GentleLayoutTokens
+
+    /// Visual/appearance tokens: radii, shadows, strokes (future), etc.
+    public var visual: GentleVisualTokens
+
+    enum CodingKeys: String, CodingKey {
+        case specVersion = "_specVersion"
+        case colors, typography, layout, visual
+    }
+
+    public init(specVersion: String = GentleDesignSystemSpecVersion.current,
+                colors: GentleColorTokens,
                 typography: GentleTypographyTokens,
-                spacing: GentleSpacingTokens,
-                padding: GentlePaddingTokens,
-                radii: GentleRadiusTokens,
-                shadows: GentleShadowTokens) {
+                layout: GentleLayoutTokens,
+                visual: GentleVisualTokens) {
+        self.specVersion = specVersion
         self.colors = colors
         self.typography = typography
-        self.spacing = spacing
-        self.padding = padding
-        self.radii = radii
-        self.shadows = shadows
+        self.layout = layout
+        self.visual = visual
     }
 }
 
@@ -196,12 +188,13 @@ public extension GentleDesignSystemSpec {
     static let gentleDefault: GentleDesignSystemSpec = .init(
         colors: .gentleDefault,
         typography: .gentleDefault,
-        spacing: .gentleDefault,
-        padding: .gentleDefault,
-        radii: .gentleDefault,
-        shadows: .gentleDefault
+        layout: .gentleDefault,
+        visual: .gentleDefault
     )
 }
+
+extension GentleDesignSystemSpec: GentleJSONEncodable {}
+extension GentleDesignSystemSpec: GentleJSONDecodable {}
 
 // MARK: - Colors (Light/Dark pairs)
 
@@ -214,9 +207,7 @@ public struct GentleColorPair: Codable, Sendable {
         self.darkHex = darkHex
     }
 
-    public func hex(for scheme: ColorScheme) -> String {
-        scheme == .dark ? darkHex : lightHex
-    }
+    public func hex(for scheme: ColorScheme) -> String { scheme == .dark ? darkHex : lightHex }
 }
 
 /// JSON-facing storage uses String keys (role.rawValue).
@@ -227,15 +218,10 @@ public struct GentleColorTokens: Codable, Sendable {
         self.pairByRole = pairByRole
     }
 
-    // Typed convenience
-    public func pair(for role: GentleColorRole) -> GentleColorPair? {
-        pairByRole[role.rawValue]
-    }
+    public func pair(for role: GentleColorRole) -> GentleColorPair? { pairByRole[role.rawValue] }
 }
 
 public extension GentleColorTokens {
-    /// Defaults chosen to be reasonable, high-contrast, and visually consistent across light/dark.
-    /// You can (and should) tune these as GentleDesign evolves.
     static let gentleDefault: GentleColorTokens = .init(
         pairByRole: [
             // Text
@@ -267,11 +253,7 @@ public extension GentleColorTokens {
 // MARK: - Typography axis enums (JSON-friendly)
 
 public enum GentleFontDesignToken: String, Codable, Sendable {
-    case `default`
-    case serif
-    case rounded
-    case monospaced
-
+    case `default`, serif, rounded, monospaced
     var swiftUIDesign: Font.Design {
         switch self {
         case .default: return .default
@@ -284,11 +266,7 @@ public enum GentleFontDesignToken: String, Codable, Sendable {
 
 /// Note: Font.Width is iOS 17+. We still store it in JSON, but only apply when available.
 public enum GentleFontWidthToken: String, Codable, Sendable {
-    case compressed
-    case condensed
-    case standard
-    case expanded
-
+    case compressed, condensed, standard, expanded
     @available(iOS 17.0, *)
     var swiftUIWidth: Font.Width {
         switch self {
@@ -301,16 +279,7 @@ public enum GentleFontWidthToken: String, Codable, Sendable {
 }
 
 public enum GentleFontWeightToken: String, Codable, Sendable {
-    case ultraLight
-    case thin
-    case light
-    case regular
-    case medium
-    case semibold
-    case bold
-    case heavy
-    case black
-
+    case ultraLight, thin, light, regular, medium, semibold, bold, heavy, black
     var swiftUIWeight: Font.Weight {
         switch self {
         case .ultraLight: return .ultraLight
@@ -332,13 +301,8 @@ public struct GentleTypographyRoleSpec: Codable, Sendable {
     public var pointSize: Double
     public var weight: GentleFontWeightToken
     public var design: GentleFontDesignToken
-
-    /// Optional: if nil, we treat as "standard".
     public var width: GentleFontWidthToken?
-
-    /// Dynamic Type anchor (semantic style used for scaling).
     public var relativeTo: GentleFontTextStyle
-
     public var lineSpacing: Double
     public var letterSpacing: Double
     public var isUppercased: Bool
@@ -365,7 +329,6 @@ public struct GentleTypographyRoleSpec: Codable, Sendable {
     }
 }
 
-/// JSON-facing storage uses String keys (role.rawValue).
 public struct GentleTypographyTokens: Codable, Sendable {
     public var roles: [String: GentleTypographyRoleSpec]
 
@@ -373,21 +336,13 @@ public struct GentleTypographyTokens: Codable, Sendable {
         self.roles = roles
     }
 
-    // Typed convenience
     public func roleSpec(for role: GentleTextRole) -> GentleTypographyRoleSpec {
         if let spec = roles[role.rawValue] { return spec }
         if let body = roles[GentleTextRole.body_m.rawValue] { return body }
-
         return GentleTypographyRoleSpec(
-            pointSize: 17,
-            weight: .regular,
-            design: .default,
-            width: nil,
-            relativeTo: .body,
-            lineSpacing: 2,
-            letterSpacing: 0,
-            isUppercased: false,
-            colorRole: .textPrimary
+            pointSize: 17, weight: .regular, design: .default, width: nil,
+            relativeTo: .body, lineSpacing: 2, letterSpacing: 0,
+            isUppercased: false, colorRole: .textPrimary
         )
     }
 }
@@ -397,127 +352,68 @@ public extension GentleTypographyTokens {
         var dict: [String: GentleTypographyRoleSpec] = [:]
 
         dict[GentleTextRole.largeTitle_xxl.rawValue] = .init(
-            pointSize: 34,
-            weight: .bold,
-            design: .rounded,
-            width: nil,
-            relativeTo: .largeTitle,
-            lineSpacing: 6,
-            colorRole: .textPrimary
+            pointSize: 34, weight: .bold, design: .rounded, width: nil,
+            relativeTo: .largeTitle, lineSpacing: 6, colorRole: .textPrimary
         )
         dict[GentleTextRole.title_xl.rawValue] = .init(
-            pointSize: 28,
-            weight: .bold,
-            design: .rounded,
-            width: nil,
-            relativeTo: .title,
-            lineSpacing: 4,
-            colorRole: .textPrimary
+            pointSize: 28, weight: .bold, design: .rounded, width: nil,
+            relativeTo: .title, lineSpacing: 4, colorRole: .textPrimary
         )
         dict[GentleTextRole.title2_l.rawValue] = .init(
-            pointSize: 22,
-            weight: .semibold,
-            design: .rounded,
-            width: nil,
-            relativeTo: .title2,
-            lineSpacing: 3,
-            colorRole: .textPrimary
+            pointSize: 22, weight: .semibold, design: .rounded, width: nil,
+            relativeTo: .title2, lineSpacing: 3, colorRole: .textPrimary
         )
         dict[GentleTextRole.title3_ml.rawValue] = .init(
-            pointSize: 20,
-            weight: .semibold,
-            design: .rounded,
-            width: nil,
-            relativeTo: .title3,
-            lineSpacing: 3,
-            colorRole: .textPrimary
+            pointSize: 20, weight: .semibold, design: .rounded, width: nil,
+            relativeTo: .title3, lineSpacing: 3, colorRole: .textPrimary
         )
         dict[GentleTextRole.headline_m.rawValue] = .init(
-            pointSize: 17,
-            weight: .semibold,
-            design: .default,
-            width: nil,
-            relativeTo: .headline,
-            colorRole: .textPrimary
+            pointSize: 17, weight: .semibold, design: .default, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
         )
 
         dict[GentleTextRole.body_m.rawValue] = .init(
-            pointSize: 17,
-            weight: .regular,
-            design: .default,
-            width: nil,
-            relativeTo: .body,
-            lineSpacing: 2,
-            colorRole: .textPrimary
+            pointSize: 17, weight: .regular, design: .default, width: nil,
+            relativeTo: .body, lineSpacing: 2, colorRole: .textPrimary
         )
         dict[GentleTextRole.bodySecondary_m.rawValue] = .init(
-            pointSize: 17,
-            weight: .regular,
-            design: .default,
-            width: nil,
-            relativeTo: .body,
-            lineSpacing: 2,
-            colorRole: .textSecondary
+            pointSize: 17, weight: .regular, design: .default, width: nil,
+            relativeTo: .body, lineSpacing: 2, colorRole: .textSecondary
         )
         dict[GentleTextRole.monoCode_m.rawValue] = .init(
-            pointSize: 17,
-            weight: .regular,
-            design: .monospaced,
-            width: .condensed,
-            relativeTo: .body,
-            letterSpacing: 0.3,
-            colorRole: .textPrimary
+            pointSize: 17, weight: .regular, design: .monospaced, width: .condensed,
+            relativeTo: .body, letterSpacing: 0.3, colorRole: .textPrimary
         )
 
         dict[GentleTextRole.callout_ms.rawValue] = .init(
-            pointSize: 16,
-            weight: .regular,
-            design: .default,
-            width: nil,
-            relativeTo: .callout,
-            colorRole: .textSecondary
+            pointSize: 16, weight: .regular, design: .default, width: nil,
+            relativeTo: .callout, colorRole: .textSecondary
         )
         dict[GentleTextRole.subheadline_ms.rawValue] = .init(
-            pointSize: 15,
-            weight: .regular,
-            design: .default,
-            width: nil,
-            relativeTo: .subheadline,
-            colorRole: .textSecondary
+            pointSize: 15, weight: .regular, design: .default, width: nil,
+            relativeTo: .subheadline, colorRole: .textSecondary
         )
 
         dict[GentleTextRole.footnote_s.rawValue] = .init(
-            pointSize: 13,
-            weight: .regular,
-            design: .default,
-            width: nil,
-            relativeTo: .footnote,
-            colorRole: .textTertiary
+            pointSize: 13, weight: .regular, design: .default, width: nil,
+            relativeTo: .footnote, colorRole: .textTertiary
         )
         dict[GentleTextRole.caption_s.rawValue] = .init(
-            pointSize: 12,
-            weight: .regular,
-            design: .default,
-            width: nil,
-            relativeTo: .caption,
-            colorRole: .textTertiary
+            pointSize: 12, weight: .regular, design: .default, width: nil,
+            relativeTo: .caption, colorRole: .textTertiary
         )
         dict[GentleTextRole.caption2_s.rawValue] = .init(
-            pointSize: 11,
-            weight: .regular,
-            design: .default,
-            width: nil,
-            relativeTo: .caption2,
-            colorRole: .textTertiary
+            pointSize: 11, weight: .regular, design: .default, width: nil,
+            relativeTo: .caption2, colorRole: .textTertiary
         )
 
         return GentleTypographyTokens(roles: dict)
     }()
 }
 
-// MARK: - Spacing (layout rhythm)
+// MARK: - Layout tokens
 
-public struct GentleSpacingTokens: Codable, Sendable {
+public struct GentleSpacingScaleTokens: Codable, Sendable {
     public var xs: Double
     public var s: Double
     public var m: Double
@@ -525,30 +421,16 @@ public struct GentleSpacingTokens: Codable, Sendable {
     public var xl: Double
     public var xxl: Double
 
-    public init(xs: Double = 4,
-                s: Double = 8,
-                m: Double = 12,
-                l: Double = 16,
-                xl: Double = 24,
-                xxl: Double = 32) {
-        self.xs = xs
-        self.s = s
-        self.m = m
-        self.l = l
-        self.xl = xl
-        self.xxl = xxl
+    public init(xs: Double = 4, s: Double = 8, m: Double = 12, l: Double = 16, xl: Double = 24, xxl: Double = 32) {
+        self.xs = xs; self.s = s; self.m = m; self.l = l; self.xl = xl; self.xxl = xxl
     }
 }
 
-public extension GentleSpacingTokens {
-    static let gentleDefault = GentleSpacingTokens()
-}
+public extension GentleSpacingScaleTokens { static let gentleDefault = GentleSpacingScaleTokens() }
 
-public enum GentleSpacingToken: String, Codable, Sendable, CaseIterable {
-    case xs, s, m, l, xl, xxl
-}
+public enum GentleSpacingToken: String, Codable, Sendable, CaseIterable { case xs, s, m, l, xl, xxl }
 
-public extension GentleSpacingTokens {
+public extension GentleSpacingScaleTokens {
     func value(for token: GentleSpacingToken) -> Double {
         switch token {
         case .xs: return xs
@@ -561,62 +443,67 @@ public extension GentleSpacingTokens {
     }
 }
 
-// MARK: - Padding (semantic container insets)
+public typealias GentleGapTokens = GentleSpacingScaleTokens
+public typealias GentleGridSpacingTokens = GentleSpacingScaleTokens
+public typealias GentleTouchTokens = GentleSpacingScaleTokens
 
-public enum GentlePaddingRole: String, Codable, Sendable {
-    case screen
-    case card
-    case control
-    case listRow
-}
+// MARK: - Insets (semantic container insets)
 
-/// Token references (not point values) so padding stays theme-configurable.
-public struct GentleAxisPaddingTokens: Codable, Sendable, Hashable {
+public enum GentleInsetRole: String, Codable, Sendable { case screen, card, control, listRow }
+
+public struct GentleAxisInsetTokens: Codable, Sendable, Hashable {
     public var horizontal: GentleSpacingToken
     public var vertical: GentleSpacingToken
-
-    public init(horizontal: GentleSpacingToken, vertical: GentleSpacingToken) {
-        self.horizontal = horizontal
-        self.vertical = vertical
-    }
+    public init(horizontal: GentleSpacingToken, vertical: GentleSpacingToken) { self.horizontal = horizontal; self.vertical = vertical }
 }
 
-/// JSON-facing storage uses String keys (role.rawValue).
-public struct GentlePaddingTokens: Codable, Sendable {
-    public var tokensByRole: [String: GentleAxisPaddingTokens]
+public struct GentleInsetTokens: Codable, Sendable {
+    public var tokensByRole: [String: GentleAxisInsetTokens]
+    public init(tokensByRole: [String: GentleAxisInsetTokens]) { self.tokensByRole = tokensByRole }
 
-    public init(tokensByRole: [String: GentleAxisPaddingTokens]) {
-        self.tokensByRole = tokensByRole
-    }
-
-    public func axisTokens(for role: GentlePaddingRole) -> GentleAxisPaddingTokens {
-        // Safe fallback — screen is a reasonable default.
+    public func axisTokens(for role: GentleInsetRole) -> GentleAxisInsetTokens {
         tokensByRole[role.rawValue]
-        ?? tokensByRole[GentlePaddingRole.screen.rawValue]
+        ?? tokensByRole[GentleInsetRole.screen.rawValue]
         ?? .init(horizontal: .xl, vertical: .l)
     }
 }
 
-public extension GentlePaddingTokens {
-    static let gentleDefault: GentlePaddingTokens = .init(
+public extension GentleInsetTokens {
+    static let gentleDefault: GentleInsetTokens = .init(
         tokensByRole: [
-            // Big gutters, editorial feel:
-            // Default spacing scale: xs=4, s=8, m=12, l=16, xl=24, xxl=32
-            GentlePaddingRole.screen.rawValue:  .init(horizontal: .xl, vertical: .l),
-
-            // Matches your existing card padding (currently spacing.m)
-            GentlePaddingRole.card.rawValue:    .init(horizontal: .m,  vertical: .m),
-
-            // Matches your button feel (you already use .horizontal l, .vertical s)
-            GentlePaddingRole.control.rawValue: .init(horizontal: .l,  vertical: .s),
-
-            // A common “custom row” inset
-            GentlePaddingRole.listRow.rawValue: .init(horizontal: .l,  vertical: .s)
+            GentleInsetRole.screen.rawValue:  .init(horizontal: .xl, vertical: .l),
+            GentleInsetRole.card.rawValue:    .init(horizontal: .m,  vertical: .m),
+            GentleInsetRole.control.rawValue: .init(horizontal: .l,  vertical: .s),
+            GentleInsetRole.listRow.rawValue: .init(horizontal: .l,  vertical: .s)
         ]
     )
 }
 
-// MARK: - Radii
+public struct GentleLayoutTokens: Codable, Sendable {
+    /// Canonical scale used by inset roles (and handy for occasional one-offs).
+    public var scale: GentleSpacingScaleTokens
+
+    public var gap: GentleGapTokens
+    public var grid: GentleGridSpacingTokens
+    public var touch: GentleTouchTokens
+    public var inset: GentleInsetTokens
+
+    public init(scale: GentleSpacingScaleTokens = .gentleDefault,
+                gap: GentleGapTokens = .gentleDefault,
+                grid: GentleGridSpacingTokens = .gentleDefault,
+                touch: GentleTouchTokens = .gentleDefault,
+                inset: GentleInsetTokens = .gentleDefault) {
+        self.scale = scale
+        self.gap = gap
+        self.grid = grid
+        self.touch = touch
+        self.inset = inset
+    }
+}
+
+public extension GentleLayoutTokens { static let gentleDefault = GentleLayoutTokens() }
+
+// MARK: - Visual tokens
 
 public struct GentleRadiusTokens: Codable, Sendable {
     public var small: Double
@@ -624,78 +511,66 @@ public struct GentleRadiusTokens: Codable, Sendable {
     public var large: Double
     public var pill: Double
 
-    public init(small: Double = 8,
-                medium: Double = 12,
-                large: Double = 20,
-                pill: Double = 999) {
-        self.small = small
-        self.medium = medium
-        self.large = large
-        self.pill = pill
+    public init(small: Double = 8, medium: Double = 12, large: Double = 20, pill: Double = 999) {
+        self.small = small; self.medium = medium; self.large = large; self.pill = pill
     }
 }
-
-public extension GentleRadiusTokens {
-    static let gentleDefault = GentleRadiusTokens()
-}
-
-// MARK: - Shadows
+public extension GentleRadiusTokens { static let gentleDefault = GentleRadiusTokens() }
 
 public struct GentleShadowTokens: Codable, Sendable {
     public var none: Double
     public var small: Double
     public var medium: Double
 
-    public init(none: Double = 0,
-                small: Double = 2,
-                medium: Double = 6) {
-        self.none = none
-        self.small = small
-        self.medium = medium
+    public init(none: Double = 0, small: Double = 2, medium: Double = 6) {
+        self.none = none; self.small = small; self.medium = medium
     }
 }
+public extension GentleShadowTokens { static let gentleDefault = GentleShadowTokens() }
 
-public extension GentleShadowTokens {
-    static let gentleDefault = GentleShadowTokens()
+public struct GentleVisualTokens: Codable, Sendable {
+    public var radii: GentleRadiusTokens
+    public var shadows: GentleShadowTokens
+    public init(radii: GentleRadiusTokens = .gentleDefault, shadows: GentleShadowTokens = .gentleDefault) {
+        self.radii = radii; self.shadows = shadows
+    }
 }
+public extension GentleVisualTokens { static let gentleDefault = GentleVisualTokens() }
 
 // MARK: - Runtime theme (built from spec)
 
 public struct GentleTheme: Sendable {
     public let spec: GentleDesignSystemSpec
 
-    public init(spec: GentleDesignSystemSpec = .gentleDefault) {
-        self.spec = spec
-    }
-
+    public init(spec: GentleDesignSystemSpec = .gentleDefault) { self.spec = spec }
     public static let `default` = GentleTheme(spec: .gentleDefault)
 
-    public var spacing: GentleSpacingTokens { spec.spacing }
-    public var padding: GentlePaddingTokens { spec.padding }
-    public var radii: GentleRadiusTokens { spec.radii }
-    public var shadows: GentleShadowTokens { spec.shadows }
+    public var layout: GentleLayoutTokens { spec.layout }
+    public var visual: GentleVisualTokens { spec.visual }
 
-    /// Resolve a color role for the current color scheme.
+    public var gap: GentleGapTokens { spec.layout.gap }
+    public var grid: GentleGridSpacingTokens { spec.layout.grid }
+    public var touch: GentleTouchTokens { spec.layout.touch }
+    public var inset: GentleInsetTokens { spec.layout.inset }
+
+    public var radii: GentleRadiusTokens { spec.visual.radii }
+    public var shadows: GentleShadowTokens { spec.visual.shadows }
+
     public func color(for role: GentleColorRole, scheme: ColorScheme) -> Color {
         guard let pair = spec.colors.pair(for: role) else { return Color.primary }
         return Color(gentleHex: pair.hex(for: scheme))
     }
 
-    /// Returns a resolved style that respects the current Dynamic Type size category.
-    public func textStyle(for role: GentleTextRole,
-                          sizeCategory: ContentSizeCategory) -> GentleResolvedTextStyle {
+    public func textStyle(for role: GentleTextRole, sizeCategory: ContentSizeCategory) -> GentleResolvedTextStyle {
         let roleSpec = spec.typography.roleSpec(for: role)
 
-        // Scale pointSize using UIFontMetrics anchored to a semantic text style.
         let metrics = UIFontMetrics(forTextStyle: roleSpec.relativeTo.uiKitTextStyle)
         let traits = UITraitCollection(preferredContentSizeCategory: sizeCategory.uiContentSizeCategory)
         let scaledSize = metrics.scaledValue(for: CGFloat(roleSpec.pointSize), compatibleWith: traits)
 
-        let baseFont = Font.system(
-            size: scaledSize,
-            weight: roleSpec.weight.swiftUIWeight,
-            design: roleSpec.design.swiftUIDesign
-        )
+        let baseFont = Font.system(size: scaledSize,
+                                   weight: roleSpec.weight.swiftUIWeight,
+                                   design: roleSpec.design.swiftUIDesign)
 
         return GentleResolvedTextStyle(
             font: baseFont,
@@ -710,38 +585,97 @@ public struct GentleTheme: Sendable {
 }
 
 public extension GentleTheme {
-    /// Returns resolved (horizontal, vertical) padding values for a semantic role,
-    /// applying an Edge.Set filter similar to SwiftUI's `.padding`.
-    func paddingValue(_ role: GentlePaddingRole, edges: Edge.Set = .all) -> (horizontal: CGFloat?, vertical: CGFloat?) {
-        let axis = spec.padding.axisTokens(for: role)
-        let h = CGFloat(spec.spacing.value(for: axis.horizontal))
-        let v = CGFloat(spec.spacing.value(for: axis.vertical))
+    func insetValue(_ role: GentleInsetRole, edges: Edge.Set = .all) -> (horizontal: CGFloat?, vertical: CGFloat?) {
+        let axis = spec.layout.inset.axisTokens(for: role)
+        let h = CGFloat(spec.layout.scale.value(for: axis.horizontal))
+        let v = CGFloat(spec.layout.scale.value(for: axis.vertical))
 
         let horizontal: CGFloat? = (edges == .all || edges.contains(.horizontal) || edges.contains(.leading) || edges.contains(.trailing)) ? h : nil
         let vertical: CGFloat? = (edges == .all || edges.contains(.vertical) || edges.contains(.top) || edges.contains(.bottom)) ? v : nil
-
         return (horizontal, vertical)
     }
 }
 
 public struct GentleResolvedTextStyle {
     public let font: Font
-
-    // Keep these so ViewModifiers can apply them cleanly
     public let design: GentleFontDesignToken
     public let width: GentleFontWidthToken?
-
     public let colorRole: GentleColorRole
     public let lineSpacing: CGFloat
     public let letterSpacing: CGFloat
     public let isUppercased: Bool
 }
 
+// MARK: - Intent facades (ergonomics for contractors)
+
+/// Exposes both raw scale values (xs/s/m/...) and intent-based values (none/micro/tight/regular/loose).
+public struct GentleGapScaleFacade: Sendable {
+    private let scale: GentleSpacingScaleTokens
+
+    public init(scale: GentleSpacingScaleTokens) { self.scale = scale }
+
+    // Raw values (handy for rare fine-tuning)
+    public var xs: CGFloat { CGFloat(scale.xs) }
+    public var s: CGFloat { CGFloat(scale.s) }
+    public var m: CGFloat { CGFloat(scale.m) }
+    public var l: CGFloat { CGFloat(scale.l) }
+    public var xl: CGFloat { CGFloat(scale.xl) }
+    public var xxl: CGFloat { CGFloat(scale.xxl) }
+
+    public func value(_ token: GentleSpacingToken) -> CGFloat { CGFloat(scale.value(for: token)) }
+
+    // Intent values (preferred for most call sites)
+    public func value(_ intent: GentleGapIntent) -> CGFloat {
+        switch intent {
+        case .none: return 0
+        case .micro: return xs
+        case .tight: return s
+        case .regular: return m
+        case .ample: return l
+        case .loose: return xl
+        case .expansive: return xxl
+        }
+    }
+
+    public var none: CGFloat { value(.none) }
+    public var micro: CGFloat { value(.micro) }
+    public var tight: CGFloat { value(.tight) }
+    public var regular: CGFloat { value(.regular) }
+    public var loose: CGFloat { value(.loose) }
+}
+
+/// Layout facade designed for call-site clarity:
+/// - `design.layout.stack.regular`
+/// - `design.layout.list.tight`
+/// - `design.layout.grid.value(.micro)`
+/// while still allowing `design.layout.gap.l` etc.
+public struct GentleLayoutFacade: Sendable {
+    private let tokens: GentleLayoutTokens
+
+    public init(tokens: GentleLayoutTokens) { self.tokens = tokens }
+
+    /// Raw generic gap scale (mostly for advanced use).
+    public var gap: GentleGapScaleFacade { .init(scale: tokens.gap) }
+
+    /// Stack spacing intent (preferred).
+    public var stack: GentleGapScaleFacade { .init(scale: tokens.gap) }
+
+    /// List spacing intent (preferred).
+    public var list: GentleGapScaleFacade { .init(scale: tokens.gap) }
+
+    /// Grid spacing (raw + intent).
+    public var grid: GentleGapScaleFacade { .init(scale: tokens.grid) }
+
+    /// Touch spacing (raw + intent).
+    public var touch: GentleGapScaleFacade { .init(scale: tokens.touch) }
+
+    /// Insets are semantic + axis-aware, and are resolved via `GentleTheme.insetValue(...)`.
+    public var inset: GentleInsetTokens { tokens.inset }
+}
+
 // MARK: - Environment + theme root
 
-private struct GentleThemeKey: EnvironmentKey {
-    static let defaultValue: GentleTheme = .default
-}
+private struct GentleThemeKey: EnvironmentKey { static let defaultValue: GentleTheme = .default }
 
 public extension EnvironmentValues {
     var gentleTheme: GentleTheme {
@@ -754,15 +688,12 @@ public struct GentleThemeRoot<Content: View>: View {
     private let theme: GentleTheme
     private let content: Content
 
-    public init(theme: GentleTheme = .default,
-                @ViewBuilder content: () -> Content) {
+    public init(theme: GentleTheme = .default, @ViewBuilder content: () -> Content) {
         self.theme = theme
         self.content = content()
     }
 
-    public var body: some View {
-        content.environment(\.gentleTheme, theme)
-    }
+    public var body: some View { content.environment(\.gentleTheme, theme) }
 }
 
 // MARK: - Modifiers
@@ -785,8 +716,7 @@ public struct GentleTextModifier: ViewModifier {
         let resolvedColorRole = overrideColorRole ?? style.colorRole
         let color = theme.color(for: resolvedColorRole, scheme: colorScheme)
 
-        // Apply font + axes
-        let view = content
+        return content
             .font(style.font)
             .gentleFontWidth(style.width)
             .fontDesign(style.design.swiftUIDesign)
@@ -795,8 +725,6 @@ public struct GentleTextModifier: ViewModifier {
             .kerning(style.letterSpacing)
             .textCase(style.isUppercased ? .uppercase : .none)
             .minimumScaleFactor(0.9)
-
-        return view
     }
 }
 
@@ -821,9 +749,8 @@ public struct GentleTextFieldModifier: ViewModifier {
         let style = theme.textStyle(for: role, sizeCategory: sizeCategory)
         let resolvedColorRole = overrideColorRole ?? style.colorRole
         let textColor = theme.color(for: resolvedColorRole, scheme: colorScheme)
-        let spacing = theme.spacing
+        let gap = theme.gap
 
-        // Standalone chrome colors
         let fill = theme.color(for: .surface, scheme: colorScheme)
         let border = theme.color(for: .borderSubtle, scheme: colorScheme)
 
@@ -833,15 +760,11 @@ public struct GentleTextFieldModifier: ViewModifier {
             .fontDesign(style.design.swiftUIDesign)
             .foregroundColor(textColor)
             .tint(theme.color(for: .primaryCTA, scheme: colorScheme))
-        // intentionally NOT applying:
-        // lineSpacing / kerning / textCase / minimumScaleFactor
 
         switch chrome {
         case .standalone(let shape):
-            // A standalone input needs clear affordance on plain backgrounds.
-            // Use a light fill + subtle stroke; shape is meaningful here.
-            let horizontal = CGFloat(spacing.l)
-            let vertical = CGFloat(spacing.m)
+            let horizontal = CGFloat(gap.l)
+            let vertical = CGFloat(gap.m)
 
             return AnyView(
                 base
@@ -851,11 +774,9 @@ public struct GentleTextFieldModifier: ViewModifier {
                         Group {
                             switch shape {
                             case .rounded:
-                                RoundedRectangle(cornerRadius: CGFloat(theme.radii.medium), style: .continuous)
-                                    .fill(fill)
+                                RoundedRectangle(cornerRadius: CGFloat(theme.radii.medium), style: .continuous).fill(fill)
                             case .pill:
-                                Capsule()
-                                    .fill(fill)
+                                Capsule().fill(fill)
                             }
                         }
                     )
@@ -866,23 +787,16 @@ public struct GentleTextFieldModifier: ViewModifier {
                                 RoundedRectangle(cornerRadius: CGFloat(theme.radii.medium), style: .continuous)
                                     .strokeBorder(border, lineWidth: 1)
                             case .pill:
-                                Capsule()
-                                    .strokeBorder(border, lineWidth: 1)
+                                Capsule().strokeBorder(border, lineWidth: 1)
                             }
                         }
                     )
             )
 
         case .formRow:
-            // In a Form/List row, the container already provides most chrome.
-            // Keep spacing modest to avoid “double framed” inputs.
-            return AnyView(
-                base
-                    .padding(.vertical, CGFloat(spacing.s))
-            )
+            return AnyView(base.padding(.vertical, CGFloat(gap.s)))
 
         case .borderless:
-            // Inline / minimalist: no container chrome.
             return AnyView(base)
         }
     }
@@ -893,10 +807,7 @@ public struct GentleSurfaceModifier: ViewModifier {
     @Environment(\.colorScheme) private var colorScheme
 
     private let role: GentleSurfaceRole
-
-    public init(role: GentleSurfaceRole) {
-        self.role = role
-    }
+    public init(role: GentleSurfaceRole) { self.role = role }
 
     public func body(content: Content) -> some View {
         let radii = theme.radii
@@ -905,23 +816,16 @@ public struct GentleSurfaceModifier: ViewModifier {
         switch role {
         case .appBackground:
             return AnyView(
-                content
-                    .background(
-                        theme.color(for: .background, scheme: colorScheme)
-                            .ignoresSafeArea()
-                    )
+                content.background(theme.color(for: .background, scheme: colorScheme).ignoresSafeArea())
             )
+
         case .surfaceOverlay:
-            return AnyView(
-                content
-                    .background(
-                        theme.color(for: .surfaceOverlay, scheme: colorScheme)
-                    )
-            )
+            return AnyView(content.background(theme.color(for: .surfaceOverlay, scheme: colorScheme)))
+
         case .card:
             return AnyView(
                 content
-                    .gentlePadding(.card)
+                    .gentleInset(GentleInsetRole.card)
                     .background(theme.color(for: .surface, scheme: colorScheme))
                     .cornerRadius(CGFloat(radii.large))
                     .overlay(
@@ -929,6 +833,7 @@ public struct GentleSurfaceModifier: ViewModifier {
                             .stroke(theme.color(for: .borderSubtle, scheme: colorScheme), lineWidth: 1)
                     )
             )
+
         case .cardChrome:
             return AnyView(
                 content
@@ -939,10 +844,11 @@ public struct GentleSurfaceModifier: ViewModifier {
                             .stroke(theme.color(for: .borderSubtle, scheme: colorScheme), lineWidth: 1)
                     )
             )
+
         case .cardElevated:
             return AnyView(
                 content
-                    .gentlePadding(.card)
+                    .gentleInset(GentleInsetRole.card)
                     .background(theme.color(for: .surfaceElevated, scheme: colorScheme))
                     .cornerRadius(CGFloat(radii.large))
                     .shadow(radius: CGFloat(shadows.medium))
@@ -984,7 +890,7 @@ public struct GentleButtonStyle: ButtonStyle {
     }
 
     public func makeBody(configuration: Configuration) -> some View {
-        let spacing = theme.spacing
+        let gap = theme.gap
         let radii = theme.radii
 
         let backgroundRole: GentleColorRole
@@ -1021,28 +927,17 @@ public struct GentleButtonStyle: ButtonStyle {
         let backgroundColor = theme.color(for: backgroundRole, scheme: colorScheme)
         let borderColor = borderRole.map { theme.color(for: $0, scheme: colorScheme) }
 
-        let cornerRadius: CGFloat = {
-            switch shape {
-            case .rounded:
-                return CGFloat(radii.medium)
-            case .pill:
-                return CGFloat(radii.pill) // 999
-            }
-        }()
+        let cornerRadius: CGFloat = (shape == .pill) ? CGFloat(radii.pill) : CGFloat(radii.medium)
 
         return configuration.label
             .gentleText(textRole, colorRole: labelColorRole)
-            .padding(.horizontal, CGFloat(spacing.xxl))
-            .padding(.vertical, CGFloat(spacing.l)) //spacing.s))
-            .background(
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .fill(backgroundColor)
-            )
+            .padding(.horizontal, CGFloat(gap.xxl))
+            .padding(.vertical, CGFloat(gap.l))
+            .background(RoundedRectangle(cornerRadius: cornerRadius).fill(backgroundColor))
             .overlay(
                 Group {
                     if let borderColor = borderColor {
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .stroke(borderColor, lineWidth: 1)
+                        RoundedRectangle(cornerRadius: cornerRadius).stroke(borderColor, lineWidth: 1)
                     }
                 }
             )
@@ -1053,20 +948,18 @@ public struct GentleButtonStyle: ButtonStyle {
     }
 }
 
-public struct GentlePaddingModifier: ViewModifier {
+public struct GentleInsetModifier: ViewModifier {
     @Environment(\.gentleTheme) private var theme
-
     private let edges: Edge.Set
-    private let role: GentlePaddingRole
+    private let role: GentleInsetRole
 
-    public init(edges: Edge.Set = .all, role: GentlePaddingRole) {
+    public init(edges: Edge.Set = .all, role: GentleInsetRole) {
         self.edges = edges
         self.role = role
     }
 
     public func body(content: Content) -> some View {
-        let resolved = theme.paddingValue(role, edges: edges)
-
+        let resolved = theme.insetValue(role, edges: edges)
         return content
             .padding(.horizontal, resolved.horizontal ?? 0)
             .padding(.vertical, resolved.vertical ?? 0)
@@ -1076,8 +969,7 @@ public struct GentlePaddingModifier: ViewModifier {
 // MARK: - View extensions (ergonomic API)
 
 public extension View {
-    func gentleText(_ role: GentleTextRole,
-                    colorRole: GentleColorRole? = nil) -> some View {
+    func gentleText(_ role: GentleTextRole, colorRole: GentleColorRole? = nil) -> some View {
         modifier(GentleTextModifier(role: role, overrideColorRole: colorRole))
     }
 
@@ -1087,13 +979,9 @@ public extension View {
         modifier(GentleTextFieldModifier(role: role, overrideColorRole: colorRole, chrome: chrome))
     }
 
-    func gentleSurface(_ role: GentleSurfaceRole) -> some View {
-        modifier(GentleSurfaceModifier(role: role))
-    }
+    func gentleSurface(_ role: GentleSurfaceRole) -> some View { modifier(GentleSurfaceModifier(role: role)) }
 
-    func gentleButton(_ role: GentleButtonRole) -> some View {
-        buttonStyle(GentleButtonStyle(role: role, shape: .rounded))
-    }
+    func gentleButton(_ role: GentleButtonRole) -> some View { buttonStyle(GentleButtonStyle(role: role, shape: .rounded)) }
 
     func gentleButton(_ role: GentleButtonRole, shape: GentleButtonShape) -> some View {
         buttonStyle(GentleButtonStyle(role: role, shape: shape))
@@ -1102,26 +990,18 @@ public extension View {
     @ViewBuilder
     func gentleFontWidth(_ width: GentleFontWidthToken?) -> some View {
         if let width {
-            if #available(iOS 17.0, *) {
-                self.fontWidth(width.swiftUIWidth)
-            } else {
-                self
-            }
-        } else {
-            self
-        }
+            if #available(iOS 17.0, *) { self.fontWidth(width.swiftUIWidth) } else { self }
+        } else { self }
     }
 
     func gentleBackground(_ role: GentleColorRole, ignoresSafeArea: Bool = false) -> some View {
         modifier(GentleBackgroundModifier(role: role, ignoresSafeArea: ignoresSafeArea))
     }
 
-    func gentlePadding(_ role: GentlePaddingRole) -> some View {
-        modifier(GentlePaddingModifier(edges: .all, role: role))
-    }
+    func gentleInset(_ role: GentleInsetRole) -> some View { modifier(GentleInsetModifier(edges: .all, role: role)) }
 
-    func gentlePadding(_ edges: Edge.Set, _ role: GentlePaddingRole) -> some View {
-        modifier(GentlePaddingModifier(edges: edges, role: role))
+    func gentleInset(_ edges: Edge.Set, _ role: GentleInsetRole) -> some View {
+        modifier(GentleInsetModifier(edges: edges, role: role))
     }
 }
 
@@ -1130,15 +1010,12 @@ public extension View {
 public extension Color {
     init(gentleHex hex: String) {
         var hexString = hex.trimmingCharacters(in: .whitespacesAndNewlines)
-        if hexString.hasPrefix("#") {
-            hexString.removeFirst()
-        }
+        if hexString.hasPrefix("#") { hexString.removeFirst() }
 
         var hexNumber: UInt64 = 0
         let scanner = Scanner(string: hexString)
 
         let r, g, b, a: Double
-
         if scanner.scanHexInt64(&hexNumber) {
             switch hexString.count {
             case 6:
@@ -1171,22 +1048,19 @@ public struct GentleDesignRuntime: DynamicProperty {
 
     public init() {}
 
-    public var wrappedValue: Resolver {
-        Resolver(theme: theme, colorScheme: colorScheme)
-    }
+    public var wrappedValue: Resolver { Resolver(theme: theme, colorScheme: colorScheme) }
 
     public struct Resolver {
         public let theme: GentleTheme
         let colorScheme: ColorScheme
 
-        public var spacing: GentleSpacingTokens { theme.spacing }
-        public var padding: GentlePaddingTokens { theme.padding }
+        public var layout: GentleLayoutFacade { .init(tokens: theme.layout) }
+        public var visual: GentleVisualTokens { theme.visual }
+
         public var radii: GentleRadiusTokens { theme.radii }
         public var shadows: GentleShadowTokens { theme.shadows }
 
-        public func color(_ role: GentleColorRole) -> Color {
-            theme.color(for: role, scheme: colorScheme)
-        }
+        public func color(_ role: GentleColorRole) -> Color { theme.color(for: role, scheme: colorScheme) }
 
         public var surface: Color { color(.surface) }
         public var background: Color { color(.background) }
@@ -1204,24 +1078,51 @@ public enum GentleUIKitTheming {
         guard let pair = theme.spec.colors.pair(for: role) else { return }
         let dark = UIColor(Color(gentleHex: pair.hex(for: .dark)))
         let light = UIColor(Color(gentleHex: pair.hex(for: .light)))
-        let dynamicTitleColor = UIColor { trait in
-            trait.userInterfaceStyle == .dark ? dark : light
-        }
+        let dynamicTitleColor = UIColor { trait in trait.userInterfaceStyle == .dark ? dark : light }
 
         let appearance = UINavigationBarAppearance()
         appearance.configureWithDefaultBackground()
 
-        appearance.largeTitleTextAttributes = [
-            .foregroundColor: dynamicTitleColor
-        ]
-
-        appearance.titleTextAttributes = [
-            .foregroundColor: dynamicTitleColor
-        ]
+        appearance.largeTitleTextAttributes = [.foregroundColor: dynamicTitleColor]
+        appearance.titleTextAttributes = [.foregroundColor: dynamicTitleColor]
 
         let navBar = UINavigationBar.appearance()
         navBar.standardAppearance = appearance
         navBar.scrollEdgeAppearance = appearance
         navBar.compactAppearance = appearance
+    }
+}
+
+// MARK: - Default JSON Encoding
+
+public protocol GentleJSONEncodable: Encodable { static func makeJSONEncoder() -> JSONEncoder }
+
+public extension GentleJSONEncodable {
+    static func makeJSONEncoder() -> JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        return encoder
+    }
+
+    func encodedJSONData(encoder: JSONEncoder = Self.makeJSONEncoder()) throws -> Data { try encoder.encode(self) }
+
+    func encodedJSONString(encoder: JSONEncoder = Self.makeJSONEncoder()) throws -> String {
+        let data = try encodedJSONData(encoder: encoder)
+        guard let s = String(data: data, encoding: .utf8) else {
+            throw EncodingError.invalidValue(data, .init(codingPath: [], debugDescription: "UTF-8 conversion failed"))
+        }
+        return s
+    }
+}
+
+public protocol GentleJSONDecodable: Decodable { static func makeJSONDecoder() -> JSONDecoder }
+
+public extension GentleJSONDecodable {
+    static func makeJSONDecoder() -> JSONDecoder { JSONDecoder() }
+    static func fromJSONData(_ data: Data, decoder: JSONDecoder = Self.makeJSONDecoder()) throws -> Self {
+        try decoder.decode(Self.self, from: data)
+    }
+    static func fromJSONString(_ string: String, decoder: JSONDecoder = Self.makeJSONDecoder()) throws -> Self {
+        try fromJSONData(Data(string.utf8), decoder: decoder)
     }
 }

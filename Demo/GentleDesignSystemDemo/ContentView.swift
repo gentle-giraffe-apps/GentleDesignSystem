@@ -2,17 +2,18 @@ import SwiftUI
 import GentleDesignSystem
 
 struct ContentView: View {
+    @GentleDesignRuntime private var design
+    
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 20) { // tighter (was 32)
+                VStack(spacing: design.layout.stack.loose) {
                     TypographySection()
                     ButtonsSection()
                     SurfacesSection()
                     ColorsSection()
                 }
-                .padding(.horizontal, 12) // tighter (was 16)
-                .padding(.vertical, 16)   // tighter (was 24)
+                .gentleInset(.screen)
             }
             .gentleSurface(.appBackground)
             .navigationTitle("Design System")
@@ -23,9 +24,11 @@ struct ContentView: View {
 // MARK: - Typography Section
 
 struct TypographySection: View {
-    private let columns = [
-        GridItem(.adaptive(minimum: 150), spacing: 12)
-    ]
+    @GentleDesignRuntime private var design
+    
+    private var columns: [GridItem] {
+        [GridItem(.adaptive(minimum: 150), spacing: design.layout.grid.regular)]
+    }
 
     private let styles: [(String, GentleTextRole)] = [
         ("largeTitle_xxl", .largeTitle_xxl),
@@ -44,13 +47,13 @@ struct TypographySection: View {
     ]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: design.layout.stack.regular) {
             Text("Typography")
                 .gentleText(.title_xl)
 
-            LazyVGrid(columns: columns, alignment: .leading, spacing: 10) {
+            LazyVGrid(columns: columns, alignment: .leading, spacing: design.layout.grid.regular) {
                 ForEach(styles, id: \.0) { name, role in
-                    VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: design.layout.stack.tight) {
                         Text(name)
                             .gentleText(.callout_ms)
                             .opacity(0.8)
@@ -64,20 +67,33 @@ struct TypographySection: View {
             .gentleSurface(.card)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .task {
+            let spec = design.theme.spec
+            do {
+                let encodedJSONString = try spec.encodedJSONString()
+                print("spec: \(encodedJSONString)")
+            } catch {
+                print("jritchey: \(error)")
+            }
+        }
     }
 }
 
 // MARK: - Buttons Section
 
 struct ButtonsSection: View {
-    private let columns = [GridItem(.adaptive(minimum: 150), spacing: 12)]
+    @GentleDesignRuntime private var design
+    
+    private var columns: [GridItem] {
+        [GridItem(.adaptive(minimum: 150), spacing: design.layout.grid.regular)]
+    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: design.layout.stack.regular) {
             Text("Buttons")
                 .gentleText(.title_xl)
 
-            LazyVGrid(columns: columns, spacing: 12) {
+            LazyVGrid(columns: columns, spacing: design.layout.grid.regular) {
                 Button("Primary") {}
                     .gentleButton(.primary)
 
@@ -99,12 +115,14 @@ struct ButtonsSection: View {
 // MARK: - Surfaces Section
 
 struct SurfacesSection: View {
+    @GentleDesignRuntime private var design
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: design.layout.stack.regular) {
             Text("Surfaces")
                 .gentleText(.title_xl)
 
-            HStack(spacing: 12) {
+            HStack(spacing: design.layout.stack.regular) {
                 surfaceCard(
                     title: "card",
                     subtitle: "Subtle border",
@@ -126,7 +144,7 @@ struct SurfacesSection: View {
         subtitle: String,
         surface: GentleSurfaceRole
     ) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: design.layout.stack.tight) {
             Text(title)
                 .gentleText(.headline_m)
 
@@ -144,10 +162,12 @@ struct SurfacesSection: View {
 struct ColorsSection: View {
     @Environment(\.gentleTheme) var theme
     @Environment(\.colorScheme) var colorScheme
-
-    private let columns = [
-        GridItem(.adaptive(minimum: 150), spacing: 12)
-    ]
+    @GentleDesignRuntime private var design
+    
+    private var columns: [GridItem] { [
+        GridItem(.adaptive(minimum: 150), spacing: design.layout.grid.regular)
+        ]
+    }
     
     private var items: [(String, Color)] {
         [
@@ -165,19 +185,19 @@ struct ColorsSection: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: design.layout.stack.regular) {
             Text("Colors")
                 .gentleText(.title_xl)
 
-            LazyVGrid(columns: columns, spacing: 10) {
+            LazyVGrid(columns: columns, spacing: design.layout.grid.tight) {
                 ForEach(items, id: \.0) { name, color in
-                    HStack(spacing: 10) {
-                        RoundedRectangle(cornerRadius: 8)
+                    HStack(spacing: design.layout.stack.regular) {
+                        RoundedRectangle(cornerRadius: design.radii.small)
                             .fill(color)
                             .frame(width: 28, height: 28)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .strokeBorder(Color.gray.opacity(0.25), lineWidth: 1)
+                                RoundedRectangle(cornerRadius: design.radii.small)
+                                    .strokeBorder(design.color(.borderSubtle), lineWidth: 1)
                             )
 
                         Text(name)
@@ -187,7 +207,6 @@ struct ColorsSection: View {
 
                         Spacer(minLength: 0)
                     }
-                    .padding(.vertical, 6)
                 }
             }
             .gentleSurface(.card)
