@@ -580,6 +580,8 @@ public extension GentleVisualTokens { static let gentleDefault = GentleVisualTok
 // MARK: - Runtime theme (built from spec)
 
 public struct GentleTheme: Sendable {
+    public var id = 0
+    
     /// The shipped, immutable baseline spec.
     public let defaultSpec: GentleDesignSystemSpec
 
@@ -1148,17 +1150,43 @@ public struct GentleDesignRuntime: DynamicProperty {
 
 public enum GentleUIKitTheming {
     @MainActor
-    public static func applyNavigationBarTitleColor(theme: GentleTheme, role: GentleColorRole) {
-        guard let pair = theme.spec.colors.pair(for: role) else { return }
-        let dark = UIColor(Color(gentleHex: pair.hex(for: .dark)))
+    public static func applyNavigationBarTitleStyle(
+        theme: GentleTheme,
+        textRole: GentleTextRole,
+        colorRole: GentleColorRole
+    ) {
+        // Dynamic color from your pair
+        guard let pair = theme.spec.colors.pair(for: colorRole) else { return }
+        let dark  = UIColor(Color(gentleHex: pair.hex(for: .dark)))
         let light = UIColor(Color(gentleHex: pair.hex(for: .light)))
-        let dynamicTitleColor = UIColor { trait in trait.userInterfaceStyle == .dark ? dark : light }
+        let dynamicTitleColor = UIColor { trait in
+            trait.userInterfaceStyle == .dark ? dark : light
+        }
+
+        // Role spec (weight/design/width/letterSpacing/etc)
+        let roleSpec = theme.spec.typography.roleSpec(for: textRole)
+
+        // Build fonts WITHOUT forcing size
+        let largeFont  = navTitleFont(from: roleSpec, kind: .large)
+        let inlineFont = navTitleFont(from: roleSpec, kind: .inline)
 
         let appearance = UINavigationBarAppearance()
         appearance.configureWithDefaultBackground()
 
-        appearance.largeTitleTextAttributes = [.foregroundColor: dynamicTitleColor]
-        appearance.titleTextAttributes = [.foregroundColor: dynamicTitleColor]
+        // ✅ This is the “divider line” culprit most of the time
+        appearance.shadowColor = .clear
+
+        appearance.largeTitleTextAttributes = [
+            .foregroundColor: dynamicTitleColor,
+            .font: largeFont,
+            .kern: roleSpec.letterSpacing
+        ]
+
+        appearance.titleTextAttributes = [
+            .foregroundColor: dynamicTitleColor,
+            .font: inlineFont,
+            .kern: roleSpec.letterSpacing
+        ]
 
         let navBar = UINavigationBar.appearance()
         navBar.standardAppearance = appearance
@@ -1535,5 +1563,112 @@ public struct TypographyRoleEditor: View {
         let letterSpacing = "letter \(singleDigit(spec.letterSpacing))"
         let lineSpacing = "line \(singleDigit(spec.lineSpacing))"
         return "\(size) • \(weight) • \(design) • \(width) • Spacing: \(letterSpacing) • \(lineSpacing)"
+    }
+}
+
+// MARK: - UIKit - Navigation Title
+
+private enum NavTitleKind {
+    case large
+    case inline
+}
+
+private extension GentleFontDesignToken {
+    var uiKitDesign: UIFontDescriptor.SystemDesign {
+        switch self {
+        case .default:    return .default
+        case .serif:      return .serif
+        case .rounded:    return .rounded
+        case .monospaced: return .monospaced
+        }
+    }
+}
+
+private extension GentleFontWidthToken {
+    /// Best-effort width values. UIKit uses a "width" trait that may or may not
+    /// have a visible effect depending on the font/design.
+    var uiKitWidthTrait: CGFloat {
+        switch self {
+        case .compressed: return -0.5
+        case .condensed:  return -0.3
+        case .standard:   return 0.0
+        case .expanded:   return 0.3
+        }
+    }
+}
+
+private extension GentleFontWeightToken {
+    var uiKitWeight: UIFont.Weight { swiftUIWeight.uiKit } // see below
+}
+
+private extension Font.Weight {
+    var uiKit: UIFont.Weight {
+        switch self {
+        case .ultraLight: return .ultraLight
+        case .thin:       return .thin
+        case .light:      return .light
+        case .regular:    return .regular
+        case .medium:     return .medium
+        case .semibold:   return .semibold
+        case .bold:       return .bold
+        case .heavy:      return .heavy
+        case .black:      return .black
+        default:          return .regular
+        }
+    }
+}
+
+private func navTitleFont(from roleSpec: GentleTypographyRoleSpec, kind: NavTitleKind) -> UIFont {
+    let textStyle: UIFont.TextStyle = (kind == .large) ? .largeTitle : .headline
+    var font = UIFont.preferredFont(forTextStyle: textStyle)
+
+    // Apply design (system design variants)
+    if let designed = font.fontDescriptor.withDesign(roleSpec.design.uiKitDesign) {
+        font = UIFont(descriptor: designed, size: 0) // 0 keeps the preferred size
+    }
+
+    // Apply weight
+    let weightedDescriptor = font.fontDescriptor.addingAttributes([
+        .traits: [UIFontDescriptor.TraitKey.weight: roleSpec.weight.uiKitWeight]
+    ])
+    font = UIFont(descriptor: weightedDescriptor, size: 0)
+
+    // Apply width (best-effort)
+    if let width = roleSpec.width {
+        let traits = font.fontDescriptor.object(forKey: .traits) as? [UIFontDescriptor.TraitKey: Any] ?? [:]
+        var newTraits = traits
+        newTraits[.width] = width.uiKitWidthTrait
+
+        let widenedDescriptor = font.fontDescriptor.addingAttributes([
+            .traits: newTraits
+        ])
+        font = UIFont(descriptor: widenedDescriptor, size: 0)
+    }
+
+    return font
+}
+
+public struct GentleNavigationBarStyler: View {
+    @Environment(\.gentleTheme) private var theme
+
+    public init() {}
+    
+    public var body: some View {
+        Color.clear
+            .onAppear {
+                apply()
+            }
+            .onChange(of: theme.id) { _ in   // or theme.hash / version
+                apply()
+            }
+    }
+
+    @MainActor
+    private func apply() {
+        GentleUIKitTheming.applyNavigationBarTitleStyle(
+            theme: theme,
+            textRole: .largeTitle_xxl,
+            colorRole: .textPrimary
+        )
     }
 }
