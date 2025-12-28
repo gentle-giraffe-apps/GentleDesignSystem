@@ -18,7 +18,11 @@ public enum GentleDesignSystemSpecVersion {
  - Ramp suffix (_xxl → _s) indicates relative position in the typography scale,
    not a fixed point size.
  */
-public enum GentleTextRole: String, Codable, Sendable {
+public enum GentleTextRole: String, Identifiable, Codable, Sendable, CaseIterable {
+    public var id: String {
+        return self.rawValue
+    }
+    
     // Ramp legend:
     // xxl > xl > l > ml > m > ms > s
     case largeTitle_xxl
@@ -51,6 +55,25 @@ public extension GentleTextRole {
         case .headline_m, .body_m, .bodySecondary_m, .monoCode_m: return .m
         case .callout_ms, .subheadline_ms: return .ms
         case .footnote_s, .caption_s, .caption2_s: return .s
+        }
+    }
+
+    /// Human-friendly label for settings UIs.
+    var displayName: String {
+        switch self {
+        case .largeTitle_xxl: return "Large Title"
+        case .title_xl: return "Title"
+        case .title2_l: return "Title 2"
+        case .title3_ml: return "Title 3"
+        case .headline_m: return "Headline"
+        case .body_m: return "Body"
+        case .bodySecondary_m: return "Body (Secondary)"
+        case .monoCode_m: return "Monospace (Code)"
+        case .callout_ms: return "Callout"
+        case .subheadline_ms: return "Subheadline"
+        case .footnote_s: return "Footnote"
+        case .caption_s: return "Caption"
+        case .caption2_s: return "Caption 2"
         }
     }
 }
@@ -253,7 +276,7 @@ public extension GentleColorTokens {
 
 // MARK: - Typography axis enums (JSON-friendly)
 
-public enum GentleFontDesignToken: String, Codable, Sendable {
+public enum GentleFontDesignToken: String, Codable, Sendable, CaseIterable {
     case `default`, serif, rounded, monospaced
     var swiftUIDesign: Font.Design {
         switch self {
@@ -266,7 +289,7 @@ public enum GentleFontDesignToken: String, Codable, Sendable {
 }
 
 /// Note: Font.Width is iOS 17+. We still store it in JSON, but only apply when available.
-public enum GentleFontWidthToken: String, Codable, Sendable {
+public enum GentleFontWidthToken: String, Codable, Sendable, CaseIterable {
     case compressed, condensed, standard, expanded
     @available(iOS 17.0, *)
     var swiftUIWidth: Font.Width {
@@ -277,9 +300,11 @@ public enum GentleFontWidthToken: String, Codable, Sendable {
         case .expanded: return .expanded
         }
     }
+
+    var displayName: String { rawValue.capitalized }
 }
 
-public enum GentleFontWeightToken: String, Codable, Sendable {
+public enum GentleFontWeightToken: String, Codable, Sendable, CaseIterable {
     case ultraLight, thin, light, regular, medium, semibold, bold, heavy, black
     var swiftUIWeight: Font.Weight {
         switch self {
@@ -292,6 +317,20 @@ public enum GentleFontWeightToken: String, Codable, Sendable {
         case .bold: return .bold
         case .heavy: return .heavy
         case .black: return .black
+        }
+    }
+
+    var displayName: String {
+        switch self {
+        case .ultraLight: return "Ultra Light"
+        case .thin: return "Thin"
+        case .light: return "Light"
+        case .regular: return "Regular"
+        case .medium: return "Medium"
+        case .semibold: return "Semibold"
+        case .bold: return "Bold"
+        case .heavy: return "Heavy"
+        case .black: return "Black"
         }
     }
 }
@@ -546,9 +585,9 @@ public struct GentleTheme: Sendable {
 
     /// The live, user-editable spec (always present).
     public var editableSpec: GentleDesignSystemSpec
-    
+
     /// The spec that actually drives rendering.
-    public var activeSpec: GentleDesignSystemSpec { editableSpec ?? defaultSpec }
+    public var activeSpec: GentleDesignSystemSpec { editableSpec }
 
     /// Convenience: legacy alias for existing call sites (points to the active spec).
     public var spec: GentleDesignSystemSpec { activeSpec }
@@ -560,18 +599,6 @@ public struct GentleTheme: Sendable {
     }
 
     public static let `default` = GentleTheme(defaultSpec: .gentleDefault, editableSpec: nil)
-
-//    /// Returns a copy with `editableSpec` replaced.
-//    public func settingEditableSpec(_ spec: GentleDesignSystemSpec) -> GentleTheme {
-//        var copy = self
-//        copy.editableSpec = spec
-//        return copy
-//    }
-//
-//    /// Returns a copy reset back to defaults (editableSpec cleared).
-//    public func resettingToDefault() -> GentleTheme {
-//        settingEditableSpec(defaultSpec)
-//    }
 
     public var layout: GentleLayoutTokens { activeSpec.layout }
     public var visual: GentleVisualTokens { activeSpec.visual }
@@ -596,14 +623,19 @@ public struct GentleTheme: Sendable {
         let traits = UITraitCollection(preferredContentSizeCategory: sizeCategory.uiContentSizeCategory)
         let scaledSize = metrics.scaledValue(for: CGFloat(roleSpec.pointSize), compatibleWith: traits)
 
-        let baseFont = Font.system(size: scaledSize,
+        var baseFont = Font.system(size: scaledSize,
                                    weight: roleSpec.weight.swiftUIWeight,
                                    design: roleSpec.design.swiftUIDesign)
 
+        if let width = roleSpec.width {
+            if roleSpec.design == .default {
+                baseFont = baseFont.width(width.swiftUIWidth)
+            }
+        }
+        
         return GentleResolvedTextStyle(
             font: baseFont,
             design: roleSpec.design,
-            width: roleSpec.width,
             colorRole: roleSpec.colorRole,
             lineSpacing: CGFloat(roleSpec.lineSpacing),
             letterSpacing: CGFloat(roleSpec.letterSpacing),
@@ -627,7 +659,7 @@ public extension GentleTheme {
 public struct GentleResolvedTextStyle {
     public let font: Font
     public let design: GentleFontDesignToken
-    public let width: GentleFontWidthToken?
+//    public let width: GentleFontWidthToken?
     public let colorRole: GentleColorRole
     public let lineSpacing: CGFloat
     public let letterSpacing: CGFloat
@@ -748,8 +780,6 @@ public struct GentleTextModifier: ViewModifier {
 
         return content
             .font(style.font)
-            .gentleFontWidth(style.width)
-            .fontDesign(style.design.swiftUIDesign)
             .foregroundColor(color)
             .lineSpacing(style.lineSpacing)
             .kerning(style.letterSpacing)
@@ -786,8 +816,6 @@ public struct GentleTextFieldModifier: ViewModifier {
 
         let base = content
             .font(style.font)
-            .gentleFontWidth(style.width)
-            .fontDesign(style.design.swiftUIDesign)
             .foregroundColor(textColor)
             .tint(theme.color(for: .primaryCTA, scheme: colorScheme))
 
@@ -841,7 +869,6 @@ public struct GentleSurfaceModifier: ViewModifier {
 
     public func body(content: Content) -> some View {
         let radii = theme.radii
-        let shadows = theme.shadows
 
         switch role {
         case .appBackground:
@@ -912,11 +939,7 @@ public struct GentleBackgroundModifier: ViewModifier {
         let c = theme.color(for: role, scheme: colorScheme)
         return content.background(
             Group {
-                if ignoresSafeArea {
-                    c.ignoresSafeArea()
-                } else {
-                    c
-                }
+                if ignoresSafeArea { c.ignoresSafeArea() } else { c }
             }
         )
     }
@@ -1034,9 +1057,15 @@ public extension View {
 
     @ViewBuilder
     func gentleFontWidth(_ width: GentleFontWidthToken?) -> some View {
+//        if let width {
+//        if #available(iOS 17.0, *) {
         if let width {
-            if #available(iOS 17.0, *) { self.fontWidth(width.swiftUIWidth) } else { self }
-        } else { self }
+            self.fontWidth(width.swiftUIWidth)
+        } else {
+            self
+        }
+//        } else { self }
+//        } else { self }
     }
 
     func gentleBackground(_ role: GentleColorRole, ignoresSafeArea: Bool = false) -> some View {
@@ -1238,11 +1267,13 @@ public struct GentleFileThemeSpecStore: GentleThemeSpecStore, Sendable {
 
 // MARK: - Theme Manager (ergonomics)
 
-/// Lightweight value-type manager that keeps IO out of `GentleTheme`.
+/// Lightweight manager that keeps IO out of `GentleTheme`.
 /// Intended usage:
 /// - `@State private var manager = GentleThemeManager()`
-/// - inject `manager.theme` into `GentleThemeRoot`
-/// - call `manager.load()` on app launch, and `manager.save()`/`manager.reset()` from settings.
+/// - Inject **both**:
+///   - `GentleThemeRoot(theme: manager.theme) { ... }`
+///   - `.environment(\.gentleThemeManager, manager)`
+/// - Call `manager.load()` on app launch, and `manager.save()`/`manager.reset()` from settings.
 @Observable
 @MainActor
 public final class GentleThemeManager {
@@ -1269,19 +1300,17 @@ public final class GentleThemeManager {
         try store.saveEditableSpec(theme.editableSpec)
     }
 
-    /// Resets the theme back to defaults.
+    /// Resets the theme back to defaults and clears persisted overrides.
     public func reset() throws {
         var t = theme
         t.editableSpec = t.defaultSpec
         theme = t
         try store.clearEditableSpec()
     }
-    
+
     public func bindingForTypographyRole(_ role: GentleTextRole) -> Binding<GentleTypographyRoleSpec> {
         Binding(
-            get: {
-                self.theme.editableSpec.typography.roleSpec(for: role)
-            },
+            get: { self.theme.editableSpec.typography.roleSpec(for: role) },
             set: { newSpec in
                 var t = self.theme
                 t.editableSpec.typography.roles[role.rawValue] = newSpec
@@ -1307,12 +1336,14 @@ public struct GentleThemeManagerRuntime: DynamicProperty {
     @Environment(\.gentleThemeManager) private var manager
     public var wrappedValue: GentleThemeManager {
         guard let manager else {
-            fatalError()
+            fatalError("gentleThemeManager is missing. Inject it with .environment(\\.gentleThemeManager, manager).")
         }
         return manager
     }
     public init() {}
 }
+
+// MARK: - Editors
 
 public struct TypographySizeEditor: View {
     private let role: GentleTextRole
@@ -1335,11 +1366,11 @@ public struct TypographySizeEditor: View {
         let binding = manager.bindingForTypographyRole(role)
 
         VStack(alignment: .leading, spacing: 12) {
-            Text(role.rawValue)
+            Text(role.displayName)
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            HStack {
+            HStack(spacing: 12) {
                 Text("Size")
                 Slider(value: binding.pointSize, in: range, step: step)
 
@@ -1349,5 +1380,160 @@ public struct TypographySizeEditor: View {
             }
         }
         .padding(.vertical, 8)
+    }
+}
+
+/// Collapsible, compact editor for a single typography role.
+/// Edits only:
+/// - size, weight, design, width, line spacing, letter spacing, uppercase
+public struct TypographyRoleEditor: View {
+    private let role: GentleTextRole
+
+    private let sizeRange: ClosedRange<Double>
+    private let sizeStep: Double
+
+    private let lineSpacingRange: ClosedRange<Double>
+    private let letterSpacingRange: ClosedRange<Double>
+
+    @State private var isExpanded: Bool = false
+    @GentleThemeManagerRuntime private var manager
+
+    public init(
+        role: GentleTextRole,
+        sizeRange: ClosedRange<Double> = 10...96,
+        sizeStep: Double = 1,
+        lineSpacingRange: ClosedRange<Double> = 0...12,
+        letterSpacingRange: ClosedRange<Double> = -1.5...2.5
+    ) {
+        self.role = role
+        self.sizeRange = sizeRange
+        self.sizeStep = sizeStep
+        self.lineSpacingRange = lineSpacingRange
+        self.letterSpacingRange = letterSpacingRange
+    }
+
+    public var body: some View {
+        let binding = manager.bindingForTypographyRole(role)
+
+        VStack(alignment: .leading, spacing: 10) {
+            Button {
+                withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
+                    isExpanded.toggle()
+                }
+            } label: {
+                VStack(alignment: .leading) {
+                    HStack(spacing: 10) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(role.rawValue)
+                                .gentleText(role)
+                        }
+                        Spacer()
+                        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                    }
+                    .contentShape(Rectangle())
+                    Text(summaryText(for: binding.wrappedValue))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+            }
+            .buttonStyle(.plain)
+
+            if isExpanded {
+                VStack(alignment: .leading, spacing: 14) {
+                    // Size
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Size")
+                            Spacer()
+                            Text("\(Int(binding.pointSize.wrappedValue)) pt")
+                                .monospacedDigit()
+                                .foregroundStyle(.secondary)
+                        }
+                        Slider(value: binding.pointSize, in: sizeRange, step: sizeStep)
+                    }
+
+                    // Weight
+                    Picker("Weight", selection: binding.weight) {
+                        ForEach(GentleFontWeightToken.allCases, id: \.self) { w in
+                            Text(w.displayName).tag(w)
+                        }
+                    }
+
+                    // Design
+                    Picker("Design", selection: binding.design) {
+                        ForEach(GentleFontDesignToken.allCases, id: \.self) { d in
+                            Text(String(describing: d).capitalized).tag(d)
+                        }
+                    }
+
+                    // Width (optional)
+                    Picker("Width", selection: widthBinding(binding)) {
+                        Text("None").tag(Optional<GentleFontWidthToken>.none)
+                        ForEach(GentleFontWidthToken.allCases, id: \.self) { w in
+                            Text(w.displayName).tag(Optional(w))
+                        }
+                    }
+                    .disabled(binding.design.wrappedValue != .default)
+
+                    if binding.design.wrappedValue != .default {
+                        Text("Width only supported when design is 'Default'.")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    
+                    // Line spacing
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Line spacing")
+                            Spacer()
+                            Text(String(format: "%.1f", binding.lineSpacing.wrappedValue))
+                                .monospacedDigit()
+                                .foregroundStyle(.secondary)
+                        }
+                        Slider(value: binding.lineSpacing, in: lineSpacingRange, step: 0.5)
+                    }
+
+                    // Letter spacing
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Letter spacing")
+                            Spacer()
+                            Text(String(format: "%.1f", binding.letterSpacing.wrappedValue))
+                                .monospacedDigit()
+                                .foregroundStyle(.secondary)
+                        }
+                        Slider(value: binding.letterSpacing, in: letterSpacingRange, step: 0.1)
+                    }
+
+                    Toggle("Uppercased", isOn: binding.isUppercased)
+                }
+                .padding(.top, 4)
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .padding(.vertical, 8)
+    }
+
+    private func widthBinding(_ roleSpec: Binding<GentleTypographyRoleSpec>) -> Binding<GentleFontWidthToken?> {
+        Binding<GentleFontWidthToken?>(
+            get: { roleSpec.width.wrappedValue },
+            set: { roleSpec.width.wrappedValue = $0 }
+        )
+    }
+
+    private func summaryText(for spec: GentleTypographyRoleSpec) -> String {
+        func singleDigit(_ value: CGFloat) -> String {
+            String(Int(value))
+        }
+        let size = "\(Int(spec.pointSize))pt"
+        let weight = spec.weight.displayName
+        let design = String(describing: spec.design).capitalized
+        let width = spec.width?.displayName ?? "None"
+        let letterSpacing = "letter \(singleDigit(spec.letterSpacing))"
+        let lineSpacing = "line \(singleDigit(spec.lineSpacing))"
+        return "\(size) • \(weight) • \(design) • \(width) • Spacing: \(letterSpacing) • \(lineSpacing)"
     }
 }
