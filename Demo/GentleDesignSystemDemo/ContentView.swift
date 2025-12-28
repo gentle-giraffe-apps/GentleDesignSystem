@@ -3,6 +3,7 @@ import GentleDesignSystem
 
 struct ContentView: View {
     @GentleDesignRuntime private var design
+    @State private var isShowingSettings = false
     
     var body: some View {
         NavigationStack {
@@ -17,7 +18,26 @@ struct ContentView: View {
             }
             .gentleSurface(.appBackground)
             .navigationTitle("Design System")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        print("settings")
+                        isShowingSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                }
+            }
+            .sheet(isPresented: $isShowingSettings) {
+                SettingsView()
+            }
         }
+    }
+}
+
+struct SettingsView: View {
+    var body: some View {
+        Text("Settings")
     }
 }
 

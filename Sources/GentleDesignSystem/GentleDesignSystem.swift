@@ -540,29 +540,56 @@ public extension GentleVisualTokens { static let gentleDefault = GentleVisualTok
 // MARK: - Runtime theme (built from spec)
 
 public struct GentleTheme: Sendable {
-    public let spec: GentleDesignSystemSpec
+    /// The shipped, immutable baseline spec.
+    public let defaultSpec: GentleDesignSystemSpec
 
-    public init(spec: GentleDesignSystemSpec = .gentleDefault) { self.spec = spec }
-    public static let `default` = GentleTheme(spec: .gentleDefault)
+    /// Optional user-edited spec. `nil` means “use defaultSpec”.
+    public var editableSpec: GentleDesignSystemSpec?
 
-    public var layout: GentleLayoutTokens { spec.layout }
-    public var visual: GentleVisualTokens { spec.visual }
+    /// The spec that actually drives rendering.
+    public var activeSpec: GentleDesignSystemSpec { editableSpec ?? defaultSpec }
 
-    public var gap: GentleGapTokens { spec.layout.gap }
-    public var grid: GentleGridSpacingTokens { spec.layout.grid }
-    public var touch: GentleTouchTokens { spec.layout.touch }
-    public var inset: GentleInsetTokens { spec.layout.inset }
+    /// Convenience: legacy alias for existing call sites (points to the active spec).
+    public var spec: GentleDesignSystemSpec { activeSpec }
 
-    public var radii: GentleRadiusTokens { spec.visual.radii }
-    public var shadows: GentleShadowTokens { spec.visual.shadows }
+    public init(defaultSpec: GentleDesignSystemSpec = .gentleDefault,
+                editableSpec: GentleDesignSystemSpec? = nil) {
+        self.defaultSpec = defaultSpec
+        self.editableSpec = editableSpec
+    }
+
+    public static let `default` = GentleTheme(defaultSpec: .gentleDefault, editableSpec: nil)
+
+    /// Returns a copy with `editableSpec` replaced.
+    public func settingEditableSpec(_ spec: GentleDesignSystemSpec?) -> GentleTheme {
+        var copy = self
+        copy.editableSpec = spec
+        return copy
+    }
+
+    /// Returns a copy reset back to defaults (editableSpec cleared).
+    public func resettingToDefault() -> GentleTheme {
+        settingEditableSpec(nil)
+    }
+
+    public var layout: GentleLayoutTokens { activeSpec.layout }
+    public var visual: GentleVisualTokens { activeSpec.visual }
+
+    public var gap: GentleGapTokens { activeSpec.layout.gap }
+    public var grid: GentleGridSpacingTokens { activeSpec.layout.grid }
+    public var touch: GentleTouchTokens { activeSpec.layout.touch }
+    public var inset: GentleInsetTokens { activeSpec.layout.inset }
+
+    public var radii: GentleRadiusTokens { activeSpec.visual.radii }
+    public var shadows: GentleShadowTokens { activeSpec.visual.shadows }
 
     public func color(for role: GentleColorRole, scheme: ColorScheme) -> Color {
-        guard let pair = spec.colors.pair(for: role) else { return Color.primary }
+        guard let pair = activeSpec.colors.pair(for: role) else { return Color.primary }
         return Color(gentleHex: pair.hex(for: scheme))
     }
 
     public func textStyle(for role: GentleTextRole, sizeCategory: ContentSizeCategory) -> GentleResolvedTextStyle {
-        let roleSpec = spec.typography.roleSpec(for: role)
+        let roleSpec = activeSpec.typography.roleSpec(for: role)
 
         let metrics = UIFontMetrics(forTextStyle: roleSpec.relativeTo.uiKitTextStyle)
         let traits = UITraitCollection(preferredContentSizeCategory: sizeCategory.uiContentSizeCategory)
@@ -586,9 +613,9 @@ public struct GentleTheme: Sendable {
 
 public extension GentleTheme {
     func insetValue(_ role: GentleInsetRole, edges: Edge.Set = .all) -> (horizontal: CGFloat?, vertical: CGFloat?) {
-        let axis = spec.layout.inset.axisTokens(for: role)
-        let h = CGFloat(spec.layout.scale.value(for: axis.horizontal))
-        let v = CGFloat(spec.layout.scale.value(for: axis.vertical))
+        let axis = activeSpec.layout.inset.axisTokens(for: role)
+        let h = CGFloat(activeSpec.layout.scale.value(for: axis.horizontal))
+        let v = CGFloat(activeSpec.layout.scale.value(for: axis.vertical))
 
         let horizontal: CGFloat? = (edges == .all || edges.contains(.horizontal) || edges.contains(.leading) || edges.contains(.trailing)) ? h : nil
         let vertical: CGFloat? = (edges == .all || edges.contains(.vertical) || edges.contains(.top) || edges.contains(.bottom)) ? v : nil
@@ -820,10 +847,10 @@ public struct GentleSurfaceModifier: ViewModifier {
             return AnyView(
                 content.background(theme.color(for: .background, scheme: colorScheme).ignoresSafeArea())
             )
-            
+
         case .surfaceOverlay:
             return AnyView(content.background(theme.color(for: .surfaceOverlay, scheme: colorScheme)))
-            
+
         case .card:
             return AnyView(
                 content
@@ -835,7 +862,7 @@ public struct GentleSurfaceModifier: ViewModifier {
                             .stroke(theme.color(for: .borderSubtle, scheme: colorScheme), lineWidth: 1)
                     )
             )
-            
+
         case .cardChrome:
             return AnyView(
                 content
@@ -846,7 +873,7 @@ public struct GentleSurfaceModifier: ViewModifier {
                             .stroke(theme.color(for: .borderSubtle, scheme: colorScheme), lineWidth: 1)
                     )
             )
-            
+
         case .cardElevated:
             return AnyView(
                 content
@@ -1141,5 +1168,120 @@ public extension GentleJSONDecodable {
     }
     static func fromJSONString(_ string: String, decoder: JSONDecoder = Self.makeJSONDecoder()) throws -> Self {
         try fromJSONData(Data(string.utf8), decoder: decoder)
+    }
+}
+
+// MARK: - Theme Spec Store
+
+public protocol GentleThemeSpecStore: Sendable {
+    func loadEditableSpec() throws -> GentleDesignSystemSpec?
+    func saveEditableSpec(_ spec: GentleDesignSystemSpec) throws
+    func clearEditableSpec() throws
+}
+
+/// File-backed JSON store (Application Support).
+public struct GentleFileThemeSpecStore: GentleThemeSpecStore, Sendable {
+    public enum StoreError: Error, Sendable {
+        case applicationSupportUnavailable
+    }
+
+    public let fileName: String
+    public let subdirectory: String?
+
+    public init(fileName: String = "gentle_theme_spec.json",
+                subdirectory: String? = "GentleDesignSystem") {
+        self.fileName = fileName
+        self.subdirectory = subdirectory
+    }
+
+    public func loadEditableSpec() throws -> GentleDesignSystemSpec? {
+        let url = try fileURL()
+        guard FileManager.default.fileExists(atPath: url.path) else { return nil }
+        let data = try Data(contentsOf: url)
+        return try GentleDesignSystemSpec.fromJSONData(data)
+    }
+
+    public func saveEditableSpec(_ spec: GentleDesignSystemSpec) throws {
+        let url = try fileURL()
+        let data = try spec.encodedJSONData()
+        try data.write(to: url, options: [.atomic])
+    }
+
+    public func clearEditableSpec() throws {
+        let url = try fileURL()
+        guard FileManager.default.fileExists(atPath: url.path) else { return }
+        try FileManager.default.removeItem(at: url)
+    }
+
+    // MARK: - Paths
+
+    private func fileURL() throws -> URL {
+        let fm = FileManager.default
+        guard let base = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            throw StoreError.applicationSupportUnavailable
+        }
+
+        let dir: URL
+        if let subdirectory {
+            dir = base.appendingPathComponent(subdirectory, isDirectory: true)
+            if !fm.fileExists(atPath: dir.path) {
+                try fm.createDirectory(at: dir, withIntermediateDirectories: true)
+            }
+        } else {
+            dir = base
+        }
+
+        return dir.appendingPathComponent(fileName, isDirectory: false)
+    }
+}
+
+// MARK: - Theme Manager (ergonomics)
+
+/// Lightweight value-type manager that keeps IO out of `GentleTheme`.
+/// Intended usage:
+/// - `@State private var manager = GentleThemeManager()`
+/// - inject `manager.theme` into `GentleThemeRoot`
+/// - call `manager.load()` on app launch, and `manager.save()`/`manager.reset()` from settings.
+public struct GentleThemeManager: Sendable {
+    public var theme: GentleTheme
+    public let store: GentleThemeSpecStore
+
+    public init(theme: GentleTheme = .default,
+                store: GentleThemeSpecStore = GentleFileThemeSpecStore()) {
+        self.theme = theme
+        self.store = store
+    }
+
+    /// Loads the persisted editable spec (if present) into `theme.editableSpec`.
+    public mutating func load() throws {
+        theme.editableSpec = try store.loadEditableSpec()
+    }
+
+    /// Persists the current `theme.editableSpec`. If it's nil, this is a no-op.
+    public func save() throws {
+        guard let spec = theme.editableSpec else { return }
+        try store.saveEditableSpec(spec)
+    }
+
+    /// Clears persisted state and resets the theme back to defaults.
+    public mutating func reset() throws {
+        theme.editableSpec = nil
+        try store.clearEditableSpec()
+    }
+
+    /// Convenience: apply a new editable spec (does not auto-persist).
+    public mutating func applyEditableSpec(_ spec: GentleDesignSystemSpec?) {
+        theme.editableSpec = spec
+    }
+}
+
+private struct GentleThemeManagerKey: EnvironmentKey {
+    static let defaultValue: GentleThemeManager? = nil
+}
+
+public extension EnvironmentValues {
+    var gentleThemeManager: GentleThemeManager? {
+        get { self[GentleThemeManagerKey.self] }
+        set { self[GentleThemeManagerKey.self] = newValue }
     }
 }
