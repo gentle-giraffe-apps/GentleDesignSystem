@@ -1,6 +1,7 @@
 //  Jonathan Ritchey
 import SwiftUI
 import Foundation
+import Observation
 import UIKit
 
 public enum GentleDesignSystemSpecVersion {
@@ -543,9 +544,9 @@ public struct GentleTheme: Sendable {
     /// The shipped, immutable baseline spec.
     public let defaultSpec: GentleDesignSystemSpec
 
-    /// Optional user-edited spec. `nil` means “use defaultSpec”.
-    public var editableSpec: GentleDesignSystemSpec?
-
+    /// The live, user-editable spec (always present).
+    public var editableSpec: GentleDesignSystemSpec
+    
     /// The spec that actually drives rendering.
     public var activeSpec: GentleDesignSystemSpec { editableSpec ?? defaultSpec }
 
@@ -555,22 +556,22 @@ public struct GentleTheme: Sendable {
     public init(defaultSpec: GentleDesignSystemSpec = .gentleDefault,
                 editableSpec: GentleDesignSystemSpec? = nil) {
         self.defaultSpec = defaultSpec
-        self.editableSpec = editableSpec
+        self.editableSpec = editableSpec ?? defaultSpec
     }
 
     public static let `default` = GentleTheme(defaultSpec: .gentleDefault, editableSpec: nil)
 
-    /// Returns a copy with `editableSpec` replaced.
-    public func settingEditableSpec(_ spec: GentleDesignSystemSpec?) -> GentleTheme {
-        var copy = self
-        copy.editableSpec = spec
-        return copy
-    }
-
-    /// Returns a copy reset back to defaults (editableSpec cleared).
-    public func resettingToDefault() -> GentleTheme {
-        settingEditableSpec(nil)
-    }
+//    /// Returns a copy with `editableSpec` replaced.
+//    public func settingEditableSpec(_ spec: GentleDesignSystemSpec) -> GentleTheme {
+//        var copy = self
+//        copy.editableSpec = spec
+//        return copy
+//    }
+//
+//    /// Returns a copy reset back to defaults (editableSpec cleared).
+//    public func resettingToDefault() -> GentleTheme {
+//        settingEditableSpec(defaultSpec)
+//    }
 
     public var layout: GentleLayoutTokens { activeSpec.layout }
     public var visual: GentleVisualTokens { activeSpec.visual }
@@ -1242,7 +1243,9 @@ public struct GentleFileThemeSpecStore: GentleThemeSpecStore, Sendable {
 /// - `@State private var manager = GentleThemeManager()`
 /// - inject `manager.theme` into `GentleThemeRoot`
 /// - call `manager.load()` on app launch, and `manager.save()`/`manager.reset()` from settings.
-public struct GentleThemeManager: Sendable {
+@Observable
+@MainActor
+public final class GentleThemeManager {
     public var theme: GentleTheme
     public let store: GentleThemeSpecStore
 
@@ -1253,25 +1256,38 @@ public struct GentleThemeManager: Sendable {
     }
 
     /// Loads the persisted editable spec (if present) into `theme.editableSpec`.
-    public mutating func load() throws {
-        theme.editableSpec = try store.loadEditableSpec()
+    public func load() throws {
+        if let savedSpec = try store.loadEditableSpec() {
+            var t = theme
+            t.editableSpec = savedSpec
+            theme = t
+        }
     }
 
-    /// Persists the current `theme.editableSpec`. If it's nil, this is a no-op.
+    /// Persists the current `theme.editableSpec`.
     public func save() throws {
-        guard let spec = theme.editableSpec else { return }
-        try store.saveEditableSpec(spec)
+        try store.saveEditableSpec(theme.editableSpec)
     }
 
-    /// Clears persisted state and resets the theme back to defaults.
-    public mutating func reset() throws {
-        theme.editableSpec = nil
+    /// Resets the theme back to defaults.
+    public func reset() throws {
+        var t = theme
+        t.editableSpec = t.defaultSpec
+        theme = t
         try store.clearEditableSpec()
     }
-
-    /// Convenience: apply a new editable spec (does not auto-persist).
-    public mutating func applyEditableSpec(_ spec: GentleDesignSystemSpec?) {
-        theme.editableSpec = spec
+    
+    public func bindingForTypographyRole(_ role: GentleTextRole) -> Binding<GentleTypographyRoleSpec> {
+        Binding(
+            get: {
+                self.theme.editableSpec.typography.roleSpec(for: role)
+            },
+            set: { newSpec in
+                var t = self.theme
+                t.editableSpec.typography.roles[role.rawValue] = newSpec
+                self.theme = t
+            }
+        )
     }
 }
 
@@ -1283,5 +1299,55 @@ public extension EnvironmentValues {
     var gentleThemeManager: GentleThemeManager? {
         get { self[GentleThemeManagerKey.self] }
         set { self[GentleThemeManagerKey.self] = newValue }
+    }
+}
+
+@propertyWrapper
+public struct GentleThemeManagerRuntime: DynamicProperty {
+    @Environment(\.gentleThemeManager) private var manager
+    public var wrappedValue: GentleThemeManager {
+        guard let manager else {
+            fatalError()
+        }
+        return manager
+    }
+    public init() {}
+}
+
+public struct TypographySizeEditor: View {
+    private let role: GentleTextRole
+    private let range: ClosedRange<Double>
+    private let step: Double
+
+    @GentleThemeManagerRuntime private var manager
+
+    public init(
+        role: GentleTextRole,
+        range: ClosedRange<Double> = 10...72,
+        step: Double = 1
+    ) {
+        self.role = role
+        self.range = range
+        self.step = step
+    }
+
+    public var body: some View {
+        let binding = manager.bindingForTypographyRole(role)
+
+        VStack(alignment: .leading, spacing: 12) {
+            Text(role.rawValue)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            HStack {
+                Text("Size")
+                Slider(value: binding.pointSize, in: range, step: step)
+
+                Text("\(Int(binding.pointSize.wrappedValue)) pt")
+                    .monospacedDigit()
+                    .frame(width: 60, alignment: .trailing)
+            }
+        }
+        .padding(.vertical, 8)
     }
 }

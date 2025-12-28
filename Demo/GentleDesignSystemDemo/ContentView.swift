@@ -36,8 +36,31 @@ struct ContentView: View {
 }
 
 struct SettingsView: View {
+    @GentleDesignRuntime private var design
+    @GentleThemeManagerRuntime private var themeManager
+
     var body: some View {
-        Text("Settings")
+        List {
+            Text("Aa Bb")
+                .gentleText(.largeTitle_xxl)
+            TypographySizeEditor(role: .largeTitle_xxl, range: 32...96, step: 2)
+            Button("Update and Save") {
+                print("hello")
+                do {
+                    try themeManager.save()
+                } catch {
+                    print("\(error)")
+                }
+            }
+            .gentleButton(.primary, shape: .pill)
+        }
+        .task {
+            do {
+                try themeManager.load()
+            } catch {
+                print("\(error)")
+            }
+        }
     }
 }
 
