@@ -5,7 +5,7 @@ import Observation
 import UIKit
 
 public enum GentleDesignSystemSpecVersion {
-    public static let current = "0.2.1" // adds gap intents + layout intent facades
+    public static let current = "0.2.2" // adds button style tokens in spec
 }
 
 // MARK: - Roles
@@ -19,10 +19,8 @@ public enum GentleDesignSystemSpecVersion {
    not a fixed point size.
  */
 public enum GentleTextRole: String, Identifiable, Codable, Sendable, CaseIterable {
-    public var id: String {
-        return self.rawValue
-    }
-    
+    public var id: String { rawValue }
+
     // Ramp legend:
     // xxl > xl > l > ml > m > ms > s
     case largeTitle_xxl
@@ -190,21 +188,28 @@ public struct GentleDesignSystemSpec: Codable, Sendable {
     /// Visual/appearance tokens: radii, shadows, strokes (future), etc.
     public var visual: GentleVisualTokens
 
+    /// Component style tokens (buttons, etc.)
+    public var buttons: GentleButtonTokens
+
     enum CodingKeys: String, CodingKey {
         case specVersion = "_specVersion"
-        case colors, typography, layout, visual
+        case colors, typography, layout, visual, buttons
     }
 
-    public init(specVersion: String = GentleDesignSystemSpecVersion.current,
-                colors: GentleColorTokens,
-                typography: GentleTypographyTokens,
-                layout: GentleLayoutTokens,
-                visual: GentleVisualTokens) {
+    public init(
+        specVersion: String = GentleDesignSystemSpecVersion.current,
+        colors: GentleColorTokens,
+        typography: GentleTypographyTokens,
+        layout: GentleLayoutTokens,
+        visual: GentleVisualTokens,
+        buttons: GentleButtonTokens
+    ) {
         self.specVersion = specVersion
         self.colors = colors
         self.typography = typography
         self.layout = layout
         self.visual = visual
+        self.buttons = buttons
     }
 }
 
@@ -213,7 +218,8 @@ public extension GentleDesignSystemSpec {
         colors: .gentleDefault,
         typography: .gentleDefault,
         layout: .gentleDefault,
-        visual: .gentleDefault
+        visual: .gentleDefault,
+        buttons: .gentleDefault
     )
 }
 
@@ -270,6 +276,107 @@ public extension GentleColorTokens {
             // Theme Colors
             GentleColorRole.themePrimary.rawValue: .init(lightHex: "#4A6EF5", darkHex: "#3B82F6"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#8FA2FF", darkHex:  "#93C5FD")
+        ]
+    )
+}
+
+// MARK: - Button tokens (NEW)
+
+/// JSON-friendly definition of a button "role" style.
+/// This is intentionally close to your existing hard-coded mapping,
+/// so current visuals remain unchanged while becoming editable.
+public struct GentleButtonRoleSpec: Codable, Sendable {
+    public var shape: GentleButtonShape
+
+    /// Typography role to apply to the button label.
+    public var textRole: GentleTextRole
+
+    /// Background fill color role.
+    public var backgroundRole: GentleColorRole
+
+    /// Foreground (label) color role.
+    public var labelColorRole: GentleColorRole
+
+    /// Optional border color role. If nil, no border.
+    public var borderRole: GentleColorRole?
+
+    /// Interaction affordances (kept JSON-friendly and tweakable).
+    public var pressedScale: Double
+    public var pressedOpacity: Double
+
+    public init(
+        shape: GentleButtonShape = .rounded,
+        textRole: GentleTextRole,
+        backgroundRole: GentleColorRole,
+        labelColorRole: GentleColorRole,
+        borderRole: GentleColorRole? = nil,
+        pressedScale: Double = 0.97,
+        pressedOpacity: Double = 0.9
+    ) {
+        self.shape = shape
+        self.textRole = textRole
+        self.backgroundRole = backgroundRole
+        self.labelColorRole = labelColorRole
+        self.borderRole = borderRole
+        self.pressedScale = pressedScale
+        self.pressedOpacity = pressedOpacity
+    }
+}
+
+public struct GentleButtonTokens: Codable, Sendable {
+    /// Stored using String keys for JSON stability (role.rawValue).
+    public var roles: [String: GentleButtonRoleSpec]
+
+    public init(roles: [String: GentleButtonRoleSpec]) {
+        self.roles = roles
+    }
+
+    public func roleSpec(for role: GentleButtonRole) -> GentleButtonRoleSpec {
+        if let spec = roles[role.rawValue] { return spec }
+        // Fallback to primary if missing.
+        if let primary = roles[GentleButtonRole.primary.rawValue] { return primary }
+        // Last-resort defaults (should never happen with gentleDefault).
+        return .init(
+            shape: .rounded,
+            textRole: .headline_m,
+            backgroundRole: .primaryCTA,
+            labelColorRole: .onPrimaryCTA,
+            borderRole: nil
+        )
+    }
+}
+
+public extension GentleButtonTokens {
+    static let gentleDefault: GentleButtonTokens = .init(
+        roles: [
+            GentleButtonRole.primary.rawValue: .init(
+                shape: .pill,
+                textRole: .headline_m,
+                backgroundRole: .primaryCTA,
+                labelColorRole: .onPrimaryCTA,
+                borderRole: nil
+            ),
+            GentleButtonRole.secondary.rawValue: .init(
+                shape: .pill,
+                textRole: .headline_m,
+                backgroundRole: .surface,
+                labelColorRole: .primaryCTA,
+                borderRole: .primaryCTA
+            ),
+            GentleButtonRole.tertiary.rawValue: .init(
+                shape: .pill,
+                textRole: .body_m,
+                backgroundRole: .background,
+                labelColorRole: .primaryCTA,
+                borderRole: nil
+            ),
+            GentleButtonRole.destructive.rawValue: .init(
+                shape: .pill,
+                textRole: .headline_m,
+                backgroundRole: .destructive,
+                labelColorRole: .onPrimaryCTA,
+                borderRole: nil
+            )
         ]
     )
 }
@@ -581,7 +688,7 @@ public extension GentleVisualTokens { static let gentleDefault = GentleVisualTok
 
 public struct GentleTheme: Sendable {
     public var id = 0
-    
+
     /// The shipped, immutable baseline spec.
     public let defaultSpec: GentleDesignSystemSpec
 
@@ -604,6 +711,7 @@ public struct GentleTheme: Sendable {
 
     public var layout: GentleLayoutTokens { activeSpec.layout }
     public var visual: GentleVisualTokens { activeSpec.visual }
+    public var buttons: GentleButtonTokens { activeSpec.buttons }
 
     public var gap: GentleGapTokens { activeSpec.layout.gap }
     public var grid: GentleGridSpacingTokens { activeSpec.layout.grid }
@@ -630,11 +738,13 @@ public struct GentleTheme: Sendable {
                                    design: roleSpec.design.swiftUIDesign)
 
         if let width = roleSpec.width {
-            if roleSpec.design == .default {
-                baseFont = baseFont.width(width.swiftUIWidth)
+            if #available(iOS 17.0, *) {
+                if roleSpec.design == .default {
+                    baseFont = baseFont.width(width.swiftUIWidth)
+                }
             }
         }
-        
+
         return GentleResolvedTextStyle(
             font: baseFont,
             design: roleSpec.design,
@@ -661,7 +771,6 @@ public extension GentleTheme {
 public struct GentleResolvedTextStyle {
     public let font: Font
     public let design: GentleFontDesignToken
-//    public let width: GentleFontWidthToken?
     public let colorRole: GentleColorRole
     public let lineSpacing: CGFloat
     public let letterSpacing: CGFloat
@@ -708,11 +817,7 @@ public struct GentleGapScaleFacade: Sendable {
     public var expansive: CGFloat { value(.expansive) }
 }
 
-/// Layout facade designed for call-site clarity:
-/// - `design.layout.stack.regular`
-/// - `design.layout.list.tight`
-/// - `design.layout.grid.value(.micro)`
-/// while still allowing `design.layout.gap.l` etc.
+/// Layout facade designed for call-site clarity.
 public struct GentleLayoutFacade: Sendable {
     private let tokens: GentleLayoutTokens
 
@@ -952,67 +1057,43 @@ public struct GentleButtonStyle: ButtonStyle {
     @Environment(\.colorScheme) private var colorScheme
 
     private let role: GentleButtonRole
-    private let shape: GentleButtonShape
+    private let shapeOverride: GentleButtonShape?
 
-    public init(role: GentleButtonRole, shape: GentleButtonShape = .rounded) {
+    /// If `shapeOverride` is nil, the per-role `shape` from the spec is used.
+    public init(role: GentleButtonRole, shape: GentleButtonShape? = nil) {
         self.role = role
-        self.shape = shape
+        self.shapeOverride = shape
     }
 
     public func makeBody(configuration: Configuration) -> some View {
         let gap = theme.gap
         let radii = theme.radii
 
-        let backgroundRole: GentleColorRole
-        let labelColorRole: GentleColorRole
-        let borderRole: GentleColorRole?
-        let textRole: GentleTextRole
+        let spec = theme.buttons.roleSpec(for: role)
 
-        switch role {
-        case .primary:
-            backgroundRole = .primaryCTA
-            labelColorRole = .onPrimaryCTA
-            borderRole = nil
-            textRole = .headline_m
+        let shapeToUse = shapeOverride ?? spec.shape
+        let cornerRadius: CGFloat = (shapeToUse == .pill) ? CGFloat(radii.pill) : CGFloat(radii.medium)
 
-        case .secondary:
-            backgroundRole = .surface
-            labelColorRole = .primaryCTA
-            borderRole = .primaryCTA
-            textRole = .headline_m
-
-        case .tertiary:
-            backgroundRole = .background
-            labelColorRole = .primaryCTA
-            borderRole = nil
-            textRole = .body_m
-
-        case .destructive:
-            backgroundRole = .destructive
-            labelColorRole = .onPrimaryCTA
-            borderRole = nil
-            textRole = .headline_m
-        }
-
-        let backgroundColor = theme.color(for: backgroundRole, scheme: colorScheme)
-        let borderColor = borderRole.map { theme.color(for: $0, scheme: colorScheme) }
-
-        let cornerRadius: CGFloat = (shape == .pill) ? CGFloat(radii.pill) : CGFloat(radii.medium)
+        let backgroundColor = theme.color(for: spec.backgroundRole, scheme: colorScheme)
+        let labelColor = theme.color(for: spec.labelColorRole, scheme: colorScheme)
+        let borderColor = spec.borderRole.map { theme.color(for: $0, scheme: colorScheme) }
 
         return configuration.label
-            .gentleText(textRole, colorRole: labelColorRole)
+            .gentleText(spec.textRole, colorRole: spec.labelColorRole)
             .padding(.horizontal, CGFloat(gap.xxl))
             .padding(.vertical, CGFloat(gap.l))
             .background(RoundedRectangle(cornerRadius: cornerRadius).fill(backgroundColor))
             .overlay(
                 Group {
-                    if let borderColor = borderColor {
+                    if let borderColor {
                         RoundedRectangle(cornerRadius: cornerRadius).stroke(borderColor, lineWidth: 1)
                     }
                 }
             )
-            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
-            .opacity(configuration.isPressed ? 0.9 : 1.0)
+            // ensure foreground is correct even if label overrides styling internally
+            .foregroundStyle(labelColor)
+            .scaleEffect(configuration.isPressed ? spec.pressedScale : 1.0)
+            .opacity(configuration.isPressed ? spec.pressedOpacity : 1.0)
             .animation(.spring(response: 0.2, dampingFraction: 0.9),
                        value: configuration.isPressed)
     }
@@ -1051,7 +1132,9 @@ public extension View {
 
     func gentleSurface(_ role: GentleSurfaceRole) -> some View { modifier(GentleSurfaceModifier(role: role)) }
 
-    func gentleButton(_ role: GentleButtonRole) -> some View { buttonStyle(GentleButtonStyle(role: role, shape: .rounded)) }
+    func gentleButton(_ role: GentleButtonRole) -> some View {
+        buttonStyle(GentleButtonStyle(role: role, shape: nil))
+    }
 
     func gentleButton(_ role: GentleButtonRole, shape: GentleButtonShape) -> some View {
         buttonStyle(GentleButtonStyle(role: role, shape: shape))
@@ -1059,15 +1142,15 @@ public extension View {
 
     @ViewBuilder
     func gentleFontWidth(_ width: GentleFontWidthToken?) -> some View {
-//        if let width {
-//        if #available(iOS 17.0, *) {
         if let width {
-            self.fontWidth(width.swiftUIWidth)
+            if #available(iOS 17.0, *) {
+                self.fontWidth(width.swiftUIWidth)
+            } else {
+                self
+            }
         } else {
             self
         }
-//        } else { self }
-//        } else { self }
     }
 
     func gentleBackground(_ role: GentleColorRole, ignoresSafeArea: Bool = false) -> some View {
@@ -1132,6 +1215,7 @@ public struct GentleDesignRuntime: DynamicProperty {
 
         public var layout: GentleLayoutFacade { .init(tokens: theme.layout) }
         public var visual: GentleVisualTokens { theme.visual }
+        public var buttons: GentleButtonTokens { theme.buttons }
 
         public var radii: GentleRadiusTokens { theme.radii }
         public var shadows: GentleShadowTokens { theme.shadows }
@@ -1295,13 +1379,6 @@ public struct GentleFileThemeSpecStore: GentleThemeSpecStore, Sendable {
 
 // MARK: - Theme Manager (ergonomics)
 
-/// Lightweight manager that keeps IO out of `GentleTheme`.
-/// Intended usage:
-/// - `@State private var manager = GentleThemeManager()`
-/// - Inject **both**:
-///   - `GentleThemeRoot(theme: manager.theme) { ... }`
-///   - `.environment(\.gentleThemeManager, manager)`
-/// - Call `manager.load()` on app launch, and `manager.save()`/`manager.reset()` from settings.
 @Observable
 @MainActor
 public final class GentleThemeManager {
@@ -1346,6 +1423,17 @@ public final class GentleThemeManager {
             }
         )
     }
+
+    public func bindingForButtonRole(_ role: GentleButtonRole) -> Binding<GentleButtonRoleSpec> {
+        Binding(
+            get: { self.theme.editableSpec.buttons.roleSpec(for: role) },
+            set: { newSpec in
+                var t = self.theme
+                t.editableSpec.buttons.roles[role.rawValue] = newSpec
+                self.theme = t
+            }
+        )
+    }
 }
 
 private struct GentleThemeManagerKey: EnvironmentKey {
@@ -1371,7 +1459,7 @@ public struct GentleThemeManagerRuntime: DynamicProperty {
     public init() {}
 }
 
-// MARK: - Editors
+// MARK: - Editors (Typography)
 
 public struct TypographySizeEditor: View {
     private let role: GentleTextRole
@@ -1408,6 +1496,101 @@ public struct TypographySizeEditor: View {
             }
         }
         .padding(.vertical, 8)
+    }
+}
+
+// MARK: - UIKit - Navigation Title (unchanged)
+
+private enum NavTitleKind { case large, inline }
+
+private extension GentleFontDesignToken {
+    var uiKitDesign: UIFontDescriptor.SystemDesign {
+        switch self {
+        case .default:    return .default
+        case .serif:      return .serif
+        case .rounded:    return .rounded
+        case .monospaced: return .monospaced
+        }
+    }
+}
+
+private extension GentleFontWidthToken {
+    var uiKitWidthTrait: CGFloat {
+        switch self {
+        case .compressed: return -0.5
+        case .condensed:  return -0.3
+        case .standard:   return 0.0
+        case .expanded:   return 0.3
+        }
+    }
+}
+
+private extension GentleFontWeightToken {
+    var uiKitWeight: UIFont.Weight { swiftUIWeight.uiKit }
+}
+
+private extension Font.Weight {
+    var uiKit: UIFont.Weight {
+        switch self {
+        case .ultraLight: return .ultraLight
+        case .thin:       return .thin
+        case .light:      return .light
+        case .regular:    return .regular
+        case .medium:     return .medium
+        case .semibold:   return .semibold
+        case .bold:       return .bold
+        case .heavy:      return .heavy
+        case .black:      return .black
+        default:          return .regular
+        }
+    }
+}
+
+private func navTitleFont(from roleSpec: GentleTypographyRoleSpec, kind: NavTitleKind) -> UIFont {
+    let textStyle: UIFont.TextStyle = (kind == .large) ? .largeTitle : .headline
+    var font = UIFont.preferredFont(forTextStyle: textStyle)
+
+    if let designed = font.fontDescriptor.withDesign(roleSpec.design.uiKitDesign) {
+        font = UIFont(descriptor: designed, size: 0)
+    }
+
+    let weightedDescriptor = font.fontDescriptor.addingAttributes([
+        .traits: [UIFontDescriptor.TraitKey.weight: roleSpec.weight.uiKitWeight]
+    ])
+    font = UIFont(descriptor: weightedDescriptor, size: 0)
+
+    if let width = roleSpec.width {
+        let traits = font.fontDescriptor.object(forKey: .traits) as? [UIFontDescriptor.TraitKey: Any] ?? [:]
+        var newTraits = traits
+        newTraits[.width] = width.uiKitWidthTrait
+
+        let widenedDescriptor = font.fontDescriptor.addingAttributes([
+            .traits: newTraits
+        ])
+        font = UIFont(descriptor: widenedDescriptor, size: 0)
+    }
+
+    return font
+}
+
+public struct GentleNavigationBarStyler: View {
+    @Environment(\.gentleTheme) private var theme
+
+    public init() {}
+
+    public var body: some View {
+        Color.clear
+            .onAppear { apply() }
+            .onChange(of: theme.id) { _ in apply() }
+    }
+
+    @MainActor
+    private func apply() {
+        GentleUIKitTheming.applyNavigationBarTitleStyle(
+            theme: theme,
+            textRole: .largeTitle_xxl,
+            colorRole: .textPrimary
+        )
     }
 }
 
@@ -1563,112 +1746,5 @@ public struct TypographyRoleEditor: View {
         let letterSpacing = "letter \(singleDigit(spec.letterSpacing))"
         let lineSpacing = "line \(singleDigit(spec.lineSpacing))"
         return "\(size) • \(weight) • \(design) • \(width) • Spacing: \(letterSpacing) • \(lineSpacing)"
-    }
-}
-
-// MARK: - UIKit - Navigation Title
-
-private enum NavTitleKind {
-    case large
-    case inline
-}
-
-private extension GentleFontDesignToken {
-    var uiKitDesign: UIFontDescriptor.SystemDesign {
-        switch self {
-        case .default:    return .default
-        case .serif:      return .serif
-        case .rounded:    return .rounded
-        case .monospaced: return .monospaced
-        }
-    }
-}
-
-private extension GentleFontWidthToken {
-    /// Best-effort width values. UIKit uses a "width" trait that may or may not
-    /// have a visible effect depending on the font/design.
-    var uiKitWidthTrait: CGFloat {
-        switch self {
-        case .compressed: return -0.5
-        case .condensed:  return -0.3
-        case .standard:   return 0.0
-        case .expanded:   return 0.3
-        }
-    }
-}
-
-private extension GentleFontWeightToken {
-    var uiKitWeight: UIFont.Weight { swiftUIWeight.uiKit } // see below
-}
-
-private extension Font.Weight {
-    var uiKit: UIFont.Weight {
-        switch self {
-        case .ultraLight: return .ultraLight
-        case .thin:       return .thin
-        case .light:      return .light
-        case .regular:    return .regular
-        case .medium:     return .medium
-        case .semibold:   return .semibold
-        case .bold:       return .bold
-        case .heavy:      return .heavy
-        case .black:      return .black
-        default:          return .regular
-        }
-    }
-}
-
-private func navTitleFont(from roleSpec: GentleTypographyRoleSpec, kind: NavTitleKind) -> UIFont {
-    let textStyle: UIFont.TextStyle = (kind == .large) ? .largeTitle : .headline
-    var font = UIFont.preferredFont(forTextStyle: textStyle)
-
-    // Apply design (system design variants)
-    if let designed = font.fontDescriptor.withDesign(roleSpec.design.uiKitDesign) {
-        font = UIFont(descriptor: designed, size: 0) // 0 keeps the preferred size
-    }
-
-    // Apply weight
-    let weightedDescriptor = font.fontDescriptor.addingAttributes([
-        .traits: [UIFontDescriptor.TraitKey.weight: roleSpec.weight.uiKitWeight]
-    ])
-    font = UIFont(descriptor: weightedDescriptor, size: 0)
-
-    // Apply width (best-effort)
-    if let width = roleSpec.width {
-        let traits = font.fontDescriptor.object(forKey: .traits) as? [UIFontDescriptor.TraitKey: Any] ?? [:]
-        var newTraits = traits
-        newTraits[.width] = width.uiKitWidthTrait
-
-        let widenedDescriptor = font.fontDescriptor.addingAttributes([
-            .traits: newTraits
-        ])
-        font = UIFont(descriptor: widenedDescriptor, size: 0)
-    }
-
-    return font
-}
-
-public struct GentleNavigationBarStyler: View {
-    @Environment(\.gentleTheme) private var theme
-
-    public init() {}
-    
-    public var body: some View {
-        Color.clear
-            .onAppear {
-                apply()
-            }
-            .onChange(of: theme.id) { _ in   // or theme.hash / version
-                apply()
-            }
-    }
-
-    @MainActor
-    private func apply() {
-        GentleUIKitTheming.applyNavigationBarTitleStyle(
-            theme: theme,
-            textRole: .largeTitle_xxl,
-            colorRole: .textPrimary
-        )
     }
 }
