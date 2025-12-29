@@ -44,6 +44,9 @@ struct SettingsView: View {
             ForEach(GentleTextRole.allCases) { role in
                 TypographyRoleEditor(role: role)
             }
+            ForEach(GentleColorRole.allCases) { role in
+                ColorRoleEditor(role: role)
+            }
             Button("Update and Save") {
                 Task { @MainActor in
                     // allow the press state to visually register

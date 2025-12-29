@@ -76,7 +76,9 @@ public extension GentleTextRole {
     }
 }
 
-public enum GentleColorRole: String, Codable, Sendable {
+public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiable {
+    public var id: String { rawValue }
+
     case textPrimary, textSecondary, textTertiary
     case onPrimaryCTA
     case background, surface, surfaceElevated
@@ -85,6 +87,26 @@ public enum GentleColorRole: String, Codable, Sendable {
     case destructive
     case primaryCTA
     case themePrimary, themeSecondary
+
+    public var displayName: String {
+        switch self {
+        case .textPrimary: return "Text Primary"
+        case .textSecondary: return "Text Secondary"
+        case .textTertiary: return "Text Tertiary"
+        case .onPrimaryCTA: return "On Primary CTA"
+        case .background: return "Background"
+        case .surface: return "Surface"
+        case .surfaceElevated: return "Surface Elevated"
+        case .surfaceOverlay: return "Surface Overlay"
+        case .onSurfaceOverlayPrimary: return "On Overlay Primary"
+        case .onSurfaceOverlaySecondary: return "On Overlay Secondary"
+        case .borderSubtle: return "Border Subtle"
+        case .destructive: return "Destructive"
+        case .primaryCTA: return "Primary CTA"
+        case .themePrimary: return "Theme Primary"
+        case .themeSecondary: return "Theme Secondary"
+        }
+    }
 }
 
 public enum GentleButtonRole: String, Codable, Sendable { case primary, secondary, tertiary, destructive }
@@ -1535,6 +1557,20 @@ public final class GentleThemeManager {
             set: { newSpec in
                 var t = self.theme
                 t.editableSpec.buttons.roles[role.rawValue] = newSpec
+                self.theme = t
+            }
+        )
+    }
+
+    public func bindingForColorRole(_ role: GentleColorRole) -> Binding<GentleColorPair> {
+        Binding(
+            get: {
+                self.theme.editableSpec.colors.pair(for: role)
+                    ?? GentleColorPair(lightHex: "#000000", darkHex: "#FFFFFF")
+            },
+            set: { newPair in
+                var t = self.theme
+                t.editableSpec.colors.pairByRole[role.rawValue] = newPair
                 self.theme = t
             }
         )
