@@ -5,7 +5,7 @@ import Observation
 import UIKit
 
 public enum GentleDesignSystemSpecVersion {
-    public static let current = "0.2.2" // adds button style tokens in spec
+    public static let current = "0.2.3" // adds button press animation roles in spec
 }
 
 // MARK: - Roles
@@ -93,6 +93,50 @@ public enum GentleButtonRole: String, Codable, Sendable { case primary, secondar
 /// - rounded: standard rounded rectangle (default)
 /// - pill: capsule-like button
 public enum GentleButtonShape: String, Codable, Sendable { case rounded, pill }
+
+// MARK: - Button animation roles
+
+/// High-level intent for button press feedback.
+/// Keep this JSON-friendly and map it to SwiftUI/UIKit behavior in code (not in JSON).
+public enum GentleButtonAnimationRole: String, Codable, Sendable, CaseIterable {
+    case none
+    case subtlePress
+    case squish
+    case pop
+    case bouncy
+}
+
+/// JSON-friendly animation tuning knobs per role.
+/// These parameters are intentionally minimal to keep themes maintainable.
+public struct GentleButtonAnimationSpec: Codable, Sendable {
+    /// Used by styles that implement pressed-state transforms (e.g. scale/opacity).
+    public var pressedScale: Double
+    public var pressedOpacity: Double
+
+    /// Used for ease-based animations.
+    public var duration: Double
+
+    /// Used for spring-based animations.
+    public var springResponse: Double
+    public var springDamping: Double
+    public var springBlend: Double
+
+    public init(
+        pressedScale: Double = 0.97,
+        pressedOpacity: Double = 0.92,
+        duration: Double = 0.12,
+        springResponse: Double = 0.22,
+        springDamping: Double = 0.85,
+        springBlend: Double = 0.0
+    ) {
+        self.pressedScale = pressedScale
+        self.pressedOpacity = pressedOpacity
+        self.duration = duration
+        self.springResponse = springResponse
+        self.springDamping = springDamping
+        self.springBlend = springBlend
+    }
+}
 
 /// Shape of a standalone text input container (only applies when chrome is `.standalone`).
 public enum GentleTextFieldShape: String, Codable, Sendable { case rounded, pill }
@@ -300,7 +344,11 @@ public struct GentleButtonRoleSpec: Codable, Sendable {
     /// Optional border color role. If nil, no border.
     public var borderRole: GentleColorRole?
 
+    /// Which "feel" to use for press feedback (animation curve + tuning).
+    public var animationRole: GentleButtonAnimationRole
+
     /// Interaction affordances (kept JSON-friendly and tweakable).
+    /// These remain per-role to preserve existing behavior and allow overrides.
     public var pressedScale: Double
     public var pressedOpacity: Double
 
@@ -310,6 +358,7 @@ public struct GentleButtonRoleSpec: Codable, Sendable {
         backgroundRole: GentleColorRole,
         labelColorRole: GentleColorRole,
         borderRole: GentleColorRole? = nil,
+        animationRole: GentleButtonAnimationRole = .squish,
         pressedScale: Double = 0.97,
         pressedOpacity: Double = 0.9
     ) {
@@ -318,6 +367,7 @@ public struct GentleButtonRoleSpec: Codable, Sendable {
         self.backgroundRole = backgroundRole
         self.labelColorRole = labelColorRole
         self.borderRole = borderRole
+        self.animationRole = animationRole
         self.pressedScale = pressedScale
         self.pressedOpacity = pressedOpacity
     }
@@ -327,8 +377,13 @@ public struct GentleButtonTokens: Codable, Sendable {
     /// Stored using String keys for JSON stability (role.rawValue).
     public var roles: [String: GentleButtonRoleSpec]
 
-    public init(roles: [String: GentleButtonRoleSpec]) {
+    /// Shared animation tuning per animation role.
+    public var animations: [String: GentleButtonAnimationSpec]
+
+    public init(roles: [String: GentleButtonRoleSpec],
+                animations: [String: GentleButtonAnimationSpec]) {
         self.roles = roles
+        self.animations = animations
     }
 
     public func roleSpec(for role: GentleButtonRole) -> GentleButtonRoleSpec {
@@ -341,8 +396,17 @@ public struct GentleButtonTokens: Codable, Sendable {
             textRole: .headline_m,
             backgroundRole: .primaryCTA,
             labelColorRole: .onPrimaryCTA,
-            borderRole: nil
+            borderRole: nil,
+            animationRole: .squish,
+            pressedScale: 0.97,
+            pressedOpacity: 0.9
         )
+    }
+
+    public func animationSpec(for role: GentleButtonAnimationRole) -> GentleButtonAnimationSpec {
+        if let spec = animations[role.rawValue] { return spec }
+        if let fallback = animations[GentleButtonAnimationRole.squish.rawValue] { return fallback }
+        return GentleButtonAnimationSpec()
     }
 }
 
@@ -354,28 +418,67 @@ public extension GentleButtonTokens {
                 textRole: .headline_m,
                 backgroundRole: .primaryCTA,
                 labelColorRole: .onPrimaryCTA,
-                borderRole: nil
+                borderRole: nil,
+                animationRole: .squish,
+                pressedScale: 0.9, // 0.97
+                pressedOpacity: 0.86 // 0.92
             ),
             GentleButtonRole.secondary.rawValue: .init(
                 shape: .pill,
                 textRole: .headline_m,
                 backgroundRole: .surface,
                 labelColorRole: .primaryCTA,
-                borderRole: .primaryCTA
+                borderRole: .primaryCTA,
+                animationRole: .subtlePress,
+                pressedScale: 0.85, // 0.98
+                pressedOpacity: 0.9 // 0.95
             ),
             GentleButtonRole.tertiary.rawValue: .init(
                 shape: .pill,
                 textRole: .body_m,
                 backgroundRole: .background,
                 labelColorRole: .primaryCTA,
-                borderRole: nil
+                borderRole: nil,
+                animationRole: .subtlePress,
+                pressedScale: 0.95, // 0.99
+                pressedOpacity: 0.93 // 0.96
             ),
             GentleButtonRole.destructive.rawValue: .init(
                 shape: .pill,
                 textRole: .headline_m,
                 backgroundRole: .destructive,
                 labelColorRole: .onPrimaryCTA,
-                borderRole: nil
+                borderRole: nil,
+                animationRole: .squish,
+                pressedScale: 0.9, // 0.97
+                pressedOpacity: 0.86 // 0.92
+            )
+        ],
+        animations: [
+            GentleButtonAnimationRole.none.rawValue: .init(
+                pressedScale: 1.0, pressedOpacity: 1.0,
+                duration: 0.0,
+                springResponse: 0.0, springDamping: 1.0, springBlend: 0.0
+            ),
+            GentleButtonAnimationRole.subtlePress.rawValue: .init(
+                pressedScale: 0.98, pressedOpacity: 0.95,
+                duration: 0.12,
+                springResponse: 0.0, springDamping: 1.0, springBlend: 0.0
+            ),
+            GentleButtonAnimationRole.squish.rawValue: .init(
+                pressedScale: 0.97, pressedOpacity: 0.92,
+                duration: 0.10,
+                springResponse: 0.22, springDamping: 0.85, springBlend: 0.0
+            ),
+            GentleButtonAnimationRole.pop.rawValue: .init(
+                pressedScale: 0.975, pressedOpacity: 0.93,
+                duration: 0.10,
+                springResponse: 0.18, springDamping: 0.78, springBlend: 0.0
+            ),
+            GentleButtonAnimationRole.bouncy.rawValue: .init(
+                pressedScale: 0.97, pressedOpacity: 0.94,
+                duration: 0.10,
+                springResponse: 0.28, springDamping: 0.70, springBlend: 0.0
             )
         ]
     )
@@ -1052,9 +1155,43 @@ public struct GentleBackgroundModifier: ViewModifier {
     }
 }
 
+// MARK: - Animation resolver
+
+@MainActor
+public enum GentleButtonAnimations {
+    public static func resolve(
+        reduceMotion: Bool,
+        role: GentleButtonAnimationRole,
+        spec: GentleButtonAnimationSpec
+    ) -> Animation? {
+        if reduceMotion { return nil }
+
+        switch role {
+        case .none:
+            return nil
+        case .subtlePress:
+            // "Feels" crisp; avoids bounce.
+            return .easeOut(duration: spec.duration)
+        case .squish:
+            return .spring(response: spec.springResponse,
+                           dampingFraction: spec.springDamping,
+                           blendDuration: spec.springBlend)
+        case .pop:
+            return .spring(response: spec.springResponse,
+                           dampingFraction: spec.springDamping,
+                           blendDuration: spec.springBlend)
+        case .bouncy:
+            return .spring(response: spec.springResponse,
+                           dampingFraction: spec.springDamping,
+                           blendDuration: spec.springBlend)
+        }
+    }
+}
+
 public struct GentleButtonStyle: ButtonStyle {
     @Environment(\.gentleTheme) private var theme
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private let role: GentleButtonRole
     private let shapeOverride: GentleButtonShape?
@@ -1070,6 +1207,12 @@ public struct GentleButtonStyle: ButtonStyle {
         let radii = theme.radii
 
         let spec = theme.buttons.roleSpec(for: role)
+        let animSpec = theme.buttons.animationSpec(for: spec.animationRole)
+        let animation = GentleButtonAnimations.resolve(
+            reduceMotion: reduceMotion,
+            role: spec.animationRole,
+            spec: animSpec
+        )
 
         let shapeToUse = shapeOverride ?? spec.shape
         let cornerRadius: CGFloat = (shapeToUse == .pill) ? CGFloat(radii.pill) : CGFloat(radii.medium)
@@ -1094,8 +1237,7 @@ public struct GentleButtonStyle: ButtonStyle {
             .foregroundStyle(labelColor)
             .scaleEffect(configuration.isPressed ? spec.pressedScale : 1.0)
             .opacity(configuration.isPressed ? spec.pressedOpacity : 1.0)
-            .animation(.spring(response: 0.2, dampingFraction: 0.9),
-                       value: configuration.isPressed)
+            .animation(animation, value: configuration.isPressed)
     }
 }
 

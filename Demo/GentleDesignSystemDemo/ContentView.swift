@@ -45,14 +45,17 @@ struct SettingsView: View {
                 TypographyRoleEditor(role: role)
             }
             Button("Update and Save") {
-                print("hello")
-                do {
-                    try themeManager.save()
-                } catch {
-                    print("\(error)")
+                Task { @MainActor in
+                    // allow the press state to visually register
+                    try? await Task.sleep(nanoseconds: 80_000_000) // 80ms (tune 60–120)
+                    do {
+                        try themeManager.save()
+                    } catch {
+                        print("\(error)")
+                    }
                 }
             }
-            .gentleButton(.primary, shape: .pill)
+            .gentleButton(.primary)
         }
         .task {
             do {
