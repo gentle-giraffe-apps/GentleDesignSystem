@@ -104,6 +104,8 @@ public enum GentleButtonAnimationRole: String, Codable, Sendable, CaseIterable {
     case squish
     case pop
     case bouncy
+    /// Shrinks on press, then springs back past original size before settling.
+    case springBack
 }
 
 /// JSON-friendly animation tuning knobs per role.
@@ -419,7 +421,7 @@ public extension GentleButtonTokens {
                 backgroundRole: .primaryCTA,
                 labelColorRole: .onPrimaryCTA,
                 borderRole: nil,
-                animationRole: .squish,
+                animationRole: .springBack, // .squish,
                 pressedScale: 0.9, // 0.97
                 pressedOpacity: 0.86 // 0.92
             ),
@@ -479,6 +481,11 @@ public extension GentleButtonTokens {
                 pressedScale: 0.97, pressedOpacity: 0.94,
                 duration: 0.10,
                 springResponse: 0.28, springDamping: 0.70, springBlend: 0.0
+            ),
+            GentleButtonAnimationRole.springBack.rawValue: .init(
+                pressedScale: 0.72, pressedOpacity: 0.90,
+                duration: 0.10,
+                springResponse: 0.45, springDamping: 0.45, springBlend: 0.0
             )
         ]
     )
@@ -1181,6 +1188,11 @@ public enum GentleButtonAnimations {
                            dampingFraction: spec.springDamping,
                            blendDuration: spec.springBlend)
         case .bouncy:
+            return .spring(response: spec.springResponse,
+                           dampingFraction: spec.springDamping,
+                           blendDuration: spec.springBlend)
+        case .springBack:
+            // Underdamped spring that overshoots 1.0 before settling
             return .spring(response: spec.springResponse,
                            dampingFraction: spec.springDamping,
                            blendDuration: spec.springBlend)
