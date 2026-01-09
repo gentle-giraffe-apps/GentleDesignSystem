@@ -91,18 +91,14 @@ The token layer defines *what* your design system means — not how it is render
 
 ### Token Categories
 
-- **Typography**
-  - `GentleTextRole`
-  - `GentleTypographyRoleSpec`
-- **Colors**
-  - `GentleColorRole`
-  - `GentleColorPair`
-- **Spacing**
-  - `GentleSpacingTokens`
-- **Radii**
-  - `GentleRadiusTokens`
-- **Shadows**
-  - `GentleShadowTokens`
+| Category | Types |
+|----------|-------|
+| **Typography** | `GentleTextRole`, `GentleTypographyRoleSpec`, `GentleTypographyTokens` |
+| **Colors** | `GentleColorRole`, `GentleColorPair`, `GentleColorTokens` |
+| **Layout** | `GentleLayoutTokens`, `GentleSpacingToken`, `GentleGapTokens`, `GentleInsetTokens` |
+| **Visual** | `GentleVisualTokens`, `GentleRadiusTokens`, `GentleShadowTokens` |
+| **Buttons** | `GentleButtonRole`, `GentleButtonRoleSpec`, `GentleButtonTokens`, `GentleButtonAnimationRole` |
+| **Surfaces** | `GentleSurfaceRole` |
 
 All tokens are:
 - `Codable`
@@ -115,16 +111,17 @@ This makes it easy to:
 - Share tokens across platforms later
 
 ```swift
-public struct GentleDesignSystemSpec {
+public struct GentleDesignSystemSpec: Codable, Sendable {
+    public var specVersion: String
     public var colors: GentleColorTokens
     public var typography: GentleTypographyTokens
-    public var spacing: GentleSpacingTokens
-    public var radii: GentleRadiusTokens
-    public var shadows: GentleShadowTokens
+    public var layout: GentleLayoutTokens
+    public var visual: GentleVisualTokens
+    public var buttons: GentleButtonTokens
 }
 ```
 
-The default theme (`.gentleDefault`) is simply one concrete spec.
+The default theme (`.default`) is simply one concrete spec.
 
 ---
 
@@ -144,12 +141,26 @@ At runtime, tokens are resolved into **actual SwiftUI values**.
 @Environment(\.gentleTheme) var theme
 ```
 
-Typography resolution uses `UIFontMetrics` to correctly scale custom font sizes while remaining anchored to Apple’s semantic text styles.
+Typography resolution uses `UIFontMetrics` to correctly scale custom font sizes while remaining anchored to Apple's semantic text styles.
 
 This ensures:
 - Accessibility scaling works correctly
 - Custom point sizes remain proportional
 - Future Dynamic Type changes remain safe
+
+### Property Wrappers
+
+For convenient access to the theme in views:
+
+```swift
+// Access resolved theme values
+@GentleDesignRuntime private var design
+
+// Use in view
+design.color(.textPrimary)    // Color for current scheme
+design.layout.stack.regular   // CGFloat spacing value
+design.buttons                // Button tokens
+```
 
 ---
 
@@ -211,7 +222,7 @@ Surfaces apply:
 - Corner radius
 - Borders or shadows
 
-The role-based API avoids “magic numbers” leaking into views.
+The role-based API avoids "magic numbers" leaking into views.
 
 ### Buttons
 
@@ -223,7 +234,57 @@ Button("Save") { }
 Buttons are:
 - Styled via `ButtonStyle`
 - Fully theme-driven
+- Support configurable animations
 - Easily extendable for new roles
+
+---
+
+## 5. Theme Management & Persistence
+
+For apps that need runtime theme editing or persistence:
+
+### GentleThemeManager
+
+```swift
+@main
+struct MyApp: App {
+    @State private var manager = GentleThemeManager(theme: .default)
+
+    var body: some Scene {
+        WindowGroup {
+            GentleThemeRoot(theme: manager.theme) {
+                ContentView()
+            }
+            .environment(\.gentleThemeManager, manager)
+        }
+    }
+}
+```
+
+### Using the Manager
+
+```swift
+@GentleThemeManagerRuntime private var manager
+
+// Save current theme to disk
+try manager.save()
+
+// Load persisted theme
+try manager.load()
+
+// Get bindings for editing
+manager.typographyBinding(for: .body_m)
+manager.colorBinding(for: .primaryCTA)
+```
+
+### Persistence
+
+`GentleFileThemeSpecStore` handles JSON persistence to Application Support:
+
+```swift
+let store = GentleFileThemeSpecStore(fileName: "my-theme.json")
+let manager = GentleThemeManager(theme: .default, store: store)
+```
 
 ---
 
@@ -254,29 +315,34 @@ Buttons are:
 - `tertiary`
 - `destructive`
 
+### Button Animation Roles
+
+| Animation | Description |
+|-----------|-------------|
+| `none` | No animation |
+| `subtlePress` | Subtle press feedback |
+| `squish` | Squish effect on press |
+| `pop` | Pop effect |
+| `bouncy` | Bouncy spring animation |
+| `springBack` | Shrinks on press, springs back past original size before settling |
+
 ### Surface Roles
 
 - `appBackground`
 - `card`
-- `cardChrome`
+- `cardChrome` (no padding)
 - `cardElevated`
 - `surfaceOverlay`
 
 ### Color Roles
 
-- `textPrimary`
-- `textSecondary`
-- `textTertiary`
-- `background`
-- `surface`
-- `surfaceElevated`
-- `surfaceOverlay`
-- `borderSubtle`
-- `primaryCTA`
-- `onPrimaryCTA`
-- `destructive`
-- `themePrimary`
-- `themeSecondary`
+| Category | Roles |
+|----------|-------|
+| **Text** | `textPrimary`, `textSecondary`, `textTertiary` |
+| **Surfaces** | `background`, `surface`, `surfaceElevated`, `surfaceOverlay`, `onSurfaceOverlayPrimary`, `onSurfaceOverlaySecondary` |
+| **Actions** | `primaryCTA`, `onPrimaryCTA`, `destructive` |
+| **Theme** | `themePrimary`, `themeSecondary` |
+| **Structure** | `borderSubtle` |
 
 ### Spacing Tokens
 
@@ -302,11 +368,11 @@ Buttons are:
 
 ## Requirements
 
-- iOS 26.0+
-- Swift 6+
+- iOS 18.0+
+- Swift 6.1+
 
 ---
 
-## 🤖 Tooling Note
+## Tooling Note
 
 Portions of drafting and editorial refinement in this repository were accelerated using large language models (including ChatGPT, Claude, and Gemini) under direct human design, validation, and final approval. All technical decisions, code, and architectural conclusions are authored and verified by the repository maintainer.
