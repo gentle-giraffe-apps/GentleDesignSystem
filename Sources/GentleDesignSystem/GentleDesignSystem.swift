@@ -1511,6 +1511,7 @@ public struct GentleFileThemeSpecStore: GentleThemeSpecStore, Sendable {
 public final class GentleThemeManager {
     public var theme: GentleTheme
     public let store: GentleThemeSpecStore
+    public private(set) var hasUnsavedChanges: Bool = false
 
     public init(theme: GentleTheme = .default,
                 store: GentleThemeSpecStore = GentleFileThemeSpecStore()) {
@@ -1525,11 +1526,13 @@ public final class GentleThemeManager {
             t.editableSpec = savedSpec
             theme = t
         }
+        hasUnsavedChanges = false
     }
 
     /// Persists the current `theme.editableSpec`.
     public func save() throws {
         try store.saveEditableSpec(theme.editableSpec)
+        hasUnsavedChanges = false
     }
 
     /// Resets the theme back to defaults and clears persisted overrides.
@@ -1547,6 +1550,7 @@ public final class GentleThemeManager {
                 var t = self.theme
                 t.editableSpec.typography.roles[role.rawValue] = newSpec
                 self.theme = t
+                self.hasUnsavedChanges = true
             }
         )
     }
@@ -1558,6 +1562,7 @@ public final class GentleThemeManager {
                 var t = self.theme
                 t.editableSpec.buttons.roles[role.rawValue] = newSpec
                 self.theme = t
+                self.hasUnsavedChanges = true
             }
         )
     }
@@ -1572,6 +1577,7 @@ public final class GentleThemeManager {
                 var t = self.theme
                 t.editableSpec.colors.pairByRole[role.rawValue] = newPair
                 self.theme = t
+                self.hasUnsavedChanges = true
             }
         )
     }
