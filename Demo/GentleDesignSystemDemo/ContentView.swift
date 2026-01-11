@@ -70,37 +70,6 @@ struct SettingsView: View {
     }
 }
 
-struct WidthSanityCheck: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-
-            Text("SF Pro — Standard / Expanded / Compressed")
-                .font(.system(size: 16, weight: .semibold))
-
-            Text("Hamburgefontsiv 0123456789")
-                .font(.system(size: 36, weight: .regular, design: .default).width(.standard))
-
-            Text("Hamburgefontsiv 0123456789")
-                .font(.system(size: 36, weight: .regular, design: .default).width(.expanded))
-
-            Text("Hamburgefontsiv 0123456789")
-                .font(.system(size: 36, weight: .regular, design: .default).width(.compressed))
-
-            Divider().padding(.vertical, 8)
-
-            Text("SF Mono — Standard / Expanded / Compressed (often no visible change)")
-                .font(.system(size: 16, weight: .semibold))
-
-            Text("Hamburgefontsiv 0123456789")
-                .font(.system(size: 36, weight: .regular, design: .monospaced).width(.expanded))
-
-            Text("Hamburgefontsiv 0123456789")
-                .font(.system(size: 36, weight: .regular, design: .monospaced).width(.compressed))
-        }
-        .padding()
-    }
-}
-
 // MARK: - Typography Section
 
 struct TypographySection: View {
