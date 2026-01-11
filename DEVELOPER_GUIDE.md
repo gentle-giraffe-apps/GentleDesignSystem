@@ -6,7 +6,7 @@ A Swift Package providing a token-driven design system for iOS 18+ SwiftUI apps.
 
 - `Sources/GentleDesignSystem/` - Package source
 - `Demo/` - Demo iOS app
-- `docs/architecture/` - Detailed context for agents
+- `docs/architecture/` - Detailed context for developers
 
 ## Must-Know Rules
 
