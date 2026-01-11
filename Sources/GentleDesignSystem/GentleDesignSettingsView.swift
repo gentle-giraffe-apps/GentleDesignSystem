@@ -11,10 +11,24 @@ public struct GentleDesignSettingsView: View {
     @State private var buttonsExpanded = false
     @State private var surfacesExpanded = false
 
-    public init() {
+    private let isInsideNavigationStack: Bool
+
+    public init(isInsideNavigationStack: Bool = false) {
+        self.isInsideNavigationStack = isInsideNavigationStack
     }
 
     public var body: some View {
+        if isInsideNavigationStack {
+            content
+        } else {
+            NavigationStack {
+                content
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var content: some View {
         List {
             Section {
                 DisclosureGroup("Fonts", isExpanded: $fontsExpanded) {
@@ -45,19 +59,26 @@ public struct GentleDesignSettingsView: View {
                         .foregroundStyle(.secondary)
                 }
             }
-
-            Button("Update and Save") {
-                Task { @MainActor in
-                    // allow the press state to visually register
-                    try? await Task.sleep(nanoseconds: 80_000_000) // 80ms (tune 60–120)
-                    do {
-                        try themeManager.save()
-                    } catch {
-                        print("\(error)")
+        }
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button {
+                    Task { @MainActor in
+                        // allow the press state to visually register
+                        try? await Task.sleep(nanoseconds: 80_000_000) // 80ms (tune 60–120)
+                        do {
+                            try themeManager.save()
+                        } catch {
+                            print("\(error)")
+                        }
                     }
+                } label: {
+                    Image(systemName: "checkmark")
+                        .fontWeight(.semibold)
+                        .foregroundStyle(themeManager.hasUnsavedChanges ? design.color(.primaryCTA) : .secondary)
                 }
+                .disabled(!themeManager.hasUnsavedChanges)
             }
-            .gentleButton(.primary)
         }
         .task {
             do {
