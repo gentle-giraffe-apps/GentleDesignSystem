@@ -7,16 +7,7 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: design.layout.stack.loose) {
-                    GentleDesignTypographySection()
-                    GentleDesignButtonsSection()
-                    GentleDesignSurfacesSection()
-                    GentleDesignColorsSection()
-                }
-                .gentleInset(.screen)
-            }
-            .gentleSurface(.appBackground)
+            GentleDesignFoundationView()
             .navigationTitle("Design System")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {

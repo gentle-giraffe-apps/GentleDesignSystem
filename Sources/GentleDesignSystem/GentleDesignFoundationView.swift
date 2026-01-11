@@ -2,41 +2,23 @@
 
 import SwiftUI
 
-public struct GentleDesignSettingsView: View {
+public struct GentleDesignFoundationView: View {
     @GentleDesignRuntime private var design
-    @GentleThemeManagerRuntime private var themeManager
-
+    
     public init() {
     }
     
     public var body: some View {
-        List {
-            ForEach(GentleTextRole.allCases) { role in
-                TypographyRoleEditor(role: role)
+        ScrollView {
+            VStack(spacing: design.layout.stack.loose) {
+                GentleDesignTypographySection()
+                GentleDesignButtonsSection()
+                GentleDesignSurfacesSection()
+                GentleDesignColorsSection()
             }
-            ForEach(GentleColorRole.allCases) { role in
-                ColorRoleEditor(role: role)
-            }
-            Button("Update and Save") {
-                Task { @MainActor in
-                    // allow the press state to visually register
-                    try? await Task.sleep(nanoseconds: 80_000_000) // 80ms (tune 60–120)
-                    do {
-                        try themeManager.save()
-                    } catch {
-                        print("\(error)")
-                    }
-                }
-            }
-            .gentleButton(.primary)
+            .gentleInset(.screen)
         }
-        .task {
-            do {
-                try themeManager.load()
-            } catch {
-                print("\(error)")
-            }
-        }
+        .gentleSurface(.appBackground)
     }
 }
 
