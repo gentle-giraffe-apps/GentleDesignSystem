@@ -12,9 +12,11 @@ public struct GentleDesignSettingsView: View {
     @State private var surfacesExpanded = false
 
     private let isInsideNavigationStack: Bool
+    private let onSave: (() async -> Void)?
 
-    public init(isInsideNavigationStack: Bool = false) {
+    public init(isInsideNavigationStack: Bool = false, onSave: (() async -> Void)? = nil) {
         self.isInsideNavigationStack = isInsideNavigationStack
+        self.onSave = onSave
     }
 
     public var body: some View {
@@ -68,6 +70,7 @@ public struct GentleDesignSettingsView: View {
                         try? await Task.sleep(nanoseconds: 80_000_000) // 80ms (tune 60–120)
                         do {
                             try themeManager.save()
+                            await onSave?()
                         } catch {
                             print("\(error)")
                         }

@@ -3,7 +3,7 @@ import GentleDesignSystem
 
 struct ContentView: View {
     @GentleDesignRuntime private var design
-    @State private var isShowingSettings = false
+    @State private var isSheetPresented = false
     
     var body: some View {
         NavigationStack {
@@ -13,14 +13,16 @@ struct ContentView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         print("settings")
-                        isShowingSettings = true
+                        isSheetPresented = true
                     } label: {
                         Image(systemName: "gearshape")
                     }
                 }
             }
-            .sheet(isPresented: $isShowingSettings) {
-                GentleDesignSettingsView()
+            .sheet(isPresented: $isSheetPresented) {
+                GentleDesignSettingsView(onSave: {
+                    isSheetPresented = false
+                })
             }
         }
     }
