@@ -1270,6 +1270,20 @@ public struct GentleButtonStyle: ButtonStyle {
         let labelColor = theme.color(for: spec.labelColorRole, scheme: colorScheme)
         let borderColor = spec.borderRole.map { theme.color(for: $0, scheme: colorScheme) }
 
+        let saturation: Double
+        let opacity: Double
+        if isEnabled {
+            saturation = 1.0
+            opacity = 1.0
+        } else {
+            if spec.labelColorRole != .onPrimaryCTA {
+                saturation = 0.3
+                opacity = 0.6
+            } else {
+                saturation = 1.0
+                opacity = 0.4
+            }
+        }
         return configuration.label
             .gentleText(textRoleToUse, colorRole: spec.labelColorRole)
             .padding(.horizontal, CGFloat(gap.xxl))
@@ -1287,8 +1301,8 @@ public struct GentleButtonStyle: ButtonStyle {
             .scaleEffect(configuration.isPressed ? spec.pressedScale : 1.0)
             .opacity(configuration.isPressed ? spec.pressedOpacity : 1.0)
             .animation(animation, value: configuration.isPressed)
-            .saturation(isEnabled ? 1.0 : 0.0)
-            .opacity(isEnabled ? 1.0 : 0.75)
+            .saturation(saturation)
+            .opacity(opacity)
     }
 }
 
