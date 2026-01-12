@@ -64,7 +64,7 @@ public struct GentleDesignSettingsView: View {
         }
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button {
+                Button("Save") {
                     Task { @MainActor in
                         // allow the press state to visually register
                         try? await Task.sleep(nanoseconds: 80_000_000) // 80ms (tune 60–120)
@@ -75,11 +75,8 @@ public struct GentleDesignSettingsView: View {
                             print("\(error)")
                         }
                     }
-                } label: {
-                    Image(systemName: "checkmark")
-                        .fontWeight(.semibold)
-                        .foregroundStyle(themeManager.hasUnsavedChanges ? design.color(.primaryCTA) : .secondary)
                 }
+                .gentleButton(.tertiary)
                 .disabled(!themeManager.hasUnsavedChanges)
             }
         }

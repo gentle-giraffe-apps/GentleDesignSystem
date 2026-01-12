@@ -1226,6 +1226,7 @@ public struct GentleButtonStyle: ButtonStyle {
     @Environment(\.gentleTheme) private var theme
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.isEnabled) private var isEnabled
 
     private let role: GentleButtonRole
     private let shapeOverride: GentleButtonShape?
@@ -1272,6 +1273,8 @@ public struct GentleButtonStyle: ButtonStyle {
             .scaleEffect(configuration.isPressed ? spec.pressedScale : 1.0)
             .opacity(configuration.isPressed ? spec.pressedOpacity : 1.0)
             .animation(animation, value: configuration.isPressed)
+            .saturation(isEnabled ? 1.0 : 0.0)
+            .opacity(isEnabled ? 1.0 : 0.75)
     }
 }
 
