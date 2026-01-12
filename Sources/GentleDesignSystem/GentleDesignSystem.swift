@@ -109,7 +109,7 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
     }
 }
 
-public enum GentleButtonRole: String, Codable, Sendable { case primary, secondary, tertiary, destructive }
+public enum GentleButtonRole: String, Codable, Sendable { case primary, secondary, tertiary, quaternary, destructive }
 
 /// Separates geometry from intent.
 /// - rounded: standard rounded rectangle (default)
@@ -459,13 +459,23 @@ public extension GentleButtonTokens {
             ),
             GentleButtonRole.tertiary.rawValue: .init(
                 shape: .pill,
+                textRole: .headline_m,
+                backgroundRole: .surface,
+                labelColorRole: .primaryCTA,
+                borderRole: nil,
+                animationRole: .subtlePress,
+                pressedScale: 0.85,
+                pressedOpacity: 0.9
+            ),
+            GentleButtonRole.quaternary.rawValue: .init(
+                shape: .pill,
                 textRole: .body_m,
                 backgroundRole: .background,
                 labelColorRole: .primaryCTA,
                 borderRole: nil,
                 animationRole: .subtlePress,
-                pressedScale: 0.95, // 0.99
-                pressedOpacity: 0.93 // 0.96
+                pressedScale: 0.95,
+                pressedOpacity: 0.93
             ),
             GentleButtonRole.destructive.rawValue: .init(
                 shape: .pill,
@@ -1230,11 +1240,14 @@ public struct GentleButtonStyle: ButtonStyle {
 
     private let role: GentleButtonRole
     private let shapeOverride: GentleButtonShape?
+    private let textRoleOverride: GentleTextRole?
 
     /// If `shapeOverride` is nil, the per-role `shape` from the spec is used.
-    public init(role: GentleButtonRole, shape: GentleButtonShape? = nil) {
+    /// If `textRoleOverride` is nil, the per-role `textRole` from the spec is used.
+    public init(role: GentleButtonRole, shape: GentleButtonShape? = nil, textRole: GentleTextRole? = nil) {
         self.role = role
         self.shapeOverride = shape
+        self.textRoleOverride = textRole
     }
 
     public func makeBody(configuration: Configuration) -> some View {
@@ -1250,6 +1263,7 @@ public struct GentleButtonStyle: ButtonStyle {
         )
 
         let shapeToUse = shapeOverride ?? spec.shape
+        let textRoleToUse = textRoleOverride ?? spec.textRole
         let cornerRadius: CGFloat = (shapeToUse == .pill) ? CGFloat(radii.pill) : CGFloat(radii.medium)
 
         let backgroundColor = theme.color(for: spec.backgroundRole, scheme: colorScheme)
@@ -1257,7 +1271,7 @@ public struct GentleButtonStyle: ButtonStyle {
         let borderColor = spec.borderRole.map { theme.color(for: $0, scheme: colorScheme) }
 
         return configuration.label
-            .gentleText(spec.textRole, colorRole: spec.labelColorRole)
+            .gentleText(textRoleToUse, colorRole: spec.labelColorRole)
             .padding(.horizontal, CGFloat(gap.xxl))
             .padding(.vertical, CGFloat(gap.l))
             .background(RoundedRectangle(cornerRadius: cornerRadius).fill(backgroundColor))
@@ -1312,11 +1326,19 @@ public extension View {
     func gentleSurface(_ role: GentleSurfaceRole) -> some View { modifier(GentleSurfaceModifier(role: role)) }
 
     func gentleButton(_ role: GentleButtonRole) -> some View {
-        buttonStyle(GentleButtonStyle(role: role, shape: nil))
+        buttonStyle(GentleButtonStyle(role: role))
     }
 
     func gentleButton(_ role: GentleButtonRole, shape: GentleButtonShape) -> some View {
         buttonStyle(GentleButtonStyle(role: role, shape: shape))
+    }
+
+    func gentleButton(_ role: GentleButtonRole, textRole: GentleTextRole) -> some View {
+        buttonStyle(GentleButtonStyle(role: role, textRole: textRole))
+    }
+
+    func gentleButton(_ role: GentleButtonRole, shape: GentleButtonShape, textRole: GentleTextRole) -> some View {
+        buttonStyle(GentleButtonStyle(role: role, shape: shape, textRole: textRole))
     }
 
     @ViewBuilder

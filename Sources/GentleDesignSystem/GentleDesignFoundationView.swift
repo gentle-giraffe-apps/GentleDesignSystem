@@ -110,6 +110,9 @@ public struct GentleDesignButtonsSection: View {
                 Button("Tertiary") {}
                     .gentleButton(.tertiary)
 
+                Button("Quaternary") {}
+                    .gentleButton(.quaternary)
+
                 Button("Destructive") {}
                     .gentleButton(.destructive)
             }
