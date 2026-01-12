@@ -104,15 +104,31 @@ public struct GentleDesignButtonsSection: View {
                 Button("Primary") {}
                     .gentleButton(.primary)
 
+                Button("Primary") {}
+                    .gentleButton(.primary)
+                    .disabled(true)
+
                 Button("Secondary") {}
                     .gentleButton(.secondary)
 
+                Button("Secondary") {}
+                    .gentleButton(.secondary)
+                    .disabled(true)
+                
                 Button("Tertiary") {}
                     .gentleButton(.tertiary)
 
+                Button("Tertiary") {}
+                    .gentleButton(.tertiary)
+                    .disabled(true)
+                
                 Button("Quaternary") {}
                     .gentleButton(.quaternary)
-
+                
+                Button("Quaternary") {}
+                    .gentleButton(.quaternary)
+                    .disabled(true)
+                
                 Button("Destructive") {}
                     .gentleButton(.destructive)
             }
