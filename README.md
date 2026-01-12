@@ -26,7 +26,7 @@ GentleDesignSystem is designed to feel *native*, *predictable*, and *composable*
 ### 1. Add the Package
 
 ```swift
-.package(url: "https://github.com/gentle-giraffe/GentleDesignSystem.git", branch: "main")
+.package(url: "https://github.com/gentle-giraffe-apps/GentleDesignSystem.git", branch: "main")
 ```
 
 ### 2. Wrap Your App Root
