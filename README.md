@@ -9,6 +9,8 @@
 
 A lightweight, token-driven SwiftUI design system with built-in Dark Mode and Dynamic Type support.
 
+💬 **[Join the discussion. Feedback and questions welcome](https://github.com/gentle-giraffe-apps/GentleDesignSystem/discussions)**
+
 GentleDesignSystem is designed to feel *native*, *predictable*, and *composable*, while still giving you a centralized place to evolve typography, color, spacing, and surface behavior over time.
 
 **See it in action:** Open `Demo/GentleDesignSystemDemo.xcodeproj` to explore all components.
