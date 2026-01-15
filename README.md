@@ -166,15 +166,10 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    JSON[(JSON File)]
-      -->|load|
-    Store[ThemeSpecStore]
-      --> 
-    Manager[GentleThemeManager]
-      --> 
-    Theme[GentleTheme]
-      --> 
-    Resolve{Resolution}
+    JSON[(JSON File)] -->|load| Store[ThemeSpecStore]
+    Store --> Manager[GentleThemeManager]
+    Manager --> Theme[GentleTheme]
+    Theme --> Resolve{Resolution}
 
     Resolve -->|ColorScheme| ResolvedColor[Color]
     Resolve -->|ContentSizeCategory| ResolvedFont[Font]
