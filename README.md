@@ -87,6 +87,88 @@ GentleDesignSystem is intentionally structured around **three layers**:
 
 This separation keeps design intent clear, runtime behavior predictable, and future evolution safe.
 
+### System Architecture
+
+```mermaid
+flowchart TB
+    subgraph Tokens["Token Layer (Design-Time)"]
+        Spec[GentleDesignSystemSpec]
+        Spec --> Colors[GentleColorTokens]
+        Spec --> Typography[GentleTypographyTokens]
+        Spec --> Layout[GentleLayoutTokens]
+        Spec --> Visual[GentleVisualTokens]
+        Spec --> Buttons[GentleButtonTokens]
+    end
+
+    subgraph Runtime["Runtime Layer"]
+        Theme[GentleTheme]
+        Manager[GentleThemeManager]
+        Store[GentleFileThemeSpecStore]
+        Manager --> Theme
+        Store -.->|load/save| Manager
+    end
+
+    subgraph SwiftUI["SwiftUI Layer"]
+        Root[GentleThemeRoot]
+        Env[Environment]
+        Modifiers[View Modifiers]
+        Root --> Env
+        Env --> Modifiers
+    end
+
+    Tokens --> Runtime
+    Runtime --> SwiftUI
+```
+
+### Token Composition
+
+```mermaid
+flowchart LR
+    subgraph TypographyTokens[GentleTypographyTokens]
+        TextRole[GentleTextRole]
+        TypoSpec[GentleTypographyRoleSpec]
+        TextRole --> TypoSpec
+    end
+
+    subgraph ColorTokens[GentleColorTokens]
+        ColorRole[GentleColorRole]
+        ColorPair[GentleColorPair]
+        ColorRole --> ColorPair
+    end
+
+    subgraph ButtonTokens[GentleButtonTokens]
+        ButtonRole[GentleButtonRole]
+        ButtonSpec[GentleButtonRoleSpec]
+        AnimRole[GentleButtonAnimationRole]
+        ButtonRole --> ButtonSpec
+        ButtonSpec --> AnimRole
+    end
+
+    TypoSpec -.->|colorRole| ColorRole
+    ButtonSpec -.->|textRole| TextRole
+    ButtonSpec -.->|backgroundRole| ColorRole
+```
+
+### Data Flow
+
+```mermaid
+flowchart LR
+    JSON[(JSON File)] -->|load| Store[ThemeSpecStore]
+    Store --> Manager[GentleThemeManager]
+    Manager --> Theme[GentleTheme]
+
+    Theme --> Resolve{Resolution}
+    Resolve -->|ColorScheme| ResolvedColor[Color]
+    Resolve -->|ContentSizeCategory| ResolvedFont[Font]
+
+    ResolvedColor --> View[SwiftUI View]
+    ResolvedFont --> View
+
+    View -->|.gentleText| Text
+    View -->|.gentleButton| Button
+    View -->|.gentleSurface| Surface
+```
+
 ---
 
 ## 1. Token Layer (Design-Time)
@@ -296,28 +378,23 @@ let manager = GentleThemeManager(theme: .default, store: store)
 
 ### Typography Roles
 
-| Role | Ramp |
-|-----|------|
-| `largeTitle_xxl` | XXL |
-| `title_xl` | XL |
-| `title2_l` | L |
-| `title3_ml` | ML |
-| `headline_m` | M |
-| `body_m` | M |
-| `bodySecondary_m` | M |
-| `monoCode_m` | M |
-| `callout_ms` | MS |
-| `subheadline_ms` | MS |
-| `footnote_s` | S |
-| `caption_s` | S |
-| `caption2_s` | S |
+13 semantic text roles organized by size ramp (xxl > xl > l > ml > m > ms > s):
+
+| Ramp | Roles |
+|------|-------|
+| XXL | `largeTitle_xxl` |
+| XL | `title_xl` |
+| L | `title2_l` |
+| ML | `title3_ml` |
+| M | `headline_m`, `body_m`, `bodySecondary_m`, `monoCode_m` |
+| MS | `callout_ms`, `subheadline_ms` |
+| S | `footnote_s`, `caption_s`, `caption2_s` |
+
+Each role resolves to a `GentleTypographyRoleSpec` containing: `pointSize`, `weight`, `design`, `width`, `relativeTo`, `lineSpacing`, `letterSpacing`, `isUppercased`, and `colorRole`.
 
 ### Button Roles
 
-- `primary`
-- `secondary`
-- `tertiary`
-- `destructive`
+`primary` · `secondary` · `tertiary` · `quaternary` · `destructive`
 
 ### Button Animation Roles
 
@@ -332,41 +409,25 @@ let manager = GentleThemeManager(theme: .default, store: store)
 
 ### Surface Roles
 
-- `appBackground`
-- `card`
-- `cardChrome` (no padding)
-- `cardElevated`
-- `surfaceOverlay`
+`appBackground` · `card` · `cardChrome` (no padding) · `cardElevated` · `surfaceOverlay`
 
 ### Color Roles
 
 | Category | Roles |
 |----------|-------|
-| **Text** | `textPrimary`, `textSecondary`, `textTertiary` |
-| **Surfaces** | `background`, `surface`, `surfaceElevated`, `surfaceOverlay`, `onSurfaceOverlayPrimary`, `onSurfaceOverlaySecondary` |
-| **Actions** | `primaryCTA`, `onPrimaryCTA`, `destructive` |
-| **Theme** | `themePrimary`, `themeSecondary` |
-| **Structure** | `borderSubtle` |
+| Text | `textPrimary`, `textSecondary`, `textTertiary` |
+| Surfaces | `background`, `surface`, `surfaceElevated`, `surfaceOverlay`, `onSurfaceOverlayPrimary`, `onSurfaceOverlaySecondary` |
+| Actions | `primaryCTA`, `onPrimaryCTA`, `destructive` |
+| Theme | `themePrimary`, `themeSecondary` |
+| Structure | `borderSubtle` |
 
 ### Spacing Tokens
 
-| Token | Value |
-|------|-------|
-| `xs` | 4 |
-| `s` | 8 |
-| `m` | 12 |
-| `l` | 16 |
-| `xl` | 24 |
-| `xxl` | 32 |
+`xs` (4) · `s` (8) · `m` (12) · `l` (16) · `xl` (24) · `xxl` (32)
 
 ### Radius Tokens
 
-| Token | Value |
-|------|-------|
-| `small` | 8 |
-| `medium` | 12 |
-| `large` | 20 |
-| `pill` | 999 |
+`small` (8) · `medium` (12) · `large` (20) · `pill` (999)
 
 ---
 
