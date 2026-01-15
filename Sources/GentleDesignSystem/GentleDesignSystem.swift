@@ -762,14 +762,14 @@ public extension GentleDesignSystemSpec {
     /// All built-in theme presets with display names
     static let allPresets: [(name: String, spec: GentleDesignSystemSpec)] = [
         ("Gentle Default", .gentleDefault),
-        ("Classic", .classic),
-        ("Modern", .modern),
-        ("Soft", .soft),
-        ("Editorial", .editorial),
-        ("Technical", .technical),
-        ("Bold", .bold),
-        ("Elegant", .elegant),
-        ("Compact", .compact),
+        ("Classic Tan", .classic),
+        ("Modern Gray", .modern),
+        ("Soft Green", .soft),
+        ("Editorial Paper", .editorial),
+        ("Technical Blue", .technical),
+        ("Bold Orange", .bold),
+        ("Elegant Purple", .elegant),
+        ("Compact Mint", .compact),
     ]
 }
 
@@ -1724,12 +1724,24 @@ public struct GentleButtonStyle: ButtonStyle {
     private let shapeOverride: GentleButtonShape?
     private let textRoleOverride: GentleTextRole?
 
+    // ✅ NEW: allow styles to expand the label to full width (so background/border fill)
+    private let expandsHorizontally: Bool
+    private let contentAlignment: Alignment
+
     /// If `shapeOverride` is nil, the per-role `shape` from the spec is used.
     /// If `textRoleOverride` is nil, the per-role `textRole` from the spec is used.
-    public init(role: GentleButtonRole, shape: GentleButtonShape? = nil, textRole: GentleTextRole? = nil) {
+    public init(
+        role: GentleButtonRole,
+        shape: GentleButtonShape? = nil,
+        textRole: GentleTextRole? = nil,
+        expandsHorizontally: Bool = false,
+        contentAlignment: Alignment = .center
+    ) {
         self.role = role
         self.shapeOverride = shape
         self.textRoleOverride = textRole
+        self.expandsHorizontally = expandsHorizontally
+        self.contentAlignment = contentAlignment
     }
 
     public func makeBody(configuration: Configuration) -> some View {
@@ -1747,6 +1759,9 @@ public struct GentleButtonStyle: ButtonStyle {
         let shapeToUse = shapeOverride ?? spec.shape
         let textRoleToUse = textRoleOverride ?? spec.textRole
         let cornerRadius: CGFloat = (shapeToUse == .pill) ? CGFloat(radii.pill) : CGFloat(radii.medium)
+
+        let secondaryOpticalTrim: CGFloat = (role == .secondary) ? 1.0 : 0.0
+        let verticalPadding: CGFloat = max(0, CGFloat(gap.s) - secondaryOpticalTrim)
 
         let backgroundColor = theme.color(for: spec.backgroundRole, scheme: colorScheme)
         let labelColor = theme.color(for: spec.labelColorRole, scheme: colorScheme)
@@ -1766,19 +1781,31 @@ public struct GentleButtonStyle: ButtonStyle {
                 opacity = 0.4
             }
         }
-        return configuration.label
+
+        // ✅ IMPORTANT: expand the label *inside* the style, before background/overlay.
+        let label = configuration.label
             .gentleText(textRoleToUse, colorRole: spec.labelColorRole)
-            .padding(.horizontal, CGFloat(gap.xxl))
-            .padding(.vertical, CGFloat(gap.l))
+
+        let sizedLabel = Group {
+            if expandsHorizontally {
+                label.frame(maxWidth: .infinity, alignment: contentAlignment)
+            } else {
+                label
+            }
+        }
+
+        return sizedLabel
+            .padding(.horizontal, CGFloat(gap.xl))
+            .padding(.vertical, verticalPadding)
             .background(RoundedRectangle(cornerRadius: cornerRadius).fill(backgroundColor))
             .overlay(
                 Group {
                     if let borderColor {
-                        RoundedRectangle(cornerRadius: cornerRadius).stroke(borderColor, lineWidth: 1)
+                        RoundedRectangle(cornerRadius: cornerRadius)
+                            .strokeBorder(borderColor, lineWidth: 1)
                     }
                 }
             )
-            // ensure foreground is correct even if label overrides styling internally
             .foregroundStyle(labelColor)
             .scaleEffect(configuration.isPressed ? spec.pressedScale : 1.0)
             .opacity(configuration.isPressed ? spec.pressedOpacity : 1.0)
@@ -1821,20 +1848,20 @@ public extension View {
 
     func gentleSurface(_ role: GentleSurfaceRole) -> some View { modifier(GentleSurfaceModifier(role: role)) }
 
-    func gentleButton(_ role: GentleButtonRole) -> some View {
-        buttonStyle(GentleButtonStyle(role: role))
+    func gentleButton(_ role: GentleButtonRole, expandsHorizontally: Bool = false) -> some View {
+        buttonStyle(GentleButtonStyle(role: role, expandsHorizontally: expandsHorizontally))
     }
 
-    func gentleButton(_ role: GentleButtonRole, shape: GentleButtonShape) -> some View {
-        buttonStyle(GentleButtonStyle(role: role, shape: shape))
+    func gentleButton(_ role: GentleButtonRole, shape: GentleButtonShape, expandsHorizontally: Bool = false) -> some View {
+        buttonStyle(GentleButtonStyle(role: role, shape: shape, expandsHorizontally: expandsHorizontally))
     }
 
-    func gentleButton(_ role: GentleButtonRole, textRole: GentleTextRole) -> some View {
-        buttonStyle(GentleButtonStyle(role: role, textRole: textRole))
+    func gentleButton(_ role: GentleButtonRole, textRole: GentleTextRole, expandsHorizontally: Bool = false) -> some View {
+        buttonStyle(GentleButtonStyle(role: role, textRole: textRole, expandsHorizontally: expandsHorizontally))
     }
 
-    func gentleButton(_ role: GentleButtonRole, shape: GentleButtonShape, textRole: GentleTextRole) -> some View {
-        buttonStyle(GentleButtonStyle(role: role, shape: shape, textRole: textRole))
+    func gentleButton(_ role: GentleButtonRole, shape: GentleButtonShape, textRole: GentleTextRole, expandsHorizontally: Bool = false) -> some View {
+        buttonStyle(GentleButtonStyle(role: role, shape: shape, textRole: textRole, expandsHorizontally: expandsHorizontally))
     }
 
     @ViewBuilder
