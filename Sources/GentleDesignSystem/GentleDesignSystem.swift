@@ -39,6 +39,12 @@ public enum GentleTextRole: String, Identifiable, Codable, Sendable, CaseIterabl
     case footnote_s
     case caption_s
     case caption2_s
+
+    // Button titles – semantic roles for button text
+    case primaryButtonTitle_m
+    case secondaryButtonTitle_m
+    case tertiaryButtonTitle_m
+    case quaternaryButtonTitle_m
 }
 
 public enum GentleTextRamp: String, Codable, Sendable { case xxl, xl, l, ml, m, ms, s }
@@ -50,7 +56,8 @@ public extension GentleTextRole {
         case .title_xl: return .xl
         case .title2_l: return .l
         case .title3_ml: return .ml
-        case .headline_m, .body_m, .bodySecondary_m, .monoCode_m: return .m
+        case .headline_m, .body_m, .bodySecondary_m, .monoCode_m,
+             .primaryButtonTitle_m, .secondaryButtonTitle_m, .tertiaryButtonTitle_m, .quaternaryButtonTitle_m: return .m
         case .callout_ms, .subheadline_ms: return .ms
         case .footnote_s, .caption_s, .caption2_s: return .s
         }
@@ -72,6 +79,10 @@ public extension GentleTextRole {
         case .footnote_s: return "Footnote"
         case .caption_s: return "Caption"
         case .caption2_s: return "Caption 2"
+        case .primaryButtonTitle_m: return "Primary Button Title"
+        case .secondaryButtonTitle_m: return "Secondary Button Title"
+        case .tertiaryButtonTitle_m: return "Tertiary Button Title"
+        case .quaternaryButtonTitle_m: return "Quaternary Button Title"
         }
     }
 }
@@ -342,6 +353,23 @@ public extension GentleDesignSystemSpec {
             pointSize: 17, weight: .regular, design: .default, width: nil,
             relativeTo: .body, lineSpacing: 3, colorRole: .textPrimary
         )
+        // Button titles – use default (not serif) for buttons
+        typo.roles[GentleTextRole.primaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .semibold, design: .default, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.secondaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .semibold, design: .default, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.tertiaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .semibold, design: .default, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.quaternaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .regular, design: .default, width: nil,
+            relativeTo: .body, colorRole: .textPrimary
+        )
         spec.typography = typo
         return spec
     }()
@@ -392,6 +420,23 @@ public extension GentleDesignSystemSpec {
         typo.roles[GentleTextRole.body_m.rawValue] = .init(
             pointSize: 16, weight: .regular, design: .default, width: nil,
             relativeTo: .body, lineSpacing: 3, colorRole: .textPrimary
+        )
+        // Button titles – clean default design with medium weight
+        typo.roles[GentleTextRole.primaryButtonTitle_m.rawValue] = .init(
+            pointSize: 16, weight: .medium, design: .default, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.secondaryButtonTitle_m.rawValue] = .init(
+            pointSize: 16, weight: .medium, design: .default, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.tertiaryButtonTitle_m.rawValue] = .init(
+            pointSize: 16, weight: .medium, design: .default, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.quaternaryButtonTitle_m.rawValue] = .init(
+            pointSize: 16, weight: .regular, design: .default, width: nil,
+            relativeTo: .body, colorRole: .textPrimary
         )
         spec.typography = typo
         return spec
@@ -456,6 +501,23 @@ public extension GentleDesignSystemSpec {
             pointSize: 15, weight: .regular, design: .rounded, width: nil,
             relativeTo: .subheadline, colorRole: .textSecondary
         )
+        // Button titles – rounded design to match the soft theme
+        typo.roles[GentleTextRole.primaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .semibold, design: .rounded, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.secondaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .semibold, design: .rounded, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.tertiaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .semibold, design: .rounded, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.quaternaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .regular, design: .rounded, width: nil,
+            relativeTo: .body, colorRole: .textPrimary
+        )
         spec.typography = typo
         return spec
     }()
@@ -515,6 +577,23 @@ public extension GentleDesignSystemSpec {
             pointSize: 16, weight: .regular, design: .serif, width: nil,
             relativeTo: .callout, colorRole: .textSecondary
         )
+        // Button titles – use default (not serif) for buttons
+        typo.roles[GentleTextRole.primaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .bold, design: .default, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.secondaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .bold, design: .default, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.tertiaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .semibold, design: .default, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.quaternaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .regular, design: .default, width: nil,
+            relativeTo: .body, colorRole: .textPrimary
+        )
         spec.typography = typo
         return spec
     }()
@@ -569,6 +648,23 @@ public extension GentleDesignSystemSpec {
         typo.roles[GentleTextRole.monoCode_m.rawValue] = .init(
             pointSize: 14, weight: .regular, design: .monospaced, width: nil,
             relativeTo: .body, letterSpacing: 0, colorRole: .textPrimary
+        )
+        // Button titles – condensed default design (monospaced would be too wide for buttons)
+        typo.roles[GentleTextRole.primaryButtonTitle_m.rawValue] = .init(
+            pointSize: 15, weight: .semibold, design: .default, width: .condensed,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.secondaryButtonTitle_m.rawValue] = .init(
+            pointSize: 15, weight: .semibold, design: .default, width: .condensed,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.tertiaryButtonTitle_m.rawValue] = .init(
+            pointSize: 15, weight: .semibold, design: .default, width: .condensed,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.quaternaryButtonTitle_m.rawValue] = .init(
+            pointSize: 15, weight: .regular, design: .default, width: .condensed,
+            relativeTo: .body, colorRole: .textPrimary
         )
         spec.typography = typo
         return spec
@@ -625,6 +721,23 @@ public extension GentleDesignSystemSpec {
             pointSize: 17, weight: .medium, design: .default, width: nil,
             relativeTo: .body, lineSpacing: 2, colorRole: .textSecondary
         )
+        // Button titles – bold/heavy weights to match the bold theme
+        typo.roles[GentleTextRole.primaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .heavy, design: .default, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.secondaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .bold, design: .default, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.tertiaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .bold, design: .default, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.quaternaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .medium, design: .default, width: nil,
+            relativeTo: .body, colorRole: .textPrimary
+        )
         spec.typography = typo
         return spec
     }()
@@ -679,6 +792,23 @@ public extension GentleDesignSystemSpec {
         typo.roles[GentleTextRole.bodySecondary_m.rawValue] = .init(
             pointSize: 17, weight: .light, design: .default, width: nil,
             relativeTo: .body, lineSpacing: 4, letterSpacing: 0.2, colorRole: .textSecondary
+        )
+        // Button titles – light/regular weights with letter spacing for elegance
+        typo.roles[GentleTextRole.primaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .regular, design: .default, width: nil,
+            relativeTo: .headline, letterSpacing: 0.5, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.secondaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .regular, design: .default, width: nil,
+            relativeTo: .headline, letterSpacing: 0.5, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.tertiaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .regular, design: .default, width: nil,
+            relativeTo: .headline, letterSpacing: 0.3, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.quaternaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .light, design: .default, width: nil,
+            relativeTo: .body, letterSpacing: 0.2, colorRole: .textPrimary
         )
         spec.typography = typo
         return spec
@@ -754,6 +884,23 @@ public extension GentleDesignSystemSpec {
         typo.roles[GentleTextRole.caption2_s.rawValue] = .init(
             pointSize: 9, weight: .regular, design: .default, width: .condensed,
             relativeTo: .caption2, colorRole: .textTertiary
+        )
+        // Button titles – condensed design to match the compact theme
+        typo.roles[GentleTextRole.primaryButtonTitle_m.rawValue] = .init(
+            pointSize: 14, weight: .semibold, design: .default, width: .condensed,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.secondaryButtonTitle_m.rawValue] = .init(
+            pointSize: 14, weight: .semibold, design: .default, width: .condensed,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.tertiaryButtonTitle_m.rawValue] = .init(
+            pointSize: 14, weight: .semibold, design: .default, width: .condensed,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.quaternaryButtonTitle_m.rawValue] = .init(
+            pointSize: 14, weight: .regular, design: .default, width: .condensed,
+            relativeTo: .body, colorRole: .textPrimary
         )
         spec.typography = typo
         return spec
@@ -921,7 +1068,7 @@ public extension GentleButtonTokens {
         roles: [
             GentleButtonRole.primary.rawValue: .init(
                 shape: .pill,
-                textRole: .headline_m,
+                textRole: .primaryButtonTitle_m,
                 backgroundRole: .primaryCTA,
                 labelColorRole: .onPrimaryCTA,
                 borderRole: nil,
@@ -931,7 +1078,7 @@ public extension GentleButtonTokens {
             ),
             GentleButtonRole.secondary.rawValue: .init(
                 shape: .pill,
-                textRole: .headline_m,
+                textRole: .secondaryButtonTitle_m,
                 backgroundRole: .surface,
                 labelColorRole: .primaryCTA,
                 borderRole: .primaryCTA,
@@ -941,7 +1088,7 @@ public extension GentleButtonTokens {
             ),
             GentleButtonRole.tertiary.rawValue: .init(
                 shape: .pill,
-                textRole: .headline_m,
+                textRole: .tertiaryButtonTitle_m,
                 backgroundRole: .surface,
                 labelColorRole: .primaryCTA,
                 borderRole: nil,
@@ -951,7 +1098,7 @@ public extension GentleButtonTokens {
             ),
             GentleButtonRole.quaternary.rawValue: .init(
                 shape: .pill,
-                textRole: .body_m,
+                textRole: .quaternaryButtonTitle_m,
                 backgroundRole: .background,
                 labelColorRole: .primaryCTA,
                 borderRole: nil,
@@ -961,7 +1108,7 @@ public extension GentleButtonTokens {
             ),
             GentleButtonRole.destructive.rawValue: .init(
                 shape: .pill,
-                textRole: .headline_m,
+                textRole: .primaryButtonTitle_m,
                 backgroundRole: .destructive,
                 labelColorRole: .onPrimaryCTA,
                 borderRole: nil,
@@ -1176,6 +1323,24 @@ public extension GentleTypographyTokens {
         dict[GentleTextRole.caption2_s.rawValue] = .init(
             pointSize: 11, weight: .regular, design: .default, width: nil,
             relativeTo: .caption2, colorRole: .textTertiary
+        )
+
+        // Button titles – default to same size as headline, semibold weight, default design (not serif)
+        dict[GentleTextRole.primaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .semibold, design: .default, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        dict[GentleTextRole.secondaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .semibold, design: .default, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        dict[GentleTextRole.tertiaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .semibold, design: .default, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        dict[GentleTextRole.quaternaryButtonTitle_m.rawValue] = .init(
+            pointSize: 17, weight: .regular, design: .default, width: nil,
+            relativeTo: .body, colorRole: .textPrimary
         )
 
         return GentleTypographyTokens(roles: dict)
