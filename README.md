@@ -165,12 +165,17 @@ flowchart TB
 ### Data Flow
 
 ```mermaid
-flowchart LR
-    JSON[(JSON File)] -->|load| Store[ThemeSpecStore]
-    Store --> Manager[GentleThemeManager]
-    Manager --> Theme[GentleTheme]
+flowchart TB
+    JSON[(JSON File)]
+      -->|load|
+    Store[ThemeSpecStore]
+      --> 
+    Manager[GentleThemeManager]
+      --> 
+    Theme[GentleTheme]
+      --> 
+    Resolve{Resolution}
 
-    Theme --> Resolve{Resolution}
     Resolve -->|ColorScheme| ResolvedColor[Color]
     Resolve -->|ContentSizeCategory| ResolvedFont[Font]
 
