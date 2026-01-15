@@ -2,10 +2,9 @@
 [![CI](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml)
 [![Swift](https://img.shields.io/badge/Swift-6.1-orange.svg)](https://swift.org)
 ![iOS](https://img.shields.io/badge/iOS-18.0+-blue?logo=apple)
-![SwiftUI](https://img.shields.io/badge/SwiftUI-Required-4A6EF5)
+![SwiftUI First](https://img.shields.io/badge/SwiftUI-First-4A6EF5)
 ![Platform](https://img.shields.io/badge/Platform-iPhone%20%7C%20iPad-lightgrey)
 ![SPM](https://img.shields.io/badge/SPM-Compatible-success)
-
 
 A lightweight, token-driven SwiftUI design system with built-in Dark Mode and Dynamic Type support.
 
@@ -15,11 +14,11 @@ GentleDesignSystem is designed to feel *native*, *predictable*, and *composable*
 
 **See it in action:** Open `Demo/GentleDesignSystemDemo.xcodeproj` to explore all components.
 
-<img src="Demo/README_assets/Typography1.png" alt="GentleDesignSystem demo – page 1" width="800" />
-<img src="Demo/README_assets/Typography2.png" alt="GentleDesignSystem demo – page 2" width="800" />
-<img src="Demo/README_assets/Typography3.png" alt="GentleDesignSystem demo – page 3" width="800" />
+<img src="Docs/README_assets/Typography1.png" alt="GentleDesignSystem demo – page 1" width="800" />
+<img src="Docs/README_assets/Typography2.png" alt="GentleDesignSystem demo – page 2" width="800" />
+<img src="Docs/README_assets/Typography3.png" alt="GentleDesignSystem demo – page 3" width="800" />
 
-![Demo animation](Demo/README_assets/Typography.gif)
+![Demo animation](Docs/README_assets/Typography.gif)
 
 ---
 
