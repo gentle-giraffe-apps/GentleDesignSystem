@@ -147,6 +147,16 @@ flowchart LR
     TypoSpec -.->|colorRole| ColorRole
     ButtonSpec -.->|textRole| TextRole
     ButtonSpec -.->|backgroundRole| ColorRole
+
+    %% --- Spacer nodes to force extra bottom height ---
+    SpacerA[" "]:::spacer
+    SpacerB[" "]:::spacer
+    SpacerC[" "]:::spacer
+    Surface --> SpacerA
+    SpacerA --> SpacerB
+    SpacerB --> SpacerC
+
+    classDef spacer fill:transparent,stroke:transparent,color:transparent;
 ```
 
 ### Data Flow
@@ -167,6 +177,16 @@ flowchart LR
     View -->|.gentleText| Text
     View -->|.gentleButton| Button
     View -->|.gentleSurface| Surface
+
+    %% --- Spacer nodes to force extra bottom height ---
+    SpacerA[" "]:::spacer
+    SpacerB[" "]:::spacer
+    SpacerC[" "]:::spacer
+    Surface --> SpacerA
+    SpacerA --> SpacerB
+    SpacerB --> SpacerC
+
+    classDef spacer fill:transparent,stroke:transparent,color:transparent;
 ```
 
 ---
