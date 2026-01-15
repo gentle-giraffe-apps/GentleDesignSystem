@@ -12,7 +12,7 @@ A lightweight, token-driven SwiftUI design system with built-in Dark Mode and Dy
 
 GentleDesignSystem is designed to feel *native*, *predictable*, and *composable*, while still giving you a centralized place to evolve typography, color, spacing, and surface behavior over time.
 
-**See it in action:** Open `Demo/GentleDesignSystemDemo.xcodeproj` to explore all components.
+**See it in action:** Open `Demo/GentleDesignSystemDemo.xcodeproj` to explore all components. The demo app also lets you update and share JSON specs via a ShareSheet.
 
 <img src="docs/README_assets/Typography1.png" alt="GentleDesignSystem demo – page 1" width="800" />
 <img src="docs/README_assets/Typography2.png" alt="GentleDesignSystem demo – page 2" width="800" />
