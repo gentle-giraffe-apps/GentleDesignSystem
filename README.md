@@ -123,41 +123,54 @@ flowchart TB
 ### Token Composition
 
 ```mermaid
-flowchart LR
-    subgraph TypographyTokens[GentleTypographyTokens]
-        TextRole[GentleTextRole]
-        TypoSpec[GentleTypographyRoleSpec]
-        TextRole --> TypoSpec
-    end
+flowchart TB
+  Spec[GentleDesignSystemSpec]
+  Spec --> Colors[GentleColorTokens]
+  Spec --> Typography[GentleTypographyTokens]
+  Spec --> Buttons[GentleButtonTokens]
 
-    subgraph ColorTokens[GentleColorTokens]
-        ColorRole[GentleColorRole]
-        ColorPair[GentleColorPair]
-        ColorRole --> ColorPair
-    end
+  %% Colors
+  Colors -->|pairByRole| ColorRole[GentleColorRole]
+  ColorRole --> Pair[GentleColorPair]
 
-    subgraph ButtonTokens[GentleButtonTokens]
-        ButtonRole[GentleButtonRole]
-        ButtonSpec[GentleButtonRoleSpec]
-        AnimRole[GentleButtonAnimationRole]
-        ButtonRole --> ButtonSpec
-        ButtonSpec --> AnimRole
-    end
+  %% Typography
+  Typography -->|roles| TextRole[GentleTextRole]
+  TextRole --> TypoSpec[GentleTypographyRoleSpec]
+  TypoSpec -.->|colorRole| ColorRole
 
-    TypoSpec -.->|colorRole| ColorRole
-    ButtonSpec -.->|textRole| TextRole
-    ButtonSpec -.->|backgroundRole| ColorRole
+  %% Buttons
+  Buttons -->|roles| ButtonRole[GentleButtonRole]
+  ButtonRole --> ButtonSpec[GentleButtonRoleSpec]
+
+  ButtonSpec -.->|textRole| TextRole
+  ButtonSpec -.->|backgroundRole| ColorRole
+  ButtonSpec -.->|labelColorRole| ColorRole
+  ButtonSpec -.->|borderRole optional| ColorRole
+
+  Buttons -->|animations| AnimRole[GentleButtonAnimationRole]
+  AnimRole --> AnimSpec[GentleButtonAnimationSpec]
+  ButtonSpec -.->|animationRole| AnimRole
+
+  %% --- Spacer nodes to force extra bottom height ---
+  SpacerA[" "]:::spacer
+  SpacerB[" "]:::spacer
+  SpacerC[" "]:::spacer
+  Surface --> SpacerA
+  SpacerA --> SpacerB
+  SpacerB --> SpacerC
+
+  classDef spacer fill:transparent,stroke:transparent,color:transparent;
 ```
 
 ### Data Flow
 
 ```mermaid
-flowchart LR
+flowchart TB
     JSON[(JSON File)] -->|load| Store[ThemeSpecStore]
     Store --> Manager[GentleThemeManager]
     Manager --> Theme[GentleTheme]
-
     Theme --> Resolve{Resolution}
+
     Resolve -->|ColorScheme| ResolvedColor[Color]
     Resolve -->|ContentSizeCategory| ResolvedFont[Font]
 
