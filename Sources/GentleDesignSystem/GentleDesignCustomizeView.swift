@@ -2,7 +2,7 @@
 
 import SwiftUI
 
-public struct GentleDesignSettingsView: View {
+public struct GentleDesignCustomizeView: View {
     @GentleDesignRuntime private var design
     @GentleThemeManagerRuntime private var themeManager
 
