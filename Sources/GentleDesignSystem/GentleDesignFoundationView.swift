@@ -43,6 +43,10 @@ public struct GentleDesignTypographySection: View {
         ("body_m", .body_m),
         ("bodySecondary_m", .bodySecondary_m),
         ("monoCode_m", .monoCode_m),
+        ("primaryButtonTitle_m", .primaryButtonTitle_m),
+        ("secondaryButtonTitle_m", .secondaryButtonTitle_m),
+        ("tertiaryButtonTitle_m", .tertiaryButtonTitle_m),
+        ("quaternaryButtonTitle_m", .quaternaryButtonTitle_m),
         ("callout_ms", .callout_ms),
         ("subheadline_ms", .subheadline_ms),
         ("footnote_s", .footnote_s),
@@ -71,15 +75,15 @@ public struct GentleDesignTypographySection: View {
             .gentleSurface(.card)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .task {
-            let spec = design.theme.spec
-            do {
-                let encodedJSONString = try spec.encodedJSONString()
-                print("spec: \(encodedJSONString)")
-            } catch {
-                print("jritchey: \(error)")
-            }
-        }
+//        .task {
+//            let spec = design.theme.spec
+//            do {
+//                let encodedJSONString = try spec.encodedJSONString()
+//                print("spec: \(encodedJSONString)")
+//            } catch {
+//                print("jritchey: \(error)")
+//            }
+//        }
     }
 }
 
