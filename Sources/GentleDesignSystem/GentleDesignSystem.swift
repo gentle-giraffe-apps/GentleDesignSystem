@@ -453,7 +453,7 @@ public extension GentleDesignSystemSpec {
     static let allPresets: [(name: String, spec: GentleDesignSystemSpec)] = [
         ("Gentle Default", .gentleDefault),
         ("Mint Green", .mintGreen),
-        ("Black & White", .blackAndWhite),
+        ("Black White", .blackAndWhite),
         ("Ocean Blue", .oceanBlue),
         ("Sunset Orange", .sunsetOrange),
         ("Lavender Purple", .lavenderPurple),
