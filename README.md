@@ -14,11 +14,11 @@ GentleDesignSystem is designed to feel *native*, *predictable*, and *composable*
 
 **See it in action:** Open `Demo/GentleDesignSystemDemo.xcodeproj` to explore all components.
 
-<img src="Docs/README_assets/Typography1.png" alt="GentleDesignSystem demo – page 1" width="800" />
-<img src="Docs/README_assets/Typography2.png" alt="GentleDesignSystem demo – page 2" width="800" />
-<img src="Docs/README_assets/Typography3.png" alt="GentleDesignSystem demo – page 3" width="800" />
+<img src="docs/README_assets/Typography1.png" alt="GentleDesignSystem demo – page 1" width="800" />
+<img src="docs/README_assets/Typography2.png" alt="GentleDesignSystem demo – page 2" width="800" />
+<img src="docs/README_assets/Typography3.png" alt="GentleDesignSystem demo – page 3" width="800" />
 
-![Demo animation](Docs/README_assets/Typography.gif)
+![Demo animation](docs/README_assets/Typography.gif)
 
 ---
 
