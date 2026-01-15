@@ -3,14 +3,17 @@ import GentleDesignSystem
 
 @main
 struct GentleDesignSystemDemoApp: App {
-    private var themeManager = GentleThemeManager(store: GentleFileThemeSpecStore())
+    @State private var themeManager = GentleThemeManager(store: GentleFileThemeSpecStore())
 
     var body: some Scene {
         WindowGroup {
             GentleThemeRoot(theme: themeManager.theme) {
-                ContentView()
+                ThemePickerView()
             }
             .environment(\.gentleThemeManager, themeManager)
+            .task {
+                try? themeManager.load()
+            }
         }
     }
 }

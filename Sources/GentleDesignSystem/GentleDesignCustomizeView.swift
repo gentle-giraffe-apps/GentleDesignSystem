@@ -80,12 +80,5 @@ public struct GentleDesignCustomizeView: View {
                 .disabled(!themeManager.hasUnsavedChanges)
             }
         }
-        .task {
-            do {
-                try themeManager.load()
-            } catch {
-                print("\(error)")
-            }
-        }
     }
 }

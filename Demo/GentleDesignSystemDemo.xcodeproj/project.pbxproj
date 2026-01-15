@@ -12,6 +12,8 @@
 		A10000010000000000000003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000003 /* Assets.xcassets */; };
 		A10000010000000000000004 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000004 /* Preview Assets.xcassets */; };
 		A10000010000000000000005 /* GentleDesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = A10000030000000000000001 /* GentleDesignSystem */; };
+		A10000010000000000000006 /* ThemePreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000006 /* ThemePreset.swift */; };
+		A10000010000000000000007 /* ThemePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000020000000000000007 /* ThemePickerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +22,8 @@
 		A10000020000000000000003 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A10000020000000000000004 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		A10000020000000000000005 /* GentleDesignSystemDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GentleDesignSystemDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000020000000000000006 /* ThemePreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemePreset.swift; sourceTree = "<group>"; };
+		A10000020000000000000007 /* ThemePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemePickerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,6 +50,8 @@
 			isa = PBXGroup;
 			children = (
 				A10000020000000000000001 /* GentleDesignSystemDemoApp.swift */,
+				A10000020000000000000007 /* ThemePickerView.swift */,
+				A10000020000000000000006 /* ThemePreset.swift */,
 				A10000020000000000000002 /* ContentView.swift */,
 				A10000020000000000000003 /* Assets.xcassets */,
 				A10000050000000000000004 /* Preview Content */,
@@ -147,6 +153,8 @@
 			files = (
 				A10000010000000000000002 /* ContentView.swift in Sources */,
 				A10000010000000000000001 /* GentleDesignSystemDemoApp.swift in Sources */,
+				A10000010000000000000006 /* ThemePreset.swift in Sources */,
+				A10000010000000000000007 /* ThemePickerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

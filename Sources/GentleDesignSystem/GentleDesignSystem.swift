@@ -291,6 +291,177 @@ public extension GentleDesignSystemSpec {
     )
 }
 
+// MARK: - Theme Presets
+
+public extension GentleDesignSystemSpec {
+
+    static let mintGreen: GentleDesignSystemSpec = {
+        var spec = GentleDesignSystemSpec.gentleDefault
+        spec.colors = GentleColorTokens(pairByRole: [
+            GentleColorRole.textPrimary.rawValue:   .init(lightHex: "#1A3A2F", darkHex: "#E8F5F0"),
+            GentleColorRole.textSecondary.rawValue: .init(lightHex: "#3D5A4F", darkHex: "#B8D4C8"),
+            GentleColorRole.textTertiary.rawValue:  .init(lightHex: "#5A7A6A", darkHex: "#8AB09E"),
+            GentleColorRole.background.rawValue:    .init(lightHex: "#F5FAF8", darkHex: "#0D1F18"),
+            GentleColorRole.surface.rawValue:       .init(lightHex: "#E8F5F0", darkHex: "#142E24"),
+            GentleColorRole.surfaceOverlay.rawValue:.init(lightHex: "#1A3A2FCC", darkHex: "#0A1A14CC"),
+            GentleColorRole.onSurfaceOverlayPrimary.rawValue:   .init(lightHex: "#F5FAF8", darkHex: "#F5FAF8"),
+            GentleColorRole.onSurfaceOverlaySecondary.rawValue: .init(lightHex: "#B8D4C8", darkHex: "#B8D4C8"),
+            GentleColorRole.surfaceElevated.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#1E3D30"),
+            GentleColorRole.borderSubtle.rawValue:   .init(lightHex: "#C5E0D4", darkHex: "#2A4D3D"),
+            GentleColorRole.primaryCTA.rawValue:     .init(lightHex: "#2E8B6E", darkHex: "#4ADE9F"),
+            GentleColorRole.onPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#0D1F18"),
+            GentleColorRole.destructive.rawValue:    .init(lightHex: "#D9534F", darkHex: "#FF6B6B"),
+            GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#2E8B6E", darkHex: "#4ADE9F"),
+            GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#6FCF97", darkHex: "#7EEAB8"),
+        ])
+        return spec
+    }()
+
+    static let blackAndWhite: GentleDesignSystemSpec = {
+        var spec = GentleDesignSystemSpec.gentleDefault
+        spec.colors = GentleColorTokens(pairByRole: [
+            GentleColorRole.textPrimary.rawValue:   .init(lightHex: "#000000", darkHex: "#FFFFFF"),
+            GentleColorRole.textSecondary.rawValue: .init(lightHex: "#333333", darkHex: "#CCCCCC"),
+            GentleColorRole.textTertiary.rawValue:  .init(lightHex: "#666666", darkHex: "#999999"),
+            GentleColorRole.background.rawValue:    .init(lightHex: "#FFFFFF", darkHex: "#000000"),
+            GentleColorRole.surface.rawValue:       .init(lightHex: "#F5F5F5", darkHex: "#1A1A1A"),
+            GentleColorRole.surfaceOverlay.rawValue:.init(lightHex: "#000000CC", darkHex: "#000000CC"),
+            GentleColorRole.onSurfaceOverlayPrimary.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.onSurfaceOverlaySecondary.rawValue: .init(lightHex: "#CCCCCC", darkHex: "#CCCCCC"),
+            GentleColorRole.surfaceElevated.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#262626"),
+            GentleColorRole.borderSubtle.rawValue:   .init(lightHex: "#E0E0E0", darkHex: "#404040"),
+            GentleColorRole.primaryCTA.rawValue:     .init(lightHex: "#000000", darkHex: "#FFFFFF"),
+            GentleColorRole.onPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#000000"),
+            GentleColorRole.destructive.rawValue:    .init(lightHex: "#000000", darkHex: "#FFFFFF"),
+            GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#000000", darkHex: "#FFFFFF"),
+            GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#666666", darkHex: "#999999"),
+        ])
+        return spec
+    }()
+
+    static let oceanBlue: GentleDesignSystemSpec = {
+        var spec = GentleDesignSystemSpec.gentleDefault
+        spec.colors = GentleColorTokens(pairByRole: [
+            GentleColorRole.textPrimary.rawValue:   .init(lightHex: "#0A2540", darkHex: "#E6F0FA"),
+            GentleColorRole.textSecondary.rawValue: .init(lightHex: "#334E68", darkHex: "#A3C4E0"),
+            GentleColorRole.textTertiary.rawValue:  .init(lightHex: "#5A7A94", darkHex: "#7BA3C4"),
+            GentleColorRole.background.rawValue:    .init(lightHex: "#F0F7FC", darkHex: "#061623"),
+            GentleColorRole.surface.rawValue:       .init(lightHex: "#E1EFF9", darkHex: "#0C2236"),
+            GentleColorRole.surfaceOverlay.rawValue:.init(lightHex: "#0A2540CC", darkHex: "#041020CC"),
+            GentleColorRole.onSurfaceOverlayPrimary.rawValue:   .init(lightHex: "#F0F7FC", darkHex: "#F0F7FC"),
+            GentleColorRole.onSurfaceOverlaySecondary.rawValue: .init(lightHex: "#A3C4E0", darkHex: "#A3C4E0"),
+            GentleColorRole.surfaceElevated.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#123456"),
+            GentleColorRole.borderSubtle.rawValue:   .init(lightHex: "#C4DCF0", darkHex: "#1E4060"),
+            GentleColorRole.primaryCTA.rawValue:     .init(lightHex: "#0066CC", darkHex: "#4DA6FF"),
+            GentleColorRole.onPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#061623"),
+            GentleColorRole.destructive.rawValue:    .init(lightHex: "#D64545", darkHex: "#FF7070"),
+            GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#0066CC", darkHex: "#4DA6FF"),
+            GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#4D94DB", darkHex: "#80C0FF"),
+        ])
+        return spec
+    }()
+
+    static let sunsetOrange: GentleDesignSystemSpec = {
+        var spec = GentleDesignSystemSpec.gentleDefault
+        spec.colors = GentleColorTokens(pairByRole: [
+            GentleColorRole.textPrimary.rawValue:   .init(lightHex: "#3D1E0A", darkHex: "#FFF0E6"),
+            GentleColorRole.textSecondary.rawValue: .init(lightHex: "#664433", darkHex: "#E0C4B0"),
+            GentleColorRole.textTertiary.rawValue:  .init(lightHex: "#8B6B55", darkHex: "#C4A088"),
+            GentleColorRole.background.rawValue:    .init(lightHex: "#FFF8F3", darkHex: "#1A0D06"),
+            GentleColorRole.surface.rawValue:       .init(lightHex: "#FFEFE5", darkHex: "#2D1A0F"),
+            GentleColorRole.surfaceOverlay.rawValue:.init(lightHex: "#3D1E0ACC", darkHex: "#140A05CC"),
+            GentleColorRole.onSurfaceOverlayPrimary.rawValue:   .init(lightHex: "#FFF8F3", darkHex: "#FFF8F3"),
+            GentleColorRole.onSurfaceOverlaySecondary.rawValue: .init(lightHex: "#E0C4B0", darkHex: "#E0C4B0"),
+            GentleColorRole.surfaceElevated.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#3D2418"),
+            GentleColorRole.borderSubtle.rawValue:   .init(lightHex: "#F0D4C0", darkHex: "#4D3020"),
+            GentleColorRole.primaryCTA.rawValue:     .init(lightHex: "#E85D04", darkHex: "#FF8C42"),
+            GentleColorRole.onPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#1A0D06"),
+            GentleColorRole.destructive.rawValue:    .init(lightHex: "#CC3300", darkHex: "#FF6644"),
+            GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#E85D04", darkHex: "#FF8C42"),
+            GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#F5A060", darkHex: "#FFB87A"),
+        ])
+        return spec
+    }()
+
+    static let lavenderPurple: GentleDesignSystemSpec = {
+        var spec = GentleDesignSystemSpec.gentleDefault
+        spec.colors = GentleColorTokens(pairByRole: [
+            GentleColorRole.textPrimary.rawValue:   .init(lightHex: "#2D1B4E", darkHex: "#F0E6FF"),
+            GentleColorRole.textSecondary.rawValue: .init(lightHex: "#4D3A6B", darkHex: "#D0C0E8"),
+            GentleColorRole.textTertiary.rawValue:  .init(lightHex: "#6E5A8A", darkHex: "#B0A0C8"),
+            GentleColorRole.background.rawValue:    .init(lightHex: "#F8F5FF", darkHex: "#120D1F"),
+            GentleColorRole.surface.rawValue:       .init(lightHex: "#F0E8FF", darkHex: "#1E1630"),
+            GentleColorRole.surfaceOverlay.rawValue:.init(lightHex: "#2D1B4ECC", darkHex: "#0D0818CC"),
+            GentleColorRole.onSurfaceOverlayPrimary.rawValue:   .init(lightHex: "#F8F5FF", darkHex: "#F8F5FF"),
+            GentleColorRole.onSurfaceOverlaySecondary.rawValue: .init(lightHex: "#D0C0E8", darkHex: "#D0C0E8"),
+            GentleColorRole.surfaceElevated.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#2A2040"),
+            GentleColorRole.borderSubtle.rawValue:   .init(lightHex: "#E0D0F0", darkHex: "#3D2D60"),
+            GentleColorRole.primaryCTA.rawValue:     .init(lightHex: "#7C4DFF", darkHex: "#A580FF"),
+            GentleColorRole.onPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#120D1F"),
+            GentleColorRole.destructive.rawValue:    .init(lightHex: "#D946EF", darkHex: "#F472B6"),
+            GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#7C4DFF", darkHex: "#A580FF"),
+            GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#B388FF", darkHex: "#C9A0FF"),
+        ])
+        return spec
+    }()
+
+    static let rosePink: GentleDesignSystemSpec = {
+        var spec = GentleDesignSystemSpec.gentleDefault
+        spec.colors = GentleColorTokens(pairByRole: [
+            GentleColorRole.textPrimary.rawValue:   .init(lightHex: "#4A1942", darkHex: "#FFE6F5"),
+            GentleColorRole.textSecondary.rawValue: .init(lightHex: "#6B3060", darkHex: "#E8C0DC"),
+            GentleColorRole.textTertiary.rawValue:  .init(lightHex: "#8B5080", darkHex: "#D0A0C4"),
+            GentleColorRole.background.rawValue:    .init(lightHex: "#FFF5FB", darkHex: "#1A0D16"),
+            GentleColorRole.surface.rawValue:       .init(lightHex: "#FFE8F5", darkHex: "#2D1826"),
+            GentleColorRole.surfaceOverlay.rawValue:.init(lightHex: "#4A1942CC", darkHex: "#140A12CC"),
+            GentleColorRole.onSurfaceOverlayPrimary.rawValue:   .init(lightHex: "#FFF5FB", darkHex: "#FFF5FB"),
+            GentleColorRole.onSurfaceOverlaySecondary.rawValue: .init(lightHex: "#E8C0DC", darkHex: "#E8C0DC"),
+            GentleColorRole.surfaceElevated.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#3D2236"),
+            GentleColorRole.borderSubtle.rawValue:   .init(lightHex: "#F0C8E4", darkHex: "#4D2840"),
+            GentleColorRole.primaryCTA.rawValue:     .init(lightHex: "#DB2777", darkHex: "#F472B6"),
+            GentleColorRole.onPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#1A0D16"),
+            GentleColorRole.destructive.rawValue:    .init(lightHex: "#BE185D", darkHex: "#FB7185"),
+            GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#DB2777", darkHex: "#F472B6"),
+            GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#F06292", darkHex: "#F9A8D4"),
+        ])
+        return spec
+    }()
+
+    static let forestGreen: GentleDesignSystemSpec = {
+        var spec = GentleDesignSystemSpec.gentleDefault
+        spec.colors = GentleColorTokens(pairByRole: [
+            GentleColorRole.textPrimary.rawValue:   .init(lightHex: "#1B3D2F", darkHex: "#E6F2EC"),
+            GentleColorRole.textSecondary.rawValue: .init(lightHex: "#3A5A4A", darkHex: "#B8D4C4"),
+            GentleColorRole.textTertiary.rawValue:  .init(lightHex: "#5A7A6A", darkHex: "#94B8A4"),
+            GentleColorRole.background.rawValue:    .init(lightHex: "#F2F8F5", darkHex: "#0D1A14"),
+            GentleColorRole.surface.rawValue:       .init(lightHex: "#E4F0EA", darkHex: "#1A2D24"),
+            GentleColorRole.surfaceOverlay.rawValue:.init(lightHex: "#1B3D2FCC", darkHex: "#0A1810CC"),
+            GentleColorRole.onSurfaceOverlayPrimary.rawValue:   .init(lightHex: "#F2F8F5", darkHex: "#F2F8F5"),
+            GentleColorRole.onSurfaceOverlaySecondary.rawValue: .init(lightHex: "#B8D4C4", darkHex: "#B8D4C4"),
+            GentleColorRole.surfaceElevated.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#243D32"),
+            GentleColorRole.borderSubtle.rawValue:   .init(lightHex: "#C4DCD0", darkHex: "#2D4D3D"),
+            GentleColorRole.primaryCTA.rawValue:     .init(lightHex: "#166534", darkHex: "#4ADE80"),
+            GentleColorRole.onPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#0D1A14"),
+            GentleColorRole.destructive.rawValue:    .init(lightHex: "#B91C1C", darkHex: "#F87171"),
+            GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#166534", darkHex: "#4ADE80"),
+            GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#22C55E", darkHex: "#86EFAC"),
+        ])
+        return spec
+    }()
+
+    /// All built-in theme presets with display names
+    static let allPresets: [(name: String, spec: GentleDesignSystemSpec)] = [
+        ("Gentle Default", .gentleDefault),
+        ("Mint Green", .mintGreen),
+        ("Black & White", .blackAndWhite),
+        ("Ocean Blue", .oceanBlue),
+        ("Sunset Orange", .sunsetOrange),
+        ("Lavender Purple", .lavenderPurple),
+        ("Rose Pink", .rosePink),
+        ("Forest Green", .forestGreen),
+    ]
+}
+
 extension GentleDesignSystemSpec: GentleJSONEncodable {}
 extension GentleDesignSystemSpec: GentleJSONDecodable {}
 
