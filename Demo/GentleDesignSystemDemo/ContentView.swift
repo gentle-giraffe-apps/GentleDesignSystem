@@ -39,7 +39,7 @@ struct ContentView: View {
                 .sheet(item: $activeSheet) { sheet in
                     switch sheet {
                     case .settings:
-                        GentleDesignEditorView(onSave: {
+                        GentleDesignCustomizeView(onSave: {
                             activeSheet = nil
                         })
                         .presentationDetents([.medium, .large])
