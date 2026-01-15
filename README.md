@@ -180,16 +180,6 @@ flowchart TB
     View -->|.gentleText| Text
     View -->|.gentleButton| Button
     View -->|.gentleSurface| Surface
-
-    %% --- Spacer nodes to force extra bottom height ---
-    SpacerA[" "]:::spacer
-    SpacerB[" "]:::spacer
-    SpacerC[" "]:::spacer
-    Surface --> SpacerA
-    SpacerA --> SpacerB
-    SpacerB --> SpacerC
-
-    classDef spacer fill:transparent,stroke:transparent,color:transparent;
 ```
 
 ---
