@@ -129,23 +129,23 @@ flowchart TB
   Spec --> Typography[GentleTypographyTokens]
   Spec --> Buttons[GentleButtonTokens]
 
-  %% --- Colors ---
+  %% Colors
   Colors -->|pairByRole| ColorRole[GentleColorRole]
   ColorRole --> Pair[GentleColorPair]
 
-  %% --- Typography ---
+  %% Typography
   Typography -->|roles| TextRole[GentleTextRole]
   TextRole --> TypoSpec[GentleTypographyRoleSpec]
   TypoSpec -.->|colorRole| ColorRole
 
-  %% --- Buttons ---
+  %% Buttons
   Buttons -->|roles| ButtonRole[GentleButtonRole]
   ButtonRole --> ButtonSpec[GentleButtonRoleSpec]
 
   ButtonSpec -.->|textRole| TextRole
   ButtonSpec -.->|backgroundRole| ColorRole
   ButtonSpec -.->|labelColorRole| ColorRole
-  ButtonSpec -.->|borderRole? (optional)| ColorRole
+  ButtonSpec -.->|borderRole optional| ColorRole
 
   Buttons -->|animations| AnimRole[GentleButtonAnimationRole]
   AnimRole --> AnimSpec[GentleButtonAnimationSpec]
