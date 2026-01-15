@@ -102,7 +102,7 @@ struct ThemePresetCard: View {
                 .gentleText(.caption_s)
 
             // Buttons
-            Button("Edit") { }
+            Button("Go") { }
                 .gentleButton(.primary, expandsHorizontally: true)
 
             Button("Edit") { }
