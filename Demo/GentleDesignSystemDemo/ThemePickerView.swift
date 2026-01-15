@@ -5,10 +5,17 @@ struct ThemePickerView: View {
     @GentleThemeManagerRuntime private var themeManager
     @GentleDesignRuntime private var design
     @State private var showingContentView = false
+    @Environment(\.horizontalSizeClass) private var sizeClass
 
-    private let columns = [
-        GridItem(.adaptive(minimum: 180, maximum: 180), spacing: 8, alignment: .leading)
-    ]
+    private var columns: [GridItem] {
+        if sizeClass == .compact {
+            // iPhone: single column, full width
+            [GridItem(.flexible())]
+        } else {
+            // iPad: adaptive grid
+            [GridItem(.adaptive(minimum: 300, maximum: 400), spacing: 8, alignment: .leading)]
+        }
+    }
     
     var body: some View {
         NavigationStack {
@@ -57,62 +64,82 @@ struct ThemePresetCard: View {
         .textPrimary, .textSecondary, .textTertiary, .onPrimaryCTA
     ]
 
-    private var nameWords: (first: String, second: String?) {
-        let words = preset.name.split(separator: " ").map(String.init)
-        return (first: words.first ?? preset.name, second: words.count > 1 ? words[1] : nil)
-    }
-
     var body: some View {
-        
-        VStack(alignment: .leading, spacing: design.layout.stack.tight) {
-            VStack(alignment: .leading, spacing: design.layout.stack.tight) {
-                HStack(alignment: .firstTextBaseline, spacing: design.layout.stack.tight) {
-                    Text("\(index)")
-                        .gentleText(.largeTitle_xxl)
-                        .fixedSize(horizontal: true, vertical: false)
+        VStack(alignment: .leading, spacing: design.layout.stack.regular) {
+            // HERO — shows off the very top of your ramp
+            Text(preset.name)
+                .gentleText(.largeTitle_xxl)
+                .lineLimit(2)
 
-                    Text(nameWords.first)
+            VStack(spacing: 0) {
+                Text("\(preset.summary) \(Image(systemName: preset.systemImageString))")
+                .gentleText(.callout_ms)
+                .lineLimit(2)
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Spacer(minLength: design.layout.gap.loose)
+                
+                HStack {
+                    Text("About")
                         .gentleText(.title_xl)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.5)
-                        .allowsTightening(true)
-                        .frame(minWidth: 0, alignment: .leading)
-                }
-
-                if let secondWord = nameWords.second {
-                    Text(secondWord)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                    Text("Colors")
                         .gentleText(.title2_l)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
-                        .allowsTightening(true)
-                        .frame(minWidth: 0, alignment: .leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                }
+                
+                Spacer(minLength: design.layout.gap.regular)
+                
+                HStack(alignment: .top) {
+                    Text(preset.description)
+                        .gentleText(.subheadline_ms)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Spacer(minLength: design.layout.gap.loose)
+                    colorGrid
+                        .frame(maxWidth: .infinity, alignment: .center)
+                }
+                
+                Spacer(minLength: design.layout.gap.loose)
+                
+                HStack(alignment: .top) {
+                    Text("Purpose")
+                        .gentleText(.title3_ml)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                    Text("Actions")
+                        .gentleText(.headline_m)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                }
+                
+                Spacer(minLength: design.layout.gap.regular)
+                
+                HStack(alignment: .top) {
+                    Text(preset.purpose)
+                        .gentleText(.body_m)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: design.layout.gap.loose)
+                    VStack {
+                        Button("Use preset") { }
+                            .gentleButton(.primary, expandsHorizontally: true)
+                        Button("Commit") { }
+                            .gentleButton(.secondary, expandsHorizontally: true)
+                        Button("Customize") { }
+                            .gentleButton(.tertiary, expandsHorizontally: false)
+                    }
+                    .opacity(0.7)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading) // ✅ gives the surface a full-width box
-            .gentleSurface(.cardElevated)
-
-            // Text samples
-            Text("headline_m")
-                .gentleText(.headline_m)
-            Text("body_m")
-                .gentleText(.body_m)
-            Text("subheadline_ms")
-                .gentleText(.subheadline_ms)
-            Text("caption_s")
-                .gentleText(.caption_s)
-
-            // Buttons
-            Button("Go") { }
-                .gentleButton(.primary, expandsHorizontally: true)
-
-            Button("Edit") { }
-                .gentleButton(.secondary, expandsHorizontally: true)
-
-            // Color grid
-            colorGrid
+            .opacity(0.8)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)   // ✅ expand first
-        .gentleSurface(.card) // ✅ then draw card chrome to full width
+        // .padding(.horizontal, design.layout.stack.regular)
+        .padding(design.layout.stack.regular)
+        .gentleSurface(.card)
     }
 
     private static let colorGridColumns = Array(repeating: GridItem(.fixed(16), spacing: 2), count: 6)

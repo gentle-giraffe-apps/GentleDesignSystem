@@ -387,6 +387,75 @@ let manager = GentleThemeManager(theme: .default, store: store)
 
 ---
 
+## 6. Theme Presets
+
+GentleDesignSystem includes 9 built-in theme presets, each designed for different use cases and aesthetics.
+
+### Accessing Presets
+
+```swift
+// Get all available presets
+let presets = GentleDesignSystemSpec.allPresets
+
+// Each preset provides:
+// - name: Display name (e.g., "Gentle Default")
+// - summary: Brief tagline
+// - description: Detailed explanation
+// - purpose: When to use this preset
+// - systemImageString: SF Symbol name for UI
+// - spec: The actual GentleDesignSystemSpec
+```
+
+### Available Presets
+
+| Preset | Summary | Best For |
+|--------|---------|----------|
+| **Gentle Default** | Calm, balanced foundation | Versatile starting point with clean hierarchy |
+| **Classic Tan** | Warm, timeless with earthy tones | Apps benefiting from warmth and heritage |
+| **Modern Gray** | Sleek, minimal with neutral foundations | Business apps where clarity is paramount |
+| **Soft Green** | Fresh, natural with calming accents | Wellness, productivity, calm focus |
+| **Editorial Paper** | Refined, print-inspired reading | Content-heavy apps, long-form reading |
+| **Technical Blue** | Precise, trustworthy with blue highlights | Developer tools, dashboards |
+| **Bold Orange** | Vibrant, energetic with strong presence | Apps that motivate action |
+| **Elegant Purple** | Sophisticated, luxurious with rich tones | Lifestyle, creative, premium apps |
+| **Compact Mint** | Dense, efficient with fresh accents | Data-rich interfaces |
+
+### Using Presets
+
+```swift
+// Apply a preset to your theme manager
+@GentleThemeManagerRuntime private var manager
+
+// Find and apply a preset
+if let editorialPreset = GentleDesignSystemSpec.allPresets.first(where: { $0.name == "Editorial Paper" }) {
+    manager.theme.editableSpec = editorialPreset.spec
+}
+```
+
+### Building a Theme Picker
+
+The demo app includes a `ThemePickerView` that displays all presets as interactive cards. Each card previews the preset's typography and colors using the preset's own theme:
+
+```swift
+ForEach(presets, id: \.name) { preset in
+    let previewTheme = GentleTheme(
+        defaultSpec: preset.spec,
+        editableSpec: preset.spec
+    )
+
+    Button {
+        themeManager.theme.editableSpec = preset.spec
+    } label: {
+        GentleThemeRoot(theme: previewTheme) {
+            // Card content renders with the preset's own styling
+            ThemePresetCard(preset: preset)
+        }
+    }
+}
+```
+
+---
+
 ## Available Tokens
 
 ### Typography Roles

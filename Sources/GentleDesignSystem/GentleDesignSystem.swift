@@ -906,17 +906,62 @@ public extension GentleDesignSystemSpec {
         return spec
     }()
 
-    /// All built-in theme presets with display names
-    static let allPresets: [(name: String, spec: GentleDesignSystemSpec)] = [
-        ("Gentle Default", .gentleDefault),
-        ("Classic Tan", .classic),
-        ("Modern Gray", .modern),
-        ("Soft Green", .soft),
-        ("Editorial Paper", .editorial),
-        ("Technical Blue", .technical),
-        ("Bold Orange", .bold),
-        ("Elegant Purple", .elegant),
-        ("Compact Mint", .compact),
+    /// All built-in theme presets with display names and descriptions
+    static let allPresets: [(name: String, summary: String, description: String, purpose: String, systemImageString: String, spec: GentleDesignSystemSpec)] = [
+        ("Gentle Default",
+         "Calm, balanced foundation for any app",
+         "A neutral theme with soft surfaces and confident accent colors that work across all contexts.",
+         "Use when you want a versatile starting point with clean hierarchy and accessible contrast.",
+         "circle.hexagongrid",
+         .gentleDefault),
+        ("Classic Tan",
+         "Warm, timeless feel with earthy tones",
+         "Rich tan backgrounds paired with warm accents create a cozy, established aesthetic.",
+         "Use for apps that benefit from warmth and a sense of heritage or craftsmanship.",
+         "book.closed.fill",
+         .classic),
+        ("Modern Gray",
+         "Sleek, minimal with neutral foundations",
+         "Cool gray surfaces with sharp accents deliver a contemporary, professional appearance.",
+         "Use for business apps or tools where clarity and efficiency are paramount.",
+         "cube.fill",
+         .modern),
+        ("Soft Green",
+         "Fresh, natural with calming green accents",
+         "Gentle green tones create a refreshing, organic feel that reduces visual fatigue.",
+         "Use for wellness, productivity, or any app where calm focus matters.",
+         "leaf.fill",
+         .soft),
+        ("Editorial Paper",
+         "Refined, print-inspired reading experience",
+         "Paper-like backgrounds and classic typography evoke the quality of fine publications.",
+         "Use for content-heavy apps where long-form reading is the primary experience.",
+         "newspaper.fill",
+         .editorial),
+        ("Technical Blue",
+         "Precise, trustworthy with blue highlights",
+         "Professional blue accents on clean surfaces convey reliability and technical competence.",
+         "Use for developer tools, dashboards, or apps requiring user trust.",
+         "terminal.fill",
+         .technical),
+        ("Bold Orange",
+         "Vibrant, energetic with strong presence",
+         "High-energy orange accents demand attention and create memorable interactions.",
+         "Use for apps that need to motivate action or stand out boldly.",
+         "bolt.fill",
+         .bold),
+        ("Elegant Purple",
+         "Sophisticated, luxurious with rich tones",
+         "Deep purple accents on refined surfaces create a premium, distinguished appearance.",
+         "Use for lifestyle, creative, or premium apps where elegance matters.",
+         "crown.fill",
+         .elegant),
+        ("Compact Mint",
+         "Dense, efficient with fresh accents",
+         "Tighter spacing with mint highlights maximizes information density while staying fresh.",
+         "Use for data-rich interfaces where screen real estate is precious.",
+         "square.grid.3x3.fill",
+         .compact),
     ]
 }
 
@@ -1680,7 +1725,7 @@ public struct GentleTextModifier: ViewModifier {
             .lineSpacing(style.lineSpacing)
             .kerning(style.letterSpacing)
             .textCase(style.isUppercased ? .uppercase : .none)
-            .minimumScaleFactor(0.9)
+//            .minimumScaleFactor(0.9)
     }
 }
 
