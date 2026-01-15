@@ -295,8 +295,112 @@ public extension GentleDesignSystemSpec {
 
 public extension GentleDesignSystemSpec {
 
-    static let mintGreen: GentleDesignSystemSpec = {
+    // MARK: Preset 1: Classic - Serif titles, traditional feel
+    static let classic: GentleDesignSystemSpec = {
         var spec = GentleDesignSystemSpec.gentleDefault
+        // Warm cream/brown colors
+        spec.colors = GentleColorTokens(pairByRole: [
+            GentleColorRole.textPrimary.rawValue:   .init(lightHex: "#2C2416", darkHex: "#F5F0E6"),
+            GentleColorRole.textSecondary.rawValue: .init(lightHex: "#5A4D3A", darkHex: "#D4C8B4"),
+            GentleColorRole.textTertiary.rawValue:  .init(lightHex: "#7A6E5A", darkHex: "#B0A48E"),
+            GentleColorRole.background.rawValue:    .init(lightHex: "#FAF8F3", darkHex: "#1A1610"),
+            GentleColorRole.surface.rawValue:       .init(lightHex: "#F5F0E6", darkHex: "#2C2416"),
+            GentleColorRole.surfaceOverlay.rawValue:.init(lightHex: "#2C2416CC", darkHex: "#0D0B08CC"),
+            GentleColorRole.onSurfaceOverlayPrimary.rawValue:   .init(lightHex: "#FAF8F3", darkHex: "#FAF8F3"),
+            GentleColorRole.onSurfaceOverlaySecondary.rawValue: .init(lightHex: "#D4C8B4", darkHex: "#D4C8B4"),
+            GentleColorRole.surfaceElevated.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#3D3426"),
+            GentleColorRole.borderSubtle.rawValue:   .init(lightHex: "#E0D8C8", darkHex: "#4A4030"),
+            GentleColorRole.primaryCTA.rawValue:     .init(lightHex: "#8B4513", darkHex: "#CD853F"),
+            GentleColorRole.onPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#1A1610"),
+            GentleColorRole.destructive.rawValue:    .init(lightHex: "#A0522D", darkHex: "#E07850"),
+            GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#8B4513", darkHex: "#CD853F"),
+            GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#B8860B", darkHex: "#DAA520"),
+        ])
+        // Serif titles, traditional typography
+        var typo = GentleTypographyTokens.gentleDefault
+        typo.roles[GentleTextRole.largeTitle_xxl.rawValue] = .init(
+            pointSize: 36, weight: .bold, design: .serif, width: nil,
+            relativeTo: .largeTitle, lineSpacing: 4, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title_xl.rawValue] = .init(
+            pointSize: 28, weight: .semibold, design: .serif, width: nil,
+            relativeTo: .title, lineSpacing: 3, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title2_l.rawValue] = .init(
+            pointSize: 22, weight: .semibold, design: .serif, width: nil,
+            relativeTo: .title2, lineSpacing: 2, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title3_ml.rawValue] = .init(
+            pointSize: 20, weight: .medium, design: .serif, width: nil,
+            relativeTo: .title3, lineSpacing: 2, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.headline_m.rawValue] = .init(
+            pointSize: 17, weight: .semibold, design: .serif, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.body_m.rawValue] = .init(
+            pointSize: 17, weight: .regular, design: .default, width: nil,
+            relativeTo: .body, lineSpacing: 3, colorRole: .textPrimary
+        )
+        spec.typography = typo
+        return spec
+    }()
+
+    // MARK: Preset 2: Modern - Clean, minimal default design
+    static let modern: GentleDesignSystemSpec = {
+        var spec = GentleDesignSystemSpec.gentleDefault
+        // Cool gray/blue colors
+        spec.colors = GentleColorTokens(pairByRole: [
+            GentleColorRole.textPrimary.rawValue:   .init(lightHex: "#1A1A2E", darkHex: "#EAEAF4"),
+            GentleColorRole.textSecondary.rawValue: .init(lightHex: "#4A4A5E", darkHex: "#B0B0C4"),
+            GentleColorRole.textTertiary.rawValue:  .init(lightHex: "#6A6A7E", darkHex: "#8A8A9E"),
+            GentleColorRole.background.rawValue:    .init(lightHex: "#FAFAFC", darkHex: "#0D0D14"),
+            GentleColorRole.surface.rawValue:       .init(lightHex: "#F0F0F4", darkHex: "#1A1A28"),
+            GentleColorRole.surfaceOverlay.rawValue:.init(lightHex: "#1A1A2ECC", darkHex: "#08080CCC"),
+            GentleColorRole.onSurfaceOverlayPrimary.rawValue:   .init(lightHex: "#FAFAFC", darkHex: "#FAFAFC"),
+            GentleColorRole.onSurfaceOverlaySecondary.rawValue: .init(lightHex: "#B0B0C4", darkHex: "#B0B0C4"),
+            GentleColorRole.surfaceElevated.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#26263A"),
+            GentleColorRole.borderSubtle.rawValue:   .init(lightHex: "#E0E0E8", darkHex: "#3A3A4E"),
+            GentleColorRole.primaryCTA.rawValue:     .init(lightHex: "#3B5BDB", darkHex: "#5C7CFA"),
+            GentleColorRole.onPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#0D0D14"),
+            GentleColorRole.destructive.rawValue:    .init(lightHex: "#E03131", darkHex: "#FF6B6B"),
+            GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#3B5BDB", darkHex: "#5C7CFA"),
+            GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#748FFC", darkHex: "#91A7FF"),
+        ])
+        // Clean default design, medium weights
+        var typo = GentleTypographyTokens.gentleDefault
+        typo.roles[GentleTextRole.largeTitle_xxl.rawValue] = .init(
+            pointSize: 32, weight: .semibold, design: .default, width: nil,
+            relativeTo: .largeTitle, lineSpacing: 4, letterSpacing: -0.5, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title_xl.rawValue] = .init(
+            pointSize: 26, weight: .semibold, design: .default, width: nil,
+            relativeTo: .title, lineSpacing: 3, letterSpacing: -0.3, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title2_l.rawValue] = .init(
+            pointSize: 21, weight: .medium, design: .default, width: nil,
+            relativeTo: .title2, lineSpacing: 2, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title3_ml.rawValue] = .init(
+            pointSize: 19, weight: .medium, design: .default, width: nil,
+            relativeTo: .title3, lineSpacing: 2, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.headline_m.rawValue] = .init(
+            pointSize: 16, weight: .medium, design: .default, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.body_m.rawValue] = .init(
+            pointSize: 16, weight: .regular, design: .default, width: nil,
+            relativeTo: .body, lineSpacing: 3, colorRole: .textPrimary
+        )
+        spec.typography = typo
+        return spec
+    }()
+
+    // MARK: Preset 3: Soft - Rounded throughout, friendly feel
+    static let soft: GentleDesignSystemSpec = {
+        var spec = GentleDesignSystemSpec.gentleDefault
+        // Soft mint/teal colors
         spec.colors = GentleColorTokens(pairByRole: [
             GentleColorRole.textPrimary.rawValue:   .init(lightHex: "#1A3A2F", darkHex: "#E8F5F0"),
             GentleColorRole.textSecondary.rawValue: .init(lightHex: "#3D5A4F", darkHex: "#B8D4C8"),
@@ -314,11 +418,52 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#2E8B6E", darkHex: "#4ADE9F"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#6FCF97", darkHex: "#7EEAB8"),
         ])
+        // All rounded, soft weights
+        var typo = GentleTypographyTokens.gentleDefault
+        typo.roles[GentleTextRole.largeTitle_xxl.rawValue] = .init(
+            pointSize: 34, weight: .bold, design: .rounded, width: nil,
+            relativeTo: .largeTitle, lineSpacing: 6, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title_xl.rawValue] = .init(
+            pointSize: 28, weight: .bold, design: .rounded, width: nil,
+            relativeTo: .title, lineSpacing: 4, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title2_l.rawValue] = .init(
+            pointSize: 22, weight: .semibold, design: .rounded, width: nil,
+            relativeTo: .title2, lineSpacing: 3, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title3_ml.rawValue] = .init(
+            pointSize: 20, weight: .semibold, design: .rounded, width: nil,
+            relativeTo: .title3, lineSpacing: 3, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.headline_m.rawValue] = .init(
+            pointSize: 17, weight: .semibold, design: .rounded, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.body_m.rawValue] = .init(
+            pointSize: 17, weight: .regular, design: .rounded, width: nil,
+            relativeTo: .body, lineSpacing: 2, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.bodySecondary_m.rawValue] = .init(
+            pointSize: 17, weight: .regular, design: .rounded, width: nil,
+            relativeTo: .body, lineSpacing: 2, colorRole: .textSecondary
+        )
+        typo.roles[GentleTextRole.callout_ms.rawValue] = .init(
+            pointSize: 16, weight: .regular, design: .rounded, width: nil,
+            relativeTo: .callout, colorRole: .textSecondary
+        )
+        typo.roles[GentleTextRole.subheadline_ms.rawValue] = .init(
+            pointSize: 15, weight: .regular, design: .rounded, width: nil,
+            relativeTo: .subheadline, colorRole: .textSecondary
+        )
+        spec.typography = typo
         return spec
     }()
 
-    static let blackAndWhite: GentleDesignSystemSpec = {
+    // MARK: Preset 4: Editorial - Serif throughout, magazine feel
+    static let editorial: GentleDesignSystemSpec = {
         var spec = GentleDesignSystemSpec.gentleDefault
+        // High contrast black/white
         spec.colors = GentleColorTokens(pairByRole: [
             GentleColorRole.textPrimary.rawValue:   .init(lightHex: "#000000", darkHex: "#FFFFFF"),
             GentleColorRole.textSecondary.rawValue: .init(lightHex: "#333333", darkHex: "#CCCCCC"),
@@ -332,15 +477,52 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.borderSubtle.rawValue:   .init(lightHex: "#E0E0E0", darkHex: "#404040"),
             GentleColorRole.primaryCTA.rawValue:     .init(lightHex: "#000000", darkHex: "#FFFFFF"),
             GentleColorRole.onPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#000000"),
-            GentleColorRole.destructive.rawValue:    .init(lightHex: "#000000", darkHex: "#FFFFFF"),
+            GentleColorRole.destructive.rawValue:    .init(lightHex: "#B91C1C", darkHex: "#F87171"),
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#000000", darkHex: "#FFFFFF"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#666666", darkHex: "#999999"),
         ])
+        // All serif, editorial typography
+        var typo = GentleTypographyTokens.gentleDefault
+        typo.roles[GentleTextRole.largeTitle_xxl.rawValue] = .init(
+            pointSize: 40, weight: .bold, design: .serif, width: nil,
+            relativeTo: .largeTitle, lineSpacing: 2, letterSpacing: -1.0, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title_xl.rawValue] = .init(
+            pointSize: 30, weight: .bold, design: .serif, width: nil,
+            relativeTo: .title, lineSpacing: 2, letterSpacing: -0.5, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title2_l.rawValue] = .init(
+            pointSize: 24, weight: .semibold, design: .serif, width: nil,
+            relativeTo: .title2, lineSpacing: 2, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title3_ml.rawValue] = .init(
+            pointSize: 20, weight: .semibold, design: .serif, width: nil,
+            relativeTo: .title3, lineSpacing: 2, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.headline_m.rawValue] = .init(
+            pointSize: 17, weight: .bold, design: .serif, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.body_m.rawValue] = .init(
+            pointSize: 18, weight: .regular, design: .serif, width: nil,
+            relativeTo: .body, lineSpacing: 4, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.bodySecondary_m.rawValue] = .init(
+            pointSize: 18, weight: .regular, design: .serif, width: nil,
+            relativeTo: .body, lineSpacing: 4, colorRole: .textSecondary
+        )
+        typo.roles[GentleTextRole.callout_ms.rawValue] = .init(
+            pointSize: 16, weight: .regular, design: .serif, width: nil,
+            relativeTo: .callout, colorRole: .textSecondary
+        )
+        spec.typography = typo
         return spec
     }()
 
-    static let oceanBlue: GentleDesignSystemSpec = {
+    // MARK: Preset 5: Technical - Monospace accents, developer feel
+    static let technical: GentleDesignSystemSpec = {
         var spec = GentleDesignSystemSpec.gentleDefault
+        // Cool blue/gray tech colors
         spec.colors = GentleColorTokens(pairByRole: [
             GentleColorRole.textPrimary.rawValue:   .init(lightHex: "#0A2540", darkHex: "#E6F0FA"),
             GentleColorRole.textSecondary.rawValue: .init(lightHex: "#334E68", darkHex: "#A3C4E0"),
@@ -358,11 +540,44 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#0066CC", darkHex: "#4DA6FF"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#4D94DB", darkHex: "#80C0FF"),
         ])
+        // Monospace titles, condensed
+        var typo = GentleTypographyTokens.gentleDefault
+        typo.roles[GentleTextRole.largeTitle_xxl.rawValue] = .init(
+            pointSize: 30, weight: .bold, design: .monospaced, width: nil,
+            relativeTo: .largeTitle, lineSpacing: 4, letterSpacing: -0.5, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title_xl.rawValue] = .init(
+            pointSize: 24, weight: .bold, design: .monospaced, width: nil,
+            relativeTo: .title, lineSpacing: 3, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title2_l.rawValue] = .init(
+            pointSize: 20, weight: .semibold, design: .monospaced, width: nil,
+            relativeTo: .title2, lineSpacing: 2, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title3_ml.rawValue] = .init(
+            pointSize: 18, weight: .semibold, design: .monospaced, width: nil,
+            relativeTo: .title3, lineSpacing: 2, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.headline_m.rawValue] = .init(
+            pointSize: 15, weight: .semibold, design: .monospaced, width: nil,
+            relativeTo: .headline, letterSpacing: 0.5, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.body_m.rawValue] = .init(
+            pointSize: 15, weight: .regular, design: .default, width: .condensed,
+            relativeTo: .body, lineSpacing: 2, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.monoCode_m.rawValue] = .init(
+            pointSize: 14, weight: .regular, design: .monospaced, width: nil,
+            relativeTo: .body, letterSpacing: 0, colorRole: .textPrimary
+        )
+        spec.typography = typo
         return spec
     }()
 
-    static let sunsetOrange: GentleDesignSystemSpec = {
+    // MARK: Preset 6: Bold - Heavy weights, strong presence
+    static let bold: GentleDesignSystemSpec = {
         var spec = GentleDesignSystemSpec.gentleDefault
+        // Warm orange/sunset colors
         spec.colors = GentleColorTokens(pairByRole: [
             GentleColorRole.textPrimary.rawValue:   .init(lightHex: "#3D1E0A", darkHex: "#FFF0E6"),
             GentleColorRole.textSecondary.rawValue: .init(lightHex: "#664433", darkHex: "#E0C4B0"),
@@ -380,11 +595,44 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#E85D04", darkHex: "#FF8C42"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#F5A060", darkHex: "#FFB87A"),
         ])
+        // Heavy weights throughout
+        var typo = GentleTypographyTokens.gentleDefault
+        typo.roles[GentleTextRole.largeTitle_xxl.rawValue] = .init(
+            pointSize: 38, weight: .black, design: .default, width: nil,
+            relativeTo: .largeTitle, lineSpacing: 4, letterSpacing: -1.0, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title_xl.rawValue] = .init(
+            pointSize: 30, weight: .heavy, design: .default, width: nil,
+            relativeTo: .title, lineSpacing: 3, letterSpacing: -0.5, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title2_l.rawValue] = .init(
+            pointSize: 24, weight: .bold, design: .default, width: nil,
+            relativeTo: .title2, lineSpacing: 2, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title3_ml.rawValue] = .init(
+            pointSize: 20, weight: .bold, design: .default, width: nil,
+            relativeTo: .title3, lineSpacing: 2, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.headline_m.rawValue] = .init(
+            pointSize: 17, weight: .bold, design: .default, width: nil,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.body_m.rawValue] = .init(
+            pointSize: 17, weight: .medium, design: .default, width: nil,
+            relativeTo: .body, lineSpacing: 2, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.bodySecondary_m.rawValue] = .init(
+            pointSize: 17, weight: .medium, design: .default, width: nil,
+            relativeTo: .body, lineSpacing: 2, colorRole: .textSecondary
+        )
+        spec.typography = typo
         return spec
     }()
 
-    static let lavenderPurple: GentleDesignSystemSpec = {
+    // MARK: Preset 7: Elegant - Light weights, expanded, airy feel
+    static let elegant: GentleDesignSystemSpec = {
         var spec = GentleDesignSystemSpec.gentleDefault
+        // Soft lavender/purple colors
         spec.colors = GentleColorTokens(pairByRole: [
             GentleColorRole.textPrimary.rawValue:   .init(lightHex: "#2D1B4E", darkHex: "#F0E6FF"),
             GentleColorRole.textSecondary.rawValue: .init(lightHex: "#4D3A6B", darkHex: "#D0C0E8"),
@@ -402,33 +650,44 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#7C4DFF", darkHex: "#A580FF"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#B388FF", darkHex: "#C9A0FF"),
         ])
+        // Light weights, expanded, generous spacing
+        var typo = GentleTypographyTokens.gentleDefault
+        typo.roles[GentleTextRole.largeTitle_xxl.rawValue] = .init(
+            pointSize: 36, weight: .light, design: .default, width: .expanded,
+            relativeTo: .largeTitle, lineSpacing: 8, letterSpacing: 1.5, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title_xl.rawValue] = .init(
+            pointSize: 28, weight: .light, design: .default, width: .expanded,
+            relativeTo: .title, lineSpacing: 6, letterSpacing: 1.0, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title2_l.rawValue] = .init(
+            pointSize: 22, weight: .regular, design: .default, width: .expanded,
+            relativeTo: .title2, lineSpacing: 4, letterSpacing: 0.5, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title3_ml.rawValue] = .init(
+            pointSize: 20, weight: .regular, design: .default, width: nil,
+            relativeTo: .title3, lineSpacing: 4, letterSpacing: 0.3, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.headline_m.rawValue] = .init(
+            pointSize: 17, weight: .regular, design: .default, width: nil,
+            relativeTo: .headline, letterSpacing: 0.5, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.body_m.rawValue] = .init(
+            pointSize: 17, weight: .light, design: .default, width: nil,
+            relativeTo: .body, lineSpacing: 4, letterSpacing: 0.2, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.bodySecondary_m.rawValue] = .init(
+            pointSize: 17, weight: .light, design: .default, width: nil,
+            relativeTo: .body, lineSpacing: 4, letterSpacing: 0.2, colorRole: .textSecondary
+        )
+        spec.typography = typo
         return spec
     }()
 
-    static let rosePink: GentleDesignSystemSpec = {
+    // MARK: Preset 8: Compact - Condensed, information-dense
+    static let compact: GentleDesignSystemSpec = {
         var spec = GentleDesignSystemSpec.gentleDefault
-        spec.colors = GentleColorTokens(pairByRole: [
-            GentleColorRole.textPrimary.rawValue:   .init(lightHex: "#4A1942", darkHex: "#FFE6F5"),
-            GentleColorRole.textSecondary.rawValue: .init(lightHex: "#6B3060", darkHex: "#E8C0DC"),
-            GentleColorRole.textTertiary.rawValue:  .init(lightHex: "#8B5080", darkHex: "#D0A0C4"),
-            GentleColorRole.background.rawValue:    .init(lightHex: "#FFF5FB", darkHex: "#1A0D16"),
-            GentleColorRole.surface.rawValue:       .init(lightHex: "#FFE8F5", darkHex: "#2D1826"),
-            GentleColorRole.surfaceOverlay.rawValue:.init(lightHex: "#4A1942CC", darkHex: "#140A12CC"),
-            GentleColorRole.onSurfaceOverlayPrimary.rawValue:   .init(lightHex: "#FFF5FB", darkHex: "#FFF5FB"),
-            GentleColorRole.onSurfaceOverlaySecondary.rawValue: .init(lightHex: "#E8C0DC", darkHex: "#E8C0DC"),
-            GentleColorRole.surfaceElevated.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#3D2236"),
-            GentleColorRole.borderSubtle.rawValue:   .init(lightHex: "#F0C8E4", darkHex: "#4D2840"),
-            GentleColorRole.primaryCTA.rawValue:     .init(lightHex: "#DB2777", darkHex: "#F472B6"),
-            GentleColorRole.onPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#1A0D16"),
-            GentleColorRole.destructive.rawValue:    .init(lightHex: "#BE185D", darkHex: "#FB7185"),
-            GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#DB2777", darkHex: "#F472B6"),
-            GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#F06292", darkHex: "#F9A8D4"),
-        ])
-        return spec
-    }()
-
-    static let forestGreen: GentleDesignSystemSpec = {
-        var spec = GentleDesignSystemSpec.gentleDefault
+        // Deep forest green colors
         spec.colors = GentleColorTokens(pairByRole: [
             GentleColorRole.textPrimary.rawValue:   .init(lightHex: "#1B3D2F", darkHex: "#E6F2EC"),
             GentleColorRole.textSecondary.rawValue: .init(lightHex: "#3A5A4A", darkHex: "#B8D4C4"),
@@ -446,19 +705,71 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#166534", darkHex: "#4ADE80"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#22C55E", darkHex: "#86EFAC"),
         ])
+        // Condensed, smaller sizes, tight spacing
+        var typo = GentleTypographyTokens.gentleDefault
+        typo.roles[GentleTextRole.largeTitle_xxl.rawValue] = .init(
+            pointSize: 28, weight: .bold, design: .default, width: .condensed,
+            relativeTo: .largeTitle, lineSpacing: 2, letterSpacing: -0.5, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title_xl.rawValue] = .init(
+            pointSize: 22, weight: .bold, design: .default, width: .condensed,
+            relativeTo: .title, lineSpacing: 2, letterSpacing: -0.3, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title2_l.rawValue] = .init(
+            pointSize: 18, weight: .semibold, design: .default, width: .condensed,
+            relativeTo: .title2, lineSpacing: 1, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.title3_ml.rawValue] = .init(
+            pointSize: 16, weight: .semibold, design: .default, width: .condensed,
+            relativeTo: .title3, lineSpacing: 1, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.headline_m.rawValue] = .init(
+            pointSize: 14, weight: .semibold, design: .default, width: .condensed,
+            relativeTo: .headline, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.body_m.rawValue] = .init(
+            pointSize: 14, weight: .regular, design: .default, width: .condensed,
+            relativeTo: .body, lineSpacing: 1, colorRole: .textPrimary
+        )
+        typo.roles[GentleTextRole.bodySecondary_m.rawValue] = .init(
+            pointSize: 14, weight: .regular, design: .default, width: .condensed,
+            relativeTo: .body, lineSpacing: 1, colorRole: .textSecondary
+        )
+        typo.roles[GentleTextRole.callout_ms.rawValue] = .init(
+            pointSize: 13, weight: .regular, design: .default, width: .condensed,
+            relativeTo: .callout, colorRole: .textSecondary
+        )
+        typo.roles[GentleTextRole.subheadline_ms.rawValue] = .init(
+            pointSize: 12, weight: .regular, design: .default, width: .condensed,
+            relativeTo: .subheadline, colorRole: .textSecondary
+        )
+        typo.roles[GentleTextRole.footnote_s.rawValue] = .init(
+            pointSize: 11, weight: .regular, design: .default, width: .condensed,
+            relativeTo: .footnote, colorRole: .textTertiary
+        )
+        typo.roles[GentleTextRole.caption_s.rawValue] = .init(
+            pointSize: 10, weight: .regular, design: .default, width: .condensed,
+            relativeTo: .caption, colorRole: .textTertiary
+        )
+        typo.roles[GentleTextRole.caption2_s.rawValue] = .init(
+            pointSize: 9, weight: .regular, design: .default, width: .condensed,
+            relativeTo: .caption2, colorRole: .textTertiary
+        )
+        spec.typography = typo
         return spec
     }()
 
     /// All built-in theme presets with display names
     static let allPresets: [(name: String, spec: GentleDesignSystemSpec)] = [
         ("Gentle Default", .gentleDefault),
-        ("Mint Green", .mintGreen),
-        ("Black & White", .blackAndWhite),
-        ("Ocean Blue", .oceanBlue),
-        ("Sunset Orange", .sunsetOrange),
-        ("Lavender Purple", .lavenderPurple),
-        ("Rose Pink", .rosePink),
-        ("Forest Green", .forestGreen),
+        ("Classic", .classic),
+        ("Modern", .modern),
+        ("Soft", .soft),
+        ("Editorial", .editorial),
+        ("Technical", .technical),
+        ("Bold", .bold),
+        ("Elegant", .elegant),
+        ("Compact", .compact),
     ]
 }
 
