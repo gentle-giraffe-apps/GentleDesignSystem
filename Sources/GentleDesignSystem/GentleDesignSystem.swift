@@ -1620,6 +1620,25 @@ public final class GentleThemeManager {
             }
         )
     }
+
+    // MARK: - Export
+
+    /// Exports the current editable spec to a temporary JSON file and returns its URL.
+    /// Suitable for use with ShareLink or other sharing mechanisms.
+    public func exportURL() throws -> URL {
+        let tempDir = FileManager.default.temporaryDirectory
+        let fileName = "GentleTheme_\(formattedTimestamp()).json"
+        let url = tempDir.appendingPathComponent(fileName)
+        let data = try theme.editableSpec.encodedJSONData()
+        try data.write(to: url, options: [.atomic])
+        return url
+    }
+
+    private func formattedTimestamp() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd_HHmmss"
+        return formatter.string(from: Date())
+    }
 }
 
 private struct GentleThemeManagerKey: EnvironmentKey {

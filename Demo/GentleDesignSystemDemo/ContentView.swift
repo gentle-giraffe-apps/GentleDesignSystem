@@ -1,44 +1,76 @@
-import SwiftUI
 import GentleDesignSystem
+import SwiftUI
+import UIKit
 
 struct ContentView: View {
+    enum ActiveSheet: String, Identifiable {
+        case settings
+        case share
+        var id: String { rawValue }
+    }
+
+    @State private var activeSheet: ActiveSheet?
+    @State private var exportURL: URL?
     @GentleDesignRuntime private var design
-    @State private var isSheetPresented = false
-    
+    @GentleThemeManagerRuntime private var themeManager
+
     var body: some View {
         NavigationStack {
             GentleDesignFoundationView()
-            .navigationTitle("Design System")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        print("settings")
-                        isSheetPresented = true
-                    } label: {
-                        Image(systemName: "gearshape")
+                .navigationTitle("Design System")
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            activeSheet = .share
+                        } label: {
+                            Label("Export", systemImage: "square.and.arrow.up")
+                        }
+                        .disabled(exportURL == nil)
+                    }
+
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            activeSheet = .settings
+                        } label: {
+                            Label("Customize", systemImage: "slider.horizontal.3")
+                        }
                     }
                 }
-            }
-            .sheet(isPresented: $isSheetPresented) {
-                GentleDesignSettingsView(onSave: {
-                    isSheetPresented = false
-                })
-            }
+                .sheet(item: $activeSheet) { sheet in
+                    switch sheet {
+                    case .settings:
+                        GentleDesignCustomizeView(onSave: {
+                            activeSheet = nil
+                        })
+                        .presentationDetents([.medium, .large])
+                        .presentationDragIndicator(.visible)
+                        .presentationBackgroundInteraction(.enabled)
+
+                    case .share:
+                        if let exportURL {
+                            GentleDesignShareSheet(items: [exportURL])
+                                .presentationDetents([.height(360), .medium, .large])
+                                .presentationDragIndicator(.visible)
+                                .presentationBackgroundInteraction(.enabled)
+                        } else {
+                            ProgressView("Preparing export…")
+                                .presentationDetents([.height(260)])
+                                .presentationDragIndicator(.visible)
+                                .task { await refreshExportURL() }
+                        }
+                    }
+                }
         }
+        .task { await refreshExportURL() }
     }
-}
 
-// MARK: - Previews
-
-#Preview("Light") {
-    GentleThemeRoot(theme: .default) {
-        ContentView()
-    }
-}
-
-#Preview("Dark") {
-    GentleThemeRoot(theme: .default) {
-        ContentView()
-            .preferredColorScheme(.dark)
+    @MainActor
+    private func refreshExportURL() async {
+        do {
+            exportURL = try themeManager.exportURL()
+        } catch {
+            print("themeManager.exportURL error: \(error)")
+            exportURL = nil
+        }
     }
 }
