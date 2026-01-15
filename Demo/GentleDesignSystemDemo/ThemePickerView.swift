@@ -7,9 +7,9 @@ struct ThemePickerView: View {
     @State private var showingContentView = false
 
     private let columns = [
-        GridItem(.adaptive(minimum: 160, maximum: 220), spacing: 16)
+        GridItem(.adaptive(minimum: 180, maximum: 180), spacing: 8, alignment: .leading)
     ]
-
+    
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -26,6 +26,7 @@ struct ThemePickerView: View {
                         } label: {
                             GentleThemeRoot(theme: previewTheme) {
                                 ThemePresetCard(preset: preset, index: index + 1)
+                                    .frame(maxWidth: .infinity, alignment: .leading) // ✅ fill cell
                             }
                         }
                         .buttonStyle(.plain)
@@ -62,21 +63,32 @@ struct ThemePresetCard: View {
     }
 
     var body: some View {
+        
         VStack(alignment: .leading, spacing: design.layout.stack.tight) {
-            // Index number + theme name in elevated surface
             VStack(alignment: .leading, spacing: design.layout.stack.tight) {
                 HStack(alignment: .firstTextBaseline, spacing: design.layout.stack.tight) {
                     Text("\(index)")
                         .gentleText(.largeTitle_xxl)
+                        .fixedSize(horizontal: true, vertical: false)
+
                     Text(nameWords.first)
                         .gentleText(.title_xl)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                        .allowsTightening(true)
+                        .frame(minWidth: 0, alignment: .leading)
                 }
 
                 if let secondWord = nameWords.second {
                     Text(secondWord)
                         .gentleText(.title2_l)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .allowsTightening(true)
+                        .frame(minWidth: 0, alignment: .leading)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading) // ✅ gives the surface a full-width box
             .gentleSurface(.cardElevated)
 
             // Text samples
@@ -90,16 +102,17 @@ struct ThemePresetCard: View {
                 .gentleText(.caption_s)
 
             // Buttons
-            Button("Go") { }
-                .gentleButton(.primary)
+            Button("Edit") { }
+                .gentleButton(.primary, expandsHorizontally: true)
 
             Button("Edit") { }
-                .gentleButton(.secondary)
+                .gentleButton(.secondary, expandsHorizontally: true)
 
             // Color grid
             colorGrid
         }
-        .gentleSurface(.card)
+        .frame(maxWidth: .infinity, alignment: .leading)   // ✅ expand first
+        .gentleSurface(.card) // ✅ then draw card chrome to full width
     }
 
     private static let colorGridColumns = Array(repeating: GridItem(.fixed(16), spacing: 2), count: 6)
