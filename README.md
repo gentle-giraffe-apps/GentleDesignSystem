@@ -125,31 +125,20 @@ flowchart TB
 ```mermaid
 flowchart TB
   Spec[GentleDesignSystemSpec]
-  Spec --> Colors[GentleColorTokens]
-  Spec --> Typography[GentleTypographyTokens]
-  Spec --> Buttons[GentleButtonTokens]
+  Spec --> Colors[Colors]
+  Spec --> Type[Typography]
+  Spec --> Buttons[Buttons]
 
-  %% Colors
-  Colors -->|pairByRole| ColorRole[GentleColorRole]
-  ColorRole --> Pair[GentleColorPair]
+  Colors --> CR[Color roles → Color pairs]
+  Type --> TR[Text roles → Typography specs]
+  Buttons --> BR[Button roles → Button specs]
+  Buttons --> AR[Animation roles → Animation specs]
 
-  %% Typography
-  Typography -->|roles| TextRole[GentleTextRole]
-  TextRole --> TypoSpec[GentleTypographyRoleSpec]
-  TypoSpec -.->|colorRole| ColorRole
-
-  %% Buttons
-  Buttons -->|roles| ButtonRole[GentleButtonRole]
-  ButtonRole --> ButtonSpec[GentleButtonRoleSpec]
-
-  ButtonSpec -.->|textRole| TextRole
-  ButtonSpec -.->|backgroundRole| ColorRole
-  ButtonSpec -.->|labelColorRole| ColorRole
-  ButtonSpec -.->|borderRole optional| ColorRole
-
-  Buttons -->|animations| AnimRole[GentleButtonAnimationRole]
-  AnimRole --> AnimSpec[GentleButtonAnimationSpec]
-  ButtonSpec -.->|animationRole| AnimRole
+  %% Cross references (the important part)
+  TR -.uses.-> CR
+  BR -.uses.-> TR
+  BR -.uses.-> CR
+  BR -.uses.-> AR
 
   %% --- Spacer nodes to force extra bottom height ---
   SpacerA[" "]:::spacer
