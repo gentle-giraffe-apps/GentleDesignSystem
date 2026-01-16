@@ -123,22 +123,49 @@ flowchart TB
 ### Token Composition
 
 ```mermaid
-flowchart TB
+flowchart LR
   Spec[GentleDesignSystemSpec]
-  Spec --> Colors[Colors]
-  Spec --> Type[Typography]
-  Spec --> Buttons[Buttons]
 
-  Colors --> CR[Color roles → Color pairs]
-  Type --> TR[Text roles → Typography specs]
-  Buttons --> BR[Button roles → Button specs]
-  Buttons --> AR[Animation roles → Animation specs]
+  %% Invisible anchors to enforce column layout (GitHub/Dagre-friendly)
+  A1(( )) --> A2(( )) --> A3(( ))
+  style A1 fill:transparent,stroke:transparent
+  style A2 fill:transparent,stroke:transparent
+  style A3 fill:transparent,stroke:transparent
+  linkStyle 0 stroke:transparent
+  linkStyle 1 stroke:transparent
 
-  %% Cross references (the important part)
-  TR -.uses.-> CR
-  BR -.uses.-> TR
-  BR -.uses.-> CR
-  BR -.uses.-> AR
+  %% Columns
+  subgraph C[Colors]
+    direction TB
+    C1[Color roles] --> C2[Color pairs]
+  end
+
+  subgraph T[Typography]
+    direction TB
+    T1[Text roles] --> T2[Typography specs]
+  end
+
+  subgraph B[Buttons]
+    direction TB
+    B1[Button roles] --> B2[Button specs]
+    B3[Animation roles] --> B4[Animation specs]
+  end
+
+  %% Pin each column to an anchor
+  A1 --> C1
+  A2 --> T1
+  A3 --> B1
+
+  %% Spec to each section
+  Spec --> C1
+  Spec --> T1
+  Spec --> B1
+
+  %% Minimal cross references (keep to 3–4 total)
+  T2 -.uses colors.-> C1
+  B2 -.uses text.-> T1
+  B2 -.uses colors.-> C1
+  B2 -.uses animation.-> B3
 ```
 
 ### Data Flow
