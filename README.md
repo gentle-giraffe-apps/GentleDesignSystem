@@ -139,16 +139,6 @@ flowchart TB
   BR -.uses.-> TR
   BR -.uses.-> CR
   BR -.uses.-> AR
-
-  %% --- Spacer nodes to force extra bottom height ---
-  SpacerA[" "]:::spacer
-  SpacerB[" "]:::spacer
-  SpacerC[" "]:::spacer
-  Surface --> SpacerA
-  SpacerA --> SpacerB
-  SpacerB --> SpacerC
-
-  classDef spacer fill:transparent,stroke:transparent,color:transparent;
 ```
 
 ### Data Flow
