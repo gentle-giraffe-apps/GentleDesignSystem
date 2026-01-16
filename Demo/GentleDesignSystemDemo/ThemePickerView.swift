@@ -4,7 +4,7 @@ import GentleDesignSystem
 struct ThemePickerView: View {
     @GentleThemeManagerRuntime private var themeManager
     @GentleDesignRuntime private var design
-    @State private var showingContentView = false
+    @State private var showingThemeStudio = false
     @Environment(\.horizontalSizeClass) private var sizeClass
 
     private var columns: [GridItem] {
@@ -29,7 +29,7 @@ struct ThemePickerView: View {
 
                         Button {
                             themeManager.theme.editableSpec = preset.spec
-                            showingContentView = true
+                            showingThemeStudio = true
                         } label: {
                             GentleThemeRoot(theme: previewTheme) {
                                 ThemePresetCard(preset: preset, index: index + 1)
@@ -43,8 +43,8 @@ struct ThemePickerView: View {
             }
             .navigationTitle("Choose Theme")
             .gentleSurface(.appBackground)
-            .navigationDestination(isPresented: $showingContentView) {
-                ContentView()
+            .navigationDestination(isPresented: $showingThemeStudio) {
+                ThemeStudioView()
             }
         }
     }
