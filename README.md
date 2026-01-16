@@ -580,5 +580,4 @@ Each role resolves to a `GentleTypographyRoleSpec` containing: `pointSize`, `wei
 
 Portions of drafting and editorial refinement in this repository were accelerated using large language models (including ChatGPT, Claude, and Gemini) under direct human design, validation, and final approval. All technical decisions, code, and architectural conclusions are authored and verified by the repository maintainer.
 
-![visitors](https://visitor-badge.laobi.icu/badge?page_id=gentle-giraffe-apps.GentleDesignSystem)
-
+![Visitors](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2Fgentle-giraffe-apps%2FGentleDesignSystem)
