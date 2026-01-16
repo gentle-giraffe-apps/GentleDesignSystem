@@ -2,7 +2,7 @@ import GentleDesignSystem
 import SwiftUI
 import UIKit
 
-struct ContentView: View {
+public struct GentleDesignStudioView: View {
     enum ActiveSheet: String, Identifiable {
         case settings
         case share
@@ -14,7 +14,10 @@ struct ContentView: View {
     @GentleDesignRuntime private var design
     @GentleThemeManagerRuntime private var themeManager
 
-    var body: some View {
+    public init() {
+    }
+    
+    public var body: some View {
         NavigationStack {
             GentleDesignFoundationView()
                 .navigationTitle("Design System")
