@@ -110,7 +110,7 @@ flowchart TB
 
     subgraph SwiftUI["SwiftUI Layer"]
         Root[GentleThemeRoot]
-        Env[Environment Values (.gentleTheme)]
+        Env[Environment Values .gentleTheme]
         Modifiers[View Modifiers]
         Root --> Env
         Env --> Modifiers
