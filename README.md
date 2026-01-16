@@ -6,15 +6,15 @@
 ![Platform](https://img.shields.io/badge/Platform-iPhone%20%7C%20iPad-lightgrey)
 ![SPM](https://img.shields.io/badge/SPM-Compatible-success)
 
-A lightweight, token-driven SwiftUI design system with built-in Dark Mode and Dynamic Type support.
+A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to feel *native*, *predictable*, and *composable*, while giving you a centralized way to evolve typography, color, spacing, and surface behavior over time.
+
+**Who is this for?** Apps that want a strong SwiftUI foundation and theme evolution without rewriting view code.
 
 💬 **[Join the discussion. Feedback and questions welcome](https://github.com/gentle-giraffe-apps/GentleDesignSystem/discussions)**
 
-GentleDesignSystem is designed to feel *native*, *predictable*, and *composable*, while still giving you a centralized place to evolve typography, color, spacing, and surface behavior over time.
-
 ![Demo animation](docs/README_assets/Typography.gif)
 
-**See it in action:** Open `Demo/GentleDesignSystemDemo.xcodeproj` to explore all components. The demo app also lets you update and share JSON specs via a ShareSheet.
+**See it in action:** Open `Demo/GentleDesignSystemDemo.xcodeproj` to explore the components. The demo app also supports editing and sharing JSON specs via the system Share Sheet.
 
 <img src="docs/README_assets/Typography1.png" alt="GentleDesignSystem demo – page 1" width="800" />
 <img src="docs/README_assets/Typography2.png" alt="GentleDesignSystem demo – page 2" width="800" />
@@ -27,7 +27,7 @@ GentleDesignSystem is designed to feel *native*, *predictable*, and *composable*
 ### 1. Add the Package
 
 ```swift
-.package(url: "https://github.com/gentle-giraffe-apps/GentleDesignSystem.git", branch: "main")
+.package(url: "https://github.com/gentle-giraffe-apps/GentleDesignSystem.git", from: "0.1.3")
 ```
 
 ### 2. Wrap Your App Root
@@ -110,7 +110,7 @@ flowchart TB
 
     subgraph SwiftUI["SwiftUI Layer"]
         Root[GentleThemeRoot]
-        Env[Environment]
+        Env[Environment Values (.gentleTheme)]
         Modifiers[View Modifiers]
         Root --> Env
         Env --> Modifiers
@@ -120,53 +120,11 @@ flowchart TB
     Runtime --> SwiftUI
 ```
 
-### Token Composition
-
-```mermaid
-flowchart TB
-  Spec[GentleDesignSystemSpec]
-  Spec --> Colors[GentleColorTokens]
-  Spec --> Typography[GentleTypographyTokens]
-  Spec --> Buttons[GentleButtonTokens]
-
-  %% Colors
-  Colors -->|pairByRole| ColorRole[GentleColorRole]
-  ColorRole --> Pair[GentleColorPair]
-
-  %% Typography
-  Typography -->|roles| TextRole[GentleTextRole]
-  TextRole --> TypoSpec[GentleTypographyRoleSpec]
-  TypoSpec -.->|colorRole| ColorRole
-
-  %% Buttons
-  Buttons -->|roles| ButtonRole[GentleButtonRole]
-  ButtonRole --> ButtonSpec[GentleButtonRoleSpec]
-
-  ButtonSpec -.->|textRole| TextRole
-  ButtonSpec -.->|backgroundRole| ColorRole
-  ButtonSpec -.->|labelColorRole| ColorRole
-  ButtonSpec -.->|borderRole optional| ColorRole
-
-  Buttons -->|animations| AnimRole[GentleButtonAnimationRole]
-  AnimRole --> AnimSpec[GentleButtonAnimationSpec]
-  ButtonSpec -.->|animationRole| AnimRole
-
-  %% --- Spacer nodes to force extra bottom height ---
-  SpacerA[" "]:::spacer
-  SpacerB[" "]:::spacer
-  SpacerC[" "]:::spacer
-  Surface --> SpacerA
-  SpacerA --> SpacerB
-  SpacerB --> SpacerC
-
-  classDef spacer fill:transparent,stroke:transparent,color:transparent;
-```
-
 ### Data Flow
 
 ```mermaid
 flowchart TB
-    JSON[(JSON File)] -->|load| Store[ThemeSpecStore]
+    JSON[(JSON File)] -->|load| Store[GentleFileThemeSpecStore]
     Store --> Manager[GentleThemeManager]
     Manager --> Theme[GentleTheme]
     Theme --> Resolve{Resolution}
@@ -181,6 +139,104 @@ flowchart TB
     View -->|.gentleButton| Button
     View -->|.gentleSurface| Surface
 ```
+
+### Data Model
+
+The design system is defined by a single JSON-friendly specification
+(`GentleDesignSystemSpec`). The diagram below shows the structure of that
+spec and how token groups are organized.
+
+```
+GentleDesignSystemSpec
+│
+├── colors: GentleColorTokens
+│       │
+│       └── pairByRole: [String: GentleColorPair]
+│               │
+│               ├── key = GentleColorRole.rawValue
+│               └── value = GentleColorPair
+│                       ├── lightHex: String
+│                       └── darkHex:  String
+│
+├── typography: GentleTypographyTokens
+│       │
+│       └── roles: [String: GentleTypographyRoleSpec]
+│               │
+│               ├── key = GentleTextRole.rawValue
+│               └── value = GentleTypographyRoleSpec
+│                       ├── pointSize: Double
+│                       ├── weight: GentleFontWeightToken
+│                       ├── design: GentleFontDesignToken
+│                       ├── width:  GentleFontWidthToken?
+│                       ├── relativeTo: GentleFontTextStyle
+│                       ├── lineSpacing: Double
+│                       ├── letterSpacing: Double
+│                       ├── isUppercased: Bool
+│                       └── colorRole: GentleColorRole
+│
+├── layout: GentleLayoutTokens
+│       │
+│       ├── scale: GentleSpacingScaleTokens
+│       │       ├── xs / s / m / l / xl / xxl : Double
+│       │       └── value(for: GentleSpacingToken) -> Double
+│       │
+│       ├── gap:   GentleGapTokens
+│       ├── grid:  GentleGridSpacingTokens
+│       ├── touch: GentleTouchTokens
+│       │
+│       └── inset: GentleInsetTokens
+│               │
+│               └── tokensByRole: [String: GentleAxisInsetTokens]
+│                       │
+│                       ├── key = GentleInsetRole.rawValue
+│                       └── value = GentleAxisInsetTokens
+│                               ├── horizontal: GentleSpacingToken
+│                               └── vertical:   GentleSpacingToken
+│
+├── visual: GentleVisualTokens
+│       │
+│       ├── radii: GentleRadiusTokens
+│       │       ├── small:  Double
+│       │       ├── medium: Double
+│       │       ├── large:  Double
+│       │       └── pill:   Double
+│       │
+│       └── shadows: GentleShadowTokens
+│               ├── none:   Double
+│               ├── small:  Double
+│               └── medium: Double
+│
+└── buttons: GentleButtonTokens
+        │
+        ├── roles: [String: GentleButtonRoleSpec]
+        │       │
+        │       ├── key = GentleButtonRole.rawValue
+        │       └── value = GentleButtonRoleSpec
+        │               ├── shape: GentleButtonShape
+        │               ├── textRole: GentleTextRole
+        │               ├── backgroundRole: GentleColorRole
+        │               ├── labelColorRole: GentleColorRole
+        │               ├── borderRole: GentleColorRole?
+        │               ├── animationRole: GentleButtonAnimationRole
+        │               ├── pressedScale: Double
+        │               └── pressedOpacity: Double
+        │
+        └── animations: [String: GentleButtonAnimationSpec]
+                │
+                ├── key = GentleButtonAnimationRole.rawValue
+                └── value = GentleButtonAnimationSpec
+                        ├── pressedScale: Double
+                        ├── pressedOpacity: Double
+                        ├── duration: Double
+                        ├── springResponse: Double
+                        ├── springDamping: Double
+                        └── springBlend: Double
+```
+
+> **Why roles instead of direct values?**  
+> Roles provide stable identifiers that allow themes to evolve safely over time.
+> Specs can change, presets can swap, and values can be overridden without
+> breaking call sites or serialized themes.
 
 ---
 
