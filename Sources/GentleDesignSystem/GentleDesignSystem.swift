@@ -2058,20 +2058,20 @@ public extension View {
 
     func gentleSurface(_ role: GentleSurfaceRole) -> some View { modifier(GentleSurfaceModifier(role: role)) }
 
-    func gentleButton(_ role: GentleButtonRole, expandsHorizontally: Bool = false) -> some View {
-        buttonStyle(GentleButtonStyle(role: role, expandsHorizontally: expandsHorizontally))
+    func gentleButton(_ role: GentleButtonRole, expandsHorizontally: Bool = false, contentAlignment: Alignment = .center) -> some View {
+        buttonStyle(GentleButtonStyle(role: role, expandsHorizontally: expandsHorizontally, contentAlignment: contentAlignment))
     }
 
-    func gentleButton(_ role: GentleButtonRole, shape: GentleButtonShape, expandsHorizontally: Bool = false) -> some View {
-        buttonStyle(GentleButtonStyle(role: role, shape: shape, expandsHorizontally: expandsHorizontally))
+    func gentleButton(_ role: GentleButtonRole, shape: GentleButtonShape, expandsHorizontally: Bool = false, contentAlignment: Alignment = .center) -> some View {
+        buttonStyle(GentleButtonStyle(role: role, shape: shape, expandsHorizontally: expandsHorizontally, contentAlignment: contentAlignment))
     }
 
-    func gentleButton(_ role: GentleButtonRole, textRole: GentleTextRole, expandsHorizontally: Bool = false) -> some View {
-        buttonStyle(GentleButtonStyle(role: role, textRole: textRole, expandsHorizontally: expandsHorizontally))
+    func gentleButton(_ role: GentleButtonRole, textRole: GentleTextRole, expandsHorizontally: Bool = false, contentAlignment: Alignment = .center) -> some View {
+        buttonStyle(GentleButtonStyle(role: role, textRole: textRole, expandsHorizontally: expandsHorizontally, contentAlignment: contentAlignment))
     }
 
-    func gentleButton(_ role: GentleButtonRole, shape: GentleButtonShape, textRole: GentleTextRole, expandsHorizontally: Bool = false) -> some View {
-        buttonStyle(GentleButtonStyle(role: role, shape: shape, textRole: textRole, expandsHorizontally: expandsHorizontally))
+    func gentleButton(_ role: GentleButtonRole, shape: GentleButtonShape, textRole: GentleTextRole, expandsHorizontally: Bool = false, contentAlignment: Alignment = .center) -> some View {
+        buttonStyle(GentleButtonStyle(role: role, shape: shape, textRole: textRole, expandsHorizontally: expandsHorizontally, contentAlignment: contentAlignment))
     }
 
     @ViewBuilder
