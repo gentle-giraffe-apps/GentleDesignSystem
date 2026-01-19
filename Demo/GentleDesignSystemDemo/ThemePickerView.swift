@@ -222,7 +222,7 @@ struct ThemePresetCard: View {
                 Text("Typography")
                     .gentleText(.headline_m)
                 Spacer()
-                HStack(spacing: 8) {
+                HStack(spacing: 8) { // alignment: .bottom, 
                     Text("Aa")
                         .gentleText(.title_xl)
                     Text("Aa")
