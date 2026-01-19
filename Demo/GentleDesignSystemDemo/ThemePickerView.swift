@@ -199,8 +199,18 @@ struct ThemePresetCard: View {
     private var typographySection: some View {
         DisclosureGroup(isExpanded: $isTypographyExpanded) {
             VStack(spacing: design.layout.gap.tight) {
-                typographySample(text: "Aa", label: "Title", style: .title_xl)
-                typographySample(text: "Aa", label: "Body", style: .body_m)
+                HStack(spacing: design.layout.gap.regular) {
+                    typographySample(text: "Aa", label: "Title", style: .title_xl)
+                    typographySample(text: "Aa", label: "Headline", style: .headline_m)
+                }
+                HStack(spacing: design.layout.gap.regular) {
+                    typographySample(text: "Aa", label: "Body", style: .body_m)
+                    typographySample(text: "Aa", label: "Callout", style: .callout_ms)
+                }
+                HStack(spacing: design.layout.gap.regular) {
+                    typographySample(text: "Aa", label: "Subheadline", style: .subheadline_ms)
+                    typographySample(text: "Aa", label: "Caption", style: .caption_s)
+                }
             }
             .padding(design.layout.gap.regular)
             .background(theme.color(for: .surface, scheme: colorScheme))
@@ -208,8 +218,25 @@ struct ThemePresetCard: View {
 //            .shadow(color: .black.opacity(0.25), radius: 24, x: 0, y: 12)
 //            .padding(.top, design.layout.gap.tight)
         } label: {
-            Text("Typography")
-                .gentleText(.headline_m)
+            HStack(spacing: 0) {
+                Text("Typography")
+                    .gentleText(.headline_m)
+                Spacer()
+                HStack(spacing: 8) { // alignment: .bottom, 
+                    Text("Aa")
+                        .gentleText(.title_xl)
+                    Text("Aa")
+                        .gentleText(.headline_m)
+                    Text("Aa")
+                        .gentleText(.body_m)
+                    Text("Aa")
+                        .gentleText(.callout_ms)
+                    Text("Aa")
+                        .gentleText(.subheadline_ms)
+                    Text("Aa")
+                        .gentleText(.caption_s)
+                }
+            }
         }
         .tint(theme.color(for: .textSecondary, scheme: colorScheme))
         .padding(design.layout.stack.regular)
@@ -243,11 +270,65 @@ struct ThemePresetCard: View {
             .padding(.top, design.layout.gap.tight)
             .allowsHitTesting(false)
         } label: {
-            Text("Buttons")
-                .gentleText(.headline_m)
+            HStack(spacing: 0) {
+                Text("Buttons")
+                    .gentleText(.headline_m)
+                Spacer()
+                buttonChips
+                    .opacity(0.7)
+            }
         }
         .tint(theme.color(for: .textSecondary, scheme: colorScheme))
         .padding(design.layout.stack.regular)
+    }
+
+    // MARK: - Button Chip Previews
+
+    private var buttonChips: some View {
+        HStack(spacing: 6) {
+            // Primary
+            buttonChip(
+                background: .primaryCTA,
+                icon: .onPrimaryCTA,
+                border: nil
+            )
+            // Secondary
+            buttonChip(
+                background: .surface,
+                icon: .primaryCTA,
+                border: .primaryCTA
+            )
+            // Tertiary
+            buttonChip(
+                background: .surface,
+                icon: .primaryCTA,
+                border: nil
+            )
+        }
+    }
+
+    private func buttonChip(
+        background: GentleColorRole,
+        icon: GentleColorRole,
+        border: GentleColorRole?
+    ) -> some View {
+        Image(systemName: "ellipsis")
+            .font(.system(size: 10, weight: .semibold))
+            .foregroundStyle(theme.color(for: icon, scheme: colorScheme))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(
+                Capsule()
+                    .fill(theme.color(for: background, scheme: colorScheme))
+            )
+            .overlay(
+                Group {
+                    if let border {
+                        Capsule()
+                            .strokeBorder(theme.color(for: border, scheme: colorScheme), lineWidth: 1)
+                    }
+                }
+            )
     }
 
     // MARK: - Divider
