@@ -208,8 +208,17 @@ struct ThemePresetCard: View {
 //            .shadow(color: .black.opacity(0.25), radius: 24, x: 0, y: 12)
 //            .padding(.top, design.layout.gap.tight)
         } label: {
-            Text("Typography")
-                .gentleText(.headline_m)
+            HStack(spacing: 0) {
+                Text("Typography")
+                    .gentleText(.headline_m)
+                Spacer()
+                HStack(spacing: 8) {
+                    Text("Aa")
+                        .gentleText(.title_xl)
+                    Text("Aa")
+                        .gentleText(.body_m)
+                }
+            }
         }
         .tint(theme.color(for: .textSecondary, scheme: colorScheme))
         .padding(design.layout.stack.regular)
