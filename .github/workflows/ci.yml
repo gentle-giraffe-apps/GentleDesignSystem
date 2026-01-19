@@ -24,6 +24,16 @@ jobs:
           bundler-cache: true
           working-directory: Demo
 
-      - name: Build (Fastlane)
+      - name: Install xcresultparser
+        run: brew install xcresultparser
+
+      - name: Build (Demo)
         run: bundle exec fastlane ios build
+
+      - name: Run Package Tests
+        run: bundle exec fastlane ios package_tests
+
+      - name: Convert coverage
+        run: bundle exec fastlane coverage_xml
+
 
