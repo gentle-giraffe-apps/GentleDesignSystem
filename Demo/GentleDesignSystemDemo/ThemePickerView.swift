@@ -200,7 +200,11 @@ struct ThemePresetCard: View {
         DisclosureGroup(isExpanded: $isTypographyExpanded) {
             VStack(spacing: design.layout.gap.tight) {
                 typographySample(text: "Aa", label: "Title", style: .title_xl)
+                typographySample(text: "Aa", label: "Headline", style: .headline_m)
                 typographySample(text: "Aa", label: "Body", style: .body_m)
+                typographySample(text: "Aa", label: "Callout", style: .callout_ms)
+                typographySample(text: "Aa", label: "Subheadline", style: .subheadline_ms)
+                typographySample(text: "Aa", label: "Caption", style: .caption_s)
             }
             .padding(design.layout.gap.regular)
             .background(theme.color(for: .surface, scheme: colorScheme))
@@ -216,7 +220,15 @@ struct ThemePresetCard: View {
                     Text("Aa")
                         .gentleText(.title_xl)
                     Text("Aa")
+                        .gentleText(.headline_m)
+                    Text("Aa")
                         .gentleText(.body_m)
+                    Text("Aa")
+                        .gentleText(.callout_ms)
+                    Text("Aa")
+                        .gentleText(.subheadline_ms)
+                    Text("Aa")
+                        .gentleText(.caption_s)
                 }
             }
         }
