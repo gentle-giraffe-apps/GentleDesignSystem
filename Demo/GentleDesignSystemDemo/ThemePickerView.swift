@@ -270,11 +270,65 @@ struct ThemePresetCard: View {
             .padding(.top, design.layout.gap.tight)
             .allowsHitTesting(false)
         } label: {
-            Text("Buttons")
-                .gentleText(.headline_m)
+            HStack(spacing: 0) {
+                Text("Buttons")
+                    .gentleText(.headline_m)
+                Spacer()
+                buttonChips
+                    .opacity(0.7)
+            }
         }
         .tint(theme.color(for: .textSecondary, scheme: colorScheme))
         .padding(design.layout.stack.regular)
+    }
+
+    // MARK: - Button Chip Previews
+
+    private var buttonChips: some View {
+        HStack(spacing: 6) {
+            // Primary
+            buttonChip(
+                background: .primaryCTA,
+                icon: .onPrimaryCTA,
+                border: nil
+            )
+            // Secondary
+            buttonChip(
+                background: .surface,
+                icon: .primaryCTA,
+                border: .primaryCTA
+            )
+            // Tertiary
+            buttonChip(
+                background: .surface,
+                icon: .primaryCTA,
+                border: nil
+            )
+        }
+    }
+
+    private func buttonChip(
+        background: GentleColorRole,
+        icon: GentleColorRole,
+        border: GentleColorRole?
+    ) -> some View {
+        Image(systemName: "ellipsis")
+            .font(.system(size: 10, weight: .semibold))
+            .foregroundStyle(theme.color(for: icon, scheme: colorScheme))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(
+                Capsule()
+                    .fill(theme.color(for: background, scheme: colorScheme))
+            )
+            .overlay(
+                Group {
+                    if let border {
+                        Capsule()
+                            .strokeBorder(theme.color(for: border, scheme: colorScheme), lineWidth: 1)
+                    }
+                }
+            )
     }
 
     // MARK: - Divider
