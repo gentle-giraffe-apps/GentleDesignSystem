@@ -50,7 +50,197 @@ struct ThemePickerView: View {
     }
 }
 
+// MARK: - New Portfolio-Quality Card
+
 struct ThemePresetCard: View {
+    let preset: ThemePreset
+    let index: Int
+
+    @GentleDesignRuntime private var design
+    @Environment(\.gentleTheme) private var theme
+    @Environment(\.colorScheme) private var colorScheme
+
+    @State private var isTypographyExpanded = true
+    @State private var isButtonsExpanded = true
+
+    // Row 1: Brand/Action colors
+    private static let brandColors: [(GentleColorRole, String)] = [
+        (.themePrimary, "Primary"),
+        (.themeSecondary, "Secondary"),
+        (.primaryCTA, "CTA"),
+        (.destructive, "Destructive")
+    ]
+
+    // Row 2: Surface/Text colors
+    private static let surfaceColors: [(GentleColorRole, String)] = [
+        (.background, "Background"),
+        (.surface, "Surface"),
+        (.textPrimary, "Text"),
+        (.borderSubtle, "Border")
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // MARK: Header
+            headerSection
+
+            divider
+
+            // MARK: Colors
+            colorsSection
+
+            divider
+
+            // MARK: Typography (Expandable)
+            typographySection
+
+            divider
+
+            // MARK: Buttons (Expandable)
+            buttonsSection
+        }
+        .background(theme.color(for: .surface, scheme: colorScheme))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        // .shadow(color: .black.opacity(0.25), radius: 24, x: 0, y: 12)
+        .shadow(color: .black.opacity(0.25), radius: 6, x: 4, y: 4)
+    }
+
+    // MARK: - Header Section
+
+    private var headerSection: some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(preset.name)
+                    .gentleText(.title_xl)
+                Text(preset.summary)
+                    .gentleText(.subheadline_ms)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.body.weight(.semibold))
+                .foregroundStyle(.tertiary)
+        }
+        .padding(design.layout.stack.regular)
+    }
+
+    // MARK: - Colors Section
+
+    private var colorsSection: some View {
+        VStack(alignment: .leading, spacing: design.layout.gap.regular) {
+            Text("Colors")
+                .gentleText(.headline_m)
+
+            // Color swatches in elevated container
+            VStack(spacing: design.layout.gap.regular) {
+                // Row 1: Brand/Action
+                colorRow(Self.brandColors)
+
+                // Row 2: Surface/Text
+                colorRow(Self.surfaceColors)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(design.layout.gap.regular)
+            .background(theme.color(for: .surface, scheme: colorScheme))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .shadow(color: .black.opacity(0.25), radius: 6, x: 4, y: 4)
+        }
+        .padding(design.layout.stack.regular)
+    }
+
+    private func colorRow(_ colors: [(GentleColorRole, String)]) -> some View {
+        HStack(spacing: design.layout.gap.regular) {
+            ForEach(colors, id: \.0) { role, label in
+                colorSwatch(role: role, label: label)
+            }
+        }
+    }
+
+    private func colorSwatch(role: GentleColorRole, label: String) -> some View {
+        VStack(spacing: 4) {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(theme.color(for: role, scheme: colorScheme))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                )
+                .frame(height: 32)
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    // MARK: - Typography Section
+
+    private var typographySection: some View {
+        DisclosureGroup(isExpanded: $isTypographyExpanded) {
+            VStack(spacing: design.layout.gap.tight) {
+                typographySample(text: "Aa", label: "Title", style: .title_xl)
+                typographySample(text: "Aa", label: "Body", style: .body_m)
+            }
+            .padding(design.layout.gap.regular)
+            .background(theme.color(for: .surface, scheme: colorScheme))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+//            .shadow(color: .black.opacity(0.25), radius: 24, x: 0, y: 12)
+//            .padding(.top, design.layout.gap.tight)
+        } label: {
+            Text("Typography")
+                .gentleText(.headline_m)
+        }
+        .tint(theme.color(for: .textSecondary, scheme: colorScheme))
+        .padding(design.layout.stack.regular)
+    }
+
+    private func typographySample(text: String, label: String, style: GentleTextRole) -> some View {
+        HStack {
+            Text(text)
+                .gentleText(style)
+            Text(label)
+                .gentleText(.body_m)
+                .foregroundStyle(.secondary)
+            Spacer()
+        }
+    }
+
+    // MARK: - Buttons Section
+
+    private var buttonsSection: some View {
+        DisclosureGroup(isExpanded: $isButtonsExpanded) {
+            HStack(spacing: design.layout.gap.tight) {
+                Button("Main") { }
+                    .gentleButton(.primary)
+                Button("Alt") { }
+                    .gentleButton(.secondary)
+                Button("Ghost") { }
+                    .gentleButton(.tertiary)
+                Spacer()
+            }
+            .padding(.leading, 12)
+            .padding(.top, design.layout.gap.tight)
+            .allowsHitTesting(false)
+        } label: {
+            Text("Buttons")
+                .gentleText(.headline_m)
+        }
+        .tint(theme.color(for: .textSecondary, scheme: colorScheme))
+        .padding(design.layout.stack.regular)
+    }
+
+    // MARK: - Divider
+
+    private var divider: some View {
+        Rectangle()
+            .fill(theme.color(for: .borderSubtle, scheme: colorScheme))
+            .frame(height: 1)
+            .padding(.horizontal, design.layout.stack.regular)
+    }
+}
+
+// MARK: - Legacy Card (for reference)
+
+struct ThemePresetCardLegacy: View {
     let preset: ThemePreset
     let index: Int
     @GentleDesignRuntime private var design
@@ -80,7 +270,7 @@ struct ThemePresetCard: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 Spacer(minLength: design.layout.gap.loose)
-                
+
                 HStack {
                     Text("About")
                         .gentleText(.title_xl)
@@ -91,9 +281,9 @@ struct ThemePresetCard: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .frame(maxHeight: .infinity, alignment: .bottom)
                 }
-                
+
                 Spacer(minLength: design.layout.gap.regular)
-                
+
                 HStack(alignment: .top) {
                     Text(preset.description)
                         .gentleText(.subheadline_ms)
@@ -103,9 +293,9 @@ struct ThemePresetCard: View {
                     colorGrid
                         .frame(maxWidth: .infinity, alignment: .center)
                 }
-                
+
                 Spacer(minLength: design.layout.gap.loose)
-                
+
                 HStack(alignment: .top) {
                     Text("Purpose")
                         .gentleText(.title3_ml)
@@ -116,9 +306,9 @@ struct ThemePresetCard: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .frame(maxHeight: .infinity, alignment: .bottom)
                 }
-                
+
                 Spacer(minLength: design.layout.gap.regular)
-                
+
                 HStack(alignment: .top) {
                     Text(preset.purpose)
                         .gentleText(.body_m)
