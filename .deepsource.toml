@@ -1,0 +1,21 @@
+version = 1
+
+[[analyzers]]
+name = "swift"
+enabled = true
+
+# Optional: tell DeepSource which folders are tests
+test_patterns = [
+  "Tests/**"
+]
+
+# Optional: exclude generated/build artifacts (tune as needed)
+exclude_patterns = [
+  ".build/**",
+  "**/.swiftpm/**",
+  "**/DerivedData/**"
+]
+
+[[analyzers]]
+name = "secrets"
+enabled = true
