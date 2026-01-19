@@ -5,6 +5,7 @@ struct ThemePickerView: View {
     @GentleThemeManagerRuntime private var themeManager
     @GentleDesignRuntime private var design
     @State private var showingThemeStudio = false
+    @State private var refreshID = UUID()
     @Environment(\.horizontalSizeClass) private var sizeClass
 
     private var columns: [GridItem] {
@@ -16,23 +17,30 @@ struct ThemePickerView: View {
             [GridItem(.adaptive(minimum: 300, maximum: 400), spacing: 8, alignment: .leading)]
         }
     }
+
+    /// Creates a preview theme for a preset, using saved edits if available.
+    private func previewThemeForPreset(_ preset: ThemePreset) -> GentleTheme {
+        let _ = refreshID // Force dependency on refreshID for redraw
+        let savedSpec = try? themeManager.store.loadEditableSpec(forPreset: preset.name)
+        return GentleTheme(
+            defaultSpec: preset.spec,
+            editableSpec: savedSpec ?? preset.spec
+        )
+    }
     
     var body: some View {
         NavigationStack {
             ScrollView {
                 LazyVGrid(columns: columns, spacing: design.layout.grid.regular) {
                     ForEach(Array(ThemePreset.allPresets.enumerated()), id: \.element.id) { index, preset in
-                        let previewTheme = GentleTheme(
-                            defaultSpec: preset.spec,
-                            editableSpec: preset.spec
-                        )
+                        let previewTheme = previewThemeForPreset(preset)
 
                         Button {
-                            themeManager.theme.editableSpec = preset.spec
+                            try? themeManager.selectPreset(name: preset.name, defaultSpec: preset.spec)
                             showingThemeStudio = true
                         } label: {
                             GentleThemeRoot(theme: previewTheme) {
-                                ThemePresetCard(preset: preset, index: index + 1)
+                                ThemePresetCard(preset: preset, index: index + 1, refreshID: refreshID)
                                     .frame(maxWidth: .infinity, alignment: .leading) // ✅ fill cell
                             }
                         }
@@ -46,6 +54,11 @@ struct ThemePickerView: View {
             .navigationDestination(isPresented: $showingThemeStudio) {
                 ThemeStudioView()
             }
+            .onChange(of: showingThemeStudio) { _, isShowing in
+                if !isShowing {
+                    refreshID = UUID()
+                }
+            }
         }
     }
 }
@@ -55,6 +68,7 @@ struct ThemePickerView: View {
 struct ThemePresetCard: View {
     let preset: ThemePreset
     let index: Int
+    var refreshID: UUID = UUID()
 
     @GentleDesignRuntime private var design
     @Environment(\.gentleTheme) private var theme
@@ -215,14 +229,12 @@ struct ThemePresetCard: View {
             .padding(design.layout.gap.regular)
             .background(theme.color(for: .surface, scheme: colorScheme))
             .clipShape(RoundedRectangle(cornerRadius: 12))
-//            .shadow(color: .black.opacity(0.25), radius: 24, x: 0, y: 12)
-//            .padding(.top, design.layout.gap.tight)
         } label: {
             HStack(spacing: 0) {
                 Text("Typography")
                     .gentleText(.headline_m)
                 Spacer()
-                HStack(spacing: 8) { // alignment: .bottom, 
+                HStack(spacing: 8) {
                     Text("Aa")
                         .gentleText(.title_xl)
                     Text("Aa")
@@ -275,6 +287,7 @@ struct ThemePresetCard: View {
                     .gentleText(.headline_m)
                 Spacer()
                 buttonChips
+                    .id(refreshID)
                     .opacity(0.7)
             }
         }

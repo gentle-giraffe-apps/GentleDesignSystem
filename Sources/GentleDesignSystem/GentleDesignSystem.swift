@@ -1523,8 +1523,8 @@ public extension GentleVisualTokens { static let gentleDefault = GentleVisualTok
 public struct GentleTheme: Sendable {
     public var id = 0
 
-    /// The shipped, immutable baseline spec.
-    public let defaultSpec: GentleDesignSystemSpec
+    /// The baseline spec for the current preset.
+    public var defaultSpec: GentleDesignSystemSpec
 
     /// The live, user-editable spec (always present).
     public var editableSpec: GentleDesignSystemSpec
@@ -2204,6 +2204,12 @@ public protocol GentleThemeSpecStore: Sendable {
     func loadEditableSpec() throws -> GentleDesignSystemSpec?
     func saveEditableSpec(_ spec: GentleDesignSystemSpec) throws
     func clearEditableSpec() throws
+
+    // Per-preset storage
+    func loadEditableSpec(forPreset name: String) throws -> GentleDesignSystemSpec?
+    func saveEditableSpec(_ spec: GentleDesignSystemSpec, forPreset name: String) throws
+    func clearEditableSpec(forPreset name: String) throws
+    func hasEditableSpec(forPreset name: String) throws -> Bool
 }
 
 /// File-backed JSON store (Application Support).
@@ -2240,9 +2246,49 @@ public struct GentleFileThemeSpecStore: GentleThemeSpecStore, Sendable {
         try FileManager.default.removeItem(at: url)
     }
 
+    // MARK: - Per-Preset Storage
+
+    public func loadEditableSpec(forPreset name: String) throws -> GentleDesignSystemSpec? {
+        let url = try presetFileURL(for: name)
+        guard FileManager.default.fileExists(atPath: url.path) else { return nil }
+        let data = try Data(contentsOf: url)
+        return try GentleDesignSystemSpec.fromJSONData(data)
+    }
+
+    public func saveEditableSpec(_ spec: GentleDesignSystemSpec, forPreset name: String) throws {
+        let url = try presetFileURL(for: name)
+        let data = try spec.encodedJSONData()
+        try data.write(to: url, options: [.atomic])
+    }
+
+    public func clearEditableSpec(forPreset name: String) throws {
+        let url = try presetFileURL(for: name)
+        guard FileManager.default.fileExists(atPath: url.path) else { return }
+        try FileManager.default.removeItem(at: url)
+    }
+
+    public func hasEditableSpec(forPreset name: String) throws -> Bool {
+        let url = try presetFileURL(for: name)
+        return FileManager.default.fileExists(atPath: url.path)
+    }
+
     // MARK: - Paths
 
     private func fileURL() throws -> URL {
+        let dir = try baseDirectory()
+        return dir.appendingPathComponent(fileName, isDirectory: false)
+    }
+
+    private func presetFileURL(for presetName: String) throws -> URL {
+        let presetsDir = try presetsDirectory()
+        let safeFileName = presetName
+            .replacingOccurrences(of: " ", with: "_")
+            .replacingOccurrences(of: "/", with: "_")
+            .lowercased() + ".json"
+        return presetsDir.appendingPathComponent(safeFileName, isDirectory: false)
+    }
+
+    private func baseDirectory() throws -> URL {
         let fm = FileManager.default
         guard let base = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
             throw StoreError.applicationSupportUnavailable
@@ -2257,8 +2303,16 @@ public struct GentleFileThemeSpecStore: GentleThemeSpecStore, Sendable {
         } else {
             dir = base
         }
+        return dir
+    }
 
-        return dir.appendingPathComponent(fileName, isDirectory: false)
+    private func presetsDirectory() throws -> URL {
+        let fm = FileManager.default
+        let dir = try baseDirectory().appendingPathComponent("presets", isDirectory: true)
+        if !fm.fileExists(atPath: dir.path) {
+            try fm.createDirectory(at: dir, withIntermediateDirectories: true)
+        }
+        return dir
     }
 }
 
@@ -2270,6 +2324,7 @@ public final class GentleThemeManager {
     public var theme: GentleTheme
     public let store: GentleThemeSpecStore
     public private(set) var hasUnsavedChanges: Bool = false
+    public private(set) var currentPresetName: String?
 
     public init(theme: GentleTheme = .default,
                 store: GentleThemeSpecStore = GentleFileThemeSpecStore()) {
@@ -2290,6 +2345,10 @@ public final class GentleThemeManager {
     /// Persists the current `theme.editableSpec`.
     public func save() throws {
         try store.saveEditableSpec(theme.editableSpec)
+        // Also save to preset-specific file if we have a current preset
+        if let presetName = currentPresetName {
+            try store.saveEditableSpec(theme.editableSpec, forPreset: presetName)
+        }
         hasUnsavedChanges = false
     }
 
@@ -2299,6 +2358,34 @@ public final class GentleThemeManager {
         t.editableSpec = t.defaultSpec
         theme = t
         try store.clearEditableSpec()
+        if let presetName = currentPresetName {
+            try store.clearEditableSpec(forPreset: presetName)
+        }
+    }
+
+    // MARK: - Preset Selection
+
+    /// Selects a preset and loads any saved edits for it.
+    /// - Parameters:
+    ///   - name: The preset name
+    ///   - defaultSpec: The preset's default spec (used if no saved edits exist)
+    public func selectPreset(name: String, defaultSpec: GentleDesignSystemSpec) throws {
+        currentPresetName = name
+        var t = theme
+        t.defaultSpec = defaultSpec
+        // Try to load saved edits for this preset, otherwise use the default
+        if let savedSpec = try store.loadEditableSpec(forPreset: name) {
+            t.editableSpec = savedSpec
+        } else {
+            t.editableSpec = defaultSpec
+        }
+        theme = t
+        hasUnsavedChanges = false
+    }
+
+    /// Checks if a preset has saved edits.
+    public func hasEditableSpec(forPreset name: String) -> Bool {
+        (try? store.hasEditableSpec(forPreset: name)) ?? false
     }
 
     public func bindingForTypographyRole(_ role: GentleTextRole) -> Binding<GentleTypographyRoleSpec> {
