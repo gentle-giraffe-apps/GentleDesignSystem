@@ -199,12 +199,18 @@ struct ThemePresetCard: View {
     private var typographySection: some View {
         DisclosureGroup(isExpanded: $isTypographyExpanded) {
             VStack(spacing: design.layout.gap.tight) {
-                typographySample(text: "Aa", label: "Title", style: .title_xl)
-                typographySample(text: "Aa", label: "Headline", style: .headline_m)
-                typographySample(text: "Aa", label: "Body", style: .body_m)
-                typographySample(text: "Aa", label: "Callout", style: .callout_ms)
-                typographySample(text: "Aa", label: "Subheadline", style: .subheadline_ms)
-                typographySample(text: "Aa", label: "Caption", style: .caption_s)
+                HStack(spacing: design.layout.gap.regular) {
+                    typographySample(text: "Aa", label: "Title", style: .title_xl)
+                    typographySample(text: "Aa", label: "Headline", style: .headline_m)
+                }
+                HStack(spacing: design.layout.gap.regular) {
+                    typographySample(text: "Aa", label: "Body", style: .body_m)
+                    typographySample(text: "Aa", label: "Callout", style: .callout_ms)
+                }
+                HStack(spacing: design.layout.gap.regular) {
+                    typographySample(text: "Aa", label: "Subheadline", style: .subheadline_ms)
+                    typographySample(text: "Aa", label: "Caption", style: .caption_s)
+                }
             }
             .padding(design.layout.gap.regular)
             .background(theme.color(for: .surface, scheme: colorScheme))
