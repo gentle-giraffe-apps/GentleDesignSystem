@@ -143,11 +143,31 @@ struct ThemePresetCard: View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .shadow(color: .black.opacity(0.25), radius: 6, x: 4, y: 4)
         } label: {
-            Text("Colors")
-                .gentleText(.headline_m)
+            HStack(spacing: 0) {
+                Text("Colors")
+                    .gentleText(.headline_m)
+                Spacer()
+                colorBar
+                    .opacity(0.7)
+            }
         }
         .tint(theme.color(for: .textSecondary, scheme: colorScheme))
         .padding(design.layout.stack.regular)
+    }
+
+    private var colorBar: some View {
+        HStack(spacing: 0) {
+            ForEach(Self.brandColors + Self.surfaceColors, id: \.0) { role, _ in
+                theme.color(for: role, scheme: colorScheme)
+                    .frame(width: 24, height: 24)
+                    .overlay(
+                        Rectangle()
+                            .stroke(Color(red: 0.7, green: 0.75, blue: 0.85), lineWidth: 1)
+                            .opacity(0.5)
+                    )
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 3))
     }
 
     private func colorRow(_ colors: [(GentleColorRole, String)]) -> some View {
