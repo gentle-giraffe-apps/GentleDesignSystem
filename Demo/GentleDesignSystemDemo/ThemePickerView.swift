@@ -60,8 +60,9 @@ struct ThemePresetCard: View {
     @Environment(\.gentleTheme) private var theme
     @Environment(\.colorScheme) private var colorScheme
 
-    @State private var isTypographyExpanded = true
-    @State private var isButtonsExpanded = true
+    @State private var isColorsExpanded = false
+    @State private var isTypographyExpanded = false
+    @State private var isButtonsExpanded = false
 
     // Row 1: Brand/Action colors
     private static let brandColors: [(GentleColorRole, String)] = [
@@ -99,10 +100,10 @@ struct ThemePresetCard: View {
             // MARK: Buttons (Expandable)
             buttonsSection
         }
+        .gentleInset(.card)
         .background(theme.color(for: .surface, scheme: colorScheme))
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        // .shadow(color: .black.opacity(0.25), radius: 24, x: 0, y: 12)
-        .shadow(color: .black.opacity(0.25), radius: 6, x: 4, y: 4)
+        .shadow(color: .black.opacity(0.25), radius: 12, x: 8, y: 8)
     }
 
     // MARK: - Header Section
@@ -127,10 +128,7 @@ struct ThemePresetCard: View {
     // MARK: - Colors Section
 
     private var colorsSection: some View {
-        VStack(alignment: .leading, spacing: design.layout.gap.regular) {
-            Text("Colors")
-                .gentleText(.headline_m)
-
+        DisclosureGroup(isExpanded: $isColorsExpanded) {
             // Color swatches in elevated container
             VStack(spacing: design.layout.gap.regular) {
                 // Row 1: Brand/Action
@@ -144,7 +142,11 @@ struct ThemePresetCard: View {
             .background(theme.color(for: .surface, scheme: colorScheme))
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .shadow(color: .black.opacity(0.25), radius: 6, x: 4, y: 4)
+        } label: {
+            Text("Colors")
+                .gentleText(.headline_m)
         }
+        .tint(theme.color(for: .textSecondary, scheme: colorScheme))
         .padding(design.layout.stack.regular)
     }
 
