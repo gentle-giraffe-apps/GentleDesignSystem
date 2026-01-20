@@ -1,9 +1,12 @@
 # GentleDesignSystem
 [![CI](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml)
+[![DeepSource](https://deepsource.io/gh/<org>/<repo>.svg/?label=active+issues)](https://deepsource.io/gh/<org>/<repo>/?ref=badge)
 [![Coverage](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/branch/main/graph/badge.svg)](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem)
-[![Swift](https://img.shields.io/badge/Swift-6.1-orange.svg)](https://swift.org)
-![iOS](https://img.shields.io/badge/iOS-18.0+-blue?logo=apple)
+
+[![Swift](https://img.shields.io/badge/Swift-6.0–6.2-orange.svg)](https://swift.org)
 ![SwiftUI First](https://img.shields.io/badge/SwiftUI-First-4A6EF5)
+
+![iOS](https://img.shields.io/badge/iOS-18.0+-blue?logo=apple)
 ![Platform](https://img.shields.io/badge/Platform-iPhone%20%7C%20iPad-lightgrey)
 ![SPM](https://img.shields.io/badge/SPM-Compatible-success)
 
