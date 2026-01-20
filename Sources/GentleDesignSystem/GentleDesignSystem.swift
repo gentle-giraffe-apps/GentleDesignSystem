@@ -132,7 +132,7 @@ public enum GentleButtonShape: String, Codable, Sendable { case rounded, pill }
 /// High-level intent for button press feedback.
 /// Keep this JSON-friendly and map it to SwiftUI/UIKit behavior in code (not in JSON).
 public enum GentleButtonAnimationRole: String, Codable, Sendable, CaseIterable {
-    case none
+    case unknown
     case subtlePress
     case squish
     case pop
@@ -198,7 +198,7 @@ public enum GentleSurfaceRole: String, Codable, Sendable {
 
 /// High-level intent for spacing between siblings (stacks, lists, grids).
 public enum GentleGapIntent: String, Codable, Sendable, CaseIterable {
-    case none
+    case unknown
     case micro
     case tight
     case regular
