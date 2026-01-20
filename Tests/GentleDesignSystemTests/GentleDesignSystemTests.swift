@@ -114,7 +114,7 @@ struct GentleButtonAnimationRoleTests {
     func testAnimationRoleCaseIterable() {
         let roles = GentleButtonAnimationRole.allCases
         #expect(roles.count == 6)
-        #expect(roles.contains(.none))
+        #expect(roles.contains(.unknown))
         #expect(roles.contains(.subtlePress))
         #expect(roles.contains(.squish))
         #expect(roles.contains(.pop))

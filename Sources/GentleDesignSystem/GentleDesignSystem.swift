@@ -132,7 +132,7 @@ public enum GentleButtonShape: String, Codable, Sendable { case rounded, pill }
 /// High-level intent for button press feedback.
 /// Keep this JSON-friendly and map it to SwiftUI/UIKit behavior in code (not in JSON).
 public enum GentleButtonAnimationRole: String, Codable, Sendable, CaseIterable {
-    case none
+    case unknown
     case subtlePress
     case squish
     case pop
@@ -1163,7 +1163,7 @@ public extension GentleButtonTokens {
             )
         ],
         animations: [
-            GentleButtonAnimationRole.none.rawValue: .init(
+            GentleButtonAnimationRole.unknown.rawValue: .init(
                 pressedScale: 1.0, pressedOpacity: 1.0,
                 duration: 0.0,
                 springResponse: 0.0, springDamping: 1.0, springBlend: 0.0
@@ -1898,7 +1898,7 @@ public enum GentleButtonAnimations {
         if reduceMotion { return nil }
 
         switch role {
-        case .none:
+        case .unknown:
             return nil
         case .subtlePress:
             // "Feels" crisp; avoids bounce.
