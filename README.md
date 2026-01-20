@@ -1,6 +1,6 @@
 # GentleDesignSystem
 [![CI](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml)
-[![DeepSource](https://deepsource.io/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=active+issues)](
+[![DeepSource](https://deepsource.io/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=static+analysis+issues)](
   https://deepsource.io/gh/gentle-giraffe-apps/GentleDesignSystem/?ref=badge
 )
 [![Coverage](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/branch/main/graph/badge.svg)](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem)
@@ -78,6 +78,19 @@ VStack {
 }
 .gentleSurface(.card)
 ```
+
+---
+
+## Quality & Tooling
+
+This project enforces quality gates via CI and static analysis:
+
+- **CI:** All commits to `main` must pass GitHub Actions checks
+- **Static analysis:** DeepSource runs on every commit to `main`  
+  The badge reflects the current number of outstanding analysis issues (**0**)
+- **Test coverage:** ~95% line coverage via unit tests
+
+These checks are intended to keep the design system safe to evolve over time.
 
 ---
 
