@@ -143,7 +143,7 @@ struct GentleGapIntentTests {
     func testGapIntentCaseIterable() {
         let intents = GentleGapIntent.allCases
         #expect(intents.count == 7)
-        #expect(intents.contains(.none))
+        #expect(intents.contains(.unknown))
         #expect(intents.contains(.micro))
         #expect(intents.contains(.tight))
         #expect(intents.contains(.regular))
@@ -892,7 +892,7 @@ struct GentleGapScaleFacadeTests {
     func testGapFacadeValueIntent() {
         let facade = GentleGapScaleFacade(scale: .gentleDefault)
 
-        #expect(facade.value(.none) == 0)
+        #expect(facade.value(.unknown) == 0)
         #expect(facade.value(.regular) == 12)
         #expect(facade.value(.expansive) == 32)
     }
