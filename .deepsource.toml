@@ -1,20 +1,20 @@
 version = 1
 
-[[analyzers]]
-name = "swift"
-enabled = true
-
-# Optional: tell DeepSource which folders are tests
+# Moving these to the top makes them global
 test_patterns = [
   "Tests/**"
 ]
 
-# Optional: exclude generated/build artifacts (tune as needed)
 exclude_patterns = [
   ".build/**",
   "**/.swiftpm/**",
   "**/DerivedData/**"
 ]
+
+[[analyzers]]
+name = "swift"
+enabled = true
+skip_rules = ["SW-W1001"] # Default parameters should always be positioned at the end
 
 [[analyzers]]
 name = "secrets"
