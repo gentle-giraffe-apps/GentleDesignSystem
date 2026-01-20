@@ -19,14 +19,14 @@ struct ThemePreset: Identifiable, Hashable {
         hasher.combine(name)
     }
 
-    static let allPresets: [ThemePreset] = GentleDesignSystemSpec.allPresets.map {
+    static let allPresets: [ThemePreset] = GentleDesignSystemSpec.allPresets.map { preset in
         ThemePreset(
-            name: $0.name,
-            summary: $0.summary,
-            description: $0.description,
-            purpose: $0.purpose,
-            systemImageString: $0.systemImageString,
-            spec: $0.spec
+            name: preset.name,
+            summary: preset.summary,
+            description: preset.description,
+            purpose: preset.purpose,
+            systemImageString: preset.systemImageString,
+            spec: preset.spec
         )
     }
 }
