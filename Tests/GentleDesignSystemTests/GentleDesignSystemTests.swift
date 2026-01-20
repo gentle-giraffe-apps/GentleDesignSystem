@@ -1906,7 +1906,7 @@ struct GentleUIKitThemingTests {
 
     @Test("Apply navigation bar with all font designs")
     func testApplyNavigationBarWithAllFontDesigns() {
-        let theme = GentleTheme.default
+        _ = GentleTheme.default
         let designs: [GentleFontDesignToken] = [.default, .serif, .rounded, .monospaced]
 
         for design in designs {
@@ -2247,8 +2247,7 @@ struct GentleJSONProtocolTests {
 
     @Test("makeJSONDecoder returns valid decoder")
     func testMakeJSONDecoder() {
-        let decoder = GentleDesignSystemSpec.makeJSONDecoder()
-        #expect(decoder != nil)
+        _ = GentleDesignSystemSpec.makeJSONDecoder()
     }
 
     @Test("encodedJSONString throws for invalid data")
@@ -2881,26 +2880,22 @@ struct GentleTextModifierTests {
 
     @Test("Text modifier can be created with role")
     func testTextModifierCreation() {
-        let modifier = GentleTextModifier(role: .body_m)
-        #expect(modifier != nil)
+        _ = GentleTextModifier(role: .body_m)
     }
 
     @Test("Text modifier can be created with override color role")
     func testTextModifierWithColorOverride() {
-        let modifier = GentleTextModifier(role: .headline_m, overrideColorRole: .destructive)
-        #expect(modifier != nil)
+        _ = GentleTextModifier(role: .headline_m, overrideColorRole: .destructive)
     }
 
     @Test("View extension gentleText creates modifier")
     func testGentleTextExtension() {
-        let view = Text("Hello").gentleText(.body_m)
-        #expect(view != nil)
+        _ = Text("Hello").gentleText(.body_m)
     }
 
     @Test("View extension gentleText with color role creates modifier")
     func testGentleTextExtensionWithColor() {
-        let view = Text("Hello").gentleText(.headline_m, colorRole: .textSecondary)
-        #expect(view != nil)
+        _ = Text("Hello").gentleText(.headline_m, colorRole: .textSecondary)
     }
 }
 
@@ -2910,36 +2905,31 @@ struct GentleTextFieldModifierTests {
 
     @Test("TextField modifier can be created with defaults")
     func testTextFieldModifierCreation() {
-        let modifier = GentleTextFieldModifier(role: .body_m)
-        #expect(modifier != nil)
+        _ = GentleTextFieldModifier(role: .body_m)
     }
 
     @Test("TextField modifier can be created with all parameters")
     func testTextFieldModifierWithAllParams() {
-        let modifier = GentleTextFieldModifier(
+        _ = GentleTextFieldModifier(
             role: .body_m,
             overrideColorRole: .textSecondary,
             chrome: .standalone(shape: .pill)
         )
-        #expect(modifier != nil)
     }
 
     @Test("TextField modifier with formRow chrome")
     func testTextFieldModifierFormRow() {
-        let modifier = GentleTextFieldModifier(role: .body_m, chrome: .formRow)
-        #expect(modifier != nil)
+        _ = GentleTextFieldModifier(role: .body_m, chrome: .formRow)
     }
 
     @Test("TextField modifier with borderless chrome")
     func testTextFieldModifierBorderless() {
-        let modifier = GentleTextFieldModifier(role: .body_m, chrome: .borderless)
-        #expect(modifier != nil)
+        _ = GentleTextFieldModifier(role: .body_m, chrome: .borderless)
     }
 
     @Test("View extension gentleTextField creates modifier")
     func testGentleTextFieldExtension() {
-        let view = TextField("Placeholder", text: .constant("")).gentleTextField(.body_m)
-        #expect(view != nil)
+        _ = TextField("Placeholder", text: .constant("")).gentleTextField(.body_m)
     }
 }
 
@@ -2952,15 +2942,13 @@ struct GentleSurfaceModifierTests {
         let roles: [GentleSurfaceRole] = [.appBackground, .card, .cardChrome, .cardElevated, .surfaceOverlay]
 
         for role in roles {
-            let modifier = GentleSurfaceModifier(role: role)
-            #expect(modifier != nil)
+            _ = GentleSurfaceModifier(role: role)
         }
     }
 
     @Test("View extension gentleSurface creates modifier")
     func testGentleSurfaceExtension() {
-        let view = Text("Hello").gentleSurface(.card)
-        #expect(view != nil)
+        _ = Text("Hello").gentleSurface(.card)
     }
 }
 
@@ -2977,14 +2965,12 @@ struct GentleBackgroundModifierTests {
 
     @Test("View extension gentleBackground creates modifier")
     func testGentleBackgroundExtension() {
-        let view = Text("Hello").gentleBackground(.surface)
-        #expect(view != nil)
+        _ = Text("Hello").gentleBackground(.surface)
     }
 
     @Test("View extension gentleBackground with ignoresSafeArea")
     func testGentleBackgroundExtensionWithSafeArea() {
-        let view = Text("Hello").gentleBackground(.background, ignoresSafeArea: true)
-        #expect(view != nil)
+        _ = Text("Hello").gentleBackground(.background, ignoresSafeArea: true)
     }
 }
 
@@ -2994,20 +2980,17 @@ struct GentleInsetModifierTests {
 
     @Test("Inset modifier can be created with all parameters")
     func testInsetModifierCreation() {
-        let modifier = GentleInsetModifier(edges: .horizontal, role: .screen)
-        #expect(modifier != nil)
+        _ = GentleInsetModifier(edges: .horizontal, role: .screen)
     }
 
     @Test("View extension gentleInset creates modifier")
     func testGentleInsetExtension() {
-        let view = Text("Hello").gentleInset(.card)
-        #expect(view != nil)
+        _ = Text("Hello").gentleInset(.card)
     }
 
     @Test("View extension gentleInset with edges creates modifier")
     func testGentleInsetExtensionWithEdges() {
-        let view = Text("Hello").gentleInset(.horizontal, .screen)
-        #expect(view != nil)
+        _ = Text("Hello").gentleInset(.horizontal, .screen)
     }
 }
 
@@ -3017,50 +3000,43 @@ struct GentleButtonStyleTests {
 
     @Test("Button style can be created with minimal parameters")
     func testButtonStyleMinimal() {
-        let style = GentleButtonStyle(role: .primary)
-        #expect(style != nil)
+        _ = GentleButtonStyle(role: .primary)
     }
 
     @Test("Button style can be created with all parameters")
     func testButtonStyleAllParams() {
-        let style = GentleButtonStyle(
+        _ = GentleButtonStyle(
             role: .secondary,
             shape: .pill,
             textRole: .headline_m,
             expandsHorizontally: true,
             contentAlignment: .leading
         )
-        #expect(style != nil)
     }
 
     @Test("View extension gentleButton with role")
     func testGentleButtonExtension() {
-        let view = Button("Tap") {}.gentleButton(.primary)
-        #expect(view != nil)
+        _ = Button("Tap") {}.gentleButton(.primary)
     }
 
     @Test("View extension gentleButton with role and shape")
     func testGentleButtonExtensionWithShape() {
-        let view = Button("Tap") {}.gentleButton(.secondary, shape: .pill)
-        #expect(view != nil)
+        _ = Button("Tap") {}.gentleButton(.secondary, shape: .pill)
     }
 
     @Test("View extension gentleButton with role and textRole")
     func testGentleButtonExtensionWithTextRole() {
-        let view = Button("Tap") {}.gentleButton(.tertiary, textRole: .caption_s)
-        #expect(view != nil)
+        _ = Button("Tap") {}.gentleButton(.tertiary, textRole: .caption_s)
     }
 
     @Test("View extension gentleButton with all overrides")
     func testGentleButtonExtensionWithAll() {
-        let view = Button("Tap") {}.gentleButton(.destructive, shape: .rounded, textRole: .headline_m)
-        #expect(view != nil)
+        _ = Button("Tap") {}.gentleButton(.destructive, shape: .rounded, textRole: .headline_m)
     }
 
     @Test("View extension gentleButton with expandsHorizontally")
     func testGentleButtonExtensionExpands() {
-        let view = Button("Tap") {}.gentleButton(.primary, expandsHorizontally: true, contentAlignment: .center)
-        #expect(view != nil)
+        _ = Button("Tap") {}.gentleButton(.primary, expandsHorizontally: true, contentAlignment: .center)
     }
 }
 
@@ -3070,19 +3046,17 @@ struct GentleThemeRootTests {
 
     @Test("Theme root can be created with default theme")
     func testThemeRootDefault() {
-        let root = GentleThemeRoot {
+        _ = GentleThemeRoot {
             Text("Hello")
         }
-        #expect(root != nil)
     }
 
     @Test("Theme root can be created with custom theme")
     func testThemeRootCustom() {
         let customTheme = GentleTheme(defaultSpec: .classic)
-        let root = GentleThemeRoot(theme: customTheme) {
+        _ = GentleThemeRoot(theme: customTheme) {
             Text("Hello")
         }
-        #expect(root != nil)
     }
 }
 
@@ -3092,32 +3066,27 @@ struct ViewFontWidthExtensionTests {
 
     @Test("gentleFontWidth with nil returns self")
     func testGentleFontWidthNil() {
-        let view = Text("Hello").gentleFontWidth(nil)
-        #expect(view != nil)
+        _ = Text("Hello").gentleFontWidth(nil)
     }
 
     @Test("gentleFontWidth with compressed")
     func testGentleFontWidthCompressed() {
-        let view = Text("Hello").gentleFontWidth(.compressed)
-        #expect(view != nil)
+        _ = Text("Hello").gentleFontWidth(.compressed)
     }
 
     @Test("gentleFontWidth with condensed")
     func testGentleFontWidthCondensed() {
-        let view = Text("Hello").gentleFontWidth(.condensed)
-        #expect(view != nil)
+        _ = Text("Hello").gentleFontWidth(.condensed)
     }
 
     @Test("gentleFontWidth with standard")
     func testGentleFontWidthStandard() {
-        let view = Text("Hello").gentleFontWidth(.standard)
-        #expect(view != nil)
+        _ = Text("Hello").gentleFontWidth(.standard)
     }
 
     @Test("gentleFontWidth with expanded")
     func testGentleFontWidthExpanded() {
-        let view = Text("Hello").gentleFontWidth(.expanded)
-        #expect(view != nil)
+        _ = Text("Hello").gentleFontWidth(.expanded)
     }
 }
 
@@ -3129,15 +3098,13 @@ struct ColorRoleEditorTests {
 
     @Test("ColorRoleEditor can be created with textPrimary role")
     func testColorRoleEditorTextPrimary() {
-        let editor = ColorRoleEditor(role: .textPrimary)
-        #expect(editor != nil)
+        _ = ColorRoleEditor(role: .textPrimary)
     }
 
     @Test("ColorRoleEditor can be created with all color roles")
     func testColorRoleEditorAllRoles() {
         for role in GentleColorRole.allCases {
-            let editor = ColorRoleEditor(role: role)
-            #expect(editor != nil)
+            _ = ColorRoleEditor(role: role)
         }
     }
 }
@@ -3150,32 +3117,28 @@ struct TypographyRoleEditorTests {
 
     @Test("TypographyRoleEditor can be created with body role")
     func testTypographyRoleEditorBody() {
-        let editor = TypographyRoleEditor(role: .body_m)
-        #expect(editor != nil)
+        _ = TypographyRoleEditor(role: .body_m)
     }
 
     @Test("TypographyRoleEditor can be created with all text roles")
     func testTypographyRoleEditorAllRoles() {
         for role in GentleTextRole.allCases {
-            let editor = TypographyRoleEditor(role: role)
-            #expect(editor != nil)
+            _ = TypographyRoleEditor(role: role)
         }
     }
 
     @Test("TypographyRoleEditor can be created with custom size range")
     func testTypographyRoleEditorCustomSizeRange() {
-        let editor = TypographyRoleEditor(role: .headline_m, sizeRange: 8...72, sizeStep: 2)
-        #expect(editor != nil)
+        _ = TypographyRoleEditor(role: .headline_m, sizeRange: 8...72, sizeStep: 2)
     }
 
     @Test("TypographyRoleEditor can be created with custom spacing ranges")
     func testTypographyRoleEditorCustomSpacingRanges() {
-        let editor = TypographyRoleEditor(
+        _ = TypographyRoleEditor(
             role: .title_xl,
             lineSpacingRange: 0...20,
             letterSpacingRange: -2.0...3.0
         )
-        #expect(editor != nil)
     }
 }
 
@@ -3187,26 +3150,22 @@ struct GentleDesignCustomizeViewTests {
 
     @Test("GentleDesignCustomizeView can be created with defaults")
     func testCustomizeViewDefault() {
-        let view = GentleDesignCustomizeView()
-        #expect(view != nil)
+        _ = GentleDesignCustomizeView()
     }
 
     @Test("GentleDesignCustomizeView can be created inside navigation stack")
     func testCustomizeViewInsideNavigationStack() {
-        let view = GentleDesignCustomizeView(isInsideNavigationStack: true)
-        #expect(view != nil)
+        _ = GentleDesignCustomizeView(isInsideNavigationStack: true)
     }
 
     @Test("GentleDesignCustomizeView can be created with onSave callback")
     func testCustomizeViewWithOnSave() {
-        let view = GentleDesignCustomizeView(onSave: {})
-        #expect(view != nil)
+        _ = GentleDesignCustomizeView(onSave: {})
     }
 
     @Test("GentleDesignCustomizeView can be created with all parameters")
     func testCustomizeViewAllParameters() {
-        let view = GentleDesignCustomizeView(isInsideNavigationStack: true, onSave: {})
-        #expect(view != nil)
+        _ = GentleDesignCustomizeView(isInsideNavigationStack: true, onSave: {})
     }
 }
 
@@ -3218,8 +3177,7 @@ struct GentleDesignFoundationViewTests {
 
     @Test("GentleDesignFoundationView can be created")
     func testFoundationView() {
-        let view = GentleDesignFoundationView()
-        #expect(view != nil)
+        _ = GentleDesignFoundationView()
     }
 }
 
@@ -3231,8 +3189,7 @@ struct GentleDesignTypographySectionTests {
 
     @Test("GentleDesignTypographySection can be created")
     func testTypographySection() {
-        let view = GentleDesignTypographySection()
-        #expect(view != nil)
+        _ = GentleDesignTypographySection()
     }
 }
 
@@ -3244,8 +3201,7 @@ struct GentleDesignButtonsSectionTests {
 
     @Test("GentleDesignButtonsSection can be created")
     func testButtonsSection() {
-        let view = GentleDesignButtonsSection()
-        #expect(view != nil)
+        _ = GentleDesignButtonsSection()
     }
 }
 
@@ -3257,8 +3213,7 @@ struct GentleDesignSurfacesSectionTests {
 
     @Test("GentleDesignSurfacesSection can be created")
     func testSurfacesSection() {
-        let view = GentleDesignSurfacesSection()
-        #expect(view != nil)
+        _ = GentleDesignSurfacesSection()
     }
 }
 
@@ -3270,8 +3225,7 @@ struct GentleDesignColorsSectionTests {
 
     @Test("GentleDesignColorsSection can be created")
     func testColorsSection() {
-        let view = GentleDesignColorsSection()
-        #expect(view != nil)
+        _ = GentleDesignColorsSection()
     }
 }
 
@@ -3283,8 +3237,7 @@ struct GentleDesignStudioViewTests {
 
     @Test("GentleDesignStudioView can be created")
     func testStudioView() {
-        let view = GentleDesignStudioView()
-        #expect(view != nil)
+        _ = GentleDesignStudioView()
     }
 
     @Test("GentleDesignStudioView ActiveSheet enum has correct raw values")
@@ -3311,28 +3264,32 @@ struct GentleDesignShareSheetTests {
 
     @Test("GentleDesignShareSheet can be created with string items")
     func testShareSheetWithStrings() {
-        let sheet = GentleDesignShareSheet(items: ["Hello", "World"])
-        #expect(sheet != nil)
+        _ = GentleDesignShareSheet(items: ["Hello", "World"])
     }
 
     @Test("GentleDesignShareSheet can be created with URL items")
-    func testShareSheetWithURLs() {
-        let url = URL(string: "https://example.com")!
-        let sheet = GentleDesignShareSheet(items: [url])
-        #expect(sheet != nil)
+    func testShareSheetWithURLs() throws {
+        let url = try #require(
+            URL(string: "https://example.com"),
+            "Expected valid URL"
+        )
+
+        _ = GentleDesignShareSheet(items: [url])
     }
 
     @Test("GentleDesignShareSheet can be created with mixed items")
-    func testShareSheetWithMixedItems() {
-        let url = URL(string: "https://example.com")!
-        let sheet = GentleDesignShareSheet(items: ["Text", url, 42])
-        #expect(sheet != nil)
+    func testShareSheetWithMixedItems() throws {
+        let url = try #require(
+            URL(string: "https://example.com"),
+            "Expected valid URL"
+        )
+
+        _ = GentleDesignShareSheet(items: ["Text", url, 42])
     }
 
     @Test("GentleDesignShareSheet can be created with empty items")
     func testShareSheetEmptyItems() {
-        let sheet = GentleDesignShareSheet(items: [])
-        #expect(sheet != nil)
+        _ = GentleDesignShareSheet(items: [])
     }
 }
 
@@ -3344,7 +3301,6 @@ struct GentleNavigationBarStylerTests {
 
     @Test("GentleNavigationBarStyler can be created")
     func testNavigationBarStyler() {
-        let styler = GentleNavigationBarStyler()
-        #expect(styler != nil)
+        _ = GentleNavigationBarStyler()
     }
 }
