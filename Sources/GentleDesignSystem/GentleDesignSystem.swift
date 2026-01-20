@@ -198,7 +198,7 @@ public enum GentleSurfaceRole: String, Codable, Sendable {
 
 /// High-level intent for spacing between siblings (stacks, lists, grids).
 public enum GentleGapIntent: String, Codable, Sendable, CaseIterable {
-    case none
+    case unknown
     case micro
     case tight
     case regular
@@ -1632,7 +1632,7 @@ public struct GentleGapScaleFacade: Sendable {
     // Intent values (preferred for most call sites)
     public func value(_ intent: GentleGapIntent) -> CGFloat {
         switch intent {
-        case .none: return 0
+        case .unknown: return 0
         case .micro: return xs
         case .tight: return s
         case .regular: return m
@@ -1642,7 +1642,7 @@ public struct GentleGapScaleFacade: Sendable {
         }
     }
 
-    public var none: CGFloat { value(.none) }
+    public var none: CGFloat { value(.unknown) }
     public var micro: CGFloat { value(.micro) }
     public var tight: CGFloat { value(.tight) }
     public var regular: CGFloat { value(.regular) }
