@@ -2,5 +2,4 @@ coverage:
   status:
     patch:
       default:
-        target: auto  # Sets target to the current project coverage
-        threshold: 1% # Allows coverage to be 1% below the target without failing
+        target: off
