@@ -3304,3 +3304,407 @@ struct GentleNavigationBarStylerTests {
         _ = GentleNavigationBarStyler()
     }
 }
+
+// MARK: - View Body Evaluation Tests
+
+/// Helper to force SwiftUI view body evaluation using ImageRenderer.
+/// This ensures the body code path is executed for coverage without needing a live UI.
+@MainActor
+private func renderViewForCoverage<V: View>(_ view: V) {
+    let renderer = ImageRenderer(content: view)
+    renderer.proposedSize = .init(width: 375, height: 667)
+    _ = renderer.cgImage
+}
+
+/// Wraps a view with the required GentleDesignSystem environment for testing.
+@MainActor
+private func wrapWithGentleEnvironment<V: View>(_ view: V) -> some View {
+    let theme = GentleTheme(defaultSpec: .gentleDefault)
+    let manager = GentleThemeManager()
+    return view
+        .environment(\.gentleTheme, theme)
+        .environment(\.gentleThemeManager, manager)
+}
+
+@Suite("View Body Evaluation Tests")
+@MainActor
+struct ViewBodyEvaluationTests {
+
+    // MARK: - Editor Views
+
+    @Test("ColorRoleEditor body evaluates without crash")
+    func testColorRoleEditorBodyEvaluates() {
+        let view = wrapWithGentleEnvironment(ColorRoleEditor(role: .textPrimary))
+        renderViewForCoverage(view)
+    }
+
+    @Test("ColorRoleEditor body evaluates for all color roles")
+    func testColorRoleEditorBodyAllRoles() {
+        for role in GentleColorRole.allCases {
+            let view = wrapWithGentleEnvironment(ColorRoleEditor(role: role))
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("TypographyRoleEditor body evaluates without crash")
+    func testTypographyRoleEditorBodyEvaluates() {
+        let view = wrapWithGentleEnvironment(TypographyRoleEditor(role: .body_m))
+        renderViewForCoverage(view)
+    }
+
+    @Test("TypographyRoleEditor body evaluates for all text roles")
+    func testTypographyRoleEditorBodyAllRoles() {
+        for role in GentleTextRole.allCases {
+            let view = wrapWithGentleEnvironment(TypographyRoleEditor(role: role))
+            renderViewForCoverage(view)
+        }
+    }
+
+    // MARK: - Foundation Views
+
+    @Test("GentleDesignFoundationView body evaluates without crash")
+    func testFoundationViewBodyEvaluates() {
+        let view = wrapWithGentleEnvironment(GentleDesignFoundationView())
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleDesignTypographySection body evaluates without crash")
+    func testTypographySectionBodyEvaluates() {
+        let view = wrapWithGentleEnvironment(GentleDesignTypographySection())
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleDesignButtonsSection body evaluates without crash")
+    func testButtonsSectionBodyEvaluates() {
+        let view = wrapWithGentleEnvironment(GentleDesignButtonsSection())
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleDesignSurfacesSection body evaluates without crash")
+    func testSurfacesSectionBodyEvaluates() {
+        let view = wrapWithGentleEnvironment(GentleDesignSurfacesSection())
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleDesignColorsSection body evaluates without crash")
+    func testColorsSectionBodyEvaluates() {
+        let view = wrapWithGentleEnvironment(GentleDesignColorsSection())
+        renderViewForCoverage(view)
+    }
+
+    // MARK: - Customize & Studio Views
+
+    @Test("GentleDesignCustomizeView body evaluates without crash")
+    func testCustomizeViewBodyEvaluates() {
+        let view = wrapWithGentleEnvironment(GentleDesignCustomizeView())
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleDesignCustomizeView body evaluates with all parameter combinations")
+    func testCustomizeViewBodyAllParams() {
+        let view1 = wrapWithGentleEnvironment(GentleDesignCustomizeView(isInsideNavigationStack: false))
+        renderViewForCoverage(view1)
+
+        let view2 = wrapWithGentleEnvironment(GentleDesignCustomizeView(isInsideNavigationStack: true))
+        renderViewForCoverage(view2)
+
+        let view3 = wrapWithGentleEnvironment(GentleDesignCustomizeView(onSave: {}))
+        renderViewForCoverage(view3)
+
+        let view4 = wrapWithGentleEnvironment(GentleDesignCustomizeView(isInsideNavigationStack: true, onSave: {}))
+        renderViewForCoverage(view4)
+    }
+
+    @Test("GentleDesignStudioView body evaluates without crash")
+    func testStudioViewBodyEvaluates() {
+        let view = wrapWithGentleEnvironment(GentleDesignStudioView())
+        renderViewForCoverage(view)
+    }
+
+    // MARK: - Navigation Bar Styler
+
+    @Test("GentleNavigationBarStyler body evaluates without crash")
+    func testNavigationBarStylerBodyEvaluates() {
+        let view = wrapWithGentleEnvironment(GentleNavigationBarStyler())
+        renderViewForCoverage(view)
+    }
+
+    // MARK: - Theme Root
+
+    @Test("GentleThemeRoot body evaluates without crash")
+    func testThemeRootBodyEvaluates() {
+        let view = GentleThemeRoot {
+            Text("Test content")
+        }
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleThemeRoot body evaluates with custom theme")
+    func testThemeRootBodyWithCustomTheme() {
+        let theme = GentleTheme(defaultSpec: .classic)
+        let view = GentleThemeRoot(theme: theme) {
+            Text("Test content")
+        }
+        renderViewForCoverage(view)
+    }
+}
+
+@Suite("Modifier Body Evaluation Tests")
+@MainActor
+struct ModifierBodyEvaluationTests {
+
+    // MARK: - Text Modifier
+
+    @Test("GentleTextModifier body evaluates for all text roles")
+    func testTextModifierBodyAllRoles() {
+        for role in GentleTextRole.allCases {
+            let view = wrapWithGentleEnvironment(
+                Text("Sample").modifier(GentleTextModifier(role: role))
+            )
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("GentleTextModifier body evaluates with color override")
+    func testTextModifierBodyWithColorOverride() {
+        let view = wrapWithGentleEnvironment(
+            Text("Sample").modifier(GentleTextModifier(role: .body_m, overrideColorRole: .primaryCTA))
+        )
+        renderViewForCoverage(view)
+    }
+
+    @Test("gentleText extension body evaluates")
+    func testGentleTextExtensionBody() {
+        let view = wrapWithGentleEnvironment(
+            Text("Sample").gentleText(.headline_m)
+        )
+        renderViewForCoverage(view)
+    }
+
+    // MARK: - TextField Modifier
+
+    @Test("GentleTextFieldModifier body evaluates for all chrome styles")
+    func testTextFieldModifierBodyAllChromes() {
+        let chromes: [GentleTextChrome] = [.formRow, .borderless]
+        for chrome in chromes {
+            let view = wrapWithGentleEnvironment(
+                TextField("Placeholder", text: .constant(""))
+                    .modifier(GentleTextFieldModifier(role: .body_m, chrome: chrome))
+            )
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("GentleTextFieldModifier body evaluates with color override")
+    func testTextFieldModifierBodyWithColorOverride() {
+        let view = wrapWithGentleEnvironment(
+            TextField("Placeholder", text: .constant(""))
+                .modifier(GentleTextFieldModifier(role: .body_m, overrideColorRole: .textSecondary))
+        )
+        renderViewForCoverage(view)
+    }
+
+    @Test("gentleTextField extension body evaluates")
+    func testGentleTextFieldExtensionBody() {
+        let view = wrapWithGentleEnvironment(
+            TextField("Placeholder", text: .constant("")).gentleTextField(.body_m)
+        )
+        renderViewForCoverage(view)
+    }
+
+    // MARK: - Surface Modifier
+
+    @Test("GentleSurfaceModifier body evaluates for all surface roles")
+    func testSurfaceModifierBodyAllRoles() {
+        let surfaceRoles: [GentleSurfaceRole] = [.appBackground, .card, .cardChrome, .cardElevated, .surfaceOverlay]
+        for role in surfaceRoles {
+            let view = wrapWithGentleEnvironment(
+                Text("Content").modifier(GentleSurfaceModifier(role: role))
+            )
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("gentleSurface extension body evaluates")
+    func testGentleSurfaceExtensionBody() {
+        let view = wrapWithGentleEnvironment(
+            Text("Content").gentleSurface(.card)
+        )
+        renderViewForCoverage(view)
+    }
+
+    // MARK: - Background Modifier
+
+    @Test("GentleBackgroundModifier body evaluates for all color roles")
+    func testBackgroundModifierBodyAllRoles() {
+        for role in GentleColorRole.allCases {
+            let view = wrapWithGentleEnvironment(
+                Text("Content").modifier(GentleBackgroundModifier(role: role, ignoresSafeArea: false))
+            )
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("GentleBackgroundModifier body evaluates with ignoresSafeArea")
+    func testBackgroundModifierBodyIgnoresSafeArea() {
+        let view = wrapWithGentleEnvironment(
+            Text("Content").modifier(GentleBackgroundModifier(role: .background, ignoresSafeArea: true))
+        )
+        renderViewForCoverage(view)
+    }
+
+    @Test("gentleBackground extension body evaluates")
+    func testGentleBackgroundExtensionBody() {
+        let view = wrapWithGentleEnvironment(
+            Text("Content").gentleBackground(.surface)
+        )
+        renderViewForCoverage(view)
+    }
+
+    // MARK: - Inset Modifier
+
+    @Test("GentleInsetModifier body evaluates for all inset roles")
+    func testInsetModifierBodyAllRoles() {
+        let insetRoles: [GentleInsetRole] = [.screen, .card, .control, .listRow]
+        for role in insetRoles {
+            let view = wrapWithGentleEnvironment(
+                Text("Content").modifier(GentleInsetModifier(role: role))
+            )
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("GentleInsetModifier body evaluates with different edge sets")
+    func testInsetModifierBodyEdgeSets() {
+        let edgeSets: [Edge.Set] = [.all, .horizontal, .vertical, .top, .bottom, .leading, .trailing]
+        for edges in edgeSets {
+            let view = wrapWithGentleEnvironment(
+                Text("Content").modifier(GentleInsetModifier(edges: edges, role: .screen))
+            )
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("gentleInset extension body evaluates")
+    func testGentleInsetExtensionBody() {
+        let view = wrapWithGentleEnvironment(
+            Text("Content").gentleInset(.card)
+        )
+        renderViewForCoverage(view)
+    }
+
+    // MARK: - Button Style
+
+    @Test("GentleButtonStyle makeBody evaluates for all button roles")
+    func testButtonStyleBodyAllRoles() {
+        let buttonRoles: [GentleButtonRole] = [.primary, .secondary, .tertiary, .quaternary, .destructive]
+        for role in buttonRoles {
+            let view = wrapWithGentleEnvironment(
+                Button("Test") {}.buttonStyle(GentleButtonStyle(role: role))
+            )
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("GentleButtonStyle makeBody evaluates with shape overrides")
+    func testButtonStyleBodyWithShapeOverrides() {
+        let buttonShapes: [GentleButtonShape] = [.rounded, .pill]
+        for shape in buttonShapes {
+            let view = wrapWithGentleEnvironment(
+                Button("Test") {}.buttonStyle(GentleButtonStyle(role: .primary, shape: shape))
+            )
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("GentleButtonStyle makeBody evaluates with expandsHorizontally")
+    func testButtonStyleBodyExpandsHorizontally() {
+        let view = wrapWithGentleEnvironment(
+            Button("Test") {}.buttonStyle(GentleButtonStyle(role: .primary, expandsHorizontally: true))
+        )
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleButtonStyle makeBody evaluates with contentAlignment variations")
+    func testButtonStyleBodyContentAlignments() {
+        let alignments: [Alignment] = [.center, .leading, .trailing]
+        for alignment in alignments {
+            let view = wrapWithGentleEnvironment(
+                Button("Test") {}
+                    .buttonStyle(GentleButtonStyle(role: .primary, expandsHorizontally: true, contentAlignment: alignment))
+            )
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("gentleButton extension body evaluates")
+    func testGentleButtonExtensionBody() {
+        let view = wrapWithGentleEnvironment(
+            Button("Test") {}.gentleButton(.secondary)
+        )
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleButtonStyle makeBody evaluates disabled state")
+    func testButtonStyleBodyDisabledState() {
+        let view = wrapWithGentleEnvironment(
+            Button("Test") {}
+                .buttonStyle(GentleButtonStyle(role: .primary))
+                .disabled(true)
+        )
+        renderViewForCoverage(view)
+    }
+}
+
+@Suite("View Body Evaluation with Presets Tests")
+@MainActor
+struct ViewBodyEvaluationWithPresetsTests {
+
+    private static let allPresets: [GentleDesignSystemSpec] = [
+        .gentleDefault, .classic, .modern, .soft,
+        .editorial, .technical, .bold, .elegant, .compact
+    ]
+
+    @Test("GentleDesignFoundationView body evaluates with all presets")
+    func testFoundationViewBodyWithAllPresets() {
+        for preset in Self.allPresets {
+            let theme = GentleTheme(defaultSpec: preset)
+            let manager = GentleThemeManager(theme: theme)
+            let view = GentleDesignFoundationView()
+                .environment(\.gentleTheme, theme)
+                .environment(\.gentleThemeManager, manager)
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("All section views body evaluate with editorial preset (serif fonts)")
+    func testSectionViewsWithEditorialPreset() {
+        let theme = GentleTheme(defaultSpec: .editorial)
+        let manager = GentleThemeManager(theme: theme)
+
+        let views: [AnyView] = [
+            AnyView(GentleDesignTypographySection()),
+            AnyView(GentleDesignButtonsSection()),
+            AnyView(GentleDesignSurfacesSection()),
+            AnyView(GentleDesignColorsSection())
+        ]
+
+        for view in views {
+            let wrapped = view
+                .environment(\.gentleTheme, theme)
+                .environment(\.gentleThemeManager, manager)
+            renderViewForCoverage(wrapped)
+        }
+    }
+
+    @Test("Text modifiers body evaluate with all presets")
+    func testTextModifiersWithAllPresets() {
+        for preset in Self.allPresets {
+            let theme = GentleTheme(defaultSpec: preset)
+            let view = Text("Sample")
+                .gentleText(.body_m)
+                .environment(\.gentleTheme, theme)
+            renderViewForCoverage(view)
+        }
+    }
+}
