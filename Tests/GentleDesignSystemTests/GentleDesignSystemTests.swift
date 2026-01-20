@@ -633,9 +633,11 @@ struct GentleDesignSystemSpecTests {
         let encoder = JSONEncoder()
 
         let data = try encoder.encode(spec)
-        let jsonString = String(data: data, encoding: .utf8)!
-
-        #expect(jsonString.contains("\"_specVersion\""))
+        if let jsonString = String(data: data, encoding: .utf8) {
+            #expect(jsonString.contains("\"_specVersion\""))
+        } else {
+            Issue.record("Could not convert encoded data to a UTF-8 string")
+        }
     }
 }
 
