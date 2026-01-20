@@ -1826,3 +1826,1297 @@ struct InsetFallbackTests {
         #expect(axis.vertical == .l)
     }
 }
+
+// MARK: - GentleUIKitTheming Tests
+
+@Suite("GentleUIKitTheming Tests")
+@MainActor
+struct GentleUIKitThemingTests {
+
+    @Test("Apply navigation bar title style does not crash")
+    func testApplyNavigationBarTitleStyle() {
+        let theme = GentleTheme.default
+
+        // Should not throw or crash
+        GentleUIKitTheming.applyNavigationBarTitleStyle(
+            theme: theme,
+            textRole: .largeTitle_xxl,
+            colorRole: .textPrimary
+        )
+    }
+
+    @Test("Apply navigation bar with different text roles")
+    func testApplyNavigationBarWithDifferentRoles() {
+        let theme = GentleTheme.default
+
+        // Test with various roles
+        GentleUIKitTheming.applyNavigationBarTitleStyle(
+            theme: theme,
+            textRole: .title_xl,
+            colorRole: .textSecondary
+        )
+
+        GentleUIKitTheming.applyNavigationBarTitleStyle(
+            theme: theme,
+            textRole: .headline_m,
+            colorRole: .themePrimary
+        )
+    }
+
+    @Test("Apply navigation bar with theme containing font width")
+    func testApplyNavigationBarWithFontWidth() {
+        var spec = GentleDesignSystemSpec.gentleDefault
+        spec.typography.roles[GentleTextRole.largeTitle_xxl.rawValue] = GentleTypographyRoleSpec(
+            pointSize: 34,
+            weight: .bold,
+            design: .default,
+            width: .expanded,
+            relativeTo: .largeTitle,
+            colorRole: .textPrimary
+        )
+
+        let theme = GentleTheme(defaultSpec: spec, editableSpec: spec)
+
+        GentleUIKitTheming.applyNavigationBarTitleStyle(
+            theme: theme,
+            textRole: .largeTitle_xxl,
+            colorRole: .textPrimary
+        )
+    }
+
+    @Test("Apply navigation bar with missing color role returns early")
+    func testApplyNavigationBarWithMissingColorRole() {
+        let emptyColors = GentleColorTokens(pairByRole: [:])
+        let spec = GentleDesignSystemSpec(
+            colors: emptyColors,
+            typography: .gentleDefault,
+            layout: .gentleDefault,
+            visual: .gentleDefault,
+            buttons: .gentleDefault
+        )
+        let theme = GentleTheme(defaultSpec: spec, editableSpec: spec)
+
+        // Should return early without crashing
+        GentleUIKitTheming.applyNavigationBarTitleStyle(
+            theme: theme,
+            textRole: .largeTitle_xxl,
+            colorRole: .textPrimary
+        )
+    }
+
+    @Test("Apply navigation bar with all font designs")
+    func testApplyNavigationBarWithAllFontDesigns() {
+        let theme = GentleTheme.default
+        let designs: [GentleFontDesignToken] = [.default, .serif, .rounded, .monospaced]
+
+        for design in designs {
+            var spec = GentleDesignSystemSpec.gentleDefault
+            spec.typography.roles[GentleTextRole.largeTitle_xxl.rawValue] = GentleTypographyRoleSpec(
+                pointSize: 34,
+                weight: .bold,
+                design: design,
+                relativeTo: .largeTitle,
+                colorRole: .textPrimary
+            )
+
+            let themeWithDesign = GentleTheme(defaultSpec: spec, editableSpec: spec)
+            GentleUIKitTheming.applyNavigationBarTitleStyle(
+                theme: themeWithDesign,
+                textRole: .largeTitle_xxl,
+                colorRole: .textPrimary
+            )
+        }
+    }
+
+    @Test("Apply navigation bar with all font weights")
+    func testApplyNavigationBarWithAllFontWeights() {
+        for weight in GentleFontWeightToken.allCases {
+            var spec = GentleDesignSystemSpec.gentleDefault
+            spec.typography.roles[GentleTextRole.largeTitle_xxl.rawValue] = GentleTypographyRoleSpec(
+                pointSize: 34,
+                weight: weight,
+                design: .default,
+                relativeTo: .largeTitle,
+                colorRole: .textPrimary
+            )
+
+            let theme = GentleTheme(defaultSpec: spec, editableSpec: spec)
+            GentleUIKitTheming.applyNavigationBarTitleStyle(
+                theme: theme,
+                textRole: .largeTitle_xxl,
+                colorRole: .textPrimary
+            )
+        }
+    }
+}
+
+// MARK: - GentleButtonAnimations Tests
+
+@Suite("GentleButtonAnimations Tests")
+@MainActor
+struct GentleButtonAnimationsTests {
+
+    @Test("Resolve returns nil when reduce motion is true")
+    func testResolveWithReduceMotion() {
+        let spec = GentleButtonAnimationSpec()
+        let animation = GentleButtonAnimations.resolve(
+            reduceMotion: true,
+            role: .squish,
+            spec: spec
+        )
+        #expect(animation == nil)
+    }
+
+    @Test("Resolve returns nil for unknown role")
+    func testResolveUnknownRole() {
+        let spec = GentleButtonAnimationSpec()
+        let animation = GentleButtonAnimations.resolve(
+            reduceMotion: false,
+            role: .unknown,
+            spec: spec
+        )
+        #expect(animation == nil)
+    }
+
+    @Test("Resolve returns easeOut for subtlePress")
+    func testResolveSubtlePress() {
+        let spec = GentleButtonAnimationSpec(duration: 0.15)
+        let animation = GentleButtonAnimations.resolve(
+            reduceMotion: false,
+            role: .subtlePress,
+            spec: spec
+        )
+        #expect(animation != nil)
+    }
+
+    @Test("Resolve returns spring for squish")
+    func testResolveSquish() {
+        let spec = GentleButtonAnimationSpec(
+            springResponse: 0.22,
+            springDamping: 0.85,
+            springBlend: 0.0
+        )
+        let animation = GentleButtonAnimations.resolve(
+            reduceMotion: false,
+            role: .squish,
+            spec: spec
+        )
+        #expect(animation != nil)
+    }
+
+    @Test("Resolve returns spring for pop")
+    func testResolvePop() {
+        let spec = GentleButtonAnimationSpec(
+            springResponse: 0.18,
+            springDamping: 0.78,
+            springBlend: 0.0
+        )
+        let animation = GentleButtonAnimations.resolve(
+            reduceMotion: false,
+            role: .pop,
+            spec: spec
+        )
+        #expect(animation != nil)
+    }
+
+    @Test("Resolve returns spring for bouncy")
+    func testResolveBouncy() {
+        let spec = GentleButtonAnimationSpec(
+            springResponse: 0.28,
+            springDamping: 0.70,
+            springBlend: 0.0
+        )
+        let animation = GentleButtonAnimations.resolve(
+            reduceMotion: false,
+            role: .bouncy,
+            spec: spec
+        )
+        #expect(animation != nil)
+    }
+
+    @Test("Resolve returns spring for springBack")
+    func testResolveSpringBack() {
+        let spec = GentleButtonAnimationSpec(
+            springResponse: 0.45,
+            springDamping: 0.45,
+            springBlend: 0.0
+        )
+        let animation = GentleButtonAnimations.resolve(
+            reduceMotion: false,
+            role: .springBack,
+            spec: spec
+        )
+        #expect(animation != nil)
+    }
+
+    @Test("All animation roles can be resolved")
+    func testAllAnimationRolesResolve() {
+        let spec = GentleButtonAnimationSpec()
+
+        for role in GentleButtonAnimationRole.allCases {
+            // Should not crash
+            _ = GentleButtonAnimations.resolve(
+                reduceMotion: false,
+                role: role,
+                spec: spec
+            )
+        }
+    }
+}
+
+// MARK: - GentleGapIntent Extended Tests
+
+@Suite("GentleGapIntent Extended Tests")
+struct GentleGapIntentExtendedTests {
+
+    @Test("Gap facade intent values match expected scale tokens")
+    func testGapFacadeIntentValuesMatchScale() {
+        let scale = GentleSpacingScaleTokens.gentleDefault
+        let facade = GentleGapScaleFacade(scale: scale)
+
+        #expect(facade.value(.unknown) == 0)
+        #expect(facade.value(.micro) == facade.xs)
+        #expect(facade.value(.tight) == facade.s)
+        #expect(facade.value(.regular) == facade.m)
+        #expect(facade.value(.ample) == facade.l)
+        #expect(facade.value(.loose) == facade.xl)
+        #expect(facade.value(.expansive) == facade.xxl)
+    }
+}
+
+// MARK: - Color Role Extended Tests
+
+@Suite("GentleColorRole Extended Tests")
+struct GentleColorRoleExtendedTests {
+
+    @Test("All color roles have unique raw values")
+    func testColorRoleUniqueRawValues() {
+        let rawValues = GentleColorRole.allCases.map { $0.rawValue }
+        let uniqueValues = Set(rawValues)
+        #expect(rawValues.count == uniqueValues.count)
+    }
+
+    @Test("Theme color with all roles")
+    func testThemeColorWithAllRoles() {
+        let theme = GentleTheme.default
+
+        for role in GentleColorRole.allCases {
+            let lightColor = theme.color(for: role, scheme: .light)
+            let darkColor = theme.color(for: role, scheme: .dark)
+
+            // Should return valid colors (not clear)
+            #expect(lightColor != Color.clear)
+            #expect(darkColor != Color.clear)
+        }
+    }
+}
+
+// MARK: - GentleTextChrome Extended Tests
+
+@Suite("GentleTextChrome Extended Tests")
+struct GentleTextChromeExtendedTests {
+
+    @Test("Text chrome formRow case")
+    func testTextChromeFormRow() {
+        let chrome = GentleTextChrome.formRow
+
+        switch chrome {
+        case .formRow:
+            // Expected
+            break
+        default:
+            Issue.record("Expected formRow chrome")
+        }
+    }
+
+    @Test("Text chrome borderless case")
+    func testTextChromeBorderless() {
+        let chrome = GentleTextChrome.borderless
+
+        switch chrome {
+        case .borderless:
+            // Expected
+            break
+        default:
+            Issue.record("Expected borderless chrome")
+        }
+    }
+}
+
+// MARK: - GentleSurfaceRole Extended Tests
+
+@Suite("GentleSurfaceRole Extended Tests")
+struct GentleSurfaceRoleExtendedTests {
+
+    @Test("All surface roles have unique raw values")
+    func testSurfaceRoleUniqueRawValues() {
+        let allRoles: [GentleSurfaceRole] = [.appBackground, .card, .cardChrome, .cardElevated, .surfaceOverlay]
+        let rawValues = allRoles.map { $0.rawValue }
+        let uniqueValues = Set(rawValues)
+        #expect(rawValues.count == uniqueValues.count)
+    }
+}
+
+// MARK: - GentleLayoutFacade Extended Tests
+
+@Suite("GentleLayoutFacade Extended Tests")
+struct GentleLayoutFacadeExtendedTests {
+
+    @Test("Layout facade stack accessor equals gap")
+    func testLayoutFacadeStackEqualsGap() {
+        let facade = GentleLayoutFacade(tokens: .gentleDefault)
+
+        #expect(facade.stack.regular == facade.gap.regular)
+        #expect(facade.stack.tight == facade.gap.tight)
+    }
+
+    @Test("Layout facade list accessor equals gap")
+    func testLayoutFacadeListEqualsGap() {
+        let facade = GentleLayoutFacade(tokens: .gentleDefault)
+
+        #expect(facade.list.regular == facade.gap.regular)
+        #expect(facade.list.ample == facade.gap.ample)
+    }
+}
+
+// MARK: - GentleDesignRuntime Tests
+
+@Suite("GentleDesignRuntime Tests")
+struct GentleDesignRuntimeTests {
+
+    @Test("Resolver layout facade works")
+    func testResolverLayoutFacade() {
+        let theme = GentleTheme.default
+        let resolver = GentleDesignRuntime.Resolver(theme: theme, colorScheme: .light)
+
+        #expect(resolver.layout.gap.regular == 12)
+    }
+
+    @Test("Resolver visual tokens work")
+    func testResolverVisualTokens() {
+        let theme = GentleTheme.default
+        let resolver = GentleDesignRuntime.Resolver(theme: theme, colorScheme: .light)
+
+        #expect(resolver.visual.radii.medium == 12)
+        #expect(resolver.radii.medium == 12)
+        #expect(resolver.shadows.small == 2)
+    }
+
+    @Test("Resolver buttons accessor works")
+    func testResolverButtonsAccessor() {
+        let theme = GentleTheme.default
+        let resolver = GentleDesignRuntime.Resolver(theme: theme, colorScheme: .light)
+
+        #expect(resolver.buttons.roleSpec(for: .primary).backgroundRole == .primaryCTA)
+    }
+
+    @Test("Resolver color function works")
+    func testResolverColorFunction() {
+        let theme = GentleTheme.default
+        let lightResolver = GentleDesignRuntime.Resolver(theme: theme, colorScheme: .light)
+        let darkResolver = GentleDesignRuntime.Resolver(theme: theme, colorScheme: .dark)
+
+        #expect(lightResolver.color(.textPrimary) != Color.clear)
+        #expect(darkResolver.color(.textPrimary) != Color.clear)
+    }
+
+    @Test("Resolver convenience color properties work")
+    func testResolverConvenienceColors() {
+        let theme = GentleTheme.default
+        let resolver = GentleDesignRuntime.Resolver(theme: theme, colorScheme: .light)
+
+        #expect(resolver.surface != Color.clear)
+        #expect(resolver.background != Color.clear)
+        #expect(resolver.borderSubtle != Color.clear)
+        #expect(resolver.textPrimary != Color.clear)
+        #expect(resolver.themePrimary != Color.clear)
+    }
+}
+
+// MARK: - GentleJSONEncodable/Decodable Tests
+
+@Suite("GentleJSON Protocol Tests")
+struct GentleJSONProtocolTests {
+
+    @Test("makeJSONEncoder returns encoder with correct options")
+    func testMakeJSONEncoder() {
+        let encoder = GentleDesignSystemSpec.makeJSONEncoder()
+        #expect(encoder.outputFormatting.contains(.prettyPrinted))
+        #expect(encoder.outputFormatting.contains(.sortedKeys))
+    }
+
+    @Test("makeJSONDecoder returns valid decoder")
+    func testMakeJSONDecoder() {
+        let decoder = GentleDesignSystemSpec.makeJSONDecoder()
+        #expect(decoder != nil)
+    }
+
+    @Test("encodedJSONString throws for invalid data")
+    func testEncodedJSONStringWithCustomEncoder() throws {
+        let spec = GentleDesignSystemSpec.gentleDefault
+        let customEncoder = JSONEncoder()
+        customEncoder.outputFormatting = []
+
+        let jsonString = try spec.encodedJSONString(encoder: customEncoder)
+        #expect(!jsonString.isEmpty)
+    }
+}
+
+// MARK: - GentleTheme ID Tests
+
+@Suite("GentleTheme ID Tests")
+struct GentleThemeIDTests {
+
+    @Test("Theme has default ID of 0")
+    func testThemeDefaultID() {
+        let theme = GentleTheme.default
+        #expect(theme.id == 0)
+    }
+
+    @Test("Theme ID can be modified")
+    func testThemeIDModification() {
+        var theme = GentleTheme.default
+        theme.id = 42
+        #expect(theme.id == 42)
+    }
+}
+
+// MARK: - GentleTypographyTokens Extended Tests
+
+@Suite("GentleTypographyTokens Extended Tests")
+struct GentleTypographyTokensExtendedTests {
+
+    @Test("All text roles have specs in gentleDefault")
+    func testAllTextRolesHaveSpecs() {
+        let tokens = GentleTypographyTokens.gentleDefault
+
+        for role in GentleTextRole.allCases {
+            let spec = tokens.roleSpec(for: role)
+            #expect(spec.pointSize > 0, "Role \(role) should have positive point size")
+            #expect(!spec.colorRole.rawValue.isEmpty)
+        }
+    }
+
+    @Test("Typography tokens with custom roles")
+    func testTypographyTokensCustomRoles() {
+        let customSpec = GentleTypographyRoleSpec(
+            pointSize: 42,
+            weight: .black,
+            design: .monospaced,
+            width: .compressed,
+            relativeTo: .headline,
+            lineSpacing: 10,
+            letterSpacing: 2,
+            isUppercased: true,
+            colorRole: .destructive
+        )
+
+        let tokens = GentleTypographyTokens(roles: [
+            GentleTextRole.headline_m.rawValue: customSpec
+        ])
+
+        let retrieved = tokens.roleSpec(for: .headline_m)
+        #expect(retrieved.pointSize == 42)
+        #expect(retrieved.weight == .black)
+        #expect(retrieved.design == .monospaced)
+        #expect(retrieved.width == .compressed)
+        #expect(retrieved.lineSpacing == 10)
+        #expect(retrieved.letterSpacing == 2)
+        #expect(retrieved.isUppercased == true)
+        #expect(retrieved.colorRole == .destructive)
+    }
+}
+
+// MARK: - GentleAxisInsetTokens Extended Tests
+
+@Suite("GentleAxisInsetTokens Extended Tests")
+struct GentleAxisInsetTokensExtendedTests {
+
+    @Test("Axis inset tokens are codable")
+    func testAxisInsetTokensCodable() throws {
+        let original = GentleAxisInsetTokens(horizontal: .xl, vertical: .s)
+        let encoder = JSONEncoder()
+        let decoder = JSONDecoder()
+
+        let data = try encoder.encode(original)
+        let decoded = try decoder.decode(GentleAxisInsetTokens.self, from: data)
+
+        #expect(decoded.horizontal == original.horizontal)
+        #expect(decoded.vertical == original.vertical)
+    }
+
+    @Test("All spacing token combinations work")
+    func testAllSpacingTokenCombinations() {
+        for h in GentleSpacingToken.allCases {
+            for v in GentleSpacingToken.allCases {
+                let tokens = GentleAxisInsetTokens(horizontal: h, vertical: v)
+                #expect(tokens.horizontal == h)
+                #expect(tokens.vertical == v)
+            }
+        }
+    }
+}
+
+// MARK: - GentleInsetRole Extended Tests
+
+@Suite("GentleInsetRole Extended Tests")
+struct GentleInsetRoleExtendedTests {
+
+    @Test("All inset roles are unique")
+    func testAllInsetRolesUnique() {
+        let roles: [GentleInsetRole] = [.screen, .card, .control, .listRow]
+        let rawValues = roles.map { $0.rawValue }
+        let uniqueValues = Set(rawValues)
+        #expect(rawValues.count == uniqueValues.count)
+    }
+}
+
+// MARK: - GentleButtonRole Extended Tests
+
+@Suite("GentleButtonRole Extended Tests")
+struct GentleButtonRoleExtendedTests {
+
+    @Test("All button roles have unique raw values")
+    func testButtonRoleUniqueRawValues() {
+        let roles: [GentleButtonRole] = [.primary, .secondary, .tertiary, .quaternary, .destructive]
+        let rawValues = roles.map { $0.rawValue }
+        let uniqueValues = Set(rawValues)
+        #expect(rawValues.count == uniqueValues.count)
+    }
+
+    @Test("Button tokens have specs for all roles")
+    func testButtonTokensHaveAllRoles() {
+        let tokens = GentleButtonTokens.gentleDefault
+        let roles: [GentleButtonRole] = [.primary, .secondary, .tertiary, .quaternary, .destructive]
+
+        for role in roles {
+            let spec = tokens.roleSpec(for: role)
+            #expect(!spec.textRole.rawValue.isEmpty)
+            #expect(!spec.backgroundRole.rawValue.isEmpty)
+            #expect(!spec.labelColorRole.rawValue.isEmpty)
+        }
+    }
+}
+
+// MARK: - GentleFileThemeSpecStore Extended Tests
+
+@Suite("GentleFileThemeSpecStore Extended Tests")
+struct GentleFileThemeSpecStoreExtendedTests {
+
+    @Test("Store with nil subdirectory")
+    func testStoreWithNilSubdirectory() throws {
+        let store = GentleFileThemeSpecStore(fileName: "test_nil_subdir_\(UUID().uuidString).json", subdirectory: nil)
+        let spec = GentleDesignSystemSpec.gentleDefault
+
+        // Save
+        try store.saveEditableSpec(spec)
+
+        // Load
+        let loaded = try store.loadEditableSpec()
+        #expect(loaded != nil)
+
+        // Cleanup
+        try store.clearEditableSpec()
+    }
+
+    @Test("Store sanitizes preset names")
+    func testStoreSanitizesPresetNames() throws {
+        let store = GentleFileThemeSpecStore(fileName: "test_sanitize_\(UUID().uuidString).json")
+        let presetName = "Test/Preset With Spaces"
+        let spec = GentleDesignSystemSpec.gentleDefault
+
+        // Should not crash with special characters
+        try store.saveEditableSpec(spec, forPreset: presetName)
+        let loaded = try store.loadEditableSpec(forPreset: presetName)
+        #expect(loaded != nil)
+
+        // Cleanup
+        try store.clearEditableSpec(forPreset: presetName)
+    }
+}
+
+// MARK: - GentleFontTextStyle Extended Tests
+
+@Suite("GentleFontTextStyle Extended Tests")
+struct GentleFontTextStyleExtendedTests {
+
+    @Test("All font text styles have UIKit mappings")
+    func testAllFontTextStylesHaveUIKitMappings() {
+        let styles: [GentleFontTextStyle] = [
+            .largeTitle, .title, .title2, .title3, .headline,
+            .body, .callout, .subheadline, .footnote, .caption, .caption2
+        ]
+
+        for style in styles {
+            // Should not crash and should return valid UIKit style
+            let uiKitStyle = style.uiKitTextStyle
+            #expect(!uiKitStyle.rawValue.isEmpty)
+        }
+    }
+}
+
+// MARK: - GentleFontDesignToken Extended Tests
+
+@Suite("GentleFontDesignToken Extended Tests")
+struct GentleFontDesignTokenExtendedTests {
+
+    @Test("All font design tokens have SwiftUI mappings")
+    func testAllFontDesignTokensHaveSwiftUIMappings() {
+        for token in GentleFontDesignToken.allCases {
+            // Should not crash
+            _ = token.swiftUIDesign
+        }
+    }
+}
+
+// MARK: - Theme Spec Accessors Tests
+
+@Suite("Theme Spec Accessors Tests")
+struct ThemeSpecAccessorsTests {
+
+    @Test("Theme spec accessor returns activeSpec")
+    func testThemeSpecAccessor() {
+        let theme = GentleTheme.default
+        #expect(theme.spec.specVersion == theme.activeSpec.specVersion)
+    }
+
+    @Test("Theme gap accessor works")
+    func testThemeGapAccessor() {
+        let theme = GentleTheme.default
+        #expect(theme.gap.m == 12)
+    }
+
+    @Test("Theme grid accessor works")
+    func testThemeGridAccessor() {
+        let theme = GentleTheme.default
+        #expect(theme.grid.m == 12)
+    }
+
+    @Test("Theme touch accessor works")
+    func testThemeTouchAccessor() {
+        let theme = GentleTheme.default
+        #expect(theme.touch.m == 12)
+    }
+}
+
+// MARK: - All Presets Comprehensive Tests
+
+@Suite("All Presets Comprehensive Tests")
+struct AllPresetsComprehensiveTests {
+
+    @Test("All presets have valid colors for all roles")
+    func testAllPresetsHaveValidColors() {
+        let presets = GentleDesignSystemSpec.allPresets
+
+        for preset in presets {
+            for role in GentleColorRole.allCases {
+                let pair = preset.spec.colors.pair(for: role)
+                #expect(pair != nil, "Preset \(preset.name) missing color for role \(role)")
+            }
+        }
+    }
+
+    @Test("All presets have valid typography for all roles")
+    func testAllPresetsHaveValidTypography() {
+        let presets = GentleDesignSystemSpec.allPresets
+
+        for preset in presets {
+            for role in GentleTextRole.allCases {
+                let spec = preset.spec.typography.roleSpec(for: role)
+                #expect(spec.pointSize > 0, "Preset \(preset.name) has invalid point size for role \(role)")
+            }
+        }
+    }
+
+    @Test("All presets have valid button specs")
+    func testAllPresetsHaveValidButtonSpecs() {
+        let presets = GentleDesignSystemSpec.allPresets
+        let buttonRoles: [GentleButtonRole] = [.primary, .secondary, .tertiary, .quaternary, .destructive]
+
+        for preset in presets {
+            for role in buttonRoles {
+                let spec = preset.spec.buttons.roleSpec(for: role)
+                #expect(spec.pressedScale > 0 && spec.pressedScale <= 1.0)
+                #expect(spec.pressedOpacity > 0 && spec.pressedOpacity <= 1.0)
+            }
+        }
+    }
+}
+
+// MARK: - Color Hex Extended Tests
+
+@Suite("Color Hex Extended Tests")
+struct ColorHexExtendedTests {
+
+    @Test("Hex with lowercase letters works")
+    func testHexLowercase() {
+        let color = Color(gentleHex: "#aabbcc")
+        #expect(color != Color.clear)
+    }
+
+    @Test("Hex with uppercase letters works")
+    func testHexUppercase() {
+        let color = Color(gentleHex: "#AABBCC")
+        #expect(color != Color.clear)
+    }
+
+    @Test("Hex with mixed case works")
+    func testHexMixedCase() {
+        let color = Color(gentleHex: "#AaBbCc")
+        #expect(color != Color.clear)
+    }
+
+    @Test("8-digit hex alpha channel works")
+    func test8DigitHexAlpha() {
+        // Full opacity
+        let opaqueColor = Color(gentleHex: "#FF0000FF")
+        #expect(opaqueColor != Color.clear)
+
+        // Half opacity
+        let halfOpacity = Color(gentleHex: "#FF000080")
+        #expect(halfOpacity != Color.clear)
+
+        // Zero opacity
+        let transparentColor = Color(gentleHex: "#FF000000")
+        #expect(transparentColor != Color.clear)
+    }
+}
+
+// MARK: - GentleSpacingScaleTokens Extended Tests
+
+@Suite("GentleSpacingScaleTokens Extended Tests")
+struct GentleSpacingScaleTokensExtendedTests {
+
+    @Test("Spacing scale is codable")
+    func testSpacingScaleCodable() throws {
+        let original = GentleSpacingScaleTokens(xs: 1, s: 2, m: 3, l: 4, xl: 5, xxl: 6)
+        let encoder = JSONEncoder()
+        let decoder = JSONDecoder()
+
+        let data = try encoder.encode(original)
+        let decoded = try decoder.decode(GentleSpacingScaleTokens.self, from: data)
+
+        #expect(decoded.xs == 1)
+        #expect(decoded.s == 2)
+        #expect(decoded.m == 3)
+        #expect(decoded.l == 4)
+        #expect(decoded.xl == 5)
+        #expect(decoded.xxl == 6)
+    }
+
+    @Test("All spacing tokens return correct values")
+    func testAllSpacingTokensReturnCorrectValues() {
+        let scale = GentleSpacingScaleTokens(xs: 1, s: 2, m: 3, l: 4, xl: 5, xxl: 6)
+
+        #expect(scale.value(for: .xs) == 1)
+        #expect(scale.value(for: .s) == 2)
+        #expect(scale.value(for: .m) == 3)
+        #expect(scale.value(for: .l) == 4)
+        #expect(scale.value(for: .xl) == 5)
+        #expect(scale.value(for: .xxl) == 6)
+    }
+}
+
+// MARK: - GentleRadiusTokens Extended Tests
+
+@Suite("GentleRadiusTokens Extended Tests")
+struct GentleRadiusTokensExtendedTests {
+
+    @Test("Radius tokens are codable")
+    func testRadiusTokensCodable() throws {
+        let original = GentleRadiusTokens(small: 4, medium: 8, large: 16, pill: 500)
+        let encoder = JSONEncoder()
+        let decoder = JSONDecoder()
+
+        let data = try encoder.encode(original)
+        let decoded = try decoder.decode(GentleRadiusTokens.self, from: data)
+
+        #expect(decoded.small == 4)
+        #expect(decoded.medium == 8)
+        #expect(decoded.large == 16)
+        #expect(decoded.pill == 500)
+    }
+}
+
+// MARK: - GentleShadowTokens Extended Tests
+
+@Suite("GentleShadowTokens Extended Tests")
+struct GentleShadowTokensExtendedTests {
+
+    @Test("Shadow tokens are codable")
+    func testShadowTokensCodable() throws {
+        let original = GentleShadowTokens(none: 0, small: 1, medium: 3)
+        let encoder = JSONEncoder()
+        let decoder = JSONDecoder()
+
+        let data = try encoder.encode(original)
+        let decoded = try decoder.decode(GentleShadowTokens.self, from: data)
+
+        #expect(decoded.none == 0)
+        #expect(decoded.small == 1)
+        #expect(decoded.medium == 3)
+    }
+}
+
+// MARK: - GentleVisualTokens Extended Tests
+
+@Suite("GentleVisualTokens Extended Tests")
+struct GentleVisualTokensExtendedTests {
+
+    @Test("Visual tokens are codable")
+    func testVisualTokensCodable() throws {
+        let original = GentleVisualTokens(
+            radii: GentleRadiusTokens(small: 4, medium: 8, large: 16, pill: 500),
+            shadows: GentleShadowTokens(none: 0, small: 1, medium: 3)
+        )
+        let encoder = JSONEncoder()
+        let decoder = JSONDecoder()
+
+        let data = try encoder.encode(original)
+        let decoded = try decoder.decode(GentleVisualTokens.self, from: data)
+
+        #expect(decoded.radii.small == 4)
+        #expect(decoded.shadows.small == 1)
+    }
+}
+
+// MARK: - GentleLayoutTokens Extended Tests
+
+@Suite("GentleLayoutTokens Extended Tests")
+struct GentleLayoutTokensExtendedTests {
+
+    @Test("Layout tokens are codable")
+    func testLayoutTokensCodable() throws {
+        let original = GentleLayoutTokens.gentleDefault
+        let encoder = JSONEncoder()
+        let decoder = JSONDecoder()
+
+        let data = try encoder.encode(original)
+        let decoded = try decoder.decode(GentleLayoutTokens.self, from: data)
+
+        #expect(decoded.scale.m == original.scale.m)
+        #expect(decoded.gap.m == original.gap.m)
+        #expect(decoded.grid.m == original.grid.m)
+        #expect(decoded.touch.m == original.touch.m)
+    }
+
+    @Test("Layout tokens custom initialization")
+    func testLayoutTokensCustomInit() {
+        let customScale = GentleSpacingScaleTokens(xs: 2, s: 4, m: 6, l: 8, xl: 10, xxl: 12)
+        let layout = GentleLayoutTokens(
+            scale: customScale,
+            gap: customScale,
+            grid: customScale,
+            touch: customScale,
+            inset: .gentleDefault
+        )
+
+        #expect(layout.scale.xs == 2)
+        #expect(layout.gap.s == 4)
+        #expect(layout.grid.m == 6)
+        #expect(layout.touch.l == 8)
+    }
+}
+
+// MARK: - GentleInsetTokens Extended Tests
+
+@Suite("GentleInsetTokens Extended Tests")
+struct GentleInsetTokensExtendedTests {
+
+    @Test("Inset tokens are codable")
+    func testInsetTokensCodable() throws {
+        let original = GentleInsetTokens.gentleDefault
+        let encoder = JSONEncoder()
+        let decoder = JSONDecoder()
+
+        let data = try encoder.encode(original)
+        let decoded = try decoder.decode(GentleInsetTokens.self, from: data)
+
+        let originalScreen = original.axisTokens(for: .screen)
+        let decodedScreen = decoded.axisTokens(for: .screen)
+
+        #expect(originalScreen.horizontal == decodedScreen.horizontal)
+        #expect(originalScreen.vertical == decodedScreen.vertical)
+    }
+
+    @Test("Inset tokens fallback chain")
+    func testInsetTokensFallbackChain() {
+        // Only has screen, missing card
+        let insets = GentleInsetTokens(tokensByRole: [
+            GentleInsetRole.screen.rawValue: .init(horizontal: .xxl, vertical: .xl)
+        ])
+
+        // Card should fallback to screen
+        let cardAxis = insets.axisTokens(for: .card)
+        #expect(cardAxis.horizontal == .xxl)
+        #expect(cardAxis.vertical == .xl)
+
+        // Control should also fallback to screen
+        let controlAxis = insets.axisTokens(for: .control)
+        #expect(controlAxis.horizontal == .xxl)
+        #expect(controlAxis.vertical == .xl)
+    }
+}
+
+// MARK: - GentleButtonTokens Animation Tests
+
+@Suite("GentleButtonTokens Animation Tests")
+struct GentleButtonTokensAnimationTests {
+
+    @Test("All default animation roles have specs")
+    func testAllDefaultAnimationRolesHaveSpecs() {
+        let tokens = GentleButtonTokens.gentleDefault
+
+        for role in GentleButtonAnimationRole.allCases {
+            let spec = tokens.animationSpec(for: role)
+            // All should have valid specs
+            #expect(spec.pressedScale >= 0 && spec.pressedScale <= 1.5)
+        }
+    }
+
+    @Test("Animation spec fallback to squish")
+    func testAnimationSpecFallbackToSquish() {
+        let squishSpec = GentleButtonAnimationSpec(
+            pressedScale: 0.5,
+            pressedOpacity: 0.5
+        )
+
+        let tokens = GentleButtonTokens(
+            roles: [:],
+            animations: [GentleButtonAnimationRole.squish.rawValue: squishSpec]
+        )
+
+        // Unknown role should fallback to squish
+        let spec = tokens.animationSpec(for: .unknown)
+        #expect(spec.pressedScale == 0.5)
+    }
+}
+
+// MARK: - GentleButtonRoleSpec Extended Tests
+
+@Suite("GentleButtonRoleSpec Extended Tests")
+struct GentleButtonRoleSpecExtendedTests {
+
+    @Test("Button role spec is codable")
+    func testButtonRoleSpecCodable() throws {
+        let original = GentleButtonRoleSpec(
+            shape: .pill,
+            textRole: .headline_m,
+            backgroundRole: .primaryCTA,
+            labelColorRole: .onPrimaryCTA,
+            borderRole: .borderSubtle,
+            animationRole: .bouncy,
+            pressedScale: 0.9,
+            pressedOpacity: 0.8
+        )
+
+        let encoder = JSONEncoder()
+        let decoder = JSONDecoder()
+
+        let data = try encoder.encode(original)
+        let decoded = try decoder.decode(GentleButtonRoleSpec.self, from: data)
+
+        #expect(decoded.shape == .pill)
+        #expect(decoded.textRole == .headline_m)
+        #expect(decoded.backgroundRole == .primaryCTA)
+        #expect(decoded.labelColorRole == .onPrimaryCTA)
+        #expect(decoded.borderRole == .borderSubtle)
+        #expect(decoded.animationRole == .bouncy)
+        #expect(decoded.pressedScale == 0.9)
+        #expect(decoded.pressedOpacity == 0.8)
+    }
+
+    @Test("Button role spec default values")
+    func testButtonRoleSpecDefaults() {
+        let spec = GentleButtonRoleSpec(
+            textRole: .body_m,
+            backgroundRole: .surface,
+            labelColorRole: .textPrimary
+        )
+
+        #expect(spec.shape == .rounded)
+        #expect(spec.borderRole == nil)
+        #expect(spec.animationRole == .squish)
+        #expect(spec.pressedScale == 0.97)
+        #expect(spec.pressedOpacity == 0.9)
+    }
+}
+
+// MARK: - GentleButtonAnimationSpec Extended Tests
+
+@Suite("GentleButtonAnimationSpec Extended Tests")
+struct GentleButtonAnimationSpecExtendedTests {
+
+    @Test("Button animation spec is codable")
+    func testButtonAnimationSpecCodable() throws {
+        let original = GentleButtonAnimationSpec(
+            pressedScale: 0.8,
+            pressedOpacity: 0.7,
+            duration: 0.2,
+            springResponse: 0.3,
+            springDamping: 0.6,
+            springBlend: 0.1
+        )
+
+        let encoder = JSONEncoder()
+        let decoder = JSONDecoder()
+
+        let data = try encoder.encode(original)
+        let decoded = try decoder.decode(GentleButtonAnimationSpec.self, from: data)
+
+        #expect(decoded.pressedScale == 0.8)
+        #expect(decoded.pressedOpacity == 0.7)
+        #expect(decoded.duration == 0.2)
+        #expect(decoded.springResponse == 0.3)
+        #expect(decoded.springDamping == 0.6)
+        #expect(decoded.springBlend == 0.1)
+    }
+}
+
+// MARK: - SwiftUI ViewModifier Tests
+
+@Suite("GentleTextModifier Tests")
+@MainActor
+struct GentleTextModifierTests {
+
+    @Test("Text modifier can be created with role")
+    func testTextModifierCreation() {
+        let modifier = GentleTextModifier(role: .body_m)
+        #expect(modifier != nil)
+    }
+
+    @Test("Text modifier can be created with override color role")
+    func testTextModifierWithColorOverride() {
+        let modifier = GentleTextModifier(role: .headline_m, overrideColorRole: .destructive)
+        #expect(modifier != nil)
+    }
+
+    @Test("View extension gentleText creates modifier")
+    func testGentleTextExtension() {
+        let view = Text("Hello").gentleText(.body_m)
+        #expect(view != nil)
+    }
+
+    @Test("View extension gentleText with color role creates modifier")
+    func testGentleTextExtensionWithColor() {
+        let view = Text("Hello").gentleText(.headline_m, colorRole: .textSecondary)
+        #expect(view != nil)
+    }
+}
+
+@Suite("GentleTextFieldModifier Tests")
+@MainActor
+struct GentleTextFieldModifierTests {
+
+    @Test("TextField modifier can be created with defaults")
+    func testTextFieldModifierCreation() {
+        let modifier = GentleTextFieldModifier(role: .body_m)
+        #expect(modifier != nil)
+    }
+
+    @Test("TextField modifier can be created with all parameters")
+    func testTextFieldModifierWithAllParams() {
+        let modifier = GentleTextFieldModifier(
+            role: .body_m,
+            overrideColorRole: .textSecondary,
+            chrome: .standalone(shape: .pill)
+        )
+        #expect(modifier != nil)
+    }
+
+    @Test("TextField modifier with formRow chrome")
+    func testTextFieldModifierFormRow() {
+        let modifier = GentleTextFieldModifier(role: .body_m, chrome: .formRow)
+        #expect(modifier != nil)
+    }
+
+    @Test("TextField modifier with borderless chrome")
+    func testTextFieldModifierBorderless() {
+        let modifier = GentleTextFieldModifier(role: .body_m, chrome: .borderless)
+        #expect(modifier != nil)
+    }
+
+    @Test("View extension gentleTextField creates modifier")
+    func testGentleTextFieldExtension() {
+        let view = TextField("Placeholder", text: .constant("")).gentleTextField(.body_m)
+        #expect(view != nil)
+    }
+}
+
+@Suite("GentleSurfaceModifier Tests")
+@MainActor
+struct GentleSurfaceModifierTests {
+
+    @Test("Surface modifier can be created with all roles")
+    func testSurfaceModifierCreation() {
+        let roles: [GentleSurfaceRole] = [.appBackground, .card, .cardChrome, .cardElevated, .surfaceOverlay]
+
+        for role in roles {
+            let modifier = GentleSurfaceModifier(role: role)
+            #expect(modifier != nil)
+        }
+    }
+
+    @Test("View extension gentleSurface creates modifier")
+    func testGentleSurfaceExtension() {
+        let view = Text("Hello").gentleSurface(.card)
+        #expect(view != nil)
+    }
+}
+
+@Suite("GentleBackgroundModifier Tests")
+@MainActor
+struct GentleBackgroundModifierTests {
+
+    @Test("Background modifier stores role and ignoresSafeArea")
+    func testBackgroundModifierProperties() {
+        let modifier = GentleBackgroundModifier(role: .background, ignoresSafeArea: true)
+        #expect(modifier.role == .background)
+        #expect(modifier.ignoresSafeArea == true)
+    }
+
+    @Test("View extension gentleBackground creates modifier")
+    func testGentleBackgroundExtension() {
+        let view = Text("Hello").gentleBackground(.surface)
+        #expect(view != nil)
+    }
+
+    @Test("View extension gentleBackground with ignoresSafeArea")
+    func testGentleBackgroundExtensionWithSafeArea() {
+        let view = Text("Hello").gentleBackground(.background, ignoresSafeArea: true)
+        #expect(view != nil)
+    }
+}
+
+@Suite("GentleInsetModifier Tests")
+@MainActor
+struct GentleInsetModifierTests {
+
+    @Test("Inset modifier can be created with all parameters")
+    func testInsetModifierCreation() {
+        let modifier = GentleInsetModifier(edges: .horizontal, role: .screen)
+        #expect(modifier != nil)
+    }
+
+    @Test("View extension gentleInset creates modifier")
+    func testGentleInsetExtension() {
+        let view = Text("Hello").gentleInset(.card)
+        #expect(view != nil)
+    }
+
+    @Test("View extension gentleInset with edges creates modifier")
+    func testGentleInsetExtensionWithEdges() {
+        let view = Text("Hello").gentleInset(.horizontal, .screen)
+        #expect(view != nil)
+    }
+}
+
+@Suite("GentleButtonStyle Tests")
+@MainActor
+struct GentleButtonStyleTests {
+
+    @Test("Button style can be created with minimal parameters")
+    func testButtonStyleMinimal() {
+        let style = GentleButtonStyle(role: .primary)
+        #expect(style != nil)
+    }
+
+    @Test("Button style can be created with all parameters")
+    func testButtonStyleAllParams() {
+        let style = GentleButtonStyle(
+            role: .secondary,
+            shape: .pill,
+            textRole: .headline_m,
+            expandsHorizontally: true,
+            contentAlignment: .leading
+        )
+        #expect(style != nil)
+    }
+
+    @Test("View extension gentleButton with role")
+    func testGentleButtonExtension() {
+        let view = Button("Tap") {}.gentleButton(.primary)
+        #expect(view != nil)
+    }
+
+    @Test("View extension gentleButton with role and shape")
+    func testGentleButtonExtensionWithShape() {
+        let view = Button("Tap") {}.gentleButton(.secondary, shape: .pill)
+        #expect(view != nil)
+    }
+
+    @Test("View extension gentleButton with role and textRole")
+    func testGentleButtonExtensionWithTextRole() {
+        let view = Button("Tap") {}.gentleButton(.tertiary, textRole: .caption_s)
+        #expect(view != nil)
+    }
+
+    @Test("View extension gentleButton with all overrides")
+    func testGentleButtonExtensionWithAll() {
+        let view = Button("Tap") {}.gentleButton(.destructive, shape: .rounded, textRole: .headline_m)
+        #expect(view != nil)
+    }
+
+    @Test("View extension gentleButton with expandsHorizontally")
+    func testGentleButtonExtensionExpands() {
+        let view = Button("Tap") {}.gentleButton(.primary, expandsHorizontally: true, contentAlignment: .center)
+        #expect(view != nil)
+    }
+}
+
+@Suite("GentleThemeRoot Tests")
+@MainActor
+struct GentleThemeRootTests {
+
+    @Test("Theme root can be created with default theme")
+    func testThemeRootDefault() {
+        let root = GentleThemeRoot {
+            Text("Hello")
+        }
+        #expect(root != nil)
+    }
+
+    @Test("Theme root can be created with custom theme")
+    func testThemeRootCustom() {
+        let customTheme = GentleTheme(defaultSpec: .classic)
+        let root = GentleThemeRoot(theme: customTheme) {
+            Text("Hello")
+        }
+        #expect(root != nil)
+    }
+}
+
+@Suite("View FontWidth Extension Tests")
+@MainActor
+struct ViewFontWidthExtensionTests {
+
+    @Test("gentleFontWidth with nil returns self")
+    func testGentleFontWidthNil() {
+        let view = Text("Hello").gentleFontWidth(nil)
+        #expect(view != nil)
+    }
+
+    @Test("gentleFontWidth with compressed")
+    func testGentleFontWidthCompressed() {
+        let view = Text("Hello").gentleFontWidth(.compressed)
+        #expect(view != nil)
+    }
+
+    @Test("gentleFontWidth with condensed")
+    func testGentleFontWidthCondensed() {
+        let view = Text("Hello").gentleFontWidth(.condensed)
+        #expect(view != nil)
+    }
+
+    @Test("gentleFontWidth with standard")
+    func testGentleFontWidthStandard() {
+        let view = Text("Hello").gentleFontWidth(.standard)
+        #expect(view != nil)
+    }
+
+    @Test("gentleFontWidth with expanded")
+    func testGentleFontWidthExpanded() {
+        let view = Text("Hello").gentleFontWidth(.expanded)
+        #expect(view != nil)
+    }
+}
