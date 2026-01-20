@@ -1,14 +1,19 @@
 # GentleDesignSystem
 [![CI](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml)
-[![DeepSource](https://deepsource.io/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=static+analysis+issues)](
-  https://deepsource.io/gh/gentle-giraffe-apps/GentleDesignSystem/?ref=badge
-)
 [![Coverage](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/branch/main/graph/badge.svg)](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem)
 [![Swift](https://img.shields.io/badge/Swift-6.0–6.2-orange.svg)](https://swift.org)
 ![SwiftUI First](https://img.shields.io/badge/SwiftUI-First-4A6EF5)
 ![iOS](https://img.shields.io/badge/iOS-18.0+-blue?logo=apple)
 ![Platform](https://img.shields.io/badge/Platform-iPhone%20%7C%20iPad-lightgrey)
 ![SPM](https://img.shields.io/badge/SPM-Compatible-success)
+
+🔍 **DeepSource Static Analysis (per commit)**  
+[![DeepSource](https://deepsource.io/gh/gentle-giraffe-apps/GentleDesignSystem.svg)](
+https://deepsource.io/gh/gentle-giraffe-apps/GentleDesignSystem/?ref=badge
+)
+[![DeepSource Resolved Issues](https://deepsource.io/gh/gentle-giraffe-apps/GentleDesignSystem.svg?label=resolved+issues)](
+https://deepsource.io/gh/gentle-giraffe-apps/GentleDesignSystem/?ref=badge
+)
 
 A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to feel *native*, *predictable*, and *composable*, while giving you a centralized way to evolve typography, color, spacing, and surface behavior over time.
 
@@ -86,9 +91,9 @@ VStack {
 This project enforces quality gates via CI and static analysis:
 
 - **CI:** All commits to `main` must pass GitHub Actions checks
-- **Static analysis:** DeepSource runs on every commit to `main`  
-  The badge reflects the current number of outstanding analysis issues (**0**)
-- **Test coverage:** ~95% line coverage via unit tests
+- **Static analysis:** DeepSource runs on every commit to `main`.  
+  The badge indicates the current number of outstanding static analysis issues.
+- **Test coverage:** Codecov reports line coverage for the `main` branch
 
 These checks are intended to keep the design system safe to evolve over time.
 
