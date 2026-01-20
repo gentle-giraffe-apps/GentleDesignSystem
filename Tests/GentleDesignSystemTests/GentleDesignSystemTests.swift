@@ -3120,3 +3120,231 @@ struct ViewFontWidthExtensionTests {
         #expect(view != nil)
     }
 }
+
+// MARK: - ColorRoleEditor Tests
+
+@Suite("ColorRoleEditor Tests")
+@MainActor
+struct ColorRoleEditorTests {
+
+    @Test("ColorRoleEditor can be created with textPrimary role")
+    func testColorRoleEditorTextPrimary() {
+        let editor = ColorRoleEditor(role: .textPrimary)
+        #expect(editor != nil)
+    }
+
+    @Test("ColorRoleEditor can be created with all color roles")
+    func testColorRoleEditorAllRoles() {
+        for role in GentleColorRole.allCases {
+            let editor = ColorRoleEditor(role: role)
+            #expect(editor != nil)
+        }
+    }
+}
+
+// MARK: - TypographyRoleEditor Tests
+
+@Suite("TypographyRoleEditor Tests")
+@MainActor
+struct TypographyRoleEditorTests {
+
+    @Test("TypographyRoleEditor can be created with body role")
+    func testTypographyRoleEditorBody() {
+        let editor = TypographyRoleEditor(role: .body_m)
+        #expect(editor != nil)
+    }
+
+    @Test("TypographyRoleEditor can be created with all text roles")
+    func testTypographyRoleEditorAllRoles() {
+        for role in GentleTextRole.allCases {
+            let editor = TypographyRoleEditor(role: role)
+            #expect(editor != nil)
+        }
+    }
+
+    @Test("TypographyRoleEditor can be created with custom size range")
+    func testTypographyRoleEditorCustomSizeRange() {
+        let editor = TypographyRoleEditor(role: .headline_m, sizeRange: 8...72, sizeStep: 2)
+        #expect(editor != nil)
+    }
+
+    @Test("TypographyRoleEditor can be created with custom spacing ranges")
+    func testTypographyRoleEditorCustomSpacingRanges() {
+        let editor = TypographyRoleEditor(
+            role: .title_xl,
+            lineSpacingRange: 0...20,
+            letterSpacingRange: -2.0...3.0
+        )
+        #expect(editor != nil)
+    }
+}
+
+// MARK: - GentleDesignCustomizeView Tests
+
+@Suite("GentleDesignCustomizeView Tests")
+@MainActor
+struct GentleDesignCustomizeViewTests {
+
+    @Test("GentleDesignCustomizeView can be created with defaults")
+    func testCustomizeViewDefault() {
+        let view = GentleDesignCustomizeView()
+        #expect(view != nil)
+    }
+
+    @Test("GentleDesignCustomizeView can be created inside navigation stack")
+    func testCustomizeViewInsideNavigationStack() {
+        let view = GentleDesignCustomizeView(isInsideNavigationStack: true)
+        #expect(view != nil)
+    }
+
+    @Test("GentleDesignCustomizeView can be created with onSave callback")
+    func testCustomizeViewWithOnSave() {
+        let view = GentleDesignCustomizeView(onSave: {})
+        #expect(view != nil)
+    }
+
+    @Test("GentleDesignCustomizeView can be created with all parameters")
+    func testCustomizeViewAllParameters() {
+        let view = GentleDesignCustomizeView(isInsideNavigationStack: true, onSave: {})
+        #expect(view != nil)
+    }
+}
+
+// MARK: - GentleDesignFoundationView Tests
+
+@Suite("GentleDesignFoundationView Tests")
+@MainActor
+struct GentleDesignFoundationViewTests {
+
+    @Test("GentleDesignFoundationView can be created")
+    func testFoundationView() {
+        let view = GentleDesignFoundationView()
+        #expect(view != nil)
+    }
+}
+
+// MARK: - GentleDesignTypographySection Tests
+
+@Suite("GentleDesignTypographySection Tests")
+@MainActor
+struct GentleDesignTypographySectionTests {
+
+    @Test("GentleDesignTypographySection can be created")
+    func testTypographySection() {
+        let view = GentleDesignTypographySection()
+        #expect(view != nil)
+    }
+}
+
+// MARK: - GentleDesignButtonsSection Tests
+
+@Suite("GentleDesignButtonsSection Tests")
+@MainActor
+struct GentleDesignButtonsSectionTests {
+
+    @Test("GentleDesignButtonsSection can be created")
+    func testButtonsSection() {
+        let view = GentleDesignButtonsSection()
+        #expect(view != nil)
+    }
+}
+
+// MARK: - GentleDesignSurfacesSection Tests
+
+@Suite("GentleDesignSurfacesSection Tests")
+@MainActor
+struct GentleDesignSurfacesSectionTests {
+
+    @Test("GentleDesignSurfacesSection can be created")
+    func testSurfacesSection() {
+        let view = GentleDesignSurfacesSection()
+        #expect(view != nil)
+    }
+}
+
+// MARK: - GentleDesignColorsSection Tests
+
+@Suite("GentleDesignColorsSection Tests")
+@MainActor
+struct GentleDesignColorsSectionTests {
+
+    @Test("GentleDesignColorsSection can be created")
+    func testColorsSection() {
+        let view = GentleDesignColorsSection()
+        #expect(view != nil)
+    }
+}
+
+// MARK: - GentleDesignStudioView Tests
+
+@Suite("GentleDesignStudioView Tests")
+@MainActor
+struct GentleDesignStudioViewTests {
+
+    @Test("GentleDesignStudioView can be created")
+    func testStudioView() {
+        let view = GentleDesignStudioView()
+        #expect(view != nil)
+    }
+
+    @Test("GentleDesignStudioView ActiveSheet enum has correct raw values")
+    func testActiveSheetRawValues() {
+        #expect(GentleDesignStudioView.ActiveSheet.settings.rawValue == "settings")
+        #expect(GentleDesignStudioView.ActiveSheet.share.rawValue == "share")
+    }
+
+    @Test("GentleDesignStudioView ActiveSheet enum is identifiable")
+    func testActiveSheetIdentifiable() {
+        let settings = GentleDesignStudioView.ActiveSheet.settings
+        let share = GentleDesignStudioView.ActiveSheet.share
+
+        #expect(settings.id == "settings")
+        #expect(share.id == "share")
+    }
+}
+
+// MARK: - GentleDesignShareSheet Tests
+
+@Suite("GentleDesignShareSheet Tests")
+@MainActor
+struct GentleDesignShareSheetTests {
+
+    @Test("GentleDesignShareSheet can be created with string items")
+    func testShareSheetWithStrings() {
+        let sheet = GentleDesignShareSheet(items: ["Hello", "World"])
+        #expect(sheet != nil)
+    }
+
+    @Test("GentleDesignShareSheet can be created with URL items")
+    func testShareSheetWithURLs() {
+        let url = URL(string: "https://example.com")!
+        let sheet = GentleDesignShareSheet(items: [url])
+        #expect(sheet != nil)
+    }
+
+    @Test("GentleDesignShareSheet can be created with mixed items")
+    func testShareSheetWithMixedItems() {
+        let url = URL(string: "https://example.com")!
+        let sheet = GentleDesignShareSheet(items: ["Text", url, 42])
+        #expect(sheet != nil)
+    }
+
+    @Test("GentleDesignShareSheet can be created with empty items")
+    func testShareSheetEmptyItems() {
+        let sheet = GentleDesignShareSheet(items: [])
+        #expect(sheet != nil)
+    }
+}
+
+// MARK: - GentleNavigationBarStyler Tests
+
+@Suite("GentleNavigationBarStyler Tests")
+@MainActor
+struct GentleNavigationBarStylerTests {
+
+    @Test("GentleNavigationBarStyler can be created")
+    func testNavigationBarStyler() {
+        let styler = GentleNavigationBarStyler()
+        #expect(styler != nil)
+    }
+}
