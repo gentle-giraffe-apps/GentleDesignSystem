@@ -1,6 +1,5 @@
 version = 1
 
-# Moving these to the top makes them global
 test_patterns = [
   "Tests/**"
 ]
@@ -14,7 +13,7 @@ exclude_patterns = [
 [[analyzers]]
 name = "swift"
 enabled = true
-skip_rules = ["SW-W1001"] # Default parameters should always be positioned at the end
+skip_rules = ["SW-W1001","SW-R1028"]
 
 [[analyzers]]
 name = "secrets"
