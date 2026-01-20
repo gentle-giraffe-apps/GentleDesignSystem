@@ -1,4 +1,7 @@
 # GentleDesignSystem
+
+A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to feel *native*, *predictable*, and *composable*, while giving you a centralized way to evolve typography, color, spacing, and surface behavior over time.
+
 [![CI](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml)
 [![Coverage](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/branch/main/graph/badge.svg)](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem)
 [![Swift](https://img.shields.io/badge/Swift-6.0–6.2-orange.svg)](https://swift.org)
@@ -8,14 +11,8 @@
 ![SPM](https://img.shields.io/badge/SPM-Compatible-success)
 
 🔍 **DeepSource Static Analysis (per commit)**  
-[![DeepSource](https://deepsource.io/gh/gentle-giraffe-apps/GentleDesignSystem.svg)](
-https://deepsource.io/gh/gentle-giraffe-apps/GentleDesignSystem/?ref=badge
-)
-[![DeepSource Resolved Issues](https://deepsource.io/gh/gentle-giraffe-apps/GentleDesignSystem.svg?label=resolved+issues)](
-https://deepsource.io/gh/gentle-giraffe-apps/GentleDesignSystem/?ref=badge
-)
-
-A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to feel *native*, *predictable*, and *composable*, while giving you a centralized way to evolve typography, color, spacing, and surface behavior over time.
+[![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=active+issues&show_trend=true&token=usGsRQEFEVnvMC62c6ekIHCT)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/)
+[![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=resolved+issues&show_trend=true&token=usGsRQEFEVnvMC62c6ekIHCT)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/)
 
 **Who is this for?** Apps that want a strong SwiftUI foundation and theme evolution without rewriting view code.
 
