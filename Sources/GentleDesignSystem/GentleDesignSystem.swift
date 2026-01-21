@@ -189,7 +189,6 @@ public enum GentleTextChrome: Sendable {
 public enum GentleSurfaceRole: String, Codable, Sendable {
     case appBackground
     case card
-    case cardChrome // no padding
     case cardElevated
     case surfaceOverlay
 }
@@ -1432,6 +1431,12 @@ public typealias GentleTouchTokens = GentleSpacingScaleTokens
 
 public enum GentleInsetRole: String, Codable, Sendable { case screen, card, control, listRow }
 
+public enum GentleInsetVariant: String, Codable, Sendable, CaseIterable {
+    case tight
+    case regular
+    case roomy
+}
+
 public struct GentleAxisInsetTokens: Codable, Sendable, Hashable {
     public var horizontal: GentleSpacingToken
     public var vertical: GentleSpacingToken
@@ -1439,23 +1444,94 @@ public struct GentleAxisInsetTokens: Codable, Sendable, Hashable {
 }
 
 public struct GentleInsetTokens: Codable, Sendable {
-    public var tokensByRole: [String: GentleAxisInsetTokens]
-    public init(tokensByRole: [String: GentleAxisInsetTokens]) { self.tokensByRole = tokensByRole }
+    /// Nested dictionary: [role.rawValue: [variant.rawValue: tokens]]
+    public var tokensByRoleVariant: [String: [String: GentleAxisInsetTokens]]
 
-    public func axisTokens(for role: GentleInsetRole) -> GentleAxisInsetTokens {
-        tokensByRole[role.rawValue]
-        ?? tokensByRole[GentleInsetRole.screen.rawValue]
-        ?? .init(horizontal: .xl, vertical: .l)
+    public init(tokensByRoleVariant: [String: [String: GentleAxisInsetTokens]]) {
+        self.tokensByRoleVariant = tokensByRoleVariant
+    }
+
+    /// Resolve axis tokens with fallback order:
+    /// role+variant → role+regular → screen+regular → hardcoded default
+    public func axisTokens(for role: GentleInsetRole, variant: GentleInsetVariant = .regular) -> GentleAxisInsetTokens {
+        let roleKey = role.rawValue
+        let variantKey = variant.rawValue
+        let regularKey = GentleInsetVariant.regular.rawValue
+        let screenKey = GentleInsetRole.screen.rawValue
+
+        // Try role+variant
+        if let variantsForRole = tokensByRoleVariant[roleKey],
+           let tokens = variantsForRole[variantKey] {
+            return tokens
+        }
+        // Fallback: role+regular
+        if let variantsForRole = tokensByRoleVariant[roleKey],
+           let tokens = variantsForRole[regularKey] {
+            return tokens
+        }
+        // Fallback: screen+regular
+        if let variantsForScreen = tokensByRoleVariant[screenKey],
+           let tokens = variantsForScreen[regularKey] {
+            return tokens
+        }
+        // Hardcoded default
+        return .init(horizontal: .xl, vertical: .l)
+    }
+
+    // MARK: - Backwards-compatible Codable
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+
+        // Try new format first: [String: [String: GentleAxisInsetTokens]]
+        if let nested = try? container.decode([String: [String: GentleAxisInsetTokens]].self) {
+            self.tokensByRoleVariant = nested
+            return
+        }
+
+        // Fallback: old format [String: GentleAxisInsetTokens] → migrate to regular variant
+        if let flat = try? container.decode([String: GentleAxisInsetTokens].self) {
+            var migrated: [String: [String: GentleAxisInsetTokens]] = [:]
+            for (roleKey, tokens) in flat {
+                migrated[roleKey] = [GentleInsetVariant.regular.rawValue: tokens]
+            }
+            self.tokensByRoleVariant = migrated
+            return
+        }
+
+        throw DecodingError.dataCorruptedError(
+            in: container,
+            debugDescription: "GentleInsetTokens: expected nested or flat dictionary"
+        )
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(tokensByRoleVariant)
     }
 }
 
 public extension GentleInsetTokens {
     static let gentleDefault: GentleInsetTokens = .init(
-        tokensByRole: [
-            GentleInsetRole.screen.rawValue:  .init(horizontal: .xl, vertical: .l),
-            GentleInsetRole.card.rawValue:    .init(horizontal: .m,  vertical: .m),
-            GentleInsetRole.control.rawValue: .init(horizontal: .l,  vertical: .s),
-            GentleInsetRole.listRow.rawValue: .init(horizontal: .l,  vertical: .s)
+        tokensByRoleVariant: [
+            GentleInsetRole.screen.rawValue: [
+                GentleInsetVariant.tight.rawValue:   .init(horizontal: .l,   vertical: .m),
+                GentleInsetVariant.regular.rawValue: .init(horizontal: .xl,  vertical: .l),
+                GentleInsetVariant.roomy.rawValue:   .init(horizontal: .xxl, vertical: .xl)
+            ],
+            GentleInsetRole.card.rawValue: [
+                GentleInsetVariant.tight.rawValue:   .init(horizontal: .xs, vertical: .xs),
+                GentleInsetVariant.regular.rawValue: .init(horizontal: .m,  vertical: .m),
+                GentleInsetVariant.roomy.rawValue:   .init(horizontal: .l,  vertical: .l)
+            ],
+            GentleInsetRole.control.rawValue: [
+                GentleInsetVariant.tight.rawValue:   .init(horizontal: .m, vertical: .xs),
+                GentleInsetVariant.regular.rawValue: .init(horizontal: .l, vertical: .s)
+            ],
+            GentleInsetRole.listRow.rawValue: [
+                GentleInsetVariant.tight.rawValue:   .init(horizontal: .m, vertical: .xs),
+                GentleInsetVariant.regular.rawValue: .init(horizontal: .l, vertical: .s)
+            ]
         ]
     )
 }
@@ -1591,8 +1667,8 @@ public struct GentleTheme: Sendable {
 }
 
 public extension GentleTheme {
-    func insetValue(_ role: GentleInsetRole, edges: Edge.Set = .all) -> (horizontal: CGFloat?, vertical: CGFloat?) {
-        let axis = activeSpec.layout.inset.axisTokens(for: role)
+    func insetValue(_ role: GentleInsetRole, variant: GentleInsetVariant = .regular, edges: Edge.Set = .all) -> (horizontal: CGFloat?, vertical: CGFloat?) {
+        let axis = activeSpec.layout.inset.axisTokens(for: role, variant: variant)
         let h = CGFloat(activeSpec.layout.scale.value(for: axis.horizontal))
         let v = CGFloat(activeSpec.layout.scale.value(for: axis.vertical))
 
@@ -1806,35 +1882,31 @@ public struct GentleSurfaceModifier: ViewModifier {
     @Environment(\.colorScheme) private var colorScheme
 
     private let role: GentleSurfaceRole
-    public init(role: GentleSurfaceRole) { self.role = role }
+    private let inset: GentleInsetRole?
+    private let insetVariant: GentleInsetVariant
+
+    public init(role: GentleSurfaceRole, inset: GentleInsetRole? = nil, insetVariant: GentleInsetVariant = .regular) {
+        self.role = role
+        self.inset = inset
+        self.insetVariant = insetVariant
+    }
 
     public func body(content: Content) -> some View {
         let radii = theme.radii
+        let insetContent = inset.map { AnyView(content.gentleInset($0, variant: insetVariant)) } ?? AnyView(content)
 
         switch role {
         case .appBackground:
             return AnyView(
-                content.background(theme.color(for: .background, scheme: colorScheme).ignoresSafeArea())
+                insetContent.background(theme.color(for: .background, scheme: colorScheme).ignoresSafeArea())
             )
 
         case .surfaceOverlay:
-            return AnyView(content.background(theme.color(for: .surfaceOverlay, scheme: colorScheme)))
+            return AnyView(insetContent.background(theme.color(for: .surfaceOverlay, scheme: colorScheme)))
 
         case .card:
             return AnyView(
-                content
-                    .gentleInset(GentleInsetRole.card)
-                    .background(theme.color(for: .surface, scheme: colorScheme))
-                    .cornerRadius(CGFloat(radii.large))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: CGFloat(radii.large))
-                            .stroke(theme.color(for: .borderSubtle, scheme: colorScheme), lineWidth: 1)
-                    )
-            )
-
-        case .cardChrome:
-            return AnyView(
-                content
+                insetContent
                     .background(theme.color(for: .surface, scheme: colorScheme))
                     .cornerRadius(CGFloat(radii.large))
                     .overlay(
@@ -1845,8 +1917,7 @@ public struct GentleSurfaceModifier: ViewModifier {
 
         case .cardElevated:
             return AnyView(
-                content
-                    .gentleInset(.card)
+                insetContent
                     .background(theme.color(for: .surfaceElevated, scheme: colorScheme))
                     .cornerRadius(CGFloat(radii.large))
                     .overlay(
@@ -2029,14 +2100,16 @@ public struct GentleInsetModifier: ViewModifier {
     @Environment(\.gentleTheme) private var theme
     private let edges: Edge.Set
     private let role: GentleInsetRole
+    private let variant: GentleInsetVariant
 
-    public init(edges: Edge.Set = .all, role: GentleInsetRole) {
+    public init(edges: Edge.Set = .all, role: GentleInsetRole, variant: GentleInsetVariant = .regular) {
         self.edges = edges
         self.role = role
+        self.variant = variant
     }
 
     public func body(content: Content) -> some View {
-        let resolved = theme.insetValue(role, edges: edges)
+        let resolved = theme.insetValue(role, variant: variant, edges: edges)
         return content
             .padding(.horizontal, resolved.horizontal ?? 0)
             .padding(.vertical, resolved.vertical ?? 0)
@@ -2056,7 +2129,9 @@ public extension View {
         modifier(GentleTextFieldModifier(role: role, overrideColorRole: colorRole, chrome: chrome))
     }
 
-    func gentleSurface(_ role: GentleSurfaceRole) -> some View { modifier(GentleSurfaceModifier(role: role)) }
+    func gentleSurface(_ role: GentleSurfaceRole, inset: GentleInsetRole? = nil, insetVariant: GentleInsetVariant = .regular) -> some View {
+        modifier(GentleSurfaceModifier(role: role, inset: inset, insetVariant: insetVariant))
+    }
 
     func gentleButton(_ role: GentleButtonRole, expandsHorizontally: Bool = false, contentAlignment: Alignment = .center) -> some View {
         buttonStyle(GentleButtonStyle(role: role, expandsHorizontally: expandsHorizontally, contentAlignment: contentAlignment))
@@ -2091,10 +2166,12 @@ public extension View {
         modifier(GentleBackgroundModifier(role: role, ignoresSafeArea: ignoresSafeArea))
     }
 
-    func gentleInset(_ role: GentleInsetRole) -> some View { modifier(GentleInsetModifier(edges: .all, role: role)) }
+    func gentleInset(_ role: GentleInsetRole, variant: GentleInsetVariant = .regular) -> some View {
+        modifier(GentleInsetModifier(edges: .all, role: role, variant: variant))
+    }
 
-    func gentleInset(_ edges: Edge.Set, _ role: GentleInsetRole) -> some View {
-        modifier(GentleInsetModifier(edges: edges, role: role))
+    func gentleInset(_ edges: Edge.Set, _ role: GentleInsetRole, variant: GentleInsetVariant = .regular) -> some View {
+        modifier(GentleInsetModifier(edges: edges, role: role, variant: variant))
     }
 }
 

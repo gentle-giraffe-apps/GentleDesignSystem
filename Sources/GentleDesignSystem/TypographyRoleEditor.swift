@@ -158,7 +158,7 @@ public struct TypographyRoleEditorSheet: View {
                 }
             }
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents([.large])
     }
 
     private func widthBinding(_ roleSpec: Binding<GentleTypographyRoleSpec>) -> Binding<GentleFontWidthToken?> {

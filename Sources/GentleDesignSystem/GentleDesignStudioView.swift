@@ -30,9 +30,9 @@ public struct GentleDesignStudioView: View {
     public var body: some View {
         NavigationStack {
             GentleDesignFoundationView(
-                onEditTypography: { activeSheet = .editTypography },
-                onEditButtons: { activeSheet = .editButtons },
-                onEditSurfaces: { activeSheet = .editSurfaces }
+//                onEditTypography: { activeSheet = .editTypography },
+//                onEditButtons: { activeSheet = .editButtons },
+//                onEditSurfaces: { activeSheet = .editSurfaces }
             )
             .navigationTitle(themeManager.currentPresetName ?? "Design System")
                 .toolbar {
