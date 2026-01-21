@@ -386,6 +386,10 @@ public struct GentleButtonRoleSpec: Codable, Sendable {
     public var pressedScale: Double
     public var pressedOpacity: Double
 
+    /// When true, skip custom background/foreground styling and use SwiftUI's native button behavior.
+    /// Useful for tertiary/quaternary buttons that should blend with system UI.
+    public var usesNativeStyle: Bool
+
     public init(
         shape: GentleButtonShape = .rounded,
         textRole: GentleTextRole,
@@ -394,7 +398,8 @@ public struct GentleButtonRoleSpec: Codable, Sendable {
         borderRole: GentleColorRole? = nil,
         animationRole: GentleButtonAnimationRole = .squish,
         pressedScale: Double = 0.97,
-        pressedOpacity: Double = 0.9
+        pressedOpacity: Double = 0.9,
+        usesNativeStyle: Bool = false
     ) {
         self.shape = shape
         self.textRole = textRole
@@ -404,6 +409,7 @@ public struct GentleButtonRoleSpec: Codable, Sendable {
         self.animationRole = animationRole
         self.pressedScale = pressedScale
         self.pressedOpacity = pressedOpacity
+        self.usesNativeStyle = usesNativeStyle
     }
 }
 
@@ -475,7 +481,8 @@ public extension GentleButtonTokens {
                 borderRole: nil,
                 animationRole: .subtlePress,
                 pressedScale: 0.85,
-                pressedOpacity: 0.9
+                pressedOpacity: 0.9,
+                usesNativeStyle: true
             ),
             GentleButtonRole.quaternary.rawValue: .init(
                 shape: .pill,
@@ -485,7 +492,8 @@ public extension GentleButtonTokens {
                 borderRole: nil,
                 animationRole: .subtlePress,
                 pressedScale: 0.95,
-                pressedOpacity: 0.93
+                pressedOpacity: 0.93,
+                usesNativeStyle: true
             ),
             GentleButtonRole.destructive.rawValue: .init(
                 shape: .pill,
@@ -1181,10 +1189,30 @@ public struct GentleButtonStyle: ButtonStyle {
     }
 
     public func makeBody(configuration: Configuration) -> some View {
+        let spec = theme.buttons.roleSpec(for: role)
+
+        // When usesNativeStyle is true, apply text styling and press animations but skip background/border/padding.
+        if spec.usesNativeStyle {
+            let textRoleToUse = textRoleOverride ?? spec.textRole
+            let animSpec = theme.buttons.animationSpec(for: spec.animationRole)
+            let animation = GentleButtonAnimations.resolve(
+                reduceMotion: reduceMotion,
+                role: spec.animationRole,
+                spec: animSpec
+            )
+            return AnyView(
+                configuration.label
+                    .gentleText(textRoleToUse, colorRole: spec.labelColorRole)
+                    .frame(maxWidth: expandsHorizontally ? .infinity : nil, alignment: contentAlignment)
+                    .scaleEffect(configuration.isPressed ? spec.pressedScale : 1.0)
+                    .opacity(configuration.isPressed ? spec.pressedOpacity : 1.0)
+                    .animation(animation, value: configuration.isPressed)
+            )
+        }
+
         let gap = theme.gap
         let radii = theme.radii
 
-        let spec = theme.buttons.roleSpec(for: role)
         let animSpec = theme.buttons.animationSpec(for: spec.animationRole)
         let animation = GentleButtonAnimations.resolve(
             reduceMotion: reduceMotion,
@@ -1230,24 +1258,26 @@ public struct GentleButtonStyle: ButtonStyle {
             }
         }
 
-        return sizedLabel
-            .padding(.horizontal, CGFloat(gap.xl))
-            .padding(.vertical, verticalPadding)
-            .background(RoundedRectangle(cornerRadius: cornerRadius).fill(backgroundColor))
-            .overlay(
-                Group {
-                    if let borderColor {
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .strokeBorder(borderColor, lineWidth: 1)
+        return AnyView(
+            sizedLabel
+                .padding(.horizontal, CGFloat(gap.xl))
+                .padding(.vertical, verticalPadding)
+                .background(RoundedRectangle(cornerRadius: cornerRadius).fill(backgroundColor))
+                .overlay(
+                    Group {
+                        if let borderColor {
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                                .strokeBorder(borderColor, lineWidth: 1)
+                        }
                     }
-                }
-            )
-            .foregroundStyle(labelColor)
-            .scaleEffect(configuration.isPressed ? spec.pressedScale : 1.0)
-            .opacity(configuration.isPressed ? spec.pressedOpacity : 1.0)
-            .animation(animation, value: configuration.isPressed)
-            .saturation(saturation)
-            .opacity(opacity)
+                )
+                .foregroundStyle(labelColor)
+                .scaleEffect(configuration.isPressed ? spec.pressedScale : 1.0)
+                .opacity(configuration.isPressed ? spec.pressedOpacity : 1.0)
+                .animation(animation, value: configuration.isPressed)
+                .saturation(saturation)
+                .opacity(opacity)
+        )
     }
 }
 
