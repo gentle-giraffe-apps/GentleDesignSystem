@@ -312,13 +312,18 @@ public struct GentleDesignSurfacesSection: View {
 
 private extension Color {
     func toGentleHexString() -> String {
-        let uiColor = UIColor(self)
         var r: CGFloat = 0
         var g: CGFloat = 0
         var b: CGFloat = 0
         var a: CGFloat = 0
 
+        #if canImport(UIKit)
+        let uiColor = UIColor(self)
         uiColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+        #elseif canImport(AppKit)
+        let nsColor = NSColor(self).usingColorSpace(.deviceRGB) ?? NSColor(self)
+        nsColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+        #endif
 
         if a < 1.0 {
             return String(
