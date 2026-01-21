@@ -2,14 +2,21 @@ import SwiftUI
 import UIKit
 
 public struct GentleDesignStudioView: View {
-    enum ActiveSheet: String, Identifiable {
+    enum ActiveSheet: Identifiable {
         case settings
         case share
-        case editColors
         case editTypography
         case editButtons
         case editSurfaces
-        var id: String { rawValue }
+        var id: String {
+            switch self {
+            case .settings: "settings"
+            case .share: "share"
+            case .editTypography: "editTypography"
+            case .editButtons: "editButtons"
+            case .editSurfaces: "editSurfaces"
+            }
+        }
     }
 
     @State private var activeSheet: ActiveSheet?
@@ -23,7 +30,6 @@ public struct GentleDesignStudioView: View {
     public var body: some View {
         NavigationStack {
             GentleDesignFoundationView(
-                onEditColors: { activeSheet = .editColors },
                 onEditTypography: { activeSheet = .editTypography },
                 onEditButtons: { activeSheet = .editButtons },
                 onEditSurfaces: { activeSheet = .editSurfaces }
@@ -42,14 +48,6 @@ public struct GentleDesignStudioView: View {
                 .sheet(item: $activeSheet) { sheet in
                     switch sheet {
                     case .settings:
-                        GentleDesignCustomizeView(section: .colors, onSave: {
-                            activeSheet = nil
-                        })
-                        .presentationDetents([.medium, .large])
-                        .presentationDragIndicator(.visible)
-                        .presentationBackgroundInteraction(.enabled)
-
-                    case .editColors:
                         GentleDesignCustomizeView(section: .colors, onSave: {
                             activeSheet = nil
                         })

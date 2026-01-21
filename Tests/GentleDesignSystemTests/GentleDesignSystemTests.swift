@@ -3240,12 +3240,6 @@ struct GentleDesignStudioViewTests {
         _ = GentleDesignStudioView()
     }
 
-    @Test("GentleDesignStudioView ActiveSheet enum has correct raw values")
-    func testActiveSheetRawValues() {
-        #expect(GentleDesignStudioView.ActiveSheet.settings.rawValue == "settings")
-        #expect(GentleDesignStudioView.ActiveSheet.share.rawValue == "share")
-    }
-
     @Test("GentleDesignStudioView ActiveSheet enum is identifiable")
     func testActiveSheetIdentifiable() {
         let settings = GentleDesignStudioView.ActiveSheet.settings

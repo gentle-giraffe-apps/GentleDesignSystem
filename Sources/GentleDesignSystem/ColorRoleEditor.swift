@@ -53,6 +53,61 @@ public struct ColorRoleCell: View {
     }
 }
 
+/// Sheet-based editor for a single color variant (light or dark).
+public struct SingleColorEditorSheet: View {
+    private let role: GentleColorRole
+    private let scheme: ColorScheme
+    @Environment(\.dismiss) private var dismiss
+    @GentleThemeManagerRuntime private var manager
+
+    public init(role: GentleColorRole, scheme: ColorScheme) {
+        self.role = role
+        self.scheme = scheme
+    }
+
+    public var body: some View {
+        let binding = manager.bindingForColorRole(role)
+        let hexBinding = scheme == .light ? binding.lightHex : binding.darkHex
+        let colorBinding = Binding<Color>(
+            get: { Color(gentleHex: hexBinding.wrappedValue) },
+            set: { newColor in hexBinding.wrappedValue = newColor.toHexString() }
+        )
+
+        NavigationStack {
+            VStack(spacing: 24) {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(colorBinding.wrappedValue)
+                    .frame(height: 100)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .strokeBorder(Color.primary.opacity(0.15), lineWidth: 1)
+                    )
+                    .padding(.horizontal)
+
+                ColorPicker("", selection: colorBinding, supportsOpacity: true)
+                    .labelsHidden()
+                    .scaleEffect(1.5)
+
+                Text(hexBinding.wrappedValue.uppercased())
+                    .font(.caption.monospaced())
+                    .foregroundStyle(.secondary)
+
+                Spacer()
+            }
+            .padding(.top, 24)
+            .navigationTitle("\(role.displayName) (\(scheme == .light ? "Light" : "Dark"))")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
 /// Sheet-based editor for a single color role.
 public struct ColorRoleEditorSheet: View {
     private let role: GentleColorRole
