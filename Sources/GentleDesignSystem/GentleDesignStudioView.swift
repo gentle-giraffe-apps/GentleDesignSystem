@@ -5,6 +5,10 @@ public struct GentleDesignStudioView: View {
     enum ActiveSheet: String, Identifiable {
         case settings
         case share
+        case editColors
+        case editTypography
+        case editButtons
+        case editSurfaces
         var id: String { rawValue }
     }
 
@@ -15,11 +19,16 @@ public struct GentleDesignStudioView: View {
 
     public init() {
     }
-    
+
     public var body: some View {
         NavigationStack {
-            GentleDesignFoundationView()
-                .navigationTitle("Design System")
+            GentleDesignFoundationView(
+                onEditColors: { activeSheet = .editColors },
+                onEditTypography: { activeSheet = .editTypography },
+                onEditButtons: { activeSheet = .editButtons },
+                onEditSurfaces: { activeSheet = .editSurfaces }
+            )
+            .navigationTitle(themeManager.currentPresetName ?? "Design System")
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
@@ -29,19 +38,43 @@ public struct GentleDesignStudioView: View {
                         }
                         .disabled(exportURL == nil)
                     }
-
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button {
-                            activeSheet = .settings
-                        } label: {
-                            Label("Customize", systemImage: "slider.horizontal.3")
-                        }
-                    }
                 }
                 .sheet(item: $activeSheet) { sheet in
                     switch sheet {
                     case .settings:
-                        GentleDesignCustomizeView(onSave: {
+                        GentleDesignCustomizeView(section: .colors, onSave: {
+                            activeSheet = nil
+                        })
+                        .presentationDetents([.medium, .large])
+                        .presentationDragIndicator(.visible)
+                        .presentationBackgroundInteraction(.enabled)
+
+                    case .editColors:
+                        GentleDesignCustomizeView(section: .colors, onSave: {
+                            activeSheet = nil
+                        })
+                        .presentationDetents([.medium, .large])
+                        .presentationDragIndicator(.visible)
+                        .presentationBackgroundInteraction(.enabled)
+
+                    case .editTypography:
+                        GentleDesignCustomizeView(section: .typography, onSave: {
+                            activeSheet = nil
+                        })
+                        .presentationDetents([.medium, .large])
+                        .presentationDragIndicator(.visible)
+                        .presentationBackgroundInteraction(.enabled)
+
+                    case .editButtons:
+                        GentleDesignCustomizeView(section: .buttons, onSave: {
+                            activeSheet = nil
+                        })
+                        .presentationDetents([.medium, .large])
+                        .presentationDragIndicator(.visible)
+                        .presentationBackgroundInteraction(.enabled)
+
+                    case .editSurfaces:
+                        GentleDesignCustomizeView(section: .surfaces, onSave: {
                             activeSheet = nil
                         })
                         .presentationDetents([.medium, .large])

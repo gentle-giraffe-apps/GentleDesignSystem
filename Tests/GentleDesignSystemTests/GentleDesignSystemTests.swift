@@ -3150,22 +3150,22 @@ struct GentleDesignCustomizeViewTests {
 
     @Test("GentleDesignCustomizeView can be created with defaults")
     func testCustomizeViewDefault() {
-        _ = GentleDesignCustomizeView()
+        _ = GentleDesignCustomizeView(section: .colors)
     }
 
     @Test("GentleDesignCustomizeView can be created inside navigation stack")
     func testCustomizeViewInsideNavigationStack() {
-        _ = GentleDesignCustomizeView(isInsideNavigationStack: true)
+        _ = GentleDesignCustomizeView(section: .typography, isInsideNavigationStack: true)
     }
 
     @Test("GentleDesignCustomizeView can be created with onSave callback")
     func testCustomizeViewWithOnSave() {
-        _ = GentleDesignCustomizeView(onSave: {})
+        _ = GentleDesignCustomizeView(section: .buttons, onSave: {})
     }
 
     @Test("GentleDesignCustomizeView can be created with all parameters")
     func testCustomizeViewAllParameters() {
-        _ = GentleDesignCustomizeView(isInsideNavigationStack: true, onSave: {})
+        _ = GentleDesignCustomizeView(section: .surfaces, isInsideNavigationStack: true, onSave: {})
     }
 }
 
@@ -3396,22 +3396,22 @@ struct ViewBodyEvaluationTests {
 
     @Test("GentleDesignCustomizeView body evaluates without crash")
     func testCustomizeViewBodyEvaluates() {
-        let view = wrapWithGentleEnvironment(GentleDesignCustomizeView())
+        let view = wrapWithGentleEnvironment(GentleDesignCustomizeView(section: .colors))
         renderViewForCoverage(view)
     }
 
     @Test("GentleDesignCustomizeView body evaluates with all parameter combinations")
     func testCustomizeViewBodyAllParams() {
-        let view1 = wrapWithGentleEnvironment(GentleDesignCustomizeView(isInsideNavigationStack: false))
+        let view1 = wrapWithGentleEnvironment(GentleDesignCustomizeView(section: .colors, isInsideNavigationStack: false))
         renderViewForCoverage(view1)
 
-        let view2 = wrapWithGentleEnvironment(GentleDesignCustomizeView(isInsideNavigationStack: true))
+        let view2 = wrapWithGentleEnvironment(GentleDesignCustomizeView(section: .typography, isInsideNavigationStack: true))
         renderViewForCoverage(view2)
 
-        let view3 = wrapWithGentleEnvironment(GentleDesignCustomizeView(onSave: {}))
+        let view3 = wrapWithGentleEnvironment(GentleDesignCustomizeView(section: .buttons, onSave: {}))
         renderViewForCoverage(view3)
 
-        let view4 = wrapWithGentleEnvironment(GentleDesignCustomizeView(isInsideNavigationStack: true, onSave: {}))
+        let view4 = wrapWithGentleEnvironment(GentleDesignCustomizeView(section: .surfaces, isInsideNavigationStack: true, onSave: {}))
         renderViewForCoverage(view4)
     }
 

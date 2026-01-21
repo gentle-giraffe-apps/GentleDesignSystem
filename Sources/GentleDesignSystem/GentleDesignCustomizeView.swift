@@ -2,19 +2,36 @@
 
 import SwiftUI
 
+public enum GentleCustomizeSection: String, CaseIterable {
+    case colors
+    case typography
+    case buttons
+    case surfaces
+
+    var title: String {
+        switch self {
+        case .colors: "Colors"
+        case .typography: "Typography"
+        case .buttons: "Buttons"
+        case .surfaces: "Surfaces"
+        }
+    }
+}
+
 public struct GentleDesignCustomizeView: View {
     @GentleDesignRuntime private var design
     @GentleThemeManagerRuntime private var themeManager
 
-    @State private var fontsExpanded = false
-    @State private var colorsExpanded = false
-    @State private var buttonsExpanded = false
-    @State private var surfacesExpanded = false
-
+    private let section: GentleCustomizeSection
     private let isInsideNavigationStack: Bool
     private let onSave: (() async -> Void)?
 
-    public init(isInsideNavigationStack: Bool = false, onSave: (() async -> Void)? = nil) {
+    public init(
+        section: GentleCustomizeSection,
+        isInsideNavigationStack: Bool = false,
+        onSave: (() async -> Void)? = nil
+    ) {
+        self.section = section
         self.isInsideNavigationStack = isInsideNavigationStack
         self.onSave = onSave
     }
@@ -33,35 +50,10 @@ public struct GentleDesignCustomizeView: View {
     private var content: some View {
         List {
             Section {
-                DisclosureGroup("Fonts", isExpanded: $fontsExpanded) {
-                    ForEach(GentleTextRole.allCases) { role in
-                        TypographyRoleEditor(role: role)
-                    }
-                }
-            }
-
-            Section {
-                DisclosureGroup("Colors", isExpanded: $colorsExpanded) {
-                    ForEach(GentleColorRole.allCases) { role in
-                        ColorRoleEditor(role: role)
-                    }
-                }
-            }
-
-            Section {
-                DisclosureGroup("Buttons", isExpanded: $buttonsExpanded) {
-                    Text("Button editor coming soon")
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            Section {
-                DisclosureGroup("Surfaces", isExpanded: $surfacesExpanded) {
-                    Text("Surface editor coming soon")
-                        .foregroundStyle(.secondary)
-                }
+                sectionContent
             }
         }
+        .navigationTitle(section.title)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
@@ -79,6 +71,26 @@ public struct GentleDesignCustomizeView: View {
                 .gentleButton(.tertiary)
                 .disabled(!themeManager.hasUnsavedChanges)
             }
+        }
+    }
+
+    @ViewBuilder
+    private var sectionContent: some View {
+        switch section {
+        case .colors:
+            ForEach(GentleColorRole.allCases) { role in
+                ColorRoleEditor(role: role)
+            }
+        case .typography:
+            ForEach(GentleTextRole.allCases) { role in
+                TypographyRoleEditor(role: role)
+            }
+        case .buttons:
+            Text("Button editor coming soon")
+                .foregroundStyle(.secondary)
+        case .surfaces:
+            Text("Surface editor coming soon")
+                .foregroundStyle(.secondary)
         }
     }
 }
