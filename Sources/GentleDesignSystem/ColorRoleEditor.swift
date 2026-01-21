@@ -1,7 +1,158 @@
 //  Jonathan Ritchey
 import SwiftUI
 
-/// Collapsible, compact editor for a single color role.
+/// Compact grid cell for displaying a color role.
+/// Tapping opens a sheet for editing.
+public struct ColorRoleCell: View {
+    private let role: GentleColorRole
+    @Binding var isEditing: Bool
+
+    @GentleThemeManagerRuntime private var manager
+
+    public init(role: GentleColorRole, isEditing: Binding<Bool>) {
+        self.role = role
+        self._isEditing = isEditing
+    }
+
+    public var body: some View {
+        let binding = manager.bindingForColorRole(role)
+
+        Button {
+            isEditing = true
+        } label: {
+            VStack(alignment: .leading, spacing: 6) {
+                // Color swatches (light and dark)
+                HStack(spacing: 3) {
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color(gentleHex: binding.lightHex.wrappedValue))
+                        .frame(width: 28, height: 28)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 4)
+                                .strokeBorder(Color.primary.opacity(0.2), lineWidth: 0.5)
+                        )
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color(gentleHex: binding.darkHex.wrappedValue))
+                        .frame(width: 28, height: 28)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 4)
+                                .strokeBorder(Color.primary.opacity(0.2), lineWidth: 0.5)
+                        )
+                }
+
+                Text(role.displayName)
+                    .font(.caption)
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(10)
+            .background(Color(.secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+/// Sheet-based editor for a single color role.
+public struct ColorRoleEditorSheet: View {
+    private let role: GentleColorRole
+    @Environment(\.dismiss) private var dismiss
+    @GentleThemeManagerRuntime private var manager
+
+    public init(role: GentleColorRole) {
+        self.role = role
+    }
+
+    public var body: some View {
+        let binding = manager.bindingForColorRole(role)
+
+        NavigationStack {
+            List {
+                Section {
+                    // Light mode color
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Light Mode")
+                                .font(.subheadline)
+                            Spacer()
+                            Text(binding.lightHex.wrappedValue.uppercased())
+                                .font(.caption.monospaced())
+                                .foregroundStyle(.secondary)
+                        }
+                        HStack(spacing: 12) {
+                            ColorPicker("", selection: lightColorBinding(binding), supportsOpacity: true)
+                                .labelsHidden()
+
+                            RoundedRectangle(cornerRadius: 6)
+                                .fill(Color(gentleHex: binding.lightHex.wrappedValue))
+                                .frame(height: 32)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .strokeBorder(Color.primary.opacity(0.15), lineWidth: 1)
+                                )
+                        }
+                    }
+                    .padding(.vertical, 4)
+
+                    // Dark mode color
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Dark Mode")
+                                .font(.subheadline)
+                            Spacer()
+                            Text(binding.darkHex.wrappedValue.uppercased())
+                                .font(.caption.monospaced())
+                                .foregroundStyle(.secondary)
+                        }
+                        HStack(spacing: 12) {
+                            ColorPicker("", selection: darkColorBinding(binding), supportsOpacity: true)
+                                .labelsHidden()
+
+                            RoundedRectangle(cornerRadius: 6)
+                                .fill(Color(gentleHex: binding.darkHex.wrappedValue))
+                                .frame(height: 32)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .strokeBorder(Color.primary.opacity(0.15), lineWidth: 1)
+                                )
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+            }
+            .navigationTitle(role.displayName)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+        .presentationDetents([.medium])
+    }
+
+    private func lightColorBinding(_ pairBinding: Binding<GentleColorPair>) -> Binding<Color> {
+        Binding<Color>(
+            get: { Color(gentleHex: pairBinding.lightHex.wrappedValue) },
+            set: { newColor in
+                pairBinding.lightHex.wrappedValue = newColor.toHexString()
+            }
+        )
+    }
+
+    private func darkColorBinding(_ pairBinding: Binding<GentleColorPair>) -> Binding<Color> {
+        Binding<Color>(
+            get: { Color(gentleHex: pairBinding.darkHex.wrappedValue) },
+            set: { newColor in
+                pairBinding.darkHex.wrappedValue = newColor.toHexString()
+            }
+        )
+    }
+}
+
+/// Collapsible, compact editor for a single color role (legacy list-based).
 /// Edits lightHex and darkHex values for the GentleColorPair.
 public struct ColorRoleEditor: View {
     private let role: GentleColorRole

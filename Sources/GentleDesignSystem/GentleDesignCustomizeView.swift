@@ -26,6 +26,9 @@ public struct GentleDesignCustomizeView: View {
     private let isInsideNavigationStack: Bool
     private let onSave: (() async -> Void)?
 
+    @State private var editingColorRole: GentleColorRole?
+    @State private var editingTypographyRole: GentleTextRole?
+
     public init(
         section: GentleCustomizeSection,
         isInsideNavigationStack: Bool = false,
@@ -78,19 +81,67 @@ public struct GentleDesignCustomizeView: View {
     private var sectionContent: some View {
         switch section {
         case .colors:
-            ForEach(GentleColorRole.allCases) { role in
-                ColorRoleEditor(role: role)
-            }
+            colorsGrid
         case .typography:
-            ForEach(GentleTextRole.allCases) { role in
-                TypographyRoleEditor(role: role)
-            }
+            typographyGrid
         case .buttons:
             Text("Button editor coming soon")
                 .foregroundStyle(.secondary)
         case .surfaces:
             Text("Surface editor coming soon")
                 .foregroundStyle(.secondary)
+        }
+    }
+
+    private var colorsGrid: some View {
+        LazyVGrid(
+            columns: [
+                GridItem(.flexible(), spacing: 12),
+                GridItem(.flexible(), spacing: 12)
+            ],
+            spacing: 12
+        ) {
+            ForEach(GentleColorRole.allCases) { role in
+                ColorRoleCell(
+                    role: role,
+                    isEditing: Binding(
+                        get: { editingColorRole == role },
+                        set: { if $0 { editingColorRole = role } }
+                    )
+                )
+            }
+        }
+        .listRowInsets(EdgeInsets())
+        .listRowBackground(Color.clear)
+        .sheet(item: $editingColorRole) { role in
+            ColorRoleEditorSheet(role: role)
+                .environment(\.gentleTheme, themeManager.theme)
+        }
+    }
+
+    private var typographyGrid: some View {
+        LazyVGrid(
+            columns: [
+                GridItem(.flexible(), spacing: 12),
+                GridItem(.flexible(), spacing: 12)
+            ],
+            spacing: 12
+        ) {
+            ForEach(GentleTextRole.allCases) { role in
+                TypographyRoleCell(
+                    role: role,
+                    isEditing: Binding(
+                        get: { editingTypographyRole == role },
+                        set: { if $0 { editingTypographyRole = role } }
+                    )
+                )
+            }
+        }
+        .listRowInsets(EdgeInsets())
+        .listRowBackground(Color.clear)
+        .sheet(item: $editingTypographyRole) { role in
+            TypographyRoleEditorSheet(role: role)
+                .environment(\.gentleTheme, themeManager.theme)
         }
     }
 }
