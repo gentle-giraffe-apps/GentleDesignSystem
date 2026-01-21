@@ -4,17 +4,31 @@ import SwiftUI
 
 public struct GentleDesignFoundationView: View {
     @GentleDesignRuntime private var design
-    
-    public init() {
+
+    private let onEditColors: (() -> Void)?
+    private let onEditTypography: (() -> Void)?
+    private let onEditButtons: (() -> Void)?
+    private let onEditSurfaces: (() -> Void)?
+
+    public init(
+        onEditColors: (() -> Void)? = nil,
+        onEditTypography: (() -> Void)? = nil,
+        onEditButtons: (() -> Void)? = nil,
+        onEditSurfaces: (() -> Void)? = nil
+    ) {
+        self.onEditColors = onEditColors
+        self.onEditTypography = onEditTypography
+        self.onEditButtons = onEditButtons
+        self.onEditSurfaces = onEditSurfaces
     }
-    
+
     public var body: some View {
         ScrollView {
             VStack(spacing: design.layout.stack.loose) {
-                GentleDesignTypographySection()
-                GentleDesignButtonsSection()
-                GentleDesignSurfacesSection()
-                GentleDesignColorsSection()
+                GentleDesignColorsSection(onEdit: onEditColors)
+                GentleDesignTypographySection(onEdit: onEditTypography)
+                GentleDesignButtonsSection(onEdit: onEditButtons)
+                GentleDesignSurfacesSection(onEdit: onEditSurfaces)
             }
             .gentleInset(.screen)
         }
@@ -26,10 +40,13 @@ public struct GentleDesignFoundationView: View {
 
 public struct GentleDesignTypographySection: View {
     @GentleDesignRuntime private var design
-    
-    public init() {
+
+    private let onEdit: (() -> Void)?
+
+    public init(onEdit: (() -> Void)? = nil) {
+        self.onEdit = onEdit
     }
-    
+
     private var columns: [GridItem] {
         [GridItem(.adaptive(minimum: 150), spacing: design.layout.grid.regular)]
     }
@@ -56,8 +73,14 @@ public struct GentleDesignTypographySection: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: design.layout.stack.regular) {
-            Text("Typography")
-                .gentleText(.title_xl)
+            HStack {
+                Text("Typography")
+                    .gentleText(.title_xl)
+                Spacer()
+                if let onEdit {
+                    Button("Edit", action: onEdit)
+                }
+            }
 
             LazyVGrid(columns: columns, alignment: .leading, spacing: design.layout.grid.regular) {
                 ForEach(styles, id: \.0) { name, role in
@@ -91,8 +114,11 @@ public struct GentleDesignTypographySection: View {
 
 public struct GentleDesignButtonsSection: View {
     @GentleDesignRuntime private var design
-    
-    public init() {
+
+    private let onEdit: (() -> Void)?
+
+    public init(onEdit: (() -> Void)? = nil) {
+        self.onEdit = onEdit
     }
 
     private var columns: [GridItem] {
@@ -101,8 +127,14 @@ public struct GentleDesignButtonsSection: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: design.layout.stack.regular) {
-            Text("Buttons")
-                .gentleText(.title_xl)
+            HStack {
+                Text("Buttons")
+                    .gentleText(.title_xl)
+                Spacer()
+                if let onEdit {
+                    Button("Edit", action: onEdit)
+                }
+            }
 
             LazyVGrid(columns: columns, spacing: design.layout.grid.regular) {
                 Button("Primary") {}
@@ -146,14 +178,23 @@ public struct GentleDesignButtonsSection: View {
 
 public struct GentleDesignSurfacesSection: View {
     @GentleDesignRuntime private var design
-    
-    public init() {
+
+    private let onEdit: (() -> Void)?
+
+    public init(onEdit: (() -> Void)? = nil) {
+        self.onEdit = onEdit
     }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: design.layout.stack.regular) {
-            Text("Surfaces")
-                .gentleText(.title_xl)
+            HStack {
+                Text("Surfaces")
+                    .gentleText(.title_xl)
+                Spacer()
+                if let onEdit {
+                    Button("Edit", action: onEdit)
+                }
+            }
 
             HStack(spacing: design.layout.stack.regular) {
                 surfaceCard(
@@ -196,15 +237,18 @@ public struct GentleDesignColorsSection: View {
     @Environment(\.gentleTheme) var theme
     @Environment(\.colorScheme) var colorScheme
     @GentleDesignRuntime private var design
-    
-    public init() {
+
+    private let onEdit: (() -> Void)?
+
+    public init(onEdit: (() -> Void)? = nil) {
+        self.onEdit = onEdit
     }
 
     private var columns: [GridItem] { [
         GridItem(.adaptive(minimum: 150), spacing: design.layout.grid.regular)
         ]
     }
-    
+
     private var items: [(String, Color)] {
         [
             ("textPrimary", theme.color(for: .textPrimary, scheme: colorScheme)),
@@ -222,8 +266,14 @@ public struct GentleDesignColorsSection: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: design.layout.stack.regular) {
-            Text("Colors")
-                .gentleText(.title_xl)
+            HStack {
+                Text("Colors")
+                    .gentleText(.title_xl)
+                Spacer()
+                if let onEdit {
+                    Button("Edit", action: onEdit)
+                }
+            }
 
             LazyVGrid(columns: columns, spacing: design.layout.grid.tight) {
                 ForEach(items, id: \.0) { name, color in
