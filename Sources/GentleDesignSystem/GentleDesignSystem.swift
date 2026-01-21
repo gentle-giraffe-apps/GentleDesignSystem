@@ -2109,10 +2109,15 @@ public struct GentleInsetModifier: ViewModifier {
     }
 
     public func body(content: Content) -> some View {
-        let resolved = theme.insetValue(role, variant: variant, edges: edges)
+        let axis = theme.activeSpec.layout.inset.axisTokens(for: role, variant: variant)
+        let h = CGFloat(theme.activeSpec.layout.scale.value(for: axis.horizontal))
+        let v = CGFloat(theme.activeSpec.layout.scale.value(for: axis.vertical))
+
         return content
-            .padding(.horizontal, resolved.horizontal ?? 0)
-            .padding(.vertical, resolved.vertical ?? 0)
+            .padding(.leading, edges.contains(.leading) || edges == .all || edges.contains(.horizontal) ? h : 0)
+            .padding(.trailing, edges.contains(.trailing) || edges == .all || edges.contains(.horizontal) ? h : 0)
+            .padding(.top, edges.contains(.top) || edges == .all || edges.contains(.vertical) ? v : 0)
+            .padding(.bottom, edges.contains(.bottom) || edges == .all || edges.contains(.vertical) ? v : 0)
     }
 }
 

@@ -102,12 +102,12 @@ struct ThemePresetCard: View {
             divider
 
             // MARK: Colors
-            colorsSection
+            colorsSection.padding(.trailing, 12)
 
             divider
 
             // MARK: Typography (Expandable)
-            typographySection
+            typographySection.padding(.trailing, 12)
 
             divider
 
@@ -121,7 +121,7 @@ struct ThemePresetCard: View {
     // MARK: - Header Section
 
     private var headerSection: some View {
-        HStack(alignment: .top) {
+        HStack(alignment: .center) { // .top) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(preset.name)
                     .gentleText(.title_xl)
@@ -131,10 +131,8 @@ struct ThemePresetCard: View {
             }
             Spacer()
             Image(systemName: "chevron.right")
-                .font(.body.weight(.semibold))
-                .foregroundStyle(.tertiary)
+                .gentleText(.title2_l)
         }
-        // .padding(design.layout.stack.regular)
     }
 
     // MARK: - Colors Section
@@ -163,8 +161,7 @@ struct ThemePresetCard: View {
                     .opacity(0.7)
             }
         }
-        .tint(theme.color(for: .textSecondary, scheme: colorScheme))
-        // .padding(design.layout.stack.regular)
+        .disclosureGroupStyle(GentleDisclosureStyle())
     }
 
     private var colorBar: some View {
@@ -248,8 +245,7 @@ struct ThemePresetCard: View {
                 }
             }
         }
-        .tint(theme.color(for: .textSecondary, scheme: colorScheme))
-        // .padding(design.layout.stack.regular)
+        .disclosureGroupStyle(GentleDisclosureStyle())
     }
 
     private func typographySample(text: String, label: String, style: GentleTextRole) -> some View {
@@ -289,8 +285,7 @@ struct ThemePresetCard: View {
                     .opacity(0.7)
             }
         }
-        .tint(theme.color(for: .textSecondary, scheme: colorScheme))
-        // .padding(design.layout.stack.regular)
+        .disclosureGroupStyle(GentleDisclosureStyle())
     }
 
     // MARK: - Button Chip Previews
@@ -349,6 +344,37 @@ struct ThemePresetCard: View {
             .fill(theme.color(for: .borderSubtle, scheme: colorScheme))
             .frame(height: 1)
             .padding(.horizontal, design.layout.stack.regular)
+    }
+}
+
+// MARK: - Left Chevron Disclosure Style
+
+struct GentleDisclosureStyle: DisclosureGroupStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    configuration.isExpanded.toggle()
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "chevron.right")
+                        .gentleText(.subheadline_ms)
+                        .opacity(0.5)
+                        .rotationEffect(.degrees(configuration.isExpanded ? 90 : 0))
+                        .animation(.easeInOut(duration: 0.2), value: configuration.isExpanded)
+
+                    configuration.label
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            if configuration.isExpanded {
+                configuration.content
+                    .padding(.leading, 20)
+            }
+        }
     }
 }
 

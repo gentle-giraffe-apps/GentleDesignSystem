@@ -177,7 +177,6 @@ public struct GentleDesignTypographySection: View {
                     .buttonStyle(.plain)
                 }
             }
-            // .gentleSurface(.card, inset: .card, insetVariant: .tight)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .sheet(item: $editingRole) { role in
@@ -194,7 +193,7 @@ public struct GentleDesignButtonsSection: View {
     public init() {}
 
     private var columns: [GridItem] {
-        [GridItem(.adaptive(minimum: 150), spacing: design.layout.grid.regular)]
+        [GridItem(.adaptive(minimum: 130), spacing: design.layout.grid.regular)]
     }
 
     public var body: some View {
@@ -234,7 +233,7 @@ public struct GentleDesignButtonsSection: View {
                 Button("Destructive") {}
                     .gentleButton(.destructive)
             }
-            .gentleSurface(.card)
+            .gentleSurface(.card, inset: .card)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -283,7 +282,7 @@ public struct GentleDesignSurfacesSection: View {
                 .opacity(0.8)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .gentleSurface(surface)
+        .gentleSurface(surface, inset: .card)
     }
 }
 
