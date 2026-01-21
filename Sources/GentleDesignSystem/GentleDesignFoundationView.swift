@@ -98,15 +98,6 @@ public struct GentleDesignTypographySection: View {
             .gentleSurface(.card)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-//        .task {
-//            let spec = design.theme.spec
-//            do {
-//                let encodedJSONString = try spec.encodedJSONString()
-//                print("spec: \(encodedJSONString)")
-//            } catch {
-//                print("jritchey: \(error)")
-//            }
-//        }
     }
 }
 

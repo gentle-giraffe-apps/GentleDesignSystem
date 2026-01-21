@@ -41,8 +41,40 @@ public struct GentleDesignStudioView: View {
                 }
                 .sheet(item: $activeSheet) { sheet in
                     switch sheet {
-                    case .settings, .editColors, .editTypography, .editButtons, .editSurfaces:
-                        GentleDesignCustomizeView(onSave: {
+                    case .settings:
+                        GentleDesignCustomizeView(section: .colors, onSave: {
+                            activeSheet = nil
+                        })
+                        .presentationDetents([.medium, .large])
+                        .presentationDragIndicator(.visible)
+                        .presentationBackgroundInteraction(.enabled)
+
+                    case .editColors:
+                        GentleDesignCustomizeView(section: .colors, onSave: {
+                            activeSheet = nil
+                        })
+                        .presentationDetents([.medium, .large])
+                        .presentationDragIndicator(.visible)
+                        .presentationBackgroundInteraction(.enabled)
+
+                    case .editTypography:
+                        GentleDesignCustomizeView(section: .typography, onSave: {
+                            activeSheet = nil
+                        })
+                        .presentationDetents([.medium, .large])
+                        .presentationDragIndicator(.visible)
+                        .presentationBackgroundInteraction(.enabled)
+
+                    case .editButtons:
+                        GentleDesignCustomizeView(section: .buttons, onSave: {
+                            activeSheet = nil
+                        })
+                        .presentationDetents([.medium, .large])
+                        .presentationDragIndicator(.visible)
+                        .presentationBackgroundInteraction(.enabled)
+
+                    case .editSurfaces:
+                        GentleDesignCustomizeView(section: .surfaces, onSave: {
                             activeSheet = nil
                         })
                         .presentationDetents([.medium, .large])
