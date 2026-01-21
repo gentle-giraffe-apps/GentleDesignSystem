@@ -3,30 +3,33 @@
 A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to feel *native*, *predictable*, and *composable*, while giving you a centralized way to evolve typography, color, spacing, and surface behavior over time.
 
 [![CI](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml)
-[![Coverage](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/branch/main/graph/badge.svg)](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem)
-[![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=active+issues&show_trend=true&token=usGsRQEFEVnvMC62c6ekIHCT)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/)
-
 [![Swift](https://img.shields.io/badge/Swift-6.0–6.2-orange.svg)](https://swift.org)
 ![iOS](https://img.shields.io/badge/iOS-18.0+-blue?logo=apple)
 ![Platform](https://img.shields.io/badge/Platform-iPhone%20%7C%20iPad-lightgrey)
 ![SPM](https://img.shields.io/badge/SPM-Compatible-success)
 
-<sub><b>Coverage trend</b></sub><br/>
+---
+
+### 📊 Coverage
+[![Coverage](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/branch/main/graph/badge.svg)](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem)
+
 <a href="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem">
   <img
     src="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/graphs/icicle.svg?token=GC1LEZ4CAF"
     height="80"
+    style="max-width: 520px;"
     alt="Codecov coverage chart"
   />
 </a>
 
-<sub><b>DeepSource (per commit)</b> · resolved</sub><br/>
-<a href="https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/">
-  <img
-    src="https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=resolved+issues&show_trend=true&token=usGsRQEFEVnvMC62c6ekIHCT"
-    alt="DeepSource resolved issues"
-  />
-</a>
+---
+
+### 🔍 Static Analysis
+<sub>(DeepSource, per commit)</sub><br/>
+
+[![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=active+issues&show_trend=true&token=usGsRQEFEVnvMC62c6ekIHCT)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/)
+[![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=resolved+issues&show_trend=true&token=usGsRQEFEVnvMC62c6ekIHCT)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/)
+
 
 **Who is this for?** Apps that want a strong SwiftUI foundation and theme evolution without rewriting view code.
 
