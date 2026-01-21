@@ -3112,6 +3112,80 @@ struct ColorRoleEditorTests {
     }
 }
 
+// MARK: - ColorRoleCell Tests
+
+@Suite("ColorRoleCell Tests")
+@MainActor
+struct ColorRoleCellTests {
+
+    @Test("ColorRoleCell can be created with textPrimary role")
+    func testColorRoleCellTextPrimary() {
+        _ = ColorRoleCell(role: .textPrimary, isEditing: .constant(false))
+    }
+
+    @Test("ColorRoleCell can be created with all color roles")
+    func testColorRoleCellAllRoles() {
+        for role in GentleColorRole.allCases {
+            _ = ColorRoleCell(role: role, isEditing: .constant(false))
+        }
+    }
+
+    @Test("ColorRoleCell can be created with editing state true")
+    func testColorRoleCellEditingTrue() {
+        _ = ColorRoleCell(role: .background, isEditing: .constant(true))
+    }
+}
+
+// MARK: - ColorRoleEditorSheet Tests
+
+@Suite("ColorRoleEditorSheet Tests")
+@MainActor
+struct ColorRoleEditorSheetTests {
+
+    @Test("ColorRoleEditorSheet can be created with textPrimary role")
+    func testColorRoleEditorSheetTextPrimary() {
+        _ = ColorRoleEditorSheet(role: .textPrimary)
+    }
+
+    @Test("ColorRoleEditorSheet can be created with all color roles")
+    func testColorRoleEditorSheetAllRoles() {
+        for role in GentleColorRole.allCases {
+            _ = ColorRoleEditorSheet(role: role)
+        }
+    }
+}
+
+// MARK: - SingleColorEditorSheet Tests
+
+@Suite("SingleColorEditorSheet Tests")
+@MainActor
+struct SingleColorEditorSheetTests {
+
+    @Test("SingleColorEditorSheet can be created with light scheme")
+    func testSingleColorEditorSheetLight() {
+        _ = SingleColorEditorSheet(role: .textPrimary, scheme: .light)
+    }
+
+    @Test("SingleColorEditorSheet can be created with dark scheme")
+    func testSingleColorEditorSheetDark() {
+        _ = SingleColorEditorSheet(role: .textPrimary, scheme: .dark)
+    }
+
+    @Test("SingleColorEditorSheet can be created with all color roles in light mode")
+    func testSingleColorEditorSheetAllRolesLight() {
+        for role in GentleColorRole.allCases {
+            _ = SingleColorEditorSheet(role: role, scheme: .light)
+        }
+    }
+
+    @Test("SingleColorEditorSheet can be created with all color roles in dark mode")
+    func testSingleColorEditorSheetAllRolesDark() {
+        for role in GentleColorRole.allCases {
+            _ = SingleColorEditorSheet(role: role, scheme: .dark)
+        }
+    }
+}
+
 // MARK: - TypographyRoleEditor Tests
 
 @Suite("TypographyRoleEditor Tests")
@@ -3141,6 +3215,74 @@ struct TypographyRoleEditorTests {
             role: .title_xl,
             lineSpacingRange: 0...20,
             letterSpacingRange: -2.0...3.0
+        )
+    }
+}
+
+// MARK: - TypographyRoleCell Tests
+
+@Suite("TypographyRoleCell Tests")
+@MainActor
+struct TypographyRoleCellTests {
+
+    @Test("TypographyRoleCell can be created with body role")
+    func testTypographyRoleCellBody() {
+        _ = TypographyRoleCell(role: .body_m, isEditing: .constant(false))
+    }
+
+    @Test("TypographyRoleCell can be created with all text roles")
+    func testTypographyRoleCellAllRoles() {
+        for role in GentleTextRole.allCases {
+            _ = TypographyRoleCell(role: role, isEditing: .constant(false))
+        }
+    }
+
+    @Test("TypographyRoleCell can be created with editing state true")
+    func testTypographyRoleCellEditingTrue() {
+        _ = TypographyRoleCell(role: .headline_m, isEditing: .constant(true))
+    }
+}
+
+// MARK: - TypographyRoleEditorSheet Tests
+
+@Suite("TypographyRoleEditorSheet Tests")
+@MainActor
+struct TypographyRoleEditorSheetTests {
+
+    @Test("TypographyRoleEditorSheet can be created with body role")
+    func testTypographyRoleEditorSheetBody() {
+        _ = TypographyRoleEditorSheet(role: .body_m)
+    }
+
+    @Test("TypographyRoleEditorSheet can be created with all text roles")
+    func testTypographyRoleEditorSheetAllRoles() {
+        for role in GentleTextRole.allCases {
+            _ = TypographyRoleEditorSheet(role: role)
+        }
+    }
+
+    @Test("TypographyRoleEditorSheet can be created with custom size range")
+    func testTypographyRoleEditorSheetCustomSizeRange() {
+        _ = TypographyRoleEditorSheet(role: .title_xl, sizeRange: 12...80, sizeStep: 2)
+    }
+
+    @Test("TypographyRoleEditorSheet can be created with custom spacing ranges")
+    func testTypographyRoleEditorSheetCustomSpacingRanges() {
+        _ = TypographyRoleEditorSheet(
+            role: .headline_m,
+            lineSpacingRange: 0...16,
+            letterSpacingRange: -2.0...4.0
+        )
+    }
+
+    @Test("TypographyRoleEditorSheet can be created with all custom parameters")
+    func testTypographyRoleEditorSheetAllParams() {
+        _ = TypographyRoleEditorSheet(
+            role: .largeTitle_xxl,
+            sizeRange: 8...100,
+            sizeStep: 0.5,
+            lineSpacingRange: 0...24,
+            letterSpacingRange: -3.0...5.0
         )
     }
 }
@@ -3353,6 +3495,88 @@ struct ViewBodyEvaluationTests {
     func testTypographyRoleEditorBodyAllRoles() {
         for role in GentleTextRole.allCases {
             let view = wrapWithGentleEnvironment(TypographyRoleEditor(role: role))
+            renderViewForCoverage(view)
+        }
+    }
+
+    // MARK: - Color Role Cell and Sheet Views
+
+    @Test("ColorRoleCell body evaluates without crash")
+    func testColorRoleCellBodyEvaluates() {
+        let view = wrapWithGentleEnvironment(ColorRoleCell(role: .textPrimary, isEditing: .constant(false)))
+        renderViewForCoverage(view)
+    }
+
+    @Test("ColorRoleCell body evaluates for all color roles")
+    func testColorRoleCellBodyAllRoles() {
+        for role in GentleColorRole.allCases {
+            let view = wrapWithGentleEnvironment(ColorRoleCell(role: role, isEditing: .constant(false)))
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("ColorRoleEditorSheet body evaluates without crash")
+    func testColorRoleEditorSheetBodyEvaluates() {
+        let view = wrapWithGentleEnvironment(ColorRoleEditorSheet(role: .textPrimary))
+        renderViewForCoverage(view)
+    }
+
+    @Test("ColorRoleEditorSheet body evaluates for all color roles")
+    func testColorRoleEditorSheetBodyAllRoles() {
+        for role in GentleColorRole.allCases {
+            let view = wrapWithGentleEnvironment(ColorRoleEditorSheet(role: role))
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("SingleColorEditorSheet body evaluates for light scheme")
+    func testSingleColorEditorSheetBodyLight() {
+        let view = wrapWithGentleEnvironment(SingleColorEditorSheet(role: .textPrimary, scheme: .light))
+        renderViewForCoverage(view)
+    }
+
+    @Test("SingleColorEditorSheet body evaluates for dark scheme")
+    func testSingleColorEditorSheetBodyDark() {
+        let view = wrapWithGentleEnvironment(SingleColorEditorSheet(role: .textPrimary, scheme: .dark))
+        renderViewForCoverage(view)
+    }
+
+    @Test("SingleColorEditorSheet body evaluates for all color roles")
+    func testSingleColorEditorSheetBodyAllRoles() {
+        for role in GentleColorRole.allCases {
+            let viewLight = wrapWithGentleEnvironment(SingleColorEditorSheet(role: role, scheme: .light))
+            renderViewForCoverage(viewLight)
+            let viewDark = wrapWithGentleEnvironment(SingleColorEditorSheet(role: role, scheme: .dark))
+            renderViewForCoverage(viewDark)
+        }
+    }
+
+    // MARK: - Typography Role Cell and Sheet Views
+
+    @Test("TypographyRoleCell body evaluates without crash")
+    func testTypographyRoleCellBodyEvaluates() {
+        let view = wrapWithGentleEnvironment(TypographyRoleCell(role: .body_m, isEditing: .constant(false)))
+        renderViewForCoverage(view)
+    }
+
+    @Test("TypographyRoleCell body evaluates for all text roles")
+    func testTypographyRoleCellBodyAllRoles() {
+        for role in GentleTextRole.allCases {
+            let view = wrapWithGentleEnvironment(TypographyRoleCell(role: role, isEditing: .constant(false)))
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("TypographyRoleEditorSheet body evaluates without crash")
+    func testTypographyRoleEditorSheetBodyEvaluates() {
+        let view = wrapWithGentleEnvironment(TypographyRoleEditorSheet(role: .body_m))
+        renderViewForCoverage(view)
+    }
+
+    @Test("TypographyRoleEditorSheet body evaluates for all text roles")
+    func testTypographyRoleEditorSheetBodyAllRoles() {
+        for role in GentleTextRole.allCases {
+            let view = wrapWithGentleEnvironment(TypographyRoleEditorSheet(role: role))
             renderViewForCoverage(view)
         }
     }
