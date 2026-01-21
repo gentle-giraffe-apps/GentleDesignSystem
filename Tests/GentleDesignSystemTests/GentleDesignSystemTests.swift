@@ -130,7 +130,6 @@ struct GentleSurfaceRoleTests {
     func testSurfaceRoleRawValues() {
         #expect(GentleSurfaceRole.appBackground.rawValue == "appBackground")
         #expect(GentleSurfaceRole.card.rawValue == "card")
-        #expect(GentleSurfaceRole.cardChrome.rawValue == "cardChrome")
         #expect(GentleSurfaceRole.cardElevated.rawValue == "cardElevated")
         #expect(GentleSurfaceRole.surfaceOverlay.rawValue == "surfaceOverlay")
     }
@@ -404,11 +403,13 @@ struct GentleInsetTokensTests {
 
     @Test("Inset tokens fallback to screen for missing role")
     func testInsetTokensFallback() {
-        let insets = GentleInsetTokens(tokensByRole: [
-            GentleInsetRole.screen.rawValue: .init(horizontal: .xxl, vertical: .xl)
+        let insets = GentleInsetTokens(tokensByRoleVariant: [
+            GentleInsetRole.screen.rawValue: [
+                GentleInsetVariant.regular.rawValue: .init(horizontal: .xxl, vertical: .xl)
+            ]
         ])
 
-        // Request missing role should fallback to screen
+        // Request missing role should fallback to screen+regular
         let axis = insets.axisTokens(for: .card)
         #expect(axis.horizontal == .xxl)
         #expect(axis.vertical == .xl)
@@ -1818,7 +1819,7 @@ struct InsetFallbackTests {
 
     @Test("Inset tokens fallback to hardcoded when completely empty")
     func testInsetTokensHardcodedFallback() {
-        let emptyInsets = GentleInsetTokens(tokensByRole: [:])
+        let emptyInsets = GentleInsetTokens(tokensByRoleVariant: [:])
 
         // When both the role and screen are missing, should fallback to hardcoded
         let axis = emptyInsets.axisTokens(for: .card)
@@ -2150,7 +2151,7 @@ struct GentleSurfaceRoleExtendedTests {
 
     @Test("All surface roles have unique raw values")
     func testSurfaceRoleUniqueRawValues() {
-        let allRoles: [GentleSurfaceRole] = [.appBackground, .card, .cardChrome, .cardElevated, .surfaceOverlay]
+        let allRoles: [GentleSurfaceRole] = [.appBackground, .card, .cardElevated, .surfaceOverlay]
         let rawValues = allRoles.map { $0.rawValue }
         let uniqueValues = Set(rawValues)
         #expect(rawValues.count == uniqueValues.count)
@@ -2740,17 +2741,19 @@ struct GentleInsetTokensExtendedTests {
 
     @Test("Inset tokens fallback chain")
     func testInsetTokensFallbackChain() {
-        // Only has screen, missing card
-        let insets = GentleInsetTokens(tokensByRole: [
-            GentleInsetRole.screen.rawValue: .init(horizontal: .xxl, vertical: .xl)
+        // Only has screen+regular, missing card
+        let insets = GentleInsetTokens(tokensByRoleVariant: [
+            GentleInsetRole.screen.rawValue: [
+                GentleInsetVariant.regular.rawValue: .init(horizontal: .xxl, vertical: .xl)
+            ]
         ])
 
-        // Card should fallback to screen
+        // Card should fallback to screen+regular
         let cardAxis = insets.axisTokens(for: .card)
         #expect(cardAxis.horizontal == .xxl)
         #expect(cardAxis.vertical == .xl)
 
-        // Control should also fallback to screen
+        // Control should also fallback to screen+regular
         let controlAxis = insets.axisTokens(for: .control)
         #expect(controlAxis.horizontal == .xxl)
         #expect(controlAxis.vertical == .xl)
@@ -2939,7 +2942,7 @@ struct GentleSurfaceModifierTests {
 
     @Test("Surface modifier can be created with all roles")
     func testSurfaceModifierCreation() {
-        let roles: [GentleSurfaceRole] = [.appBackground, .card, .cardChrome, .cardElevated, .surfaceOverlay]
+        let roles: [GentleSurfaceRole] = [.appBackground, .card, .cardElevated, .surfaceOverlay]
 
         for role in roles {
             _ = GentleSurfaceModifier(role: role)
@@ -3510,7 +3513,7 @@ struct ModifierBodyEvaluationTests {
 
     @Test("GentleSurfaceModifier body evaluates for all surface roles")
     func testSurfaceModifierBodyAllRoles() {
-        let surfaceRoles: [GentleSurfaceRole] = [.appBackground, .card, .cardChrome, .cardElevated, .surfaceOverlay]
+        let surfaceRoles: [GentleSurfaceRole] = [.appBackground, .card, .cardElevated, .surfaceOverlay]
         for role in surfaceRoles {
             let view = wrapWithGentleEnvironment(
                 Text("Content").modifier(GentleSurfaceModifier(role: role))

@@ -6,27 +6,15 @@ import UIKit
 public struct GentleDesignFoundationView: View {
     @GentleDesignRuntime private var design
 
-    private let onEditTypography: (() -> Void)?
-    private let onEditButtons: (() -> Void)?
-    private let onEditSurfaces: (() -> Void)?
-
-    public init(
-        onEditTypography: (() -> Void)? = nil,
-        onEditButtons: (() -> Void)? = nil,
-        onEditSurfaces: (() -> Void)? = nil
-    ) {
-        self.onEditTypography = onEditTypography
-        self.onEditButtons = onEditButtons
-        self.onEditSurfaces = onEditSurfaces
-    }
+    public init() {}
 
     public var body: some View {
         ScrollView {
             VStack(spacing: design.layout.stack.loose) {
                 GentleDesignColorsSection()
-                GentleDesignTypographySection(onEdit: onEditTypography)
-                GentleDesignButtonsSection(onEdit: onEditButtons)
-                GentleDesignSurfacesSection(onEdit: onEditSurfaces)
+                GentleDesignTypographySection()
+                GentleDesignButtonsSection()
+                GentleDesignSurfacesSection()
             }
             .gentleInset(.screen)
         }
@@ -34,19 +22,110 @@ public struct GentleDesignFoundationView: View {
     }
 }
 
+// MARK: - Colors Section
+
+public struct GentleDesignColorsSection: View {
+    @GentleDesignRuntime private var design
+    @GentleThemeManagerRuntime private var manager
+
+    private var columns: [GridItem] { [
+        GridItem(.adaptive(minimum: 135), spacing: design.layout.grid.regular)
+        ]
+    }
+
+    private var items: [(String, GentleColorRole)] {
+        [
+            ("textPrimary", .textPrimary),
+            ("textSecondary", .textSecondary),
+            ("textTertiary", .textTertiary),
+            ("background", .background),
+            ("surface", .surface),
+            ("surfaceElevated", .surfaceElevated),
+            ("borderSubtle", .borderSubtle),
+            ("primaryCTA", .primaryCTA),
+            ("onPrimaryCTA", .onPrimaryCTA),
+            ("destructive", .destructive)
+        ]
+    }
+
+    public init() {}
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: design.layout.stack.regular) {
+            Text("Colors")
+                .gentleText(.title_xl)
+
+            LazyVGrid(columns: columns, spacing: design.layout.grid.tight) {
+                ForEach(items, id: \.0) { name, role in
+                    ColorSwatchRow(role: role, name: name)
+                }
+            }
+            .gentleSurface(.card, inset: .card, insetVariant: .tight)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+private struct ColorSwatchRow: View {
+    let role: GentleColorRole
+    let name: String
+
+    @GentleDesignRuntime private var design
+    @GentleThemeManagerRuntime private var manager
+
+    var body: some View {
+        let binding = manager.bindingForColorRole(role)
+        let lightBinding = Binding<Color>(
+            get: { Color(gentleHex: binding.lightHex.wrappedValue) },
+            set: { binding.lightHex.wrappedValue = $0.toGentleHexString() }
+        )
+        let darkBinding = Binding<Color>(
+            get: { Color(gentleHex: binding.darkHex.wrappedValue) },
+            set: { binding.darkHex.wrappedValue = $0.toGentleHexString() }
+        )
+
+        HStack(spacing: design.layout.stack.tight) {
+            HStack(spacing: 2) {
+                ZStack {
+                    lightBinding.wrappedValue.clipShape(RoundedRectangle(cornerRadius: 4))
+
+                    ColorPicker("", selection: lightBinding, supportsOpacity: true)
+                        .labelsHidden()
+                        .opacity(0.1)
+                }
+                .frame(width: 32, height: 32)
+
+                ZStack {
+                    darkBinding.wrappedValue.clipShape(RoundedRectangle(cornerRadius: 4))
+
+                    ColorPicker("", selection: darkBinding, supportsOpacity: true)
+                        .labelsHidden()
+                        .opacity(0.1)
+                }
+                .frame(width: 32, height: 32)
+            }
+
+            Text(name.camelCaseBreakable)
+                .gentleText(.caption_s)
+                .lineLimit(2)
+                .minimumScaleFactor(0.75)
+
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
 // MARK: - Typography Section
 
 public struct GentleDesignTypographySection: View {
     @GentleDesignRuntime private var design
+    @State private var editingRole: GentleTextRole?
 
-    private let onEdit: (() -> Void)?
-
-    public init(onEdit: (() -> Void)? = nil) {
-        self.onEdit = onEdit
-    }
+    public init() {}
 
     private var columns: [GridItem] {
-        [GridItem(.adaptive(minimum: 150), spacing: design.layout.grid.regular)]
+        [GridItem(.adaptive(minimum: 135), spacing: design.layout.grid.regular)]
     }
 
     private let styles: [(String, GentleTextRole)] = [
@@ -71,31 +150,38 @@ public struct GentleDesignTypographySection: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: design.layout.stack.regular) {
-            HStack {
-                Text("Typography")
-                    .gentleText(.title_xl)
-                Spacer()
-                if let onEdit {
-                    Button("Edit", action: onEdit)
-                }
-            }
+            Text("Typography")
+                .gentleText(.title_xl)
 
             LazyVGrid(columns: columns, alignment: .leading, spacing: design.layout.grid.regular) {
                 ForEach(styles, id: \.0) { name, role in
-                    VStack(alignment: .leading, spacing: design.layout.stack.tight) {
-                        Text(name)
-                            .gentleText(.callout_ms)
-                            .opacity(0.8)
-                        Text("Aa Bb")
-                            .gentleText(role)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                    Button {
+                        editingRole = role
+                    } label: {
+                        HStack {
+                            VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+                                Text(name.camelCaseBreakable)
+                                    .gentleText(.callout_ms)
+                                    .opacity(0.8)
+                                Text("Aa Bb")
+                                    .gentleText(role)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
+                            }
+                            Spacer()
+                            Image(systemName: "slider.horizontal.3")
+                                .foregroundStyle(design.color(.textSecondary))
+                        }
+                        .gentleSurface(.card, inset: .card, insetVariant: .tight)
                     }
+                    .buttonStyle(.plain)
                 }
             }
-            .gentleSurface(.card)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .sheet(item: $editingRole) { role in
+            TypographyRoleEditorSheet(role: role)
+        }
     }
 }
 
@@ -104,26 +190,16 @@ public struct GentleDesignTypographySection: View {
 public struct GentleDesignButtonsSection: View {
     @GentleDesignRuntime private var design
 
-    private let onEdit: (() -> Void)?
-
-    public init(onEdit: (() -> Void)? = nil) {
-        self.onEdit = onEdit
-    }
+    public init() {}
 
     private var columns: [GridItem] {
-        [GridItem(.adaptive(minimum: 150), spacing: design.layout.grid.regular)]
+        [GridItem(.adaptive(minimum: 130), spacing: design.layout.grid.regular)]
     }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: design.layout.stack.regular) {
-            HStack {
-                Text("Buttons")
-                    .gentleText(.title_xl)
-                Spacer()
-                if let onEdit {
-                    Button("Edit", action: onEdit)
-                }
-            }
+            Text("Buttons")
+                .gentleText(.title_xl)
 
             LazyVGrid(columns: columns, spacing: design.layout.grid.regular) {
                 Button("Primary") {}
@@ -157,7 +233,7 @@ public struct GentleDesignButtonsSection: View {
                 Button("Destructive") {}
                     .gentleButton(.destructive)
             }
-            .gentleSurface(.card)
+            .gentleSurface(.card, inset: .card)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -168,22 +244,12 @@ public struct GentleDesignButtonsSection: View {
 public struct GentleDesignSurfacesSection: View {
     @GentleDesignRuntime private var design
 
-    private let onEdit: (() -> Void)?
-
-    public init(onEdit: (() -> Void)? = nil) {
-        self.onEdit = onEdit
-    }
+    public init() {}
 
     public var body: some View {
         VStack(alignment: .leading, spacing: design.layout.stack.regular) {
-            HStack {
-                Text("Surfaces")
-                    .gentleText(.title_xl)
-                Spacer()
-                if let onEdit {
-                    Button("Edit", action: onEdit)
-                }
-            }
+            Text("Surfaces")
+                .gentleText(.title_xl)
 
             HStack(spacing: design.layout.stack.regular) {
                 surfaceCard(
@@ -216,98 +282,7 @@ public struct GentleDesignSurfacesSection: View {
                 .opacity(0.8)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .gentleSurface(surface)
-    }
-}
-
-// MARK: - Colors Section
-
-public struct GentleDesignColorsSection: View {
-    @GentleDesignRuntime private var design
-    @GentleThemeManagerRuntime private var manager
-
-    private var columns: [GridItem] { [
-        GridItem(.adaptive(minimum: 150), spacing: design.layout.grid.regular)
-        ]
-    }
-
-    private var items: [(String, GentleColorRole)] {
-        [
-            ("textPrimary", .textPrimary),
-            ("textSecondary", .textSecondary),
-            ("textTertiary", .textTertiary),
-            ("background", .background),
-            ("surface", .surface),
-            ("surfaceElevated", .surfaceElevated),
-            ("borderSubtle", .borderSubtle),
-            ("primaryCTA", .primaryCTA),
-            ("onPrimaryCTA", .onPrimaryCTA),
-            ("destructive", .destructive)
-        ]
-    }
-
-    public init() {}
-
-    public var body: some View {
-        VStack(alignment: .leading, spacing: design.layout.stack.regular) {
-            Text("Colors")
-                .gentleText(.title_xl)
-
-            LazyVGrid(columns: columns, spacing: design.layout.grid.tight) {
-                ForEach(items, id: \.0) { name, role in
-                    ColorSwatchRow(role: role, name: name)
-                }
-            }
-            .gentleSurface(.card)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-}
-
-private struct ColorSwatchRow: View {
-    let role: GentleColorRole
-    let name: String
-
-    @GentleDesignRuntime private var design
-    @GentleThemeManagerRuntime private var manager
-
-    var body: some View {
-        let binding = manager.bindingForColorRole(role)
-        let lightBinding = Binding<Color>(
-            get: { Color(gentleHex: binding.lightHex.wrappedValue) },
-            set: { binding.lightHex.wrappedValue = $0.toGentleHexString() }
-        )
-        let darkBinding = Binding<Color>(
-            get: { Color(gentleHex: binding.darkHex.wrappedValue) },
-            set: { binding.darkHex.wrappedValue = $0.toGentleHexString() }
-        )
-
-        HStack(spacing: design.layout.stack.regular) {
-            HStack(spacing: 3) {
-                ZStack {
-                    lightBinding.wrappedValue.clipShape(RoundedRectangle(cornerRadius: 4))
-                    
-                    ColorPicker("", selection: lightBinding, supportsOpacity: true)
-                        .labelsHidden()
-                        .opacity(0.1)
-                }
-                
-                ZStack {
-                    darkBinding.wrappedValue.clipShape(RoundedRectangle(cornerRadius: 4))
-                    
-                    ColorPicker("", selection: darkBinding, supportsOpacity: true)
-                        .labelsHidden()
-                        .opacity(0.1)
-                }
-            }
-
-            Text(name)
-                .gentleText(.caption_s)
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
-
-            Spacer(minLength: 0)
-        }
+        .gentleSurface(surface, inset: .card)
     }
 }
 
