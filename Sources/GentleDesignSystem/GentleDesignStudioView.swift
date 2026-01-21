@@ -37,12 +37,25 @@ public struct GentleDesignStudioView: View {
             .navigationTitle(themeManager.currentPresetName ?? "Design System")
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
-                        Button {
-                            activeSheet = .share
-                        } label: {
-                            Label("Export", systemImage: "square.and.arrow.up")
+                        HStack(spacing: 16) {
+                            Button {
+                                Task {
+                                    try? themeManager.save()
+                                }
+                            } label: {
+                                Image(systemName: "checkmark")
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(themeManager.hasUnsavedChanges ? design.color(.primaryCTA) : .gray)
+                            }
+                            .disabled(!themeManager.hasUnsavedChanges)
+
+                            Button {
+                                activeSheet = .share
+                            } label: {
+                                Label("Export", systemImage: "square.and.arrow.up")
+                            }
+                            .disabled(exportURL == nil)
                         }
-                        .disabled(exportURL == nil)
                     }
                 }
                 .sheet(item: $activeSheet) { sheet in

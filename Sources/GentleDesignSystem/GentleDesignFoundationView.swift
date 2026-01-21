@@ -54,13 +54,14 @@ public struct GentleDesignColorsSection: View {
         VStack(alignment: .leading, spacing: design.layout.stack.regular) {
             Text("Colors")
                 .gentleText(.title_xl)
-
+                .opacity(0.7)
+            
             LazyVGrid(columns: columns, spacing: design.layout.grid.tight) {
                 ForEach(items, id: \.0) { name, role in
                     ColorSwatchRow(role: role, name: name)
                 }
             }
-            .gentleSurface(.card, inset: .card, insetVariant: .tight)
+            .gentleSurface(.card, inset: .card)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -125,7 +126,7 @@ public struct GentleDesignTypographySection: View {
     public init() {}
 
     private var columns: [GridItem] {
-        [GridItem(.adaptive(minimum: 135), spacing: design.layout.grid.regular)]
+        [GridItem(.adaptive(minimum: 100), spacing: design.layout.grid.regular)]
     }
 
     private let styles: [(String, GentleTextRole)] = [
@@ -152,6 +153,7 @@ public struct GentleDesignTypographySection: View {
         VStack(alignment: .leading, spacing: design.layout.stack.regular) {
             Text("Typography")
                 .gentleText(.title_xl)
+                .opacity(0.7)
 
             LazyVGrid(columns: columns, alignment: .leading, spacing: design.layout.grid.regular) {
                 ForEach(styles, id: \.0) { name, role in
@@ -159,20 +161,38 @@ public struct GentleDesignTypographySection: View {
                         editingRole = role
                     } label: {
                         HStack {
-                            VStack(alignment: .leading, spacing: design.layout.stack.tight) {
-                                Text(name.camelCaseBreakable)
-                                    .gentleText(.callout_ms)
-                                    .opacity(0.8)
-                                Text("Aa Bb")
-                                    .gentleText(role)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.8)
+                            VStack(alignment: .leading, spacing: 0) {
+//                                HStack(alignment: .top) {
+//                                    Text(name.camelCaseBreakable)
+//                                        .gentleText(.caption_s)
+//                                    Spacer()
+//                                    Image(systemName: "slider.horizontal.3")
+//                                        .gentleText(.title3_ml)
+//                                        .opacity(0.7)
+//                                }
+//                                Text("Aa Bb")
+//                                    .gentleText(role)
+//                                    .lineLimit(1)
+//                                    .minimumScaleFactor(0.8)
+                                HStack(alignment: .top) {
+                                    VStack(alignment: .leading) {
+                                        Text("Aa")
+                                            .gentleText(role)
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.8)
+                                        Text(name.camelCaseBreakable)
+                                            .gentleText(.caption_s)
+                                    }
+                                    Spacer()
+                                    Image(systemName: "slider.horizontal.3")
+                                        .gentleText(.title3_ml)
+                                        .opacity(0.7)
+                                }
                             }
-                            Spacer()
-                            Image(systemName: "slider.horizontal.3")
-                                .foregroundStyle(design.color(.textSecondary))
                         }
-                        .gentleSurface(.card, inset: .card, insetVariant: .tight)
+                        .padding(.vertical, design.layout.gap.s)
+                        .padding(.horizontal, design.layout.gap.m)
+                        .gentleSurface(.card)
                     }
                     .buttonStyle(.plain)
                 }
@@ -200,6 +220,7 @@ public struct GentleDesignButtonsSection: View {
         VStack(alignment: .leading, spacing: design.layout.stack.regular) {
             Text("Buttons")
                 .gentleText(.title_xl)
+                .opacity(0.7)
 
             LazyVGrid(columns: columns, spacing: design.layout.grid.regular) {
                 Button("Primary") {}
@@ -250,7 +271,8 @@ public struct GentleDesignSurfacesSection: View {
         VStack(alignment: .leading, spacing: design.layout.stack.regular) {
             Text("Surfaces")
                 .gentleText(.title_xl)
-
+                .opacity(0.7)
+            
             HStack(spacing: design.layout.stack.regular) {
                 surfaceCard(
                     title: "card",
@@ -290,13 +312,18 @@ public struct GentleDesignSurfacesSection: View {
 
 private extension Color {
     func toGentleHexString() -> String {
-        let uiColor = UIColor(self)
         var r: CGFloat = 0
         var g: CGFloat = 0
         var b: CGFloat = 0
         var a: CGFloat = 0
 
+        #if canImport(UIKit)
+        let uiColor = UIColor(self)
         uiColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+        #elseif canImport(AppKit)
+        let nsColor = NSColor(self).usingColorSpace(.deviceRGB) ?? NSColor(self)
+        nsColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+        #endif
 
         if a < 1.0 {
             return String(

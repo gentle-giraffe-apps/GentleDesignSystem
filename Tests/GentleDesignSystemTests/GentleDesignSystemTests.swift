@@ -385,12 +385,12 @@ struct GentleInsetTokensTests {
         let insets = GentleInsetTokens.gentleDefault
 
         let screen = insets.axisTokens(for: .screen)
-        #expect(screen.horizontal == .xl)
+        #expect(screen.horizontal == .m)
         #expect(screen.vertical == .l)
 
         let card = insets.axisTokens(for: .card)
-        #expect(card.horizontal == .m)
-        #expect(card.vertical == .m)
+        #expect(card.horizontal == .l)
+        #expect(card.vertical == .l)
 
         let control = insets.axisTokens(for: .control)
         #expect(control.horizontal == .l)
@@ -787,7 +787,7 @@ struct GentleThemeTests {
         let theme = GentleTheme.default
 
         let screenInset = theme.insetValue(.screen)
-        #expect(screenInset.horizontal == 24) // xl = 24
+        #expect(screenInset.horizontal == 12) // m = 12
         #expect(screenInset.vertical == 16) // l = 16
     }
 
@@ -796,7 +796,7 @@ struct GentleThemeTests {
         let theme = GentleTheme.default
 
         let horizontalOnly = theme.insetValue(.screen, edges: .horizontal)
-        #expect(horizontalOnly.horizontal == 24)
+        #expect(horizontalOnly.horizontal == 12)
         #expect(horizontalOnly.vertical == nil)
 
         let verticalOnly = theme.insetValue(.screen, edges: .vertical)
@@ -918,7 +918,7 @@ struct GentleLayoutFacadeTests {
         let facade = GentleLayoutFacade(tokens: .gentleDefault)
 
         let screenInset = facade.inset.axisTokens(for: .screen)
-        #expect(screenInset.horizontal == .xl)
+        #expect(screenInset.horizontal == .m)
         #expect(screenInset.vertical == .l)
     }
 }
@@ -1560,7 +1560,7 @@ struct GentleThemeExtendedTests {
 
         let inset = theme.inset
         let screenInset = inset.axisTokens(for: .screen)
-        #expect(screenInset.horizontal == .xl)
+        #expect(screenInset.horizontal == .m)
     }
 
     @Test("Theme text style with font width")
@@ -1595,7 +1595,7 @@ struct GentleThemeExtendedTests {
         let theme = GentleTheme.default
 
         let leadingInset = theme.insetValue(.screen, edges: .leading)
-        #expect(leadingInset.horizontal == 24)
+        #expect(leadingInset.horizontal == 12)
         #expect(leadingInset.vertical == nil)
     }
 
@@ -1604,7 +1604,7 @@ struct GentleThemeExtendedTests {
         let theme = GentleTheme.default
 
         let trailingInset = theme.insetValue(.screen, edges: .trailing)
-        #expect(trailingInset.horizontal == 24)
+        #expect(trailingInset.horizontal == 12)
         #expect(trailingInset.vertical == nil)
     }
 
