@@ -1,22 +1,20 @@
 //  Jonathan Ritchey
 
 import SwiftUI
+import UIKit
 
 public struct GentleDesignFoundationView: View {
     @GentleDesignRuntime private var design
 
-    private let onEditColors: (() -> Void)?
     private let onEditTypography: (() -> Void)?
     private let onEditButtons: (() -> Void)?
     private let onEditSurfaces: (() -> Void)?
 
     public init(
-        onEditColors: (() -> Void)? = nil,
         onEditTypography: (() -> Void)? = nil,
         onEditButtons: (() -> Void)? = nil,
         onEditSurfaces: (() -> Void)? = nil
     ) {
-        self.onEditColors = onEditColors
         self.onEditTypography = onEditTypography
         self.onEditButtons = onEditButtons
         self.onEditSurfaces = onEditSurfaces
@@ -25,7 +23,7 @@ public struct GentleDesignFoundationView: View {
     public var body: some View {
         ScrollView {
             VStack(spacing: design.layout.stack.loose) {
-                GentleDesignColorsSection(onEdit: onEditColors)
+                GentleDesignColorsSection()
                 GentleDesignTypographySection(onEdit: onEditTypography)
                 GentleDesignButtonsSection(onEdit: onEditButtons)
                 GentleDesignSurfacesSection(onEdit: onEditSurfaces)
@@ -225,69 +223,121 @@ public struct GentleDesignSurfacesSection: View {
 // MARK: - Colors Section
 
 public struct GentleDesignColorsSection: View {
-    @Environment(\.gentleTheme) var theme
-    @Environment(\.colorScheme) var colorScheme
     @GentleDesignRuntime private var design
-
-    private let onEdit: (() -> Void)?
-
-    public init(onEdit: (() -> Void)? = nil) {
-        self.onEdit = onEdit
-    }
+    @GentleThemeManagerRuntime private var manager
 
     private var columns: [GridItem] { [
         GridItem(.adaptive(minimum: 150), spacing: design.layout.grid.regular)
         ]
     }
 
-    private var items: [(String, Color)] {
+    private var items: [(String, GentleColorRole)] {
         [
-            ("textPrimary", theme.color(for: .textPrimary, scheme: colorScheme)),
-            ("textSecondary", theme.color(for: .textSecondary, scheme: colorScheme)),
-            ("textTertiary", theme.color(for: .textTertiary, scheme: colorScheme)),
-            ("background", theme.color(for: .background, scheme: colorScheme)),
-            ("surface", theme.color(for: .surface, scheme: colorScheme)),
-            ("surfaceElevated", theme.color(for: .surfaceElevated, scheme: colorScheme)),
-            ("borderSubtle", theme.color(for: .borderSubtle, scheme: colorScheme)),
-            ("primaryCTA", theme.color(for: .primaryCTA, scheme: colorScheme)),
-            ("onPrimaryCTA", theme.color(for: .onPrimaryCTA, scheme: colorScheme)),
-            ("destructive", theme.color(for: .destructive, scheme: colorScheme))
+            ("textPrimary", .textPrimary),
+            ("textSecondary", .textSecondary),
+            ("textTertiary", .textTertiary),
+            ("background", .background),
+            ("surface", .surface),
+            ("surfaceElevated", .surfaceElevated),
+            ("borderSubtle", .borderSubtle),
+            ("primaryCTA", .primaryCTA),
+            ("onPrimaryCTA", .onPrimaryCTA),
+            ("destructive", .destructive)
         ]
     }
 
+    public init() {}
+
     public var body: some View {
         VStack(alignment: .leading, spacing: design.layout.stack.regular) {
-            HStack {
-                Text("Colors")
-                    .gentleText(.title_xl)
-                Spacer()
-                if let onEdit {
-                    Button("Edit", action: onEdit)
-                }
-            }
+            Text("Colors")
+                .gentleText(.title_xl)
 
             LazyVGrid(columns: columns, spacing: design.layout.grid.tight) {
-                ForEach(items, id: \.0) { name, color in
-                    HStack(spacing: design.layout.stack.regular) {
-                        RoundedRectangle(cornerRadius: design.radii.small)
-                            .fill(color)
-                            .frame(width: 28, height: 28)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: design.radii.small)
-                                    .strokeBorder(design.color(.borderSubtle), lineWidth: 1)
-                            )
-
-                        Text(name)
-                            .gentleText(.caption_s)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.75)
-
-                        Spacer(minLength: 0)
-                    }
+                ForEach(items, id: \.0) { name, role in
+                    ColorSwatchRow(role: role, name: name)
                 }
             }
             .gentleSurface(.card)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+private struct ColorSwatchRow: View {
+    let role: GentleColorRole
+    let name: String
+
+    @GentleDesignRuntime private var design
+    @GentleThemeManagerRuntime private var manager
+
+    var body: some View {
+        let binding = manager.bindingForColorRole(role)
+        let lightBinding = Binding<Color>(
+            get: { Color(gentleHex: binding.lightHex.wrappedValue) },
+            set: { binding.lightHex.wrappedValue = $0.toGentleHexString() }
+        )
+        let darkBinding = Binding<Color>(
+            get: { Color(gentleHex: binding.darkHex.wrappedValue) },
+            set: { binding.darkHex.wrappedValue = $0.toGentleHexString() }
+        )
+
+        HStack(spacing: design.layout.stack.regular) {
+            HStack(spacing: 3) {
+                ZStack {
+                    lightBinding.wrappedValue.clipShape(RoundedRectangle(cornerRadius: 4))
+                    
+                    ColorPicker("", selection: lightBinding, supportsOpacity: true)
+                        .labelsHidden()
+                        .opacity(0.1)
+                }
+                
+                ZStack {
+                    darkBinding.wrappedValue.clipShape(RoundedRectangle(cornerRadius: 4))
+                    
+                    ColorPicker("", selection: darkBinding, supportsOpacity: true)
+                        .labelsHidden()
+                        .opacity(0.1)
+                }
+            }
+
+            Text(name)
+                .gentleText(.caption_s)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+
+            Spacer(minLength: 0)
+        }
+    }
+}
+
+// MARK: - Color to Hex conversion
+
+private extension Color {
+    func toGentleHexString() -> String {
+        let uiColor = UIColor(self)
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+
+        uiColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+
+        if a < 1.0 {
+            return String(
+                format: "#%02X%02X%02X%02X",
+                Int(r * 255),
+                Int(g * 255),
+                Int(b * 255),
+                Int(a * 255)
+            )
+        } else {
+            return String(
+                format: "#%02X%02X%02X",
+                Int(r * 255),
+                Int(g * 255),
+                Int(b * 255)
+            )
+        }
     }
 }
