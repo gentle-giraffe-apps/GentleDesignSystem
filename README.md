@@ -4,22 +4,27 @@ A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to fe
 
 [![CI](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml)
 [![Coverage](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/branch/main/graph/badge.svg)](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem)
+[![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=active+issues&show_trend=true&token=usGsRQEFEVnvMC62c6ekIHCT)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/)
+
 [![Swift](https://img.shields.io/badge/Swift-6.0–6.2-orange.svg)](https://swift.org)
-![SwiftUI First](https://img.shields.io/badge/SwiftUI-First-4A6EF5)
 ![iOS](https://img.shields.io/badge/iOS-18.0+-blue?logo=apple)
 ![Platform](https://img.shields.io/badge/Platform-iPhone%20%7C%20iPad-lightgrey)
 ![SPM](https://img.shields.io/badge/SPM-Compatible-success)
 
-🔍 **Static Analysis (per commit)**  
-[![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=active+issues&show_trend=true&token=usGsRQEFEVnvMC62c6ekIHCT)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/)
-[![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=resolved+issues&show_trend=true&token=usGsRQEFEVnvMC62c6ekIHCT)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/)
-
-Unit-test coverage graph
+<sub><b>Coverage trend</b></sub><br/>
 <a href="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem">
   <img
     src="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/graphs/icicle.svg?token=GC1LEZ4CAF"
     height="80"
     alt="Codecov coverage chart"
+  />
+</a>
+
+<sub><b>DeepSource (per commit)</b> · resolved</sub><br/>
+<a href="https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/">
+  <img
+    src="https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=resolved+issues&show_trend=true&token=usGsRQEFEVnvMC62c6ekIHCT"
+    alt="DeepSource resolved issues"
   />
 </a>
 
