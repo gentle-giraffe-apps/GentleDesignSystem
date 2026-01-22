@@ -15,7 +15,7 @@ A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to fe
 <sub><strong>Codecov Snapshot</strong></sub><br/>
 <a href="https://codecov.io/gh/gentle-giraffe-apps/GentleNetworking">
   <img
-    src="https://codecov.io/gh/gentle-giraffe-apps/GentleNetworking/graphs/icicle.svg?token=XHHY2SO3U5"
+    src="https://codecov.io/gh/gentle-giraffe-apps/GentleNetworking/graphs/icicle.svg"
     height="72"
     style="max-width: 420px;"
     alt="Codecov coverage history icicle chart"
