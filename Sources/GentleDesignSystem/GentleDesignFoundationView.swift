@@ -260,7 +260,7 @@ private struct GentleButtonPreview: View {
 
     var body: some View {
         let spec = theme.buttons.roleSpec(for: role)
-        let textRole = spec.textRole
+        let textRole = role.defaultTextRole
         let animSpec = theme.buttons.animationSpec(for: spec.animationRole)
         let animation = GentleButtonAnimations.resolve(
             reduceMotion: reduceMotion,
@@ -268,10 +268,23 @@ private struct GentleButtonPreview: View {
             spec: animSpec
         )
 
+        // Derive colors from material role
+        let (backgroundColor, labelColorRole): (Color, GentleColorRole) = {
+            switch spec.materialRole {
+            case .solidFillPrimaryCTA:
+                return (theme.color(for: .primaryCTA, scheme: colorScheme), .onPrimaryCTA)
+            case .solidFillDestructive:
+                return (theme.color(for: .destructive, scheme: colorScheme), .onPrimaryCTA)
+            case .hollow:
+                return (Color.clear, .primaryCTA)
+            }
+        }()
+        let labelColor = theme.color(for: labelColorRole, scheme: colorScheme)
+
         // When usesNativeStyle is true, skip background/border/padding - just text styling with accent color
         if spec.usesNativeStyle {
             Text("Customize")
-                .gentleText(textRole, colorRole: spec.labelColorRole)
+                .gentleText(textRole, colorRole: labelColorRole)
                 .scaleEffect(isPressed ? spec.pressedScale : 1.0)
                 .opacity(isPressed ? spec.pressedOpacity : 1.0)
                 .animation(animation, value: isPressed)
@@ -287,12 +300,10 @@ private struct GentleButtonPreview: View {
             let secondaryOpticalTrim: CGFloat = (role == .secondary) ? 1.0 : 0.0
             let verticalPadding: CGFloat = max(0, CGFloat(gap.s) - secondaryOpticalTrim)
 
-            let backgroundColor = theme.color(for: spec.backgroundRole, scheme: colorScheme)
-            let labelColor = theme.color(for: spec.labelColorRole, scheme: colorScheme)
             let borderColor = spec.borderRole.map { theme.color(for: $0, scheme: colorScheme) }
 
             Text("Customize")
-                .gentleText(textRole, colorRole: spec.labelColorRole)
+                .gentleText(textRole, colorRole: labelColorRole)
                 .padding(.horizontal, CGFloat(gap.xl))
                 .padding(.vertical, verticalPadding)
                 .background(RoundedRectangle(cornerRadius: cornerRadius).fill(backgroundColor))
@@ -382,6 +393,7 @@ private struct ButtonRoleEditorSheet: View {
     @GentleThemeManagerRuntime private var manager
 
     private let shapes: [GentleButtonShape] = [.rounded, .pill]
+    private let materialRoles: [GentleButtonMaterialRole] = GentleButtonMaterialRole.allCases
     private let colorRoles: [GentleColorRole] = GentleColorRole.allCases
     private let animationRoles: [GentleButtonAnimationRole] = GentleButtonAnimationRole.allCases
 
@@ -423,9 +435,10 @@ private struct ButtonRoleEditorSheet: View {
                         }
                         .disabled(binding.usesNativeStyle.wrappedValue)
 
-                        Picker("Background", selection: backgroundStyleBinding(binding)) {
-                            Text("Solid").tag(true)
-                            Text("Transparent").tag(false)
+                        Picker("Material", selection: binding.materialRole) {
+                            ForEach(materialRoles, id: \.self) { material in
+                                Text(material.displayName).tag(material)
+                            }
                         }
                         .disabled(binding.usesNativeStyle.wrappedValue)
 
@@ -468,16 +481,6 @@ private struct ButtonRoleEditorSheet: View {
                         }
 
                         Toggle("Uses Native Style", isOn: binding.usesNativeStyle)
-                            .onChange(of: binding.usesNativeStyle.wrappedValue) { _, newValue in
-                                if newValue {
-                                    // When enabling native style, use primaryCTA as the accent color
-                                    binding.labelColorRole.wrappedValue = .primaryCTA
-                                } else {
-                                    // When disabling native style, set up for a styled button
-                                    binding.labelColorRole.wrappedValue = .onPrimaryCTA
-                                    binding.backgroundRole.wrappedValue = .primaryCTA
-                                }
-                            }
 
                         if binding.usesNativeStyle.wrappedValue {
                             Text("Native style ignores background, border, and shape.")
@@ -506,15 +509,6 @@ private struct ButtonRoleEditorSheet: View {
         Binding<GentleColorRole?>(
             get: { roleSpec.borderRole.wrappedValue },
             set: { roleSpec.borderRole.wrappedValue = $0 }
-        )
-    }
-
-    private func backgroundStyleBinding(_ roleSpec: Binding<GentleButtonRoleSpec>) -> Binding<Bool> {
-        Binding<Bool>(
-            get: { roleSpec.backgroundRole.wrappedValue == .primaryCTA },
-            set: { isSolid in
-                roleSpec.backgroundRole.wrappedValue = isSolid ? .primaryCTA : .surface
-            }
         )
     }
 }
