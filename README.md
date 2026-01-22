@@ -8,11 +8,19 @@ A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to fe
 ![Platform](https://img.shields.io/badge/Platform-iPhone%20%7C%20iPad-lightgrey)
 ![SPM](https://img.shields.io/badge/SPM-Compatible-success)
 
-| Metric            | Trend |
-|:------------------|:------|
-| [![Coverage](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/branch/main/graph/badge.svg)](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem) | <a href="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem"><img src="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/graphs/icicle.svg?token=GC1LEZ4CAF" height="40" style="max-width: 420px;" alt="Codecov coverage chart" /></a> |
-| [![DeepSource Static Analysis](https://img.shields.io/badge/DeepSource-Static%20Analysis-0A2540?logo=deepsource&logoColor=white)](https://deepsource.io/) | [![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=active+issues&show_trend=true&token=usGsRQEFEVnvMC62c6ekIHCT)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/)<br/>[![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=resolved+issues&show_trend=true&token=usGsRQEFEVnvMC62c6ekIHCT)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/) |
-
+[![Coverage](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/branch/main/graph/badge.svg)](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem) 
+[![DeepSource Static Analysis](https://img.shields.io/badge/DeepSource-Static%20Analysis-0A2540?logo=deepsource&logoColor=white)](https://deepsource.io/) 
+[![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=active+issues&show_trend=true&token=usGsRQEFEVnvMC62c6ekIHCT)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/)
+[![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=resolved+issues&show_trend=true&token=usGsRQEFEVnvMC62c6ekIHCT)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/)<br/>
+<sub><strong>Codecov Graph</strong></sub><br/>
+<a href="https://codecov.io/gh/gentle-giraffe-apps/GentleNetworking">
+  <img
+    src="https://codecov.io/gh/gentle-giraffe-apps/GentleNetworking/graphs/icicle.svg?token=XHHY2SO3U5"
+    height="72"
+    style="max-width: 420px;"
+    alt="Codecov coverage history icicle chart"
+  />
+</a>
 
 **Who is this for?** Apps that want a strong SwiftUI foundation and theme evolution without rewriting view code.
 
