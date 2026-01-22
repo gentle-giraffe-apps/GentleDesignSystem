@@ -120,7 +120,10 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
     }
 }
 
-public enum GentleButtonRole: String, Codable, Sendable { case primary, secondary, tertiary, quaternary, destructive }
+public enum GentleButtonRole: String, Codable, Sendable, Identifiable {
+    case primary, secondary, tertiary, quaternary, destructive
+    public var id: String { rawValue }
+}
 
 /// Separates geometry from intent.
 /// - rounded: standard rounded rectangle (default)
