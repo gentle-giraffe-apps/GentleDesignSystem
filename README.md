@@ -12,7 +12,7 @@ A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to fe
 [![DeepSource Static Analysis](https://img.shields.io/badge/DeepSource-Static%20Analysis-0A2540?logo=deepsource&logoColor=white)](https://deepsource.io/) 
 [![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=active+issues&show_trend=true&token=usGsRQEFEVnvMC62c6ekIHCT)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/)
 [![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=resolved+issues&show_trend=true&token=usGsRQEFEVnvMC62c6ekIHCT)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/)<br/>
-<sub><strong>Codecov Graph</strong></sub><br/>
+<sub><strong>Codecov Snapshot</strong></sub><br/>
 <a href="https://codecov.io/gh/gentle-giraffe-apps/GentleNetworking">
   <img
     src="https://codecov.io/gh/gentle-giraffe-apps/GentleNetworking/graphs/icicle.svg?token=XHHY2SO3U5"
