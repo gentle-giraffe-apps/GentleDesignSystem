@@ -1252,6 +1252,7 @@ public struct GentleButtonStyle: ButtonStyle {
         // ✅ IMPORTANT: expand the label *inside* the style, before background/overlay.
         let label = configuration.label
             .gentleText(textRoleToUse, colorRole: spec.labelColorRole)
+            .foregroundStyle(labelColor)
 
         let sizedLabel = Group {
             if expandsHorizontally {
@@ -1274,7 +1275,6 @@ public struct GentleButtonStyle: ButtonStyle {
                         }
                     }
                 )
-                .foregroundStyle(labelColor)
                 .scaleEffect(configuration.isPressed ? spec.pressedScale : 1.0)
                 .opacity(configuration.isPressed ? spec.pressedOpacity : 1.0)
                 .animation(animation, value: configuration.isPressed)
