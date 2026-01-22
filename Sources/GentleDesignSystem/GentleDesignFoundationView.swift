@@ -209,12 +209,21 @@ public struct GentleDesignTypographySection: View {
 
 public struct GentleDesignButtonsSection: View {
     @GentleDesignRuntime private var design
+    @State private var editingRole: GentleButtonRole?
 
     public init() {}
 
     private var columns: [GridItem] {
-        [GridItem(.adaptive(minimum: 130), spacing: design.layout.grid.regular)]
+        [GridItem(.adaptive(minimum: 150), spacing: design.layout.grid.regular)]
     }
+
+    private let buttonStyles: [(String, GentleButtonRole)] = [
+        ("Primary", .primary),
+        ("Secondary", .secondary),
+        ("Tertiary", .tertiary),
+        ("Quaternary", .quaternary),
+        ("Destructive", .destructive)
+    ]
 
     public var body: some View {
         VStack(alignment: .leading, spacing: design.layout.stack.regular) {
@@ -223,40 +232,170 @@ public struct GentleDesignButtonsSection: View {
                 .opacity(0.7)
 
             LazyVGrid(columns: columns, spacing: design.layout.grid.regular) {
-                Button("Primary") {}
-                    .gentleButton(.primary)
-
-                Button("Primary") {}
-                    .gentleButton(.primary)
-                    .disabled(true)
-
-                Button("Secondary") {}
-                    .gentleButton(.secondary)
-
-                Button("Secondary") {}
-                    .gentleButton(.secondary)
-                    .disabled(true)
-                
-                Button("Tertiary") {}
-                    .gentleButton(.tertiary)
-
-                Button("Tertiary") {}
-                    .gentleButton(.tertiary)
-                    .disabled(true)
-                
-                Button("Quaternary") {}
-                    .gentleButton(.quaternary)
-                
-                Button("Quaternary") {}
-                    .gentleButton(.quaternary)
-                    .disabled(true)
-                
-                Button("Destructive") {}
-                    .gentleButton(.destructive)
+                ForEach(buttonStyles, id: \.0) { name, role in
+                    ButtonPreviewCard(name: name, role: role) {
+                        editingRole = role
+                    }
+                }
             }
-            .gentleSurface(.card, inset: .card)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .sheet(item: $editingRole) { role in
+            ButtonRoleEditorSheet(role: role)
+        }
+    }
+}
+
+// MARK: - Button Preview (non-interactive)
+
+/// A non-interactive view that renders the appearance of a gentle button.
+/// Use this when you need to display a button preview inside another tappable area.
+private struct GentleButtonPreview: View {
+    let role: GentleButtonRole
+    var isPressed: Bool = false
+
+    @Environment(\.gentleTheme) private var theme
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        let spec = theme.buttons.roleSpec(for: role)
+        let textRole = spec.textRole
+        let animSpec = theme.buttons.animationSpec(for: spec.animationRole)
+        let animation = GentleButtonAnimations.resolve(
+            reduceMotion: reduceMotion,
+            role: spec.animationRole,
+            spec: animSpec
+        )
+
+        // When usesNativeStyle is true, skip background/border/padding - just text styling
+        if spec.usesNativeStyle {
+            Text("Customize")
+                .gentleText(textRole, colorRole: spec.labelColorRole)
+                .scaleEffect(isPressed ? spec.pressedScale : 1.0)
+                .opacity(isPressed ? spec.pressedOpacity : 1.0)
+                .animation(animation, value: isPressed)
+        } else {
+            let gap = theme.gap
+            let radii = theme.radii
+
+            let cornerRadius: CGFloat = (spec.shape == .pill)
+                ? CGFloat(radii.pill)
+                : CGFloat(radii.medium)
+
+            // Secondary buttons have optical trim adjustment
+            let secondaryOpticalTrim: CGFloat = (role == .secondary) ? 1.0 : 0.0
+            let verticalPadding: CGFloat = max(0, CGFloat(gap.s) - secondaryOpticalTrim)
+
+            let backgroundColor = theme.color(for: spec.backgroundRole, scheme: colorScheme)
+            let labelColor = theme.color(for: spec.labelColorRole, scheme: colorScheme)
+            let borderColor = spec.borderRole.map { theme.color(for: $0, scheme: colorScheme) }
+
+            Text("Customize")
+                .gentleText(textRole, colorRole: spec.labelColorRole)
+                .padding(.horizontal, CGFloat(gap.xl))
+                .padding(.vertical, verticalPadding)
+                .background(RoundedRectangle(cornerRadius: cornerRadius).fill(backgroundColor))
+                .overlay(
+                    Group {
+                        if let borderColor {
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                                .strokeBorder(borderColor, lineWidth: 1)
+                        }
+                    }
+                )
+                .foregroundStyle(labelColor)
+                .scaleEffect(isPressed ? spec.pressedScale : 1.0)
+                .opacity(isPressed ? spec.pressedOpacity : 1.0)
+                .animation(animation, value: isPressed)
+        }
+    }
+}
+
+// MARK: - Button Preview Card
+
+private struct ButtonPreviewCard: View {
+    let name: String
+    let role: GentleButtonRole
+    let action: () -> Void
+
+    @GentleDesignRuntime private var design
+
+    var body: some View {
+        Button(action: action) {
+            ButtonPreviewCardContent(name: name, role: role)
+        }
+        .buttonStyle(ButtonPreviewCardStyle())
+        .gentleSurface(.card)
+    }
+}
+
+private struct ButtonPreviewCardContent: View {
+    let name: String
+    let role: GentleButtonRole
+
+    @GentleDesignRuntime private var design
+    @Environment(\.buttonPreviewCardIsPressed) private var isPressed
+
+    var body: some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+                GentleButtonPreview(role: role, isPressed: isPressed)
+
+                Text(name.camelCaseBreakable)
+                    .gentleText(.caption_s)
+            }
+            Spacer()
+        }
+        .padding(.vertical, design.layout.gap.s)
+        .padding(.horizontal, design.layout.gap.m)
+        .contentShape(Rectangle())
+    }
+}
+
+private struct ButtonPreviewCardStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        // This is a workaround - we need to rebuild content with isPressed
+        // The actual isPressed passing happens via environment or reconstruction
+        configuration.label
+            .environment(\.buttonPreviewCardIsPressed, configuration.isPressed)
+    }
+}
+
+private struct ButtonPreviewCardIsPressedKey: EnvironmentKey {
+    static let defaultValue: Bool = false
+}
+
+private extension EnvironmentValues {
+    var buttonPreviewCardIsPressed: Bool {
+        get { self[ButtonPreviewCardIsPressedKey.self] }
+        set { self[ButtonPreviewCardIsPressedKey.self] = newValue }
+    }
+}
+
+// MARK: - Button Role Editor Sheet
+
+private struct ButtonRoleEditorSheet: View {
+    let role: GentleButtonRole
+    @Environment(\.dismiss) private var dismiss
+    @GentleDesignRuntime private var design
+
+    var body: some View {
+        NavigationStack {
+            VStack {
+                Text("Customize Buttons")
+                    .gentleText(.title_xl)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .gentleSurface(.appBackground)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
+        }
     }
 }
 
