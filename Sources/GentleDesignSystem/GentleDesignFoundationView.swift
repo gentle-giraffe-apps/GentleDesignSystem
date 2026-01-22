@@ -268,7 +268,7 @@ private struct GentleButtonPreview: View {
             spec: animSpec
         )
 
-        // When usesNativeStyle is true, skip background/border/padding - just text styling
+        // When usesNativeStyle is true, skip background/border/padding - just text styling with accent color
         if spec.usesNativeStyle {
             Text("Customize")
                 .gentleText(textRole, colorRole: spec.labelColorRole)
@@ -379,15 +379,118 @@ private struct ButtonRoleEditorSheet: View {
     let role: GentleButtonRole
     @Environment(\.dismiss) private var dismiss
     @GentleDesignRuntime private var design
+    @GentleThemeManagerRuntime private var manager
+
+    private let shapes: [GentleButtonShape] = [.rounded, .pill]
+    private let colorRoles: [GentleColorRole] = GentleColorRole.allCases
+    private let animationRoles: [GentleButtonAnimationRole] = GentleButtonAnimationRole.allCases
 
     var body: some View {
+        let binding = manager.bindingForButtonRole(role)
+
         NavigationStack {
-            VStack {
-                Text("Customize Buttons")
-                    .gentleText(.title_xl)
+            VStack(spacing: 0) {
+                VStack(alignment: .leading, spacing: design.layout.stack.regular) {
+                    Text(role.rawValue.capitalized)
+                        .gentleText(.title_xl)
+
+                    HStack(spacing: design.layout.stack.regular) {
+                        VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+                            Text("Default")
+                                .gentleText(.caption_s)
+                                .opacity(0.7)
+                            GentleButtonPreview(role: role)
+                        }
+
+                        VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+                            Text("Pressed")
+                                .gentleText(.caption_s)
+                                .opacity(0.7)
+                            GentleButtonPreview(role: role, isPressed: true)
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, design.layout.gap.m)
+                .padding(.vertical, design.layout.gap.s)
+
+                List {
+                    Section {
+                        Picker("Shape", selection: binding.shape) {
+                            ForEach(shapes, id: \.self) { shape in
+                                Text(shape.rawValue.capitalized).tag(shape)
+                            }
+                        }
+                        .disabled(binding.usesNativeStyle.wrappedValue)
+
+                        Picker("Background", selection: backgroundStyleBinding(binding)) {
+                            Text("Solid").tag(true)
+                            Text("Transparent").tag(false)
+                        }
+                        .disabled(binding.usesNativeStyle.wrappedValue)
+
+                        Picker("Border Role", selection: borderRoleBinding(binding)) {
+                            Text("None").tag(Optional<GentleColorRole>.none)
+                            ForEach(colorRoles, id: \.self) { colorRole in
+                                Text(colorRole.displayName).tag(Optional(colorRole))
+                            }
+                        }
+                        .disabled(binding.usesNativeStyle.wrappedValue)
+
+                        Picker("Animation Role", selection: binding.animationRole) {
+                            ForEach(animationRoles, id: \.self) { role in
+                                Text(role.rawValue.capitalized).tag(role)
+                            }
+                        }
+                    }
+
+                    Section {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Pressed Scale")
+                                Spacer()
+                                Text(String(format: "%.2f", binding.pressedScale.wrappedValue))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                            }
+                            Slider(value: binding.pressedScale, in: 0.7...1.0, step: 0.01)
+                        }
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Pressed Opacity")
+                                Spacer()
+                                Text(String(format: "%.2f", binding.pressedOpacity.wrappedValue))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                            }
+                            Slider(value: binding.pressedOpacity, in: 0.3...1.0, step: 0.01)
+                        }
+
+                        Toggle("Uses Native Style", isOn: binding.usesNativeStyle)
+                            .onChange(of: binding.usesNativeStyle.wrappedValue) { _, newValue in
+                                if newValue {
+                                    // When enabling native style, use primaryCTA as the accent color
+                                    binding.labelColorRole.wrappedValue = .primaryCTA
+                                } else {
+                                    // When disabling native style, set up for a styled button
+                                    binding.labelColorRole.wrappedValue = .onPrimaryCTA
+                                    binding.backgroundRole.wrappedValue = .primaryCTA
+                                }
+                            }
+
+                        if binding.usesNativeStyle.wrappedValue {
+                            Text("Native style ignores background, border, and shape.")
+                                .gentleText(.caption_s)
+                                .opacity(0.7)
+                        }
+                    }
+                }
+                .listStyle(.insetGrouped)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .gentleSurface(.appBackground)
+            .navigationTitle("Customize Buttons")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") {
@@ -396,6 +499,23 @@ private struct ButtonRoleEditorSheet: View {
                 }
             }
         }
+        .presentationDetents([.large])
+    }
+
+    private func borderRoleBinding(_ roleSpec: Binding<GentleButtonRoleSpec>) -> Binding<GentleColorRole?> {
+        Binding<GentleColorRole?>(
+            get: { roleSpec.borderRole.wrappedValue },
+            set: { roleSpec.borderRole.wrappedValue = $0 }
+        )
+    }
+
+    private func backgroundStyleBinding(_ roleSpec: Binding<GentleButtonRoleSpec>) -> Binding<Bool> {
+        Binding<Bool>(
+            get: { roleSpec.backgroundRole.wrappedValue == .primaryCTA },
+            set: { isSolid in
+                roleSpec.backgroundRole.wrappedValue = isSolid ? .primaryCTA : .surface
+            }
+        )
     }
 }
 
