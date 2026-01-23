@@ -527,170 +527,238 @@ enum ProceduralTexture {
     }
 }
 
-// MARK: - Material Presets
-//
-// DESIGN PRINCIPLE: "Perceptual Material" vs "Literal Pattern"
-// ─────────────────────────────────────────────────────────────
-// These presets aim for a *perceptual* feel of the material, NOT a literal
-// representation. For example:
-//
-// • Cloth should feel "soft, organic, fiber-like" via coarse noise grain,
-//   NOT show a visible woven grid. A literal weave pattern competes with
-//   UI content and reads as "patterned fabric" rather than "cloth surface."
-//
-// • Silk should feel "smooth with subtle shimmer" via lighting gradients,
-//   with only the faintest fine noise to avoid looking like flat plastic.
-//
-// • Plastic should feel "clean, uniform, manufactured" via very fine noise
-//   at near-invisible intensity—just enough to avoid dead-flat digital feel.
-//
-// • Aluminum should feel "precise, directional, machined" via brushed lines.
-//
-// The `.weave` pattern is kept for diagnostic/debug purposes and as an
-// optional "linen/fabric" variant, but is NOT the default for cloth.
-
 public extension GentleMaterialSurface.Recipe {
 
-    // MARK: - Cloth (soft, human, organic)
+    // ═══════════════════════════════════════════════════════════════════════════
+    // MARK: - Production Presets (subtle, but readable on device)
+    // ═══════════════════════════════════════════════════════════════════════════
     //
-    // CLOTH TEXTURE PHILOSOPHY: "Felt, not seen"
-    // ──────────────────────────────────────────
-    // Uses anisotropic noise (scaleX ≠ scaleY) for subtle directional fiber feel.
-    //
-    // KEY INSIGHT: Scale values must be >= 1.0 for texture to be visible on device.
-    // The ~20% anisotropy (scaleX/scaleY ratio) creates directional grain that
-    // differentiates cloth from paper's uniform isotropic texture.
-    //
-    // At production intensity (~5-7%), the texture should be barely perceptible
-    // but contribute to the overall "soft, fibrous" feel of the surface.
+    // Updated rule:
+    // - Default presets match the "Boosted (25%)" presets for visibility,
+    //   EXCEPT aluminum stays restrained as a production default.
 
-    /// Soft, human, forgiving — perceptual cloth via anisotropic noise
+    // MARK: Cloth — set equal to clothBoosted
     static let cloth = Self(
-        lighting: .init(
-            style: .softTop,
-            intensity: 0.07
-        ),
+        lighting: .init(style: .softTop, intensity: 0.08),
         texture: .init(
             pattern: .noise,
-            intensity: 0.06,
-            scaleX: 1.4,            // Visible grain (must be >= 1.0)
-            scaleY: 1.15            // ~20% anisotropy for directional fiber feel
+            intensity: 0.22,
+            scaleX: 1.40,
+            scaleY: 1.15
         ),
         secondaryTexture: .init(
             pattern: .noise,
-            intensity: 0.025,       // Very subtle micro-fiber layer
-            scaleX: 0.8,
-            scaleY: 0.65,
-            rotation: .degrees(22)  // Slight rotation = fiber alignment variation
+            intensity: 0.08,
+            scaleX: 1.00,
+            scaleY: 0.85,
+            rotation: .degrees(22)
         ),
-        depth: .init(
-            innerHighlight: 0.04,
-            ambientOcclusion: 0.07
-        )
+        depth: .init(innerHighlight: 0.05, ambientOcclusion: 0.10)
     )
 
-    // MARK: - Paper (flat, isotropic, uniform)
-    //
-    // Single-layer ISOTROPIC noise with diffuse lighting.
-    // NO anisotropy, NO secondary layer — reads as "flat sheet" not "woven".
-    // This uniform quality is what differentiates paper from cloth.
-
-    /// Flat, uniform, archival — isotropic noise like watercolor paper
+    // MARK: Paper — set equal to paperBoosted
     static let paper = Self(
-        lighting: .init(
-            style: .softTop,
-            intensity: 0.05
-        ),
-        texture: .init(
-            pattern: .noise,
-            intensity: 0.07,
-            scale: 1.6              // Uniform scale = isotropic (no directional bias)
-        ),
-        // NO secondaryTexture — paper is single-layer
-        depth: .init(
-            innerHighlight: 0.03,
-            ambientOcclusion: 0.06
-        )
+        lighting: .init(style: .softTop, intensity: 0.06),
+        texture: .init(pattern: .noise, intensity: 0.28, scale: 1.9),
+        depth: .init(innerHighlight: 0.04, ambientOcclusion: 0.09)
     )
 
-    // MARK: - Plastic (clean, manufactured, uniform)
-    // Uses very fine noise at minimal intensity
-
-    /// Clean, consumer-tech, neutral — smooth with imperceptible grain
+    // MARK: Plastic — set equal to plasticBoosted
     static let plastic = Self(
-        lighting: .init(
-            style: .softTop,
-            intensity: 0.12
-        ),
-        texture: .init(
-            pattern: .noise,
-            intensity: 0.03,        // Very low — just breaks up flatness
-            scale: 0.8              // Smaller scale = fine uniform grain
-        ),
-        depth: .init(
-            innerHighlight: 0.08,
-            ambientOcclusion: 0.05
-        )
+        lighting: .init(style: .softTop, intensity: 0.12),
+        texture: .init(pattern: .noise, intensity: 0.14, scale: 1.2),
+        depth: .init(innerHighlight: 0.09, ambientOcclusion: 0.05)
     )
 
-    // MARK: - Silk (warm, premium, shimmer)
-    // Lighting-driven with finest noise at lowest intensity
-
-    /// Warm, premium, subtle shimmer — lighting gradient with whisper of grain
+    // MARK: Silk — set equal to silkBoosted
     static let silk = Self(
-        lighting: .init(
-            style: .directional(angle: .degrees(-35)),
-            intensity: 0.14
-        ),
-        texture: .init(
-            pattern: .noise,
-            intensity: 0.04,        // Barely visible
-            scale: 0.6              // Finest scale = smooth silk feel
-        ),
-        depth: .init(
-            innerHighlight: 0.10,
-            ambientOcclusion: 0.04
-        )
+        lighting: .init(style: .directional(angle: .degrees(-35)), intensity: 0.14),
+        texture: .init(pattern: .noise, intensity: 0.12, scale: 1.1),
+        depth: .init(innerHighlight: 0.11, ambientOcclusion: 0.04)
     )
 
-    // MARK: - Aluminum (precise, engineered, directional)
-    // Uses brushed texture for machined metal feel
-
-    /// Precise, engineered, cool — directional brushed grain
+    // MARK: Aluminum — keep restrained production default (NOT boosted)
     static let aluminum = Self(
-        lighting: .init(
-            style: .directional(angle: .degrees(15)),
-            intensity: 0.16
-        ),
+        lighting: .init(style: .directional(angle: .degrees(15)), intensity: 0.16),
         texture: .init(
             pattern: .brushed,
-            intensity: 0.07,
+            intensity: 0.14,
             scale: 1.0
         ),
-        depth: .init(
-            innerHighlight: 0.05,
-            ambientOcclusion: 0.06
-        )
+        depth: .init(innerHighlight: 0.06, ambientOcclusion: 0.07)
     )
 
-    // MARK: - Linen (optional fabric variant with actual weave)
-    // This is the "literal weave" option for when you want visible fabric texture
-
-    /// Visible woven fabric pattern — use sparingly, competes with UI content
+    // MARK: Linen — set equal to linenBoosted
     static let linen = Self(
-        lighting: .init(
-            style: .softTop,
-            intensity: 0.06
-        ),
+        lighting: .init(style: .softTop, intensity: 0.06),
+        texture: .init(pattern: .weave, intensity: 0.20, scale: 1.0),
+        depth: .init(innerHighlight: 0.04, ambientOcclusion: 0.07)
+    )
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // MARK: - Debug Presets (25% / 50% / 100% inspection ramps)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    // MARK: - Cloth (anisotropic noise for directional fiber feel)
+
+    // 25% intensity — visible fiber grain (debug)
+    static let clothBoosted = Self(
+        lighting: .init(style: .softTop, intensity: 0.08),
         texture: .init(
-            pattern: .weave,
-            intensity: 0.12,
-            scale: 1.0
+            pattern: .noise,
+            intensity: 0.22,
+            scaleX: 1.40,
+            scaleY: 1.15
         ),
-        depth: .init(
-            innerHighlight: 0.03,
-            ambientOcclusion: 0.06
-        )
+        secondaryTexture: .init(
+            pattern: .noise,
+            intensity: 0.08,
+            scaleX: 1.00,
+            scaleY: 0.85,
+            rotation: .degrees(22)
+        ),
+        depth: .init(innerHighlight: 0.05, ambientOcclusion: 0.10)
+    )
+
+    // 50% intensity — strong for debugging
+    static let clothMax = Self(
+        lighting: .init(style: .softTop, intensity: 0.08),
+        texture: .init(
+            pattern: .noise,
+            intensity: 0.40,
+            scaleX: 1.40,
+            scaleY: 1.15
+        ),
+        secondaryTexture: .init(
+            pattern: .noise,
+            intensity: 0.14,
+            scaleX: 1.00,
+            scaleY: 0.85,
+            rotation: .degrees(22)
+        ),
+        depth: .init(innerHighlight: 0.05, ambientOcclusion: 0.10)
+    )
+
+    // MARK: - Paper (single-layer isotropic noise)
+
+    static let paperBoosted = Self(
+        lighting: .init(style: .softTop, intensity: 0.06),
+        texture: .init(pattern: .noise, intensity: 0.28, scale: 1.9),
+        depth: .init(innerHighlight: 0.04, ambientOcclusion: 0.09)
+    )
+
+    static let paperMax = Self(
+        lighting: .init(style: .softTop, intensity: 0.06),
+        texture: .init(pattern: .noise, intensity: 0.50, scale: 1.9),
+        depth: .init(innerHighlight: 0.04, ambientOcclusion: 0.09)
+    )
+
+    // MARK: - Plastic
+
+    static let plasticBoosted = Self(
+        lighting: .init(style: .softTop, intensity: 0.12),
+        texture: .init(pattern: .noise, intensity: 0.14, scale: 1.2),
+        depth: .init(innerHighlight: 0.09, ambientOcclusion: 0.05)
+    )
+
+    static let plasticMax = Self(
+        lighting: .init(style: .softTop, intensity: 0.12),
+        texture: .init(pattern: .noise, intensity: 0.30, scale: 1.2),
+        depth: .init(innerHighlight: 0.09, ambientOcclusion: 0.05)
+    )
+
+    // MARK: - Silk
+
+    static let silkBoosted = Self(
+        lighting: .init(style: .directional(angle: .degrees(-35)), intensity: 0.14),
+        texture: .init(pattern: .noise, intensity: 0.12, scale: 1.1),
+        depth: .init(innerHighlight: 0.11, ambientOcclusion: 0.04)
+    )
+
+    static let silkMax = Self(
+        lighting: .init(style: .directional(angle: .degrees(-35)), intensity: 0.14),
+        texture: .init(pattern: .noise, intensity: 0.26, scale: 1.1),
+        depth: .init(innerHighlight: 0.11, ambientOcclusion: 0.04)
+    )
+
+    // MARK: - Aluminum
+
+    static let aluminumBoosted = Self(
+        lighting: .init(style: .directional(angle: .degrees(15)), intensity: 0.16),
+        texture: .init(pattern: .brushed, intensity: 0.22, scale: 1.0),
+        depth: .init(innerHighlight: 0.06, ambientOcclusion: 0.07)
+    )
+
+    static let aluminumMax = Self(
+        lighting: .init(style: .directional(angle: .degrees(15)), intensity: 0.16),
+        texture: .init(pattern: .brushed, intensity: 0.42, scale: 1.0),
+        depth: .init(innerHighlight: 0.06, ambientOcclusion: 0.07)
+    )
+
+    // MARK: - Linen
+
+    static let linenBoosted = Self(
+        lighting: .init(style: .softTop, intensity: 0.06),
+        texture: .init(pattern: .weave, intensity: 0.20, scale: 1.0),
+        depth: .init(innerHighlight: 0.04, ambientOcclusion: 0.07)
+    )
+
+    static let linenMax = Self(
+        lighting: .init(style: .softTop, intensity: 0.06),
+        texture: .init(pattern: .weave, intensity: 0.38, scale: 1.0),
+        depth: .init(innerHighlight: 0.04, ambientOcclusion: 0.07)
+    )
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // MARK: - 100% INTENSITY (Full visibility for texture inspection)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    static let clothFull = Self(
+        lighting: .init(style: .softTop, intensity: 0.08),
+        texture: .init(
+            pattern: .noise,
+            intensity: 0.70,
+            scaleX: 1.40,
+            scaleY: 1.15
+        ),
+        secondaryTexture: .init(
+            pattern: .noise,
+            intensity: 0.26,
+            scaleX: 1.00,
+            scaleY: 0.85,
+            rotation: .degrees(22)
+        ),
+        depth: .init(innerHighlight: 0.05, ambientOcclusion: 0.10)
+    )
+
+    static let paperFull = Self(
+        lighting: .init(style: .softTop, intensity: 0.06),
+        texture: .init(pattern: .noise, intensity: 0.80, scale: 1.9),
+        depth: .init(innerHighlight: 0.04, ambientOcclusion: 0.09)
+    )
+
+    static let plasticFull = Self(
+        lighting: .init(style: .softTop, intensity: 0.12),
+        texture: .init(pattern: .noise, intensity: 0.65, scale: 1.2),
+        depth: .init(innerHighlight: 0.09, ambientOcclusion: 0.05)
+    )
+
+    static let silkFull = Self(
+        lighting: .init(style: .directional(angle: .degrees(-35)), intensity: 0.14),
+        texture: .init(pattern: .noise, intensity: 0.55, scale: 1.1),
+        depth: .init(innerHighlight: 0.11, ambientOcclusion: 0.04)
+    )
+
+    static let aluminumFull = Self(
+        lighting: .init(style: .directional(angle: .degrees(15)), intensity: 0.16),
+        texture: .init(pattern: .brushed, intensity: 0.78, scale: 1.0),
+        depth: .init(innerHighlight: 0.06, ambientOcclusion: 0.07)
+    )
+
+    static let linenFull = Self(
+        lighting: .init(style: .softTop, intensity: 0.06),
+        texture: .init(pattern: .weave, intensity: 0.80, scale: 1.0),
+        depth: .init(innerHighlight: 0.04, ambientOcclusion: 0.07)
     )
 }
 

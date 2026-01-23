@@ -180,7 +180,7 @@ public struct GentleDesignTypographySection: View {
                         .padding(.horizontal, design.layout.gap.m)
                         .gentleSurface(.card)
                         .overlay(
-                            RoundedRectangle(cornerRadius: CGFloat(theme.radii.medium))
+                            RoundedRectangle(cornerRadius: CGFloat(theme.surfaces.roleSpec(for: .card).cornerRadius))
                                 .strokeBorder(
                                     theme.color(for: .primaryCTA, scheme: colorScheme)
                                         .opacity(0.5),
@@ -429,7 +429,7 @@ private struct ButtonPreviewCard: View {
         .buttonStyle(ButtonPreviewCardStyle())
         .gentleSurface(.card)
         .overlay(
-            RoundedRectangle(cornerRadius: CGFloat(theme.radii.large))
+            RoundedRectangle(cornerRadius: CGFloat(theme.surfaces.roleSpec(for: .card).cornerRadius))
                 .strokeBorder(
                     theme.color(for: .primaryCTA, scheme: colorScheme)
                         .opacity(0.5),
@@ -700,7 +700,7 @@ public struct GentleDesignSurfacesSection: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .gentleSurface(surface, inset: .card)
             .overlay(
-                RoundedRectangle(cornerRadius: CGFloat(theme.radii.large))
+                RoundedRectangle(cornerRadius: CGFloat(theme.surfaces.roleSpec(for: surface).cornerRadius))
                     .strokeBorder(
                         theme.color(for: .primaryCTA, scheme: colorScheme)
                             .opacity(0.5),
@@ -934,7 +934,8 @@ public struct GentleDesignMaterialsSection: View {
                 .gentleText(.title_xl)
                 .opacity(0.7)
 
-            // Raw Textures
+            // Raw Textures (commented out for cleaner UI)
+            /*
             VStack(alignment: .leading, spacing: design.layout.stack.tight) {
                 Text("Procedural Textures (Raw)")
                     .gentleText(.headline_m)
@@ -959,6 +960,7 @@ public struct GentleDesignMaterialsSection: View {
                 }
             }
             .gentleSurface(.card, inset: .card)
+            */
 
             // Material Presets
             VStack(alignment: .leading, spacing: design.layout.stack.tight) {
@@ -1003,7 +1005,8 @@ public struct GentleDesignMaterialsSection: View {
             }
             .gentleSurface(.card, inset: .card)
 
-            // Boosted Presets (more visible texture)
+            // Boosted Presets (commented out for cleaner UI)
+            /*
             VStack(alignment: .leading, spacing: design.layout.stack.tight) {
                 Text("Presets with Boosted Texture (25%)")
                     .gentleText(.headline_m)
@@ -1045,7 +1048,9 @@ public struct GentleDesignMaterialsSection: View {
                 }
             }
             .gentleSurface(.card, inset: .card)
+            */
 
+            /*
             // Full Materials at 50% texture (very visible debug)
             VStack(alignment: .leading, spacing: design.layout.stack.tight) {
                 Text("Full Materials at 50% Texture")
@@ -1131,6 +1136,7 @@ public struct GentleDesignMaterialsSection: View {
                 }
             }
             .gentleSurface(.card, inset: .card)
+             */
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -1211,202 +1217,15 @@ private struct MaterialPresetCard: View {
                 recipe: recipe
             )
             .frame(height: 80)
+            .overlay {
+                Text("Aa Bb")
+                    .gentleText(.headline_m)
+            }
 
             Text(label)
                 .gentleText(.caption_s)
         }
     }
-}
-
-// MARK: - Debug Material Presets
-//
-// These use the SAME texture mappings as production presets, just at higher
-// intensity for visibility testing.
-//
-// CLOTH vs PAPER — "Felt, Not Seen"
-// ─────────────────────────────────
-// CLOTH: Fine-grained anisotropic noise + secondary layer + blur
-//   - Small scale values (< 1.0) = high frequency = fine fibers
-//   - Anisotropy (scaleX ≠ scaleY) = subtle directional grain
-//   - Blur = soft edges, not harsh speckles
-//
-// PAPER: Isotropic single-layer noise, no blur
-//   - Uniform scale = no directional bias
-//   - Reads as flat, powdery, uniform sheet
-//
-// At debug intensities (25-50%), cloth should still look like FINE FIBERS,
-// not "chunky oatmeal." The key is small scales + blur.
-
-private extension GentleMaterialSurface.Recipe {
-
-    // MARK: - Cloth (anisotropic noise for directional fiber feel)
-    //
-    // KEY: Scale must be >= 1.0 for texture to be visible on device.
-    // Anisotropy (scaleX ≠ scaleY) creates directional "fiber" feel.
-    // No blur - let the texture show through clearly.
-
-    // 25% intensity — visible fiber grain
-    static let clothBoosted = Self(
-        lighting: .init(style: .softTop, intensity: 0.08),
-        texture: .init(
-            pattern: .noise,
-            intensity: 0.25,
-            scaleX: 1.4,            // Visible grain
-            scaleY: 1.15            // ~20% anisotropy for directional feel
-        ),
-        secondaryTexture: .init(
-            pattern: .noise,
-            intensity: 0.10,
-            scaleX: 0.8,
-            scaleY: 0.65,
-            rotation: .degrees(22)
-        ),
-        depth: .init(innerHighlight: 0.04, ambientOcclusion: 0.08)
-    )
-
-    // 50% intensity — strong for debugging
-    static let clothMax = Self(
-        lighting: .init(style: .softTop, intensity: 0.08),
-        texture: .init(
-            pattern: .noise,
-            intensity: 0.45,
-            scaleX: 1.4,
-            scaleY: 1.15
-        ),
-        secondaryTexture: .init(
-            pattern: .noise,
-            intensity: 0.18,
-            scaleX: 0.8,
-            scaleY: 0.65,
-            rotation: .degrees(22)
-        ),
-        depth: .init(innerHighlight: 0.04, ambientOcclusion: 0.08)
-    )
-
-    // MARK: - Paper (single-layer isotropic noise)
-
-    static let paperBoosted = Self(
-        lighting: .init(style: .softTop, intensity: 0.06),
-        texture: .init(pattern: .noise, intensity: 0.22, scale: 1.6),
-        depth: .init(innerHighlight: 0.03, ambientOcclusion: 0.07)
-    )
-
-    static let paperMax = Self(
-        lighting: .init(style: .softTop, intensity: 0.06),
-        texture: .init(pattern: .noise, intensity: 0.45, scale: 1.6),
-        depth: .init(innerHighlight: 0.03, ambientOcclusion: 0.07)
-    )
-
-    // MARK: - Plastic
-
-    static let plasticBoosted = Self(
-        lighting: .init(style: .softTop, intensity: 0.12),
-        texture: .init(pattern: .noise, intensity: 0.15, scale: 0.8),
-        depth: .init(innerHighlight: 0.08, ambientOcclusion: 0.05)
-    )
-
-    static let plasticMax = Self(
-        lighting: .init(style: .softTop, intensity: 0.12),
-        texture: .init(pattern: .noise, intensity: 0.35, scale: 0.8),
-        depth: .init(innerHighlight: 0.08, ambientOcclusion: 0.05)
-    )
-
-    // MARK: - Silk
-
-    static let silkBoosted = Self(
-        lighting: .init(style: .directional(angle: .degrees(-35)), intensity: 0.14),
-        texture: .init(pattern: .noise, intensity: 0.12, scale: 0.6),
-        depth: .init(innerHighlight: 0.10, ambientOcclusion: 0.04)
-    )
-
-    static let silkMax = Self(
-        lighting: .init(style: .directional(angle: .degrees(-35)), intensity: 0.14),
-        texture: .init(pattern: .noise, intensity: 0.30, scale: 0.6),
-        depth: .init(innerHighlight: 0.10, ambientOcclusion: 0.04)
-    )
-
-    // MARK: - Aluminum
-
-    static let aluminumBoosted = Self(
-        lighting: .init(style: .directional(angle: .degrees(15)), intensity: 0.16),
-        texture: .init(pattern: .brushed, intensity: 0.18, scale: 1.0),
-        depth: .init(innerHighlight: 0.05, ambientOcclusion: 0.06)
-    )
-
-    static let aluminumMax = Self(
-        lighting: .init(style: .directional(angle: .degrees(15)), intensity: 0.16),
-        texture: .init(pattern: .brushed, intensity: 0.40, scale: 1.0),
-        depth: .init(innerHighlight: 0.05, ambientOcclusion: 0.06)
-    )
-
-    // MARK: - Linen (literal weave pattern — for comparison/diagnostics only)
-
-    static let linenBoosted = Self(
-        lighting: .init(style: .softTop, intensity: 0.06),
-        texture: .init(pattern: .weave, intensity: 0.25, scale: 1.0),
-        depth: .init(innerHighlight: 0.03, ambientOcclusion: 0.06)
-    )
-
-    static let linenMax = Self(
-        lighting: .init(style: .softTop, intensity: 0.06),
-        texture: .init(pattern: .weave, intensity: 0.45, scale: 1.0),
-        depth: .init(innerHighlight: 0.03, ambientOcclusion: 0.06)
-    )
-
-    // ═══════════════════════════════════════════════════════════════════════════
-    // MARK: - 100% INTENSITY (Full visibility for texture inspection)
-    // ═══════════════════════════════════════════════════════════════════════════
-    //
-    // These presets show textures at maximum intensity (1.0) so you can clearly
-    // see the texture pattern, grain, and directionality. Use for debugging only.
-
-    static let clothFull = Self(
-        lighting: .init(style: .softTop, intensity: 0.08),
-        texture: .init(
-            pattern: .noise,
-            intensity: 0.75,
-            scaleX: 1.4,
-            scaleY: 1.15
-        ),
-        secondaryTexture: .init(
-            pattern: .noise,
-            intensity: 0.30,
-            scaleX: 0.8,
-            scaleY: 0.65,
-            rotation: .degrees(22)
-        ),
-        depth: .init(innerHighlight: 0.04, ambientOcclusion: 0.08)
-    )
-
-    static let paperFull = Self(
-        lighting: .init(style: .softTop, intensity: 0.06),
-        texture: .init(pattern: .noise, intensity: 0.85, scale: 1.6),
-        depth: .init(innerHighlight: 0.03, ambientOcclusion: 0.07)
-    )
-
-    static let plasticFull = Self(
-        lighting: .init(style: .softTop, intensity: 0.12),
-        texture: .init(pattern: .noise, intensity: 0.70, scale: 0.8),
-        depth: .init(innerHighlight: 0.08, ambientOcclusion: 0.05)
-    )
-
-    static let silkFull = Self(
-        lighting: .init(style: .directional(angle: .degrees(-35)), intensity: 0.14),
-        texture: .init(pattern: .noise, intensity: 0.60, scale: 0.6),
-        depth: .init(innerHighlight: 0.10, ambientOcclusion: 0.04)
-    )
-
-    static let aluminumFull = Self(
-        lighting: .init(style: .directional(angle: .degrees(15)), intensity: 0.16),
-        texture: .init(pattern: .brushed, intensity: 0.80, scale: 1.0),
-        depth: .init(innerHighlight: 0.05, ambientOcclusion: 0.06)
-    )
-
-    static let linenFull = Self(
-        lighting: .init(style: .softTop, intensity: 0.06),
-        texture: .init(pattern: .weave, intensity: 0.85, scale: 1.0),
-        depth: .init(innerHighlight: 0.03, ambientOcclusion: 0.06)
-    )
 }
 
 // MARK: - Color to Hex conversion
