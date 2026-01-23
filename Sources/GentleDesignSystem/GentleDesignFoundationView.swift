@@ -361,7 +361,7 @@ public struct GentleButtonPreview: View {
 
         // When usesNativeStyle is true, skip background/border/padding - just text styling with accent color
         if spec.usesNativeStyle {
-            Text("OK")
+            Text("Edit")
                 .gentleText(textRole, colorRole: labelColorRole)
                 .scaleEffect(isPressed ? spec.pressedScale : 1.0)
                 .opacity(isPressed ? spec.pressedOpacity : 1.0)
@@ -387,7 +387,7 @@ public struct GentleButtonPreview: View {
                 }
             }()
 
-            Text("OK")
+            Text("Edit")
                 .gentleText(textRole, colorRole: labelColorRole)
                 .padding(.horizontal, CGFloat(gap.xl))
                 .padding(.vertical, verticalPadding)
@@ -426,7 +426,7 @@ private struct ButtonPreviewCard: View {
         .buttonStyle(ButtonPreviewCardStyle())
         .gentleSurface(.card)
         .overlay(
-            RoundedRectangle(cornerRadius: CGFloat(theme.radii.medium))
+            RoundedRectangle(cornerRadius: CGFloat(theme.radii.large))
                 .strokeBorder(
                     theme.color(for: .primaryCTA, scheme: colorScheme)
                         .opacity(0.5),
@@ -642,6 +642,8 @@ private struct ButtonRoleEditorSheet: View {
 
 public struct GentleDesignSurfacesSection: View {
     @GentleDesignRuntime private var design
+    @Environment(\.gentleTheme) private var theme
+    @Environment(\.colorScheme) private var colorScheme
     @State private var editingRole: GentleSurfaceRole?
 
     public init() {}
@@ -680,22 +682,24 @@ public struct GentleDesignSurfacesSection: View {
         Button {
             editingRole = surface
         } label: {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: design.layout.stack.tight) {
-                    Text(title)
-                        .gentleText(.headline_m)
+            VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+                Text(title)
+                    .gentleText(.headline_m)
 
-                    Text(subtitle)
-                        .gentleText(.caption_s)
-                        .opacity(0.8)
-                }
-                Spacer()
-                Image(systemName: "gearshape")
-                    .gentleText(.body_m)
-                    .opacity(0.5)
+                Text(subtitle)
+                    .gentleText(.caption_s)
+                    .opacity(0.8)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .gentleSurface(surface, inset: .card)
+            .overlay(
+                RoundedRectangle(cornerRadius: CGFloat(theme.radii.large))
+                    .strokeBorder(
+                        theme.color(for: .primaryCTA, scheme: colorScheme)
+                            .opacity(0.5),
+                        lineWidth: 1
+                    )
+            )
         }
         .buttonStyle(.plain)
     }
