@@ -111,12 +111,14 @@ public struct TypographyRoleEditorSheet: View {
                         } label: {
                             HStack(spacing: 4) {
                                 Text(binding.weight.wrappedValue.displayName)
-                                    .foregroundStyle(.secondary)
+                                    .font(.title3)
+                                    .fontWeight(binding.weight.wrappedValue.swiftUIWeight)
                                 Image(systemName: "chevron.up.chevron.down")
                                     .font(.caption2)
-                                    .foregroundStyle(.tertiary)
                             }
+                            .foregroundStyle(.secondary)
                         }
+                        .buttonStyle(.plain)
                         .popover(isPresented: $showingWeightPicker) {
                             WeightPickerPopover(
                                 selectedWeight: binding.weight,
