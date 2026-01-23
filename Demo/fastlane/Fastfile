@@ -15,15 +15,19 @@
 
 default_platform(:ios)
 
-  platform :ios do
+platform :ios do
+  # Shared derived data path for all lanes to reuse compiled artifacts
+  DERIVED_DATA_PATH = File.expand_path("../../build/DerivedData", __dir__)
+
   desc "Build package and demo app"
   lane :build do
     build_app(
       project: "GentleDesignSystemDemo.xcodeproj",
       scheme: "GentleDesignSystemDemo",
       configuration: "Debug",
-      skip_package_ipa: true,   # important: avoids IPA packaging
-      destination: "generic/platform=iOS Simulator"
+      skip_package_ipa: true,
+      destination: "generic/platform=iOS Simulator",
+      derived_data_path: DERIVED_DATA_PATH
     )
   end
 
@@ -42,7 +46,8 @@ default_platform(:ios)
           -sdk iphonesimulator \
           -destination "platform=iOS Simulator,name=iPhone 17" \
           -enableCodeCoverage YES \
-          -resultBundlePath TestResults.xcresult
+          -resultBundlePath TestResults.xcresult \
+          -derivedDataPath #{DERIVED_DATA_PATH}
       CMD
     end
   end
