@@ -34,7 +34,7 @@ public struct GentleMaterialSurface: View {
 
     public struct Lighting: Sendable {
         public enum Style: Sendable {
-            case none
+            case noLighting
             case softTop
             case directional(angle: Angle)
         }
@@ -202,7 +202,7 @@ public struct GentleMaterialSurface: View {
     @ViewBuilder
     private var lightingLayer: some View {
         switch recipe.lighting.style {
-        case .none:
+        case .noLighting:
             EmptyView()
 
         case .softTop:
@@ -890,17 +890,17 @@ public extension GentleMaterialSurface.Recipe {
 #Preview("Textures DEBUG (High Intensity)") {
     let debugRecipes: [(String, GentleMaterialSurface.Recipe)] = [
         ("Noise 50%", .init(
-            lighting: .init(style: .none, intensity: 0),
+            lighting: .init(style: .noLighting, intensity: 0),
             texture: .init(pattern: .noise, intensity: 0.5, scale: 1.0),
             depth: .init(innerHighlight: 0, ambientOcclusion: 0)
         )),
         ("Weave 50%", .init(
-            lighting: .init(style: .none, intensity: 0),
+            lighting: .init(style: .noLighting, intensity: 0),
             texture: .init(pattern: .weave, intensity: 0.5, scale: 1.0),
             depth: .init(innerHighlight: 0, ambientOcclusion: 0)
         )),
         ("Brushed 50%", .init(
-            lighting: .init(style: .none, intensity: 0),
+            lighting: .init(style: .noLighting, intensity: 0),
             texture: .init(pattern: .brushed, intensity: 0.5, scale: 1.0),
             depth: .init(innerHighlight: 0, ambientOcclusion: 0)
         )),

@@ -1191,7 +1191,7 @@ private struct DebugMaterialCard: View {
                 baseColor: Color(white: 0.85),
                 cornerRadius: 8,
                 recipe: .init(
-                    lighting: .init(style: .none, intensity: 0),
+                    lighting: .init(style: . noLighting, intensity: 0),
                     texture: .init(pattern: pattern, intensity: 0.5, scale: 1.0),
                     depth: .init(innerHighlight: 0, ambientOcclusion: 0)
                 )
