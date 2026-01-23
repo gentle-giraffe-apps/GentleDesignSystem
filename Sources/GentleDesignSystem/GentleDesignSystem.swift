@@ -258,6 +258,112 @@ public enum GentleSurfaceRole: String, Codable, Sendable {
     case surfaceOverlay
 }
 
+// MARK: - Surface specs
+
+/// Defines the visual appearance of a surface role.
+public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
+    // Colors
+    public var background: GentleColorPair
+    public var border: GentleColorPair
+
+    // Structure
+    public var cornerRadius: Double
+    public var borderWidth: Double
+
+    // Shadow
+    public var shadowRadius: Double
+    public var shadowOpacity: Double
+    public var shadowOffsetX: Double
+    public var shadowOffsetY: Double
+
+    public init(
+        background: GentleColorPair,
+        border: GentleColorPair,
+        cornerRadius: Double = 20,
+        borderWidth: Double = 1,
+        shadowRadius: Double = 0,
+        shadowOpacity: Double = 0,
+        shadowOffsetX: Double = 0,
+        shadowOffsetY: Double = 0
+    ) {
+        self.background = background
+        self.border = border
+        self.cornerRadius = cornerRadius
+        self.borderWidth = borderWidth
+        self.shadowRadius = shadowRadius
+        self.shadowOpacity = shadowOpacity
+        self.shadowOffsetX = shadowOffsetX
+        self.shadowOffsetY = shadowOffsetY
+    }
+}
+
+public struct GentleSurfaceTokens: Codable, Sendable {
+    /// Stored using String keys for JSON stability (role.rawValue).
+    public var roles: [String: GentleSurfaceRoleSpec]
+
+    public init(roles: [String: GentleSurfaceRoleSpec]) {
+        self.roles = roles
+    }
+
+    public func roleSpec(for role: GentleSurfaceRole) -> GentleSurfaceRoleSpec {
+        if let spec = roles[role.rawValue] { return spec }
+        // Fallback to card if missing.
+        if let card = roles[GentleSurfaceRole.card.rawValue] { return card }
+        // Last-resort defaults (should never happen with gentleDefault).
+        return .init(
+            background: GentleColorPair(lightHex: "#FAFAFE", darkHex: "#111827"),
+            border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151")
+        )
+    }
+}
+
+public extension GentleSurfaceTokens {
+    static let gentleDefault: GentleSurfaceTokens = .init(
+        roles: [
+            GentleSurfaceRole.appBackground.rawValue: .init(
+                background: GentleColorPair(lightHex: "#F3F4F6", darkHex: "#030712"),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0,
+                shadowRadius: 0,
+                shadowOpacity: 0,
+                shadowOffsetX: 0,
+                shadowOffsetY: 0
+            ),
+            GentleSurfaceRole.card.rawValue: .init(
+                background: GentleColorPair(lightHex: "#FAFAFE", darkHex: "#111827"),
+                border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
+                cornerRadius: 20,
+                borderWidth: 1,
+                shadowRadius: 0,
+                shadowOpacity: 0,
+                shadowOffsetX: 0,
+                shadowOffsetY: 0
+            ),
+            GentleSurfaceRole.cardElevated.rawValue: .init(
+                background: GentleColorPair(lightHex: "#FFFFFF", darkHex: "#1F2937"),
+                border: GentleColorPair(lightHex: "#E5E7EB59", darkHex: "#37415159"),
+                cornerRadius: 20,
+                borderWidth: 0.5,
+                shadowRadius: 8,
+                shadowOpacity: 0.08,
+                shadowOffsetX: 0,
+                shadowOffsetY: 6
+            ),
+            GentleSurfaceRole.surfaceOverlay.rawValue: .init(
+                background: GentleColorPair(lightHex: "#111827CC", darkHex: "#020617CC"),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0,
+                shadowRadius: 0,
+                shadowOpacity: 0,
+                shadowOffsetX: 0,
+                shadowOffsetY: 0
+            )
+        ]
+    )
+}
+
 // MARK: - Gap intents
 
 /// High-level intent for spacing between siblings (stacks, lists, grids).
@@ -336,9 +442,12 @@ public struct GentleDesignSystemSpec: Codable, Sendable {
     /// Component style tokens (buttons, etc.)
     public var buttons: GentleButtonTokens
 
+    /// Surface style tokens
+    public var surfaces: GentleSurfaceTokens
+
     enum CodingKeys: String, CodingKey {
         case specVersion = "_specVersion"
-        case colors, typography, layout, visual, buttons
+        case colors, typography, layout, visual, buttons, surfaces
     }
 
     public init(
@@ -347,7 +456,8 @@ public struct GentleDesignSystemSpec: Codable, Sendable {
         typography: GentleTypographyTokens,
         layout: GentleLayoutTokens,
         visual: GentleVisualTokens,
-        buttons: GentleButtonTokens
+        buttons: GentleButtonTokens,
+        surfaces: GentleSurfaceTokens = .gentleDefault
     ) {
         self.specVersion = specVersion
         self.colors = colors
@@ -355,6 +465,7 @@ public struct GentleDesignSystemSpec: Codable, Sendable {
         self.layout = layout
         self.visual = visual
         self.buttons = buttons
+        self.surfaces = surfaces
     }
 }
 
@@ -364,7 +475,8 @@ public extension GentleDesignSystemSpec {
         typography: .gentleDefault,
         layout: .gentleDefault,
         visual: .gentleDefault,
-        buttons: .gentleDefault
+        buttons: .gentleDefault,
+        surfaces: .gentleDefault
     )
 }
 
@@ -1010,6 +1122,7 @@ public struct GentleTheme: Sendable {
     public var layout: GentleLayoutTokens { activeSpec.layout }
     public var visual: GentleVisualTokens { activeSpec.visual }
     public var buttons: GentleButtonTokens { activeSpec.buttons }
+    public var surfaces: GentleSurfaceTokens { activeSpec.surfaces }
 
     public var gap: GentleGapTokens { activeSpec.layout.gap }
     public var grid: GentleGridSpacingTokens { activeSpec.layout.grid }
@@ -1376,6 +1489,7 @@ public struct GentleDesignRuntime: DynamicProperty {
         public var layout: GentleLayoutFacade { .init(tokens: theme.layout) }
         public var visual: GentleVisualTokens { theme.visual }
         public var buttons: GentleButtonTokens { theme.buttons }
+        public var surfaces: GentleSurfaceTokens { theme.surfaces }
 
         public var radii: GentleRadiusTokens { theme.radii }
         public var shadows: GentleShadowTokens { theme.shadows }
@@ -1480,6 +1594,18 @@ public final class GentleThemeManager {
             set: { newSpec in
                 var t = self.theme
                 t.editableSpec.buttons.roles[role.rawValue] = newSpec
+                self.theme = t
+                self.hasUnsavedChanges = true
+            }
+        )
+    }
+
+    public func bindingForSurfaceRole(_ role: GentleSurfaceRole) -> Binding<GentleSurfaceRoleSpec> {
+        Binding(
+            get: { self.theme.editableSpec.surfaces.roleSpec(for: role) },
+            set: { newSpec in
+                var t = self.theme
+                t.editableSpec.surfaces.roles[role.rawValue] = newSpec
                 self.theme = t
                 self.hasUnsavedChanges = true
             }

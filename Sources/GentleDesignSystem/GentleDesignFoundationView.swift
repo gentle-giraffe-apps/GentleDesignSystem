@@ -361,7 +361,7 @@ public struct GentleButtonPreview: View {
 
         // When usesNativeStyle is true, skip background/border/padding - just text styling with accent color
         if spec.usesNativeStyle {
-            Text("OK")
+            Text("Edit")
                 .gentleText(textRole, colorRole: labelColorRole)
                 .scaleEffect(isPressed ? spec.pressedScale : 1.0)
                 .opacity(isPressed ? spec.pressedOpacity : 1.0)
@@ -387,7 +387,7 @@ public struct GentleButtonPreview: View {
                 }
             }()
 
-            Text("OK")
+            Text("Edit")
                 .gentleText(textRole, colorRole: labelColorRole)
                 .padding(.horizontal, CGFloat(gap.xl))
                 .padding(.vertical, verticalPadding)
@@ -426,7 +426,7 @@ private struct ButtonPreviewCard: View {
         .buttonStyle(ButtonPreviewCardStyle())
         .gentleSurface(.card)
         .overlay(
-            RoundedRectangle(cornerRadius: CGFloat(theme.radii.medium))
+            RoundedRectangle(cornerRadius: CGFloat(theme.radii.large))
                 .strokeBorder(
                     theme.color(for: .primaryCTA, scheme: colorScheme)
                         .opacity(0.5),
@@ -642,6 +642,9 @@ private struct ButtonRoleEditorSheet: View {
 
 public struct GentleDesignSurfacesSection: View {
     @GentleDesignRuntime private var design
+    @Environment(\.gentleTheme) private var theme
+    @Environment(\.colorScheme) private var colorScheme
+    @State private var editingRole: GentleSurfaceRole?
 
     public init() {}
 
@@ -650,7 +653,7 @@ public struct GentleDesignSurfacesSection: View {
             Text("Surfaces")
                 .gentleText(.title_xl)
                 .opacity(0.7)
-            
+
             HStack(spacing: design.layout.stack.regular) {
                 surfaceCard(
                     title: "card",
@@ -666,6 +669,9 @@ public struct GentleDesignSurfacesSection: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .sheet(item: $editingRole) { role in
+            SurfaceRoleEditorSheet(role: role)
+        }
     }
 
     private func surfaceCard(
@@ -673,16 +679,234 @@ public struct GentleDesignSurfacesSection: View {
         subtitle: String,
         surface: GentleSurfaceRole
     ) -> some View {
-        VStack(alignment: .leading, spacing: design.layout.stack.tight) {
-            Text(title)
-                .gentleText(.headline_m)
+        Button {
+            editingRole = surface
+        } label: {
+            VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+                Text(title)
+                    .gentleText(.headline_m)
 
-            Text(subtitle)
-                .gentleText(.caption_s)
-                .opacity(0.8)
+                Text(subtitle)
+                    .gentleText(.caption_s)
+                    .opacity(0.8)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .gentleSurface(surface, inset: .card)
+            .overlay(
+                RoundedRectangle(cornerRadius: CGFloat(theme.radii.large))
+                    .strokeBorder(
+                        theme.color(for: .primaryCTA, scheme: colorScheme)
+                            .opacity(0.5),
+                        lineWidth: 1
+                    )
+            )
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .gentleSurface(surface, inset: .card)
+        .buttonStyle(.plain)
+    }
+}
+
+extension GentleSurfaceRole: Identifiable {
+    public var id: String { rawValue }
+}
+
+// MARK: - Surface Role Editor Sheet
+
+private struct SurfaceRoleEditorSheet: View {
+    let role: GentleSurfaceRole
+    @Environment(\.dismiss) private var dismiss
+    @GentleDesignRuntime private var design
+    @GentleThemeManagerRuntime private var manager
+
+    /// The initial spec captured when the sheet appears, used to revert on cancel/drag-dismiss.
+    @State private var initialSpec: GentleSurfaceRoleSpec?
+    /// Tracks whether the user explicitly saved changes.
+    @State private var didSave = false
+
+    var body: some View {
+        let binding = manager.bindingForSurfaceRole(role)
+
+        NavigationStack {
+            VStack(spacing: 0) {
+                // Preview section
+                VStack(alignment: .leading, spacing: design.layout.stack.regular) {
+                    Text(role.rawValue.capitalized)
+                        .gentleText(.title_xl)
+
+                    // Surface preview
+                    VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+                        Text("Preview")
+                            .gentleText(.headline_m)
+                        Text("Sample content")
+                            .gentleText(.caption_s)
+                            .opacity(0.8)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .gentleSurface(role, inset: .card)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, design.layout.gap.m)
+                .padding(.vertical, design.layout.gap.s)
+
+                List {
+                    Section("Colors") {
+                        SurfaceColorPairRow(name: "Background", binding: binding.background)
+                        SurfaceColorPairRow(name: "Border", binding: binding.border)
+                    }
+
+                    Section("Structure") {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Corner Radius")
+                                Spacer()
+                                Text(String(format: "%.0f", binding.cornerRadius.wrappedValue))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                            }
+                            Slider(value: binding.cornerRadius, in: 0...40, step: 1)
+                        }
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Border Width")
+                                Spacer()
+                                Text(String(format: "%.1f", binding.borderWidth.wrappedValue))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                            }
+                            Slider(value: binding.borderWidth, in: 0...4, step: 0.5)
+                        }
+                    }
+
+                    Section("Shadow") {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Shadow Radius")
+                                Spacer()
+                                Text(String(format: "%.0f", binding.shadowRadius.wrappedValue))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                            }
+                            Slider(value: binding.shadowRadius, in: 0...20, step: 1)
+                        }
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Shadow Opacity")
+                                Spacer()
+                                Text(String(format: "%.2f", binding.shadowOpacity.wrappedValue))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                            }
+                            Slider(value: binding.shadowOpacity, in: 0...0.5, step: 0.01)
+                        }
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Shadow Offset X")
+                                Spacer()
+                                Text(String(format: "%.0f", binding.shadowOffsetX.wrappedValue))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                            }
+                            Slider(value: binding.shadowOffsetX, in: -10...10, step: 1)
+                        }
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Shadow Offset Y")
+                                Spacer()
+                                Text(String(format: "%.0f", binding.shadowOffsetY.wrappedValue))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                            }
+                            Slider(value: binding.shadowOffsetY, in: -10...10, step: 1)
+                        }
+                    }
+                }
+                .listStyle(.insetGrouped)
+            }
+            .gentleSurface(.appBackground)
+            .navigationTitle("Customize Surface")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button {
+                        revertChanges()
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button {
+                        didSave = true
+                        dismiss()
+                    } label: {
+                        Image(systemName: "checkmark")
+                    }
+                }
+            }
+        }
+        .presentationDetents([.large])
+        .onAppear {
+            // Capture initial state for potential revert
+            initialSpec = manager.bindingForSurfaceRole(role).wrappedValue
+        }
+        .onDisappear {
+            // If user dragged to dismiss without saving, revert changes
+            if !didSave {
+                revertChanges()
+            }
+        }
+    }
+
+    private func revertChanges() {
+        guard let initialSpec else { return }
+        manager.bindingForSurfaceRole(role).wrappedValue = initialSpec
+    }
+}
+
+// MARK: - Surface Color Pair Row
+
+private struct SurfaceColorPairRow: View {
+    let name: String
+    @Binding var binding: GentleColorPair
+
+    var body: some View {
+        let lightBinding = Binding<Color>(
+            get: { Color(gentleHex: binding.lightHex) },
+            set: { binding.lightHex = $0.toGentleHexString() }
+        )
+        let darkBinding = Binding<Color>(
+            get: { Color(gentleHex: binding.darkHex) },
+            set: { binding.darkHex = $0.toGentleHexString() }
+        )
+
+        HStack {
+            Text(name)
+
+            Spacer()
+
+            HStack(spacing: 4) {
+                ZStack {
+                    lightBinding.wrappedValue
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                    ColorPicker("", selection: lightBinding, supportsOpacity: true)
+                        .labelsHidden()
+                        .opacity(0.1)
+                }
+                .frame(width: 36, height: 36)
+
+                ZStack {
+                    darkBinding.wrappedValue
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                    ColorPicker("", selection: darkBinding, supportsOpacity: true)
+                        .labelsHidden()
+                        .opacity(0.1)
+                }
+                .frame(width: 36, height: 36)
+            }
+        }
     }
 }
 

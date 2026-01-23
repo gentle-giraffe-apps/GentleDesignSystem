@@ -118,49 +118,48 @@ public struct GentleSurfaceModifier: ViewModifier {
     }
 
     public func body(content: Content) -> some View {
-        let radii = theme.radii
+        let spec = theme.surfaces.roleSpec(for: role)
         let insetContent = inset.map { AnyView(content.gentleInset($0, variant: insetVariant)) } ?? AnyView(content)
+
+        let backgroundColor = Color(gentleHex: spec.background.hex(for: colorScheme))
+        let borderColor = Color(gentleHex: spec.border.hex(for: colorScheme))
+        let cornerRadius = CGFloat(spec.cornerRadius)
 
         switch role {
         case .appBackground:
             return AnyView(
-                insetContent.background(theme.color(for: .background, scheme: colorScheme).ignoresSafeArea())
+                insetContent.background(backgroundColor.ignoresSafeArea())
             )
 
         case .surfaceOverlay:
-            return AnyView(insetContent.background(theme.color(for: .surfaceOverlay, scheme: colorScheme)))
-
-        case .card:
             return AnyView(
                 insetContent
-                    .background(theme.color(for: .surface, scheme: colorScheme))
-                    .cornerRadius(CGFloat(radii.large))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: CGFloat(radii.large))
-                            .stroke(theme.color(for: .borderSubtle, scheme: colorScheme), lineWidth: 1)
-                    )
+                    .background(backgroundColor)
+                    .cornerRadius(cornerRadius)
             )
 
-        case .cardElevated:
+        case .card, .cardElevated:
+            let hasBorder = spec.borderWidth > 0
+            let hasShadow = spec.shadowRadius > 0
+            let shadowOpacity = colorScheme == .dark ? spec.shadowOpacity * 3.5 : spec.shadowOpacity
+
             return AnyView(
                 insetContent
-                    .background(theme.color(for: .surfaceElevated, scheme: colorScheme))
-                    .cornerRadius(CGFloat(radii.large))
+                    .background(backgroundColor)
+                    .cornerRadius(cornerRadius)
                     .overlay(
-                        RoundedRectangle(cornerRadius: CGFloat(radii.large))
-                            .stroke(theme.color(for: .borderSubtle, scheme: colorScheme).opacity(0.35), lineWidth: 0.5)
+                        Group {
+                            if hasBorder {
+                                RoundedRectangle(cornerRadius: cornerRadius)
+                                    .stroke(borderColor, lineWidth: CGFloat(spec.borderWidth))
+                            }
+                        }
                     )
                     .shadow(
-                        color: Color.black.opacity(colorScheme == .dark ? 0.45 : 0.12),
-                        radius: 1,
-                        x: 0,
-                        y: 1
-                    )
-                    .shadow(
-                        color: Color.black.opacity(colorScheme == .dark ? 0.30 : 0.08),
-                        radius: 8,
-                        x: 0,
-                        y: 6
+                        color: hasShadow ? Color.black.opacity(shadowOpacity) : Color.clear,
+                        radius: CGFloat(spec.shadowRadius),
+                        x: CGFloat(spec.shadowOffsetX),
+                        y: CGFloat(spec.shadowOffsetY)
                     )
             )
         }
