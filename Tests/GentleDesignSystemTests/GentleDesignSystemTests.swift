@@ -511,20 +511,16 @@ struct GentleButtonRoleSpecTests {
     func testButtonRoleSpecProperties() {
         let spec = GentleButtonRoleSpec(
             shape: .pill,
-            textRole: .headline_m,
-            backgroundRole: .primaryCTA,
-            labelColorRole: .onPrimaryCTA,
-            borderRole: .borderSubtle,
+            materialRole: .solidFillPrimaryCTA,
+            borderRole: .subtle,
             animationRole: .bouncy,
             pressedScale: 0.95,
             pressedOpacity: 0.85
         )
 
         #expect(spec.shape == .pill)
-        #expect(spec.textRole == .headline_m)
-        #expect(spec.backgroundRole == .primaryCTA)
-        #expect(spec.labelColorRole == .onPrimaryCTA)
-        #expect(spec.borderRole == .borderSubtle)
+        #expect(spec.materialRole == .solidFillPrimaryCTA)
+        #expect(spec.borderRole == .subtle)
         #expect(spec.animationRole == .bouncy)
         #expect(spec.pressedScale == 0.95)
         #expect(spec.pressedOpacity == 0.85)
@@ -539,24 +535,22 @@ struct GentleButtonTokensTests {
         let tokens = GentleButtonTokens.gentleDefault
 
         let primary = tokens.roleSpec(for: .primary)
-        #expect(primary.backgroundRole == .primaryCTA)
+        #expect(primary.materialRole == .solidFillPrimaryCTA)
 
         let secondary = tokens.roleSpec(for: .secondary)
-        #expect(secondary.borderRole != nil)
+        #expect(secondary.borderRole == .accent)
 
         let tertiary = tokens.roleSpec(for: .tertiary)
-        #expect(tertiary.backgroundRole == .surface)
+        #expect(tertiary.materialRole == .hollow)
 
         let destructive = tokens.roleSpec(for: .destructive)
-        #expect(destructive.backgroundRole == .destructive)
+        #expect(destructive.materialRole == .solidFillDestructive)
     }
 
     @Test("Button tokens fallback to primary for missing role")
     func testButtonTokensFallback() {
         let primarySpec = GentleButtonRoleSpec(
-            textRole: .headline_m,
-            backgroundRole: .primaryCTA,
-            labelColorRole: .onPrimaryCTA
+            materialRole: .solidFillPrimaryCTA
         )
 
         let tokens = GentleButtonTokens(
@@ -565,7 +559,7 @@ struct GentleButtonTokensTests {
         )
 
         let spec = tokens.roleSpec(for: .destructive)
-        #expect(spec.backgroundRole == .primaryCTA)
+        #expect(spec.materialRole == .solidFillPrimaryCTA)
     }
 
     @Test("Default button tokens contain animation specs")
@@ -612,7 +606,7 @@ struct GentleDesignSystemSpecTests {
         #expect(spec.visual.radii.medium == 12)
 
         // Buttons
-        #expect(spec.buttons.roleSpec(for: .primary).backgroundRole == .primaryCTA)
+        #expect(spec.buttons.roleSpec(for: .primary).materialRole == .solidFillPrimaryCTA)
     }
 
     @Test("Spec is codable")
@@ -1551,7 +1545,7 @@ struct GentleThemeExtendedTests {
         let theme = GentleTheme.default
 
         let buttons = theme.buttons
-        #expect(buttons.roleSpec(for: .primary).backgroundRole == .primaryCTA)
+        #expect(buttons.roleSpec(for: .primary).materialRole == .solidFillPrimaryCTA)
     }
 
     @Test("Theme inset accessor works")
@@ -1640,9 +1634,7 @@ struct GentleButtonTokensExtendedTests {
 
         // Should return hardcoded defaults
         #expect(spec.shape == .rounded)
-        #expect(spec.textRole == .headline_m)
-        #expect(spec.backgroundRole == .primaryCTA)
-        #expect(spec.labelColorRole == .onPrimaryCTA)
+        #expect(spec.materialRole == .solidFillPrimaryCTA)
     }
 
     @Test("Animation spec fallback for missing role")
@@ -1750,10 +1742,8 @@ struct JSONEncodingEdgeCasesTests {
                 roles: [
                     GentleButtonRole.primary.rawValue: GentleButtonRoleSpec(
                         shape: .pill,
-                        textRole: .caption_s,
-                        backgroundRole: .destructive,
-                        labelColorRole: .textTertiary,
-                        borderRole: .themePrimary,
+                        materialRole: .solidFillDestructive,
+                        borderRole: .accent,
                         animationRole: .pop,
                         pressedScale: 0.8,
                         pressedOpacity: 0.5
@@ -2208,7 +2198,7 @@ struct GentleDesignRuntimeTests {
         let theme = GentleTheme.default
         let resolver = GentleDesignRuntime.Resolver(theme: theme, colorScheme: .light)
 
-        #expect(resolver.buttons.roleSpec(for: .primary).backgroundRole == .primaryCTA)
+        #expect(resolver.buttons.roleSpec(for: .primary).materialRole == .solidFillPrimaryCTA)
     }
 
     @Test("Resolver color function works")
@@ -2391,9 +2381,7 @@ struct GentleButtonRoleExtendedTests {
 
         for role in roles {
             let spec = tokens.roleSpec(for: role)
-            #expect(!spec.textRole.rawValue.isEmpty)
-            #expect(!spec.backgroundRole.rawValue.isEmpty)
-            #expect(!spec.labelColorRole.rawValue.isEmpty)
+            #expect(!spec.materialRole.rawValue.isEmpty)
         }
     }
 }
@@ -2803,10 +2791,8 @@ struct GentleButtonRoleSpecExtendedTests {
     func testButtonRoleSpecCodable() throws {
         let original = GentleButtonRoleSpec(
             shape: .pill,
-            textRole: .headline_m,
-            backgroundRole: .primaryCTA,
-            labelColorRole: .onPrimaryCTA,
-            borderRole: .borderSubtle,
+            materialRole: .solidFillPrimaryCTA,
+            borderRole: .subtle,
             animationRole: .bouncy,
             pressedScale: 0.9,
             pressedOpacity: 0.8
@@ -2819,10 +2805,8 @@ struct GentleButtonRoleSpecExtendedTests {
         let decoded = try decoder.decode(GentleButtonRoleSpec.self, from: data)
 
         #expect(decoded.shape == .pill)
-        #expect(decoded.textRole == .headline_m)
-        #expect(decoded.backgroundRole == .primaryCTA)
-        #expect(decoded.labelColorRole == .onPrimaryCTA)
-        #expect(decoded.borderRole == .borderSubtle)
+        #expect(decoded.materialRole == .solidFillPrimaryCTA)
+        #expect(decoded.borderRole == .subtle)
         #expect(decoded.animationRole == .bouncy)
         #expect(decoded.pressedScale == 0.9)
         #expect(decoded.pressedOpacity == 0.8)
@@ -2831,13 +2815,11 @@ struct GentleButtonRoleSpecExtendedTests {
     @Test("Button role spec default values")
     func testButtonRoleSpecDefaults() {
         let spec = GentleButtonRoleSpec(
-            textRole: .body_m,
-            backgroundRole: .surface,
-            labelColorRole: .textPrimary
+            materialRole: .hollow
         )
 
         #expect(spec.shape == .rounded)
-        #expect(spec.borderRole == nil)
+        #expect(spec.borderRole == .hidden)
         #expect(spec.animationRole == .squish)
         #expect(spec.pressedScale == 0.97)
         #expect(spec.pressedOpacity == 0.9)

@@ -1,5 +1,4 @@
 import SwiftUI
-import UIKit
 
 public struct GentleDesignStudioView: View {
     enum ActiveSheet: Identifiable {
@@ -21,6 +20,7 @@ public struct GentleDesignStudioView: View {
 
     @State private var activeSheet: ActiveSheet?
     @State private var exportURL: URL?
+    @State private var showRevertAlert = false
     @GentleDesignRuntime private var design
     @GentleThemeManagerRuntime private var themeManager
 
@@ -39,20 +39,33 @@ public struct GentleDesignStudioView: View {
                     ToolbarItem(placement: .topBarTrailing) {
                         HStack(spacing: 16) {
                             Button {
+                                showRevertAlert = true
+                            } label: {
+                                Image(systemName: "arrow.uturn.backward")
+                                    .gentleText(.title3_ml, colorRole: themeManager.hasUnsavedChanges ? .destructive : .textTertiary)
+                                    .opacity(themeManager.hasUnsavedChanges ? 1 : 0.5)
+                                    .padding()
+                            }
+                            .disabled(!themeManager.hasUnsavedChanges)
+
+                            Button {
                                 Task {
                                     try? themeManager.save()
                                 }
                             } label: {
                                 Image(systemName: "checkmark")
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(themeManager.hasUnsavedChanges ? design.color(.primaryCTA) : .gray)
+                                    .gentleText(.title3_ml, colorRole: themeManager.hasUnsavedChanges ? .primaryCTA : .textTertiary)
+                                    .opacity(themeManager.hasUnsavedChanges ? 1 : 0.5)
+                                    .padding()
                             }
                             .disabled(!themeManager.hasUnsavedChanges)
 
                             Button {
                                 activeSheet = .share
                             } label: {
-                                Label("Export", systemImage: "square.and.arrow.up")
+                                Image(systemName: "square.and.arrow.up")
+                                    .gentleText(.title3_ml)
+                                    .padding()
                             }
                             .disabled(exportURL == nil)
                         }
@@ -108,6 +121,14 @@ public struct GentleDesignStudioView: View {
                 }
         }
         .task { await refreshExportURL() }
+        .alert("Revert Changes?", isPresented: $showRevertAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Revert", role: .destructive) {
+                try? themeManager.load()
+            }
+        } message: {
+            Text("This will discard all unsaved changes and restore the last saved version.")
+        }
     }
 
     @MainActor

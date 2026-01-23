@@ -240,13 +240,12 @@ GentleDesignSystemSpec
         │       ├── key = GentleButtonRole.rawValue
         │       └── value = GentleButtonRoleSpec
         │               ├── shape: GentleButtonShape
-        │               ├── textRole: GentleTextRole
-        │               ├── backgroundRole: GentleColorRole
-        │               ├── labelColorRole: GentleColorRole
-        │               ├── borderRole: GentleColorRole?
+        │               ├── materialRole: GentleButtonMaterialRole
+        │               ├── borderRole: GentleButtonBorderRole
         │               ├── animationRole: GentleButtonAnimationRole
         │               ├── pressedScale: Double
-        │               └── pressedOpacity: Double
+        │               ├── pressedOpacity: Double
+        │               └── usesNativeStyle: Bool
         │
         └── animations: [String: GentleButtonAnimationSpec]
                 │

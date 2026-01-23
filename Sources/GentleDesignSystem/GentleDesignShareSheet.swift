@@ -1,5 +1,7 @@
-//  Jonathan Ritchey
+//  Jonathan Ritchey
 import SwiftUI
+
+#if canImport(UIKit)
 import UIKit
 
 public struct GentleDesignShareSheet: UIViewControllerRepresentable {
@@ -9,7 +11,7 @@ public struct GentleDesignShareSheet: UIViewControllerRepresentable {
     public init(items: [Any]) {
         self.items = items
     }
-    
+
     public func makeUIViewController(context: Context) -> UIActivityViewController {
         UIActivityViewController(activityItems: items, applicationActivities: activities)
     }
@@ -18,3 +20,4 @@ public struct GentleDesignShareSheet: UIViewControllerRepresentable {
         // no-op
     }
 }
+#endif

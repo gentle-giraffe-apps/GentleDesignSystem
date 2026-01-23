@@ -57,6 +57,9 @@ public struct TypographyRoleEditorSheet: View {
     @Environment(\.dismiss) private var dismiss
     @GentleThemeManagerRuntime private var manager
 
+    @State private var initialSpec: GentleTypographyRoleSpec?
+    @State private var didSave = false
+
     public init(
         role: GentleTextRole,
         sizeRange: ClosedRange<Double> = 10...96,
@@ -151,14 +154,38 @@ public struct TypographyRoleEditorSheet: View {
             .navigationTitle(role.rawValue)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button {
+                        revertChanges()
                         dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button {
+                        didSave = true
+                        dismiss()
+                    } label: {
+                        Image(systemName: "checkmark")
                     }
                 }
             }
         }
         .presentationDetents([.large])
+        .onAppear {
+            initialSpec = manager.bindingForTypographyRole(role).wrappedValue
+        }
+        .onDisappear {
+            if !didSave {
+                revertChanges()
+            }
+        }
+    }
+
+    private func revertChanges() {
+        guard let initialSpec else { return }
+        manager.bindingForTypographyRole(role).wrappedValue = initialSpec
     }
 
     private func widthBinding(_ roleSpec: Binding<GentleTypographyRoleSpec>) -> Binding<GentleFontWidthToken?> {

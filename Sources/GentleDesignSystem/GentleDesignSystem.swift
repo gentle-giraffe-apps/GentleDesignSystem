@@ -2,10 +2,12 @@
 import SwiftUI
 import Foundation
 import Observation
+#if canImport(UIKit)
 import UIKit
+#endif
 
 public enum GentleDesignSystemSpecVersion {
-    public static let current = "0.2.3" // adds button press animation roles in spec
+    public static let current = "0.3.0" // simplify button spec: materialRole + borderRole replace textRole/backgroundRole/labelColorRole/borderRole
 }
 
 // MARK: - Roles
@@ -125,6 +127,66 @@ public enum GentleButtonRole: String, Codable, Sendable, Identifiable {
     public var id: String { rawValue }
 }
 
+public extension GentleButtonRole {
+    /// The default typography role for this button role.
+    var defaultTextRole: GentleTextRole {
+        switch self {
+        case .primary: return .primaryButtonTitle_m
+        case .secondary: return .secondaryButtonTitle_m
+        case .tertiary: return .tertiaryButtonTitle_m
+        case .quaternary: return .quaternaryButtonTitle_m
+        case .destructive: return .primaryButtonTitle_m
+        }
+    }
+}
+
+/// Defines the visual surface treatment of a button.
+/// Determines both the background appearance and the appropriate label color.
+public enum GentleButtonMaterialRole: String, Codable, Sendable, CaseIterable, Identifiable {
+    public var id: String { rawValue }
+
+    /// Solid fill using primaryCTA color, with onPrimaryCTA text.
+    case solidFillPrimaryCTA
+
+    /// Solid fill using destructive color, with onPrimaryCTA text.
+    case solidFillDestructive
+
+    /// No background fill, with primaryCTA text.
+    case hollow
+
+    // Future: ultraThinMaterial, glass, etc.
+
+    public var displayName: String {
+        switch self {
+        case .solidFillPrimaryCTA: return "Solid (Primary)"
+        case .solidFillDestructive: return "Solid (Destructive)"
+        case .hollow: return "Hollow"
+        }
+    }
+}
+
+/// Defines the border treatment of a button.
+public enum GentleButtonBorderRole: String, Codable, Sendable, CaseIterable, Identifiable {
+    public var id: String { rawValue }
+
+    /// No border.
+    case hidden
+
+    /// Accent border using primaryCTA color.
+    case accent
+
+    /// Subtle border using borderSubtle color.
+    case subtle
+
+    public var displayName: String {
+        switch self {
+        case .hidden: return "None"
+        case .accent: return "Accent"
+        case .subtle: return "Subtle"
+        }
+    }
+}
+
 /// Separates geometry from intent.
 /// - rounded: standard rounded rectangle (default)
 /// - pill: capsule-like button
@@ -216,6 +278,7 @@ public enum GentleFontTextStyle: String, Codable, Sendable {
     case largeTitle, title, title2, title3, headline, body, callout, subheadline, footnote, caption, caption2
 }
 
+#if canImport(UIKit)
 public extension GentleFontTextStyle {
     /// UIKit semantic anchor used by UIFontMetrics for Dynamic Type scaling.
     var uiKitTextStyle: UIFont.TextStyle {
@@ -254,6 +317,7 @@ private extension ContentSizeCategory {
         }
     }
 }
+#endif
 
 // MARK: - Codable token structs (JSON-friendly)
 
@@ -309,7 +373,7 @@ extension GentleDesignSystemSpec: GentleJSONDecodable {}
 
 // MARK: - Colors (Light/Dark pairs)
 
-public struct GentleColorPair: Codable, Sendable {
+public struct GentleColorPair: Codable, Sendable, Equatable {
     public var lightHex: String
     public var darkHex: String
 
@@ -364,28 +428,20 @@ public extension GentleColorTokens {
 // MARK: - Button tokens (NEW)
 
 /// JSON-friendly definition of a button "role" style.
-/// This is intentionally close to your existing hard-coded mapping,
-/// so current visuals remain unchanged while becoming editable.
+/// Typography is derived from the button role; colors are derived from the material role.
 public struct GentleButtonRoleSpec: Codable, Sendable {
     public var shape: GentleButtonShape
 
-    /// Typography role to apply to the button label.
-    public var textRole: GentleTextRole
+    /// The visual surface treatment (determines background and label colors).
+    public var materialRole: GentleButtonMaterialRole
 
-    /// Background fill color role.
-    public var backgroundRole: GentleColorRole
-
-    /// Foreground (label) color role.
-    public var labelColorRole: GentleColorRole
-
-    /// Optional border color role. If nil, no border.
-    public var borderRole: GentleColorRole?
+    /// The border treatment.
+    public var borderRole: GentleButtonBorderRole
 
     /// Which "feel" to use for press feedback (animation curve + tuning).
     public var animationRole: GentleButtonAnimationRole
 
     /// Interaction affordances (kept JSON-friendly and tweakable).
-    /// These remain per-role to preserve existing behavior and allow overrides.
     public var pressedScale: Double
     public var pressedOpacity: Double
 
@@ -395,19 +451,15 @@ public struct GentleButtonRoleSpec: Codable, Sendable {
 
     public init(
         shape: GentleButtonShape = .rounded,
-        textRole: GentleTextRole,
-        backgroundRole: GentleColorRole,
-        labelColorRole: GentleColorRole,
-        borderRole: GentleColorRole? = nil,
+        materialRole: GentleButtonMaterialRole,
+        borderRole: GentleButtonBorderRole = .hidden,
         animationRole: GentleButtonAnimationRole = .squish,
         pressedScale: Double = 0.97,
         pressedOpacity: Double = 0.9,
         usesNativeStyle: Bool = false
     ) {
         self.shape = shape
-        self.textRole = textRole
-        self.backgroundRole = backgroundRole
-        self.labelColorRole = labelColorRole
+        self.materialRole = materialRole
         self.borderRole = borderRole
         self.animationRole = animationRole
         self.pressedScale = pressedScale
@@ -436,10 +488,8 @@ public struct GentleButtonTokens: Codable, Sendable {
         // Last-resort defaults (should never happen with gentleDefault).
         return .init(
             shape: .rounded,
-            textRole: .headline_m,
-            backgroundRole: .primaryCTA,
-            labelColorRole: .onPrimaryCTA,
-            borderRole: nil,
+            materialRole: .solidFillPrimaryCTA,
+            borderRole: .hidden,
             animationRole: .squish,
             pressedScale: 0.97,
             pressedOpacity: 0.9
@@ -458,30 +508,24 @@ public extension GentleButtonTokens {
         roles: [
             GentleButtonRole.primary.rawValue: .init(
                 shape: .pill,
-                textRole: .primaryButtonTitle_m,
-                backgroundRole: .primaryCTA,
-                labelColorRole: .onPrimaryCTA,
-                borderRole: nil,
-                animationRole: .springBack, // .squish,
-                pressedScale: 0.9, // 0.97
-                pressedOpacity: 0.86 // 0.92
+                materialRole: .solidFillPrimaryCTA,
+                borderRole: .hidden,
+                animationRole: .springBack,
+                pressedScale: 0.9,
+                pressedOpacity: 0.86
             ),
             GentleButtonRole.secondary.rawValue: .init(
                 shape: .pill,
-                textRole: .secondaryButtonTitle_m,
-                backgroundRole: .surface,
-                labelColorRole: .primaryCTA,
-                borderRole: .primaryCTA,
+                materialRole: .hollow,
+                borderRole: .accent,
                 animationRole: .subtlePress,
-                pressedScale: 0.85, // 0.98
-                pressedOpacity: 0.9 // 0.95
+                pressedScale: 0.85,
+                pressedOpacity: 0.9
             ),
             GentleButtonRole.tertiary.rawValue: .init(
                 shape: .pill,
-                textRole: .tertiaryButtonTitle_m,
-                backgroundRole: .surface,
-                labelColorRole: .primaryCTA,
-                borderRole: nil,
+                materialRole: .hollow,
+                borderRole: .hidden,
                 animationRole: .subtlePress,
                 pressedScale: 0.85,
                 pressedOpacity: 0.9,
@@ -489,10 +533,8 @@ public extension GentleButtonTokens {
             ),
             GentleButtonRole.quaternary.rawValue: .init(
                 shape: .pill,
-                textRole: .quaternaryButtonTitle_m,
-                backgroundRole: .background,
-                labelColorRole: .primaryCTA,
-                borderRole: nil,
+                materialRole: .hollow,
+                borderRole: .hidden,
                 animationRole: .subtlePress,
                 pressedScale: 0.95,
                 pressedOpacity: 0.93,
@@ -500,13 +542,11 @@ public extension GentleButtonTokens {
             ),
             GentleButtonRole.destructive.rawValue: .init(
                 shape: .pill,
-                textRole: .primaryButtonTitle_m,
-                backgroundRole: .destructive,
-                labelColorRole: .onPrimaryCTA,
-                borderRole: nil,
+                materialRole: .solidFillDestructive,
+                borderRole: .hidden,
                 animationRole: .squish,
-                pressedScale: 0.9, // 0.97
-                pressedOpacity: 0.86 // 0.92
+                pressedScale: 0.9,
+                pressedOpacity: 0.86
             )
         ],
         animations: [
@@ -987,20 +1027,33 @@ public struct GentleTheme: Sendable {
     public func textStyle(for role: GentleTextRole, sizeCategory: ContentSizeCategory) -> GentleResolvedTextStyle {
         let roleSpec = activeSpec.typography.roleSpec(for: role)
 
+        #if canImport(UIKit)
         let metrics = UIFontMetrics(forTextStyle: roleSpec.relativeTo.uiKitTextStyle)
         let traits = UITraitCollection(preferredContentSizeCategory: sizeCategory.uiContentSizeCategory)
         let scaledSize = metrics.scaledValue(for: CGFloat(roleSpec.pointSize), compatibleWith: traits)
+        #else
+        // On macOS, use the base point size without Dynamic Type scaling
+        let scaledSize = CGFloat(roleSpec.pointSize)
+        #endif
 
         var baseFont = Font.system(size: scaledSize,
                                    weight: roleSpec.weight.swiftUIWeight,
                                    design: roleSpec.design.swiftUIDesign)
 
         if let width = roleSpec.width {
+            #if os(iOS)
             if #available(iOS 17.0, *) {
                 if roleSpec.design == .default {
                     baseFont = baseFont.width(width.swiftUIWidth)
                 }
             }
+            #elseif os(macOS)
+            if #available(macOS 14.0, *) {
+                if roleSpec.design == .default {
+                    baseFont = baseFont.width(width.swiftUIWidth)
+                }
+            }
+            #endif
         }
 
         return GentleResolvedTextStyle(
@@ -1194,9 +1247,24 @@ public struct GentleButtonStyle: ButtonStyle {
     public func makeBody(configuration: Configuration) -> some View {
         let spec = theme.buttons.roleSpec(for: role)
 
+        // Derive text role from button role (or use override)
+        let textRoleToUse = textRoleOverride ?? role.defaultTextRole
+
+        // Derive colors from material role
+        let (backgroundColor, labelColorRole): (Color, GentleColorRole) = {
+            switch spec.materialRole {
+            case .solidFillPrimaryCTA:
+                return (theme.color(for: .primaryCTA, scheme: colorScheme), .onPrimaryCTA)
+            case .solidFillDestructive:
+                return (theme.color(for: .destructive, scheme: colorScheme), .onPrimaryCTA)
+            case .hollow:
+                return (Color.clear, .primaryCTA)
+            }
+        }()
+        let labelColor = theme.color(for: labelColorRole, scheme: colorScheme)
+
         // When usesNativeStyle is true, apply text styling and press animations but skip background/border/padding.
         if spec.usesNativeStyle {
-            let textRoleToUse = textRoleOverride ?? spec.textRole
             let animSpec = theme.buttons.animationSpec(for: spec.animationRole)
             let animation = GentleButtonAnimations.resolve(
                 reduceMotion: reduceMotion,
@@ -1205,7 +1273,7 @@ public struct GentleButtonStyle: ButtonStyle {
             )
             return AnyView(
                 configuration.label
-                    .gentleText(textRoleToUse, colorRole: spec.labelColorRole)
+                    .gentleText(textRoleToUse, colorRole: labelColorRole)
                     .frame(maxWidth: expandsHorizontally ? .infinity : nil, alignment: contentAlignment)
                     .scaleEffect(configuration.isPressed ? spec.pressedScale : 1.0)
                     .opacity(configuration.isPressed ? spec.pressedOpacity : 1.0)
@@ -1224,34 +1292,40 @@ public struct GentleButtonStyle: ButtonStyle {
         )
 
         let shapeToUse = shapeOverride ?? spec.shape
-        let textRoleToUse = textRoleOverride ?? spec.textRole
         let cornerRadius: CGFloat = (shapeToUse == .pill) ? CGFloat(radii.pill) : CGFloat(radii.medium)
 
         let secondaryOpticalTrim: CGFloat = (role == .secondary) ? 1.0 : 0.0
         let verticalPadding: CGFloat = max(0, CGFloat(gap.s) - secondaryOpticalTrim)
 
-        let backgroundColor = theme.color(for: spec.backgroundRole, scheme: colorScheme)
-        let labelColor = theme.color(for: spec.labelColorRole, scheme: colorScheme)
-        let borderColor = spec.borderRole.map { theme.color(for: $0, scheme: colorScheme) }
+        // Resolve border color from border role
+        let borderColor: Color? = {
+            switch spec.borderRole {
+            case .hidden: return nil
+            case .accent: return theme.color(for: .primaryCTA, scheme: colorScheme)
+            case .subtle: return theme.color(for: .borderSubtle, scheme: colorScheme)
+            }
+        }()
 
+        // Disabled state: solid fills dim opacity, hollow buttons desaturate
         let saturation: Double
-        let opacity: Double
+        let disabledOpacity: Double
         if isEnabled {
             saturation = 1.0
-            opacity = 1.0
+            disabledOpacity = 1.0
         } else {
-            if spec.labelColorRole != .onPrimaryCTA {
-                saturation = 0.3
-                opacity = 0.6
-            } else {
+            switch spec.materialRole {
+            case .solidFillPrimaryCTA, .solidFillDestructive:
                 saturation = 1.0
-                opacity = 0.4
+                disabledOpacity = 0.4
+            case .hollow:
+                saturation = 0.3
+                disabledOpacity = 0.6
             }
         }
 
-        // ✅ IMPORTANT: expand the label *inside* the style, before background/overlay.
+        // Expand the label *inside* the style, before background/overlay.
         let label = configuration.label
-            .gentleText(textRoleToUse, colorRole: spec.labelColorRole)
+            .gentleText(textRoleToUse, colorRole: labelColorRole)
             .foregroundStyle(labelColor)
 
         let sizedLabel = Group {
@@ -1279,7 +1353,7 @@ public struct GentleButtonStyle: ButtonStyle {
                 .opacity(configuration.isPressed ? spec.pressedOpacity : 1.0)
                 .animation(animation, value: configuration.isPressed)
                 .saturation(saturation)
-                .opacity(opacity)
+                .opacity(disabledOpacity)
         )
     }
 }
