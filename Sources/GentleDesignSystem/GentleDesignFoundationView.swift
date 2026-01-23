@@ -715,28 +715,170 @@ private struct SurfaceRoleEditorSheet: View {
     let role: GentleSurfaceRole
     @Environment(\.dismiss) private var dismiss
     @GentleDesignRuntime private var design
+    @GentleThemeManagerRuntime private var manager
+    @Environment(\.gentleTheme) private var theme
+    @Environment(\.colorScheme) private var colorScheme
+
+    /// Tracks whether the user explicitly saved changes.
+    @State private var didSave = false
+    /// Initial color values for reverting
+    @State private var initialColors: [GentleColorRole: GentleColorPair] = [:]
+
+    /// The color roles relevant to this surface role
+    private var relevantColorRoles: [(String, GentleColorRole)] {
+        switch role {
+        case .card:
+            return [
+                ("Background", .surface),
+                ("Border", .borderSubtle)
+            ]
+        case .cardElevated:
+            return [
+                ("Background", .surfaceElevated),
+                ("Border", .borderSubtle)
+            ]
+        case .appBackground:
+            return [
+                ("Background", .background)
+            ]
+        case .surfaceOverlay:
+            return [
+                ("Overlay", .surfaceOverlay),
+                ("Primary Text", .onSurfaceOverlayPrimary),
+                ("Secondary Text", .onSurfaceOverlaySecondary)
+            ]
+        }
+    }
 
     var body: some View {
         NavigationStack {
-            VStack {
-                Text("Customize Surfaces")
-                    .gentleText(.title_xl)
+            VStack(spacing: 0) {
+                // Preview section
+                VStack(alignment: .leading, spacing: design.layout.stack.regular) {
+                    Text(role.rawValue.capitalized)
+                        .gentleText(.title_xl)
+
+                    // Surface preview
+                    VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+                        Text("Preview")
+                            .gentleText(.headline_m)
+                        Text("Sample content")
+                            .gentleText(.caption_s)
+                            .opacity(0.8)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .gentleSurface(role, inset: .card)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, design.layout.gap.m)
+                .padding(.vertical, design.layout.gap.s)
+
+                List {
+                    Section("Colors") {
+                        ForEach(relevantColorRoles, id: \.1) { name, colorRole in
+                            SurfaceColorRow(name: name, colorRole: colorRole)
+                        }
+                    }
+
+                    if role == .cardElevated {
+                        Section("Shadow") {
+                            Text("Shadow settings are controlled by the theme's shadow tokens.")
+                                .gentleText(.caption_s)
+                                .opacity(0.7)
+                        }
+                    }
+                }
+                .listStyle(.insetGrouped)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .gentleSurface(.appBackground)
-            .navigationTitle("Surfaces")
+            .navigationTitle("Customize Surface")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
+                        revertChanges()
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
                     }
                 }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button {
+                        didSave = true
+                        dismiss()
+                    } label: {
+                        Image(systemName: "checkmark")
+                    }
+                }
             }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.large])
+        .onAppear {
+            // Capture initial state for potential revert
+            for (_, colorRole) in relevantColorRoles {
+                initialColors[colorRole] = manager.bindingForColorRole(colorRole).wrappedValue
+            }
+        }
+        .onDisappear {
+            // If user dragged to dismiss without saving, revert changes
+            if !didSave {
+                revertChanges()
+            }
+        }
+    }
+
+    private func revertChanges() {
+        for (colorRole, colorPair) in initialColors {
+            manager.bindingForColorRole(colorRole).wrappedValue = colorPair
+        }
+    }
+}
+
+// MARK: - Surface Color Row
+
+private struct SurfaceColorRow: View {
+    let name: String
+    let colorRole: GentleColorRole
+
+    @GentleDesignRuntime private var design
+    @GentleThemeManagerRuntime private var manager
+
+    var body: some View {
+        let binding = manager.bindingForColorRole(colorRole)
+        let lightBinding = Binding<Color>(
+            get: { Color(gentleHex: binding.lightHex.wrappedValue) },
+            set: { binding.lightHex.wrappedValue = $0.toGentleHexString() }
+        )
+        let darkBinding = Binding<Color>(
+            get: { Color(gentleHex: binding.darkHex.wrappedValue) },
+            set: { binding.darkHex.wrappedValue = $0.toGentleHexString() }
+        )
+
+        HStack {
+            Text(name)
+
+            Spacer()
+
+            HStack(spacing: 4) {
+                ZStack {
+                    lightBinding.wrappedValue
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                    ColorPicker("", selection: lightBinding, supportsOpacity: true)
+                        .labelsHidden()
+                        .opacity(0.1)
+                }
+                .frame(width: 36, height: 36)
+
+                ZStack {
+                    darkBinding.wrappedValue
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                    ColorPicker("", selection: darkBinding, supportsOpacity: true)
+                        .labelsHidden()
+                        .opacity(0.1)
+                }
+                .frame(width: 36, height: 36)
+            }
+        }
     }
 }
 
