@@ -59,6 +59,7 @@ public struct TypographyRoleEditorSheet: View {
 
     @State private var initialSpec: GentleTypographyRoleSpec?
     @State private var didSave = false
+    @State private var showingWeightPicker = false
 
     public init(
         role: GentleTextRole,
@@ -99,18 +100,54 @@ public struct TypographyRoleEditorSheet: View {
                         Slider(value: binding.pointSize, in: sizeRange, step: sizeStep)
                     }
 
+                    Toggle("Uppercased", isOn: binding.isUppercased)
+
                     // Weight
-                    Picker("Weight", selection: binding.weight) {
-                        ForEach(GentleFontWeightToken.allCases, id: \.self) { w in
-                            Text(w.displayName).tag(w)
+                    HStack {
+                        Text("Weight")
+                        Spacer()
+                        Button {
+                            showingWeightPicker = true
+                        } label: {
+                            HStack(spacing: 4) {
+                                Text(binding.weight.wrappedValue.displayName)
+                                    .foregroundStyle(.secondary)
+                                Image(systemName: "chevron.up.chevron.down")
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                            }
+                        }
+                        .popover(isPresented: $showingWeightPicker) {
+                            WeightPickerPopover(
+                                selectedWeight: binding.weight,
+                                onDismiss: { showingWeightPicker = false }
+                            )
                         }
                     }
 
                     // Design
-                    Picker("Design", selection: binding.design) {
-                        ForEach(GentleFontDesignToken.allCases, id: \.self) { d in
-                            Text(String(describing: d).capitalized).tag(d)
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Design")
+                        HStack(spacing: 2) {
+                            ForEach(GentleFontDesignToken.allCases, id: \.self) { d in
+                                let isSelected = binding.design.wrappedValue == d
+                                Button {
+                                    binding.design.wrappedValue = d
+                                } label: {
+                                    Text(d == .monospaced ? "Mono" : String(describing: d).capitalized)
+                                        .font(.system(.subheadline, design: d.swiftUIDesign, weight: .medium))
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 8)
+                                        .background(isSelected ? Color.accentColor : Color.clear)
+                                        .foregroundStyle(isSelected ? .white : .primary)
+                                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
+                        .padding(2)
+                        .background(Color(.tertiarySystemFill))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
 
                     // Width (only available when design is Default)
@@ -124,7 +161,7 @@ public struct TypographyRoleEditorSheet: View {
                     }
 
                     // Line spacing
-                    VStack(alignment: .leading, spacing: 6) {
+                    HStack {
                         HStack {
                             Text("Line spacing")
                             Spacer()
@@ -132,11 +169,13 @@ public struct TypographyRoleEditorSheet: View {
                                 .monospacedDigit()
                                 .foregroundStyle(.secondary)
                         }
+                        .frame(maxWidth: .infinity)
                         Slider(value: binding.lineSpacing, in: lineSpacingRange, step: 0.5)
+                            .frame(maxWidth: .infinity)
                     }
 
                     // Letter spacing
-                    VStack(alignment: .leading, spacing: 6) {
+                    HStack {
                         HStack {
                             Text("Letter spacing")
                             Spacer()
@@ -144,10 +183,10 @@ public struct TypographyRoleEditorSheet: View {
                                 .monospacedDigit()
                                 .foregroundStyle(.secondary)
                         }
+                        .frame(maxWidth: .infinity)
                         Slider(value: binding.letterSpacing, in: letterSpacingRange, step: 0.1)
+                            .frame(maxWidth: .infinity)
                     }
-
-                    Toggle("Uppercased", isOn: binding.isUppercased)
                 }
                 .listStyle(.insetGrouped)
             }
@@ -348,5 +387,62 @@ public struct TypographyRoleEditor: View {
         let letterSpacing = "letter \(singleDigit(spec.letterSpacing))"
         let lineSpacing = "line \(singleDigit(spec.lineSpacing))"
         return "\(size) • \(weight) • \(design) • \(width) • Spacing: \(letterSpacing) • \(lineSpacing)"
+    }
+}
+
+// MARK: - Weight Picker Popover
+
+private struct WeightPickerPopover: View {
+    @Binding var selectedWeight: GentleFontWeightToken
+    let onDismiss: () -> Void
+
+    private let weights = GentleFontWeightToken.allCases
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(weights, id: \.self) { weight in
+                    WeightOptionRow(
+                        weight: weight,
+                        isSelected: selectedWeight == weight,
+                        onSelect: {
+                            selectedWeight = weight
+                            onDismiss()
+                        }
+                    )
+                    if weight != weights.last {
+                        Divider()
+                    }
+                }
+            }
+            .padding(.vertical, 8)
+        }
+        .frame(minWidth: 200, maxHeight: 400)
+        .presentationCompactAdaptation(.popover)
+    }
+}
+
+private struct WeightOptionRow: View {
+    let weight: GentleFontWeightToken
+    let isSelected: Bool
+    let onSelect: () -> Void
+
+    var body: some View {
+        Button(action: onSelect) {
+            HStack {
+                Text(weight.displayName)
+                    .fontWeight(weight.swiftUIWeight)
+                    .foregroundStyle(.primary)
+                Spacer()
+                if isSelected {
+                    Image(systemName: "checkmark")
+                        .foregroundStyle(Color.accentColor)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 }
