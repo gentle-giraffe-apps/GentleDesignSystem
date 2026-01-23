@@ -30,10 +30,6 @@ A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to fe
 
 **See it in action:** Open `Demo/GentleDesignSystemDemo.xcodeproj` to explore the components. The demo app also supports editing and sharing JSON specs via the system Share Sheet.
 
-<img src="Docs/README_assets/Typography1.png" alt="GentleDesignSystem demo – page 1" width="800" />
-<img src="Docs/README_assets/Typography2.png" alt="GentleDesignSystem demo – page 2" width="800" />
-<img src="Docs/README_assets/Typography3.png" alt="GentleDesignSystem demo – page 3" width="800" />
-
 ---
 
 ## Quick Start
@@ -41,7 +37,7 @@ A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to fe
 ### 1. Add the Package
 
 ```swift
-.package(url: "https://github.com/gentle-giraffe-apps/GentleDesignSystem.git", from: "0.1.3")
+.package(url: "https://github.com/gentle-giraffe-apps/GentleDesignSystem.git", from: "0.1.7")
 ```
 
 ### 2. Wrap Your App Root
