@@ -1166,7 +1166,7 @@ private struct RawTextureCard: View {
     @ViewBuilder
     private var textureView: some View {
         switch pattern {
-        case .none:
+        case .noPattern:
             Color.clear
         case .noise:
             ProceduralTexture.noise
