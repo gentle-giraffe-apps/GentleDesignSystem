@@ -2,10 +2,12 @@
 import SwiftUI
 import Foundation
 import Observation
+#if canImport(UIKit)
 import UIKit
+#endif
 
 public enum GentleDesignSystemSpecVersion {
-    public static let current = "0.3.0" // simplify button spec: materialRole replaces textRole/backgroundRole/labelColorRole
+    public static let current = "0.3.0" // simplify button spec: materialRole + borderRole replace textRole/backgroundRole/labelColorRole/borderRole
 }
 
 // MARK: - Roles
@@ -163,6 +165,28 @@ public enum GentleButtonMaterialRole: String, Codable, Sendable, CaseIterable, I
     }
 }
 
+/// Defines the border treatment of a button.
+public enum GentleButtonBorderRole: String, Codable, Sendable, CaseIterable, Identifiable {
+    public var id: String { rawValue }
+
+    /// No border.
+    case none
+
+    /// Accent border using primaryCTA color.
+    case accent
+
+    /// Subtle border using borderSubtle color.
+    case subtle
+
+    public var displayName: String {
+        switch self {
+        case .none: return "None"
+        case .accent: return "Accent"
+        case .subtle: return "Subtle"
+        }
+    }
+}
+
 /// Separates geometry from intent.
 /// - rounded: standard rounded rectangle (default)
 /// - pill: capsule-like button
@@ -254,6 +278,7 @@ public enum GentleFontTextStyle: String, Codable, Sendable {
     case largeTitle, title, title2, title3, headline, body, callout, subheadline, footnote, caption, caption2
 }
 
+#if canImport(UIKit)
 public extension GentleFontTextStyle {
     /// UIKit semantic anchor used by UIFontMetrics for Dynamic Type scaling.
     var uiKitTextStyle: UIFont.TextStyle {
@@ -292,6 +317,7 @@ private extension ContentSizeCategory {
         }
     }
 }
+#endif
 
 // MARK: - Codable token structs (JSON-friendly)
 
@@ -347,7 +373,7 @@ extension GentleDesignSystemSpec: GentleJSONDecodable {}
 
 // MARK: - Colors (Light/Dark pairs)
 
-public struct GentleColorPair: Codable, Sendable {
+public struct GentleColorPair: Codable, Sendable, Equatable {
     public var lightHex: String
     public var darkHex: String
 
@@ -409,8 +435,8 @@ public struct GentleButtonRoleSpec: Codable, Sendable {
     /// The visual surface treatment (determines background and label colors).
     public var materialRole: GentleButtonMaterialRole
 
-    /// Optional border color role. If nil, no border.
-    public var borderRole: GentleColorRole?
+    /// The border treatment.
+    public var borderRole: GentleButtonBorderRole
 
     /// Which "feel" to use for press feedback (animation curve + tuning).
     public var animationRole: GentleButtonAnimationRole
@@ -426,7 +452,7 @@ public struct GentleButtonRoleSpec: Codable, Sendable {
     public init(
         shape: GentleButtonShape = .rounded,
         materialRole: GentleButtonMaterialRole,
-        borderRole: GentleColorRole? = nil,
+        borderRole: GentleButtonBorderRole = .none,
         animationRole: GentleButtonAnimationRole = .squish,
         pressedScale: Double = 0.97,
         pressedOpacity: Double = 0.9,
@@ -463,7 +489,7 @@ public struct GentleButtonTokens: Codable, Sendable {
         return .init(
             shape: .rounded,
             materialRole: .solidFillPrimaryCTA,
-            borderRole: nil,
+            borderRole: .none,
             animationRole: .squish,
             pressedScale: 0.97,
             pressedOpacity: 0.9
@@ -483,7 +509,7 @@ public extension GentleButtonTokens {
             GentleButtonRole.primary.rawValue: .init(
                 shape: .pill,
                 materialRole: .solidFillPrimaryCTA,
-                borderRole: nil,
+                borderRole: .none,
                 animationRole: .springBack,
                 pressedScale: 0.9,
                 pressedOpacity: 0.86
@@ -491,7 +517,7 @@ public extension GentleButtonTokens {
             GentleButtonRole.secondary.rawValue: .init(
                 shape: .pill,
                 materialRole: .hollow,
-                borderRole: .primaryCTA,
+                borderRole: .accent,
                 animationRole: .subtlePress,
                 pressedScale: 0.85,
                 pressedOpacity: 0.9
@@ -499,7 +525,7 @@ public extension GentleButtonTokens {
             GentleButtonRole.tertiary.rawValue: .init(
                 shape: .pill,
                 materialRole: .hollow,
-                borderRole: nil,
+                borderRole: .none,
                 animationRole: .subtlePress,
                 pressedScale: 0.85,
                 pressedOpacity: 0.9,
@@ -508,7 +534,7 @@ public extension GentleButtonTokens {
             GentleButtonRole.quaternary.rawValue: .init(
                 shape: .pill,
                 materialRole: .hollow,
-                borderRole: nil,
+                borderRole: .none,
                 animationRole: .subtlePress,
                 pressedScale: 0.95,
                 pressedOpacity: 0.93,
@@ -517,7 +543,7 @@ public extension GentleButtonTokens {
             GentleButtonRole.destructive.rawValue: .init(
                 shape: .pill,
                 materialRole: .solidFillDestructive,
-                borderRole: nil,
+                borderRole: .none,
                 animationRole: .squish,
                 pressedScale: 0.9,
                 pressedOpacity: 0.86
@@ -1001,20 +1027,33 @@ public struct GentleTheme: Sendable {
     public func textStyle(for role: GentleTextRole, sizeCategory: ContentSizeCategory) -> GentleResolvedTextStyle {
         let roleSpec = activeSpec.typography.roleSpec(for: role)
 
+        #if canImport(UIKit)
         let metrics = UIFontMetrics(forTextStyle: roleSpec.relativeTo.uiKitTextStyle)
         let traits = UITraitCollection(preferredContentSizeCategory: sizeCategory.uiContentSizeCategory)
         let scaledSize = metrics.scaledValue(for: CGFloat(roleSpec.pointSize), compatibleWith: traits)
+        #else
+        // On macOS, use the base point size without Dynamic Type scaling
+        let scaledSize = CGFloat(roleSpec.pointSize)
+        #endif
 
         var baseFont = Font.system(size: scaledSize,
                                    weight: roleSpec.weight.swiftUIWeight,
                                    design: roleSpec.design.swiftUIDesign)
 
         if let width = roleSpec.width {
+            #if os(iOS)
             if #available(iOS 17.0, *) {
                 if roleSpec.design == .default {
                     baseFont = baseFont.width(width.swiftUIWidth)
                 }
             }
+            #elseif os(macOS)
+            if #available(macOS 14.0, *) {
+                if roleSpec.design == .default {
+                    baseFont = baseFont.width(width.swiftUIWidth)
+                }
+            }
+            #endif
         }
 
         return GentleResolvedTextStyle(
@@ -1258,7 +1297,14 @@ public struct GentleButtonStyle: ButtonStyle {
         let secondaryOpticalTrim: CGFloat = (role == .secondary) ? 1.0 : 0.0
         let verticalPadding: CGFloat = max(0, CGFloat(gap.s) - secondaryOpticalTrim)
 
-        let borderColor = spec.borderRole.map { theme.color(for: $0, scheme: colorScheme) }
+        // Resolve border color from border role
+        let borderColor: Color? = {
+            switch spec.borderRole {
+            case .none: return nil
+            case .accent: return theme.color(for: .primaryCTA, scheme: colorScheme)
+            case .subtle: return theme.color(for: .borderSubtle, scheme: colorScheme)
+            }
+        }()
 
         // Disabled state: solid fills dim opacity, hollow buttons desaturate
         let saturation: Double

@@ -241,7 +241,7 @@ GentleDesignSystemSpec
         │       └── value = GentleButtonRoleSpec
         │               ├── shape: GentleButtonShape
         │               ├── materialRole: GentleButtonMaterialRole
-        │               ├── borderRole: GentleColorRole?
+        │               ├── borderRole: GentleButtonBorderRole
         │               ├── animationRole: GentleButtonAnimationRole
         │               ├── pressedScale: Double
         │               ├── pressedOpacity: Double

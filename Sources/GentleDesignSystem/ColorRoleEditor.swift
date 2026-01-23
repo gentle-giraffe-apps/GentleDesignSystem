@@ -60,50 +60,92 @@ public struct SingleColorEditorSheet: View {
     @Environment(\.dismiss) private var dismiss
     @GentleThemeManagerRuntime private var manager
 
+    /// Local working copy - only committed on Save.
+    @State private var workingPair: GentleColorPair?
+    /// The initial value for reset functionality.
+    @State private var initialPair: GentleColorPair?
+
     public init(role: GentleColorRole, scheme: ColorScheme) {
         self.role = role
         self.scheme = scheme
     }
 
     public var body: some View {
-        let binding = manager.bindingForColorRole(role)
-        let hexBinding = scheme == .light ? binding.lightHex : binding.darkHex
-        let colorBinding = Binding<Color>(
-            get: { Color(gentleHex: hexBinding.wrappedValue) },
-            set: { newColor in hexBinding.wrappedValue = newColor.toHexString() }
-        )
-
         NavigationStack {
-            VStack(spacing: 24) {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(colorBinding.wrappedValue)
-                    .frame(height: 100)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .strokeBorder(Color.primary.opacity(0.15), lineWidth: 1)
-                    )
-                    .padding(.horizontal)
-
-                ColorPicker("", selection: colorBinding, supportsOpacity: true)
-                    .labelsHidden()
-                    .scaleEffect(1.5)
-
-                Text(hexBinding.wrappedValue.uppercased())
-                    .font(.caption.monospaced())
-                    .foregroundStyle(.secondary)
-
-                Spacer()
-            }
-            .padding(.top, 24)
-            .navigationTitle("\(role.displayName) (\(scheme == .light ? "Light" : "Dark"))")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
-                        dismiss()
+            if let workingPair, let initialPair {
+                let hexBinding = Binding<String>(
+                    get: { scheme == .light ? workingPair.lightHex : workingPair.darkHex },
+                    set: { newHex in
+                        if scheme == .light {
+                            self.workingPair?.lightHex = newHex
+                        } else {
+                            self.workingPair?.darkHex = newHex
+                        }
                     }
+                )
+                let colorBinding = Binding<Color>(
+                    get: { Color(gentleHex: hexBinding.wrappedValue) },
+                    set: { newColor in hexBinding.wrappedValue = newColor.toHexString() }
+                )
+
+                VStack(spacing: 24) {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(colorBinding.wrappedValue)
+                        .frame(height: 100)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .strokeBorder(Color.primary.opacity(0.15), lineWidth: 1)
+                        )
+                        .padding(.horizontal)
+
+                    ColorPicker("", selection: colorBinding, supportsOpacity: true)
+                        .labelsHidden()
+                        .scaleEffect(1.5)
+
+                    Text(hexBinding.wrappedValue.uppercased())
+                        .font(.caption.monospaced())
+                        .foregroundStyle(.secondary)
+
+                    // Reset button - only show if changed from initial
+                    if workingPair != initialPair {
+                        Button {
+                            self.workingPair = initialPair
+                        } label: {
+                            Label("Reset", systemImage: "arrow.uturn.backward")
+                        }
+                        .buttonStyle(.bordered)
+                    }
+
+                    Spacer()
+                }
+                .padding(.top, 24)
+            }
+        }
+        .navigationTitle("\(role.displayName) (\(scheme == .light ? "Light" : "Dark"))")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark")
                 }
             }
+            ToolbarItem(placement: .confirmationAction) {
+                Button {
+                    if let workingPair {
+                        manager.bindingForColorRole(role).wrappedValue = workingPair
+                    }
+                    dismiss()
+                } label: {
+                    Image(systemName: "checkmark")
+                }
+            }
+        }
+        .onAppear {
+            let current = manager.bindingForColorRole(role).wrappedValue
+            initialPair = current
+            workingPair = current
         }
     }
 }
@@ -114,95 +156,126 @@ public struct ColorRoleEditorSheet: View {
     @Environment(\.dismiss) private var dismiss
     @GentleThemeManagerRuntime private var manager
 
+    /// Local working copy - only committed on Save.
+    @State private var workingPair: GentleColorPair?
+    /// The initial value for reset functionality.
+    @State private var initialPair: GentleColorPair?
+
     public init(role: GentleColorRole) {
         self.role = role
     }
 
     public var body: some View {
-        let binding = manager.bindingForColorRole(role)
-
         NavigationStack {
-            List {
-                Section {
-                    // Light mode color
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("Light Mode")
-                                .font(.subheadline)
-                            Spacer()
-                            Text(binding.lightHex.wrappedValue.uppercased())
-                                .font(.caption.monospaced())
-                                .foregroundStyle(.secondary)
-                        }
-                        HStack(spacing: 12) {
-                            ColorPicker("", selection: lightColorBinding(binding), supportsOpacity: true)
-                                .labelsHidden()
+            if let initialPair, var workingPair {
+                let lightHexBinding = Binding<String>(
+                    get: { workingPair.lightHex },
+                    set: { self.workingPair?.lightHex = $0 }
+                )
+                let darkHexBinding = Binding<String>(
+                    get: { workingPair.darkHex },
+                    set: { self.workingPair?.darkHex = $0 }
+                )
 
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(Color(gentleHex: binding.lightHex.wrappedValue))
-                                .frame(height: 32)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .strokeBorder(Color.primary.opacity(0.15), lineWidth: 1)
-                                )
+                List {
+                    Section {
+                        // Light mode color
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text("Light Mode")
+                                    .font(.subheadline)
+                                Spacer()
+                                Text(lightHexBinding.wrappedValue.uppercased())
+                                    .font(.caption.monospaced())
+                                    .foregroundStyle(.secondary)
+                            }
+                            HStack(spacing: 12) {
+                                ColorPicker("", selection: colorBinding(for: lightHexBinding), supportsOpacity: true)
+                                    .labelsHidden()
+
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(Color(gentleHex: lightHexBinding.wrappedValue))
+                                    .frame(height: 32)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 6)
+                                            .strokeBorder(Color.primary.opacity(0.15), lineWidth: 1)
+                                    )
+                            }
                         }
+                        .padding(.vertical, 4)
+
+                        // Dark mode color
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text("Dark Mode")
+                                    .font(.subheadline)
+                                Spacer()
+                                Text(darkHexBinding.wrappedValue.uppercased())
+                                    .font(.caption.monospaced())
+                                    .foregroundStyle(.secondary)
+                            }
+                            HStack(spacing: 12) {
+                                ColorPicker("", selection: colorBinding(for: darkHexBinding), supportsOpacity: true)
+                                    .labelsHidden()
+
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(Color(gentleHex: darkHexBinding.wrappedValue))
+                                    .frame(height: 32)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 6)
+                                            .strokeBorder(Color.primary.opacity(0.15), lineWidth: 1)
+                                    )
+                            }
+                        }
+                        .padding(.vertical, 4)
                     }
-                    .padding(.vertical, 4)
 
-                    // Dark mode color
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("Dark Mode")
-                                .font(.subheadline)
-                            Spacer()
-                            Text(binding.darkHex.wrappedValue.uppercased())
-                                .font(.caption.monospaced())
-                                .foregroundStyle(.secondary)
+                    // Reset button - only show if changed from initial
+                    if self.workingPair != initialPair {
+                        Section {
+                            Button {
+                                self.workingPair = initialPair
+                            } label: {
+                                Label("Reset to Original", systemImage: "arrow.uturn.backward")
+                            }
                         }
-                        HStack(spacing: 12) {
-                            ColorPicker("", selection: darkColorBinding(binding), supportsOpacity: true)
-                                .labelsHidden()
-
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(Color(gentleHex: binding.darkHex.wrappedValue))
-                                .frame(height: 32)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .strokeBorder(Color.primary.opacity(0.15), lineWidth: 1)
-                                )
-                        }
-                    }
-                    .padding(.vertical, 4)
-                }
-            }
-            .navigationTitle(role.displayName)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
-                        dismiss()
                     }
                 }
             }
         }
+        .navigationTitle(role.displayName)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                }
+            }
+            ToolbarItem(placement: .confirmationAction) {
+                Button {
+                    if let workingPair {
+                        manager.bindingForColorRole(role).wrappedValue = workingPair
+                    }
+                    dismiss()
+                } label: {
+                    Image(systemName: "checkmark")
+                }
+            }
+        }
         .presentationDetents([.medium])
+        .onAppear {
+            let current = manager.bindingForColorRole(role).wrappedValue
+            initialPair = current
+            workingPair = current
+        }
     }
 
-    private func lightColorBinding(_ pairBinding: Binding<GentleColorPair>) -> Binding<Color> {
+    private func colorBinding(for hexBinding: Binding<String>) -> Binding<Color> {
         Binding<Color>(
-            get: { Color(gentleHex: pairBinding.lightHex.wrappedValue) },
-            set: { newColor in
-                pairBinding.lightHex.wrappedValue = newColor.toHexString()
-            }
-        )
-    }
-
-    private func darkColorBinding(_ pairBinding: Binding<GentleColorPair>) -> Binding<Color> {
-        Binding<Color>(
-            get: { Color(gentleHex: pairBinding.darkHex.wrappedValue) },
-            set: { newColor in
-                pairBinding.darkHex.wrappedValue = newColor.toHexString()
-            }
+            get: { Color(gentleHex: hexBinding.wrappedValue) },
+            set: { newColor in hexBinding.wrappedValue = newColor.toHexString() }
         )
     }
 }
@@ -349,15 +422,26 @@ public struct ColorRoleEditor: View {
 
 // MARK: - Color to Hex conversion
 
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
+
 private extension Color {
     func toHexString() -> String {
-        let uiColor = UIColor(self)
         var r: CGFloat = 0
         var g: CGFloat = 0
         var b: CGFloat = 0
         var a: CGFloat = 0
 
+        #if canImport(UIKit)
+        let uiColor = UIColor(self)
         uiColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+        #elseif canImport(AppKit)
+        let nsColor = NSColor(self).usingColorSpace(.deviceRGB) ?? NSColor(self)
+        nsColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+        #endif
 
         if a < 1.0 {
             return String(

@@ -1,7 +1,11 @@
 //  Jonathan Ritchey
 
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 public struct GentleDesignFoundationView: View {
     @GentleDesignRuntime private var design
@@ -162,18 +166,6 @@ public struct GentleDesignTypographySection: View {
                     } label: {
                         HStack {
                             VStack(alignment: .leading, spacing: 0) {
-//                                HStack(alignment: .top) {
-//                                    Text(name.camelCaseBreakable)
-//                                        .gentleText(.caption_s)
-//                                    Spacer()
-//                                    Image(systemName: "slider.horizontal.3")
-//                                        .gentleText(.title3_ml)
-//                                        .opacity(0.7)
-//                                }
-//                                Text("Aa Bb")
-//                                    .gentleText(role)
-//                                    .lineLimit(1)
-//                                    .minimumScaleFactor(0.8)
                                 HStack(alignment: .top) {
                                     VStack(alignment: .leading) {
                                         Text("Aa")
@@ -300,7 +292,14 @@ private struct GentleButtonPreview: View {
             let secondaryOpticalTrim: CGFloat = (role == .secondary) ? 1.0 : 0.0
             let verticalPadding: CGFloat = max(0, CGFloat(gap.s) - secondaryOpticalTrim)
 
-            let borderColor = spec.borderRole.map { theme.color(for: $0, scheme: colorScheme) }
+            // Resolve border color from border role
+            let borderColor: Color? = {
+                switch spec.borderRole {
+                case .none: return nil
+                case .accent: return theme.color(for: .primaryCTA, scheme: colorScheme)
+                case .subtle: return theme.color(for: .borderSubtle, scheme: colorScheme)
+                }
+            }()
 
             Text("Customize")
                 .gentleText(textRole, colorRole: labelColorRole)
@@ -392,9 +391,14 @@ private struct ButtonRoleEditorSheet: View {
     @GentleDesignRuntime private var design
     @GentleThemeManagerRuntime private var manager
 
+    /// The initial spec captured when the sheet appears, used to revert on cancel/drag-dismiss.
+    @State private var initialSpec: GentleButtonRoleSpec?
+    /// Tracks whether the user explicitly saved changes.
+    @State private var didSave = false
+
     private let shapes: [GentleButtonShape] = [.rounded, .pill]
     private let materialRoles: [GentleButtonMaterialRole] = GentleButtonMaterialRole.allCases
-    private let colorRoles: [GentleColorRole] = GentleColorRole.allCases
+    private let borderRoles: [GentleButtonBorderRole] = GentleButtonBorderRole.allCases
     private let animationRoles: [GentleButtonAnimationRole] = GentleButtonAnimationRole.allCases
 
     var body: some View {
@@ -441,14 +445,22 @@ private struct ButtonRoleEditorSheet: View {
                             }
                         }
                         .disabled(binding.usesNativeStyle.wrappedValue)
-
-                        Picker("Border Role", selection: borderRoleBinding(binding)) {
-                            Text("None").tag(Optional<GentleColorRole>.none)
-                            ForEach(colorRoles, id: \.self) { colorRole in
-                                Text(colorRole.displayName).tag(Optional(colorRole))
+                        .onChange(of: binding.materialRole.wrappedValue) { _, newValue in
+                            // Solid fills don't need borders
+                            if newValue != .hollow {
+                                binding.borderRole.wrappedValue = .none
                             }
                         }
-                        .disabled(binding.usesNativeStyle.wrappedValue)
+
+                        // Only show border picker for hollow buttons
+                        if binding.materialRole.wrappedValue == .hollow {
+                            Picker("Border", selection: binding.borderRole) {
+                                ForEach(borderRoles, id: \.self) { border in
+                                    Text(border.displayName).tag(border)
+                                }
+                            }
+                            .disabled(binding.usesNativeStyle.wrappedValue)
+                        }
 
                         Picker("Animation Role", selection: binding.animationRole) {
                             ForEach(animationRoles, id: \.self) { role in
@@ -495,21 +507,40 @@ private struct ButtonRoleEditorSheet: View {
             .navigationTitle("Customize Buttons")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button {
+                        revertChanges()
                         dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button {
+                        didSave = true
+                        dismiss()
+                    } label: {
+                        Image(systemName: "checkmark")
                     }
                 }
             }
         }
         .presentationDetents([.large])
+        .onAppear {
+            // Capture initial state for potential revert
+            initialSpec = manager.bindingForButtonRole(role).wrappedValue
+        }
+        .onDisappear {
+            // If user dragged to dismiss without saving, revert changes
+            if !didSave {
+                revertChanges()
+            }
+        }
     }
 
-    private func borderRoleBinding(_ roleSpec: Binding<GentleButtonRoleSpec>) -> Binding<GentleColorRole?> {
-        Binding<GentleColorRole?>(
-            get: { roleSpec.borderRole.wrappedValue },
-            set: { roleSpec.borderRole.wrappedValue = $0 }
-        )
+    private func revertChanges() {
+        guard let initialSpec else { return }
+        manager.bindingForButtonRole(role).wrappedValue = initialSpec
     }
 }
 

@@ -512,7 +512,7 @@ struct GentleButtonRoleSpecTests {
         let spec = GentleButtonRoleSpec(
             shape: .pill,
             materialRole: .solidFillPrimaryCTA,
-            borderRole: .borderSubtle,
+            borderRole: .subtle,
             animationRole: .bouncy,
             pressedScale: 0.95,
             pressedOpacity: 0.85
@@ -520,7 +520,7 @@ struct GentleButtonRoleSpecTests {
 
         #expect(spec.shape == .pill)
         #expect(spec.materialRole == .solidFillPrimaryCTA)
-        #expect(spec.borderRole == .borderSubtle)
+        #expect(spec.borderRole == .subtle)
         #expect(spec.animationRole == .bouncy)
         #expect(spec.pressedScale == 0.95)
         #expect(spec.pressedOpacity == 0.85)
@@ -538,7 +538,7 @@ struct GentleButtonTokensTests {
         #expect(primary.materialRole == .solidFillPrimaryCTA)
 
         let secondary = tokens.roleSpec(for: .secondary)
-        #expect(secondary.borderRole != nil)
+        #expect(secondary.borderRole == .accent)
 
         let tertiary = tokens.roleSpec(for: .tertiary)
         #expect(tertiary.materialRole == .hollow)
@@ -1743,7 +1743,7 @@ struct JSONEncodingEdgeCasesTests {
                     GentleButtonRole.primary.rawValue: GentleButtonRoleSpec(
                         shape: .pill,
                         materialRole: .solidFillDestructive,
-                        borderRole: .themePrimary,
+                        borderRole: .accent,
                         animationRole: .pop,
                         pressedScale: 0.8,
                         pressedOpacity: 0.5
@@ -2792,7 +2792,7 @@ struct GentleButtonRoleSpecExtendedTests {
         let original = GentleButtonRoleSpec(
             shape: .pill,
             materialRole: .solidFillPrimaryCTA,
-            borderRole: .borderSubtle,
+            borderRole: .subtle,
             animationRole: .bouncy,
             pressedScale: 0.9,
             pressedOpacity: 0.8
@@ -2806,7 +2806,7 @@ struct GentleButtonRoleSpecExtendedTests {
 
         #expect(decoded.shape == .pill)
         #expect(decoded.materialRole == .solidFillPrimaryCTA)
-        #expect(decoded.borderRole == .borderSubtle)
+        #expect(decoded.borderRole == .subtle)
         #expect(decoded.animationRole == .bouncy)
         #expect(decoded.pressedScale == 0.9)
         #expect(decoded.pressedOpacity == 0.8)
@@ -2819,7 +2819,7 @@ struct GentleButtonRoleSpecExtendedTests {
         )
 
         #expect(spec.shape == .rounded)
-        #expect(spec.borderRole == nil)
+        #expect(spec.borderRole == .none)
         #expect(spec.animationRole == .squish)
         #expect(spec.pressedScale == 0.97)
         #expect(spec.pressedOpacity == 0.9)
