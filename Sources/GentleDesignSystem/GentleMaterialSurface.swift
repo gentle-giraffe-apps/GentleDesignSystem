@@ -52,7 +52,7 @@ public struct GentleMaterialSurface: View {
 
     public struct Texture: Sendable {
         public enum Pattern: Sendable {
-            case none
+            case noPattern
             case noise
             case weave
             case brushed
@@ -232,7 +232,7 @@ public struct GentleMaterialSurface: View {
     private var textureLayer: some View {
         ZStack {
             // Primary texture layer
-            if recipe.texture.pattern != .none,
+            if recipe.texture.pattern != .noPattern,
                recipe.texture.intensity > 0,
                let texture = proceduralTexture(for: recipe.texture.pattern) {
                 texture
@@ -248,7 +248,7 @@ public struct GentleMaterialSurface: View {
             // Secondary texture layer (optional fiber/detail)
             // Used for cloth to add subtle directional micro-fiber cue
             if let secondary = recipe.secondaryTexture,
-               secondary.pattern != .none,
+               secondary.pattern != .noPattern,
                secondary.intensity > 0,
                let texture = proceduralTexture(for: secondary.pattern) {
                 texture
@@ -300,7 +300,7 @@ public struct GentleMaterialSurface: View {
         for pattern: Texture.Pattern
     ) -> Image? {
         switch pattern {
-        case .none:
+        case .noPattern:
             return nil
         case .noise:
             return ProceduralTexture.noise
@@ -507,9 +507,12 @@ enum ProceduralTexture {
 
     private static func imageFromPixels(_ pixels: [UInt8], size: Int) -> Image {
         let data = Data(pixels)
-        let provider = CGDataProvider(data: data as CFData)!
 
-        let cgImage = CGImage(
+        guard let provider = CGDataProvider(data: data as CFData) else {
+            return fallbackImage
+        }
+
+        guard let cgImage = CGImage(
             width: size,
             height: size,
             bitsPerComponent: 8,
@@ -521,7 +524,36 @@ enum ProceduralTexture {
             decode: nil,
             shouldInterpolate: false,
             intent: .defaultIntent
-        )!
+        ) else {
+            return fallbackImage
+        }
+
+        return Image(decorative: cgImage, scale: 1.0, orientation: .up)
+    }
+
+    /// A simple 1x1 neutral gray image used as fallback when texture generation fails.
+    /// Tiles seamlessly and blends invisibly with most surfaces.
+    private static var fallbackImage: Image {
+        let pixel: [UInt8] = [128, 128, 128, 255] // neutral gray, fully opaque
+        let data = Data(pixel)
+
+        guard let provider = CGDataProvider(data: data as CFData),
+              let cgImage = CGImage(
+                  width: 1,
+                  height: 1,
+                  bitsPerComponent: 8,
+                  bitsPerPixel: 32,
+                  bytesPerRow: 4,
+                  space: CGColorSpaceCreateDeviceRGB(),
+                  bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue),
+                  provider: provider,
+                  decode: nil,
+                  shouldInterpolate: false,
+                  intent: .defaultIntent
+              ) else {
+            // Ultimate fallback: return a system image that's guaranteed to exist
+            return Image(systemName: "square.fill")
+        }
 
         return Image(decorative: cgImage, scale: 1.0, orientation: .up)
     }
