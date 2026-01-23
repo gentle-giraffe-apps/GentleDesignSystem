@@ -242,16 +242,101 @@ public struct GentleDesignButtonsSection: View {
 
 /// A non-interactive view that renders the appearance of a gentle button.
 /// Use this when you need to display a button preview inside another tappable area.
-private struct GentleButtonPreview: View {
-    let role: GentleButtonRole
-    var isPressed: Bool = false
+/// Set `isMiniature: true` for a compact chip representation (e.g., in theme pickers).
+public struct GentleButtonPreview: View {
+    public let role: GentleButtonRole
+    public var isPressed: Bool = false
+    public var isMiniature: Bool = false
 
     @Environment(\.gentleTheme) private var theme
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    var body: some View {
+    public init(role: GentleButtonRole, isPressed: Bool = false, isMiniature: Bool = false) {
+        self.role = role
+        self.isPressed = isPressed
+        self.isMiniature = isMiniature
+    }
+
+    public var body: some View {
         let spec = theme.buttons.roleSpec(for: role)
+
+        if isMiniature {
+            miniatureBody(spec: spec)
+        } else {
+            fullSizeBody(spec: spec)
+        }
+    }
+
+    // MARK: - Miniature (chip) rendering
+
+    @ViewBuilder
+    private func miniatureBody(spec: GentleButtonRoleSpec) -> some View {
+        // Derive colors from material role
+        let (backgroundColor, iconColorRole): (Color, GentleColorRole) = {
+            switch spec.materialRole {
+            case .solidFillPrimaryCTA:
+                return (theme.color(for: .primaryCTA, scheme: colorScheme), .onPrimaryCTA)
+            case .solidFillDestructive:
+                return (theme.color(for: .destructive, scheme: colorScheme), .onPrimaryCTA)
+            case .hollow:
+                // Use surface color for miniature chips so they're visible
+                return (theme.color(for: .surface, scheme: colorScheme), .primaryCTA)
+            }
+        }()
+        let iconColor = theme.color(for: iconColorRole, scheme: colorScheme)
+
+        // Resolve border color from border role
+        let borderColor: Color? = {
+            switch spec.borderRole {
+            case .hidden: return nil
+            case .accent: return theme.color(for: .primaryCTA, scheme: colorScheme)
+            case .subtle: return theme.color(for: .borderSubtle, scheme: colorScheme)
+            }
+        }()
+
+        // When usesNativeStyle is true, show minimal chip with just the icon
+        if spec.usesNativeStyle {
+            Image(systemName: "ellipsis")
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(theme.color(for: .primaryCTA, scheme: colorScheme))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+        } else {
+            let isPill = spec.shape == .pill
+
+            Image(systemName: "ellipsis")
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(iconColor)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(
+                    Group {
+                        if isPill {
+                            Capsule().fill(backgroundColor)
+                        } else {
+                            RoundedRectangle(cornerRadius: 6).fill(backgroundColor)
+                        }
+                    }
+                )
+                .overlay(
+                    Group {
+                        if let borderColor {
+                            if isPill {
+                                Capsule().strokeBorder(borderColor, lineWidth: 1)
+                            } else {
+                                RoundedRectangle(cornerRadius: 6).strokeBorder(borderColor, lineWidth: 1)
+                            }
+                        }
+                    }
+                )
+        }
+    }
+
+    // MARK: - Full-size rendering
+
+    @ViewBuilder
+    private func fullSizeBody(spec: GentleButtonRoleSpec) -> some View {
         let textRole = role.defaultTextRole
         let animSpec = theme.buttons.animationSpec(for: spec.animationRole)
         let animation = GentleButtonAnimations.resolve(
