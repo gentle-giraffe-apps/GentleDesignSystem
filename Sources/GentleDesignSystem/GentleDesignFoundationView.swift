@@ -295,7 +295,7 @@ private struct GentleButtonPreview: View {
             // Resolve border color from border role
             let borderColor: Color? = {
                 switch spec.borderRole {
-                case .none: return nil
+                case .hidden: return nil
                 case .accent: return theme.color(for: .primaryCTA, scheme: colorScheme)
                 case .subtle: return theme.color(for: .borderSubtle, scheme: colorScheme)
                 }
@@ -448,7 +448,7 @@ private struct ButtonRoleEditorSheet: View {
                         .onChange(of: binding.materialRole.wrappedValue) { _, newValue in
                             // Solid fills don't need borders
                             if newValue != .hollow {
-                                binding.borderRole.wrappedValue = .none
+                                binding.borderRole.wrappedValue = .hidden
                             }
                         }
 

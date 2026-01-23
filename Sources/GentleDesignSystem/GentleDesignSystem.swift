@@ -170,7 +170,7 @@ public enum GentleButtonBorderRole: String, Codable, Sendable, CaseIterable, Ide
     public var id: String { rawValue }
 
     /// No border.
-    case none
+    case hidden
 
     /// Accent border using primaryCTA color.
     case accent
@@ -180,7 +180,7 @@ public enum GentleButtonBorderRole: String, Codable, Sendable, CaseIterable, Ide
 
     public var displayName: String {
         switch self {
-        case .none: return "None"
+        case .hidden: return "None"
         case .accent: return "Accent"
         case .subtle: return "Subtle"
         }
@@ -452,7 +452,7 @@ public struct GentleButtonRoleSpec: Codable, Sendable {
     public init(
         shape: GentleButtonShape = .rounded,
         materialRole: GentleButtonMaterialRole,
-        borderRole: GentleButtonBorderRole = .none,
+        borderRole: GentleButtonBorderRole = .hidden,
         animationRole: GentleButtonAnimationRole = .squish,
         pressedScale: Double = 0.97,
         pressedOpacity: Double = 0.9,
@@ -489,7 +489,7 @@ public struct GentleButtonTokens: Codable, Sendable {
         return .init(
             shape: .rounded,
             materialRole: .solidFillPrimaryCTA,
-            borderRole: .none,
+            borderRole: .hidden,
             animationRole: .squish,
             pressedScale: 0.97,
             pressedOpacity: 0.9
@@ -509,7 +509,7 @@ public extension GentleButtonTokens {
             GentleButtonRole.primary.rawValue: .init(
                 shape: .pill,
                 materialRole: .solidFillPrimaryCTA,
-                borderRole: .none,
+                borderRole: .hidden,
                 animationRole: .springBack,
                 pressedScale: 0.9,
                 pressedOpacity: 0.86
@@ -525,7 +525,7 @@ public extension GentleButtonTokens {
             GentleButtonRole.tertiary.rawValue: .init(
                 shape: .pill,
                 materialRole: .hollow,
-                borderRole: .none,
+                borderRole: .hidden,
                 animationRole: .subtlePress,
                 pressedScale: 0.85,
                 pressedOpacity: 0.9,
@@ -534,7 +534,7 @@ public extension GentleButtonTokens {
             GentleButtonRole.quaternary.rawValue: .init(
                 shape: .pill,
                 materialRole: .hollow,
-                borderRole: .none,
+                borderRole: .hidden,
                 animationRole: .subtlePress,
                 pressedScale: 0.95,
                 pressedOpacity: 0.93,
@@ -543,7 +543,7 @@ public extension GentleButtonTokens {
             GentleButtonRole.destructive.rawValue: .init(
                 shape: .pill,
                 materialRole: .solidFillDestructive,
-                borderRole: .none,
+                borderRole: .hidden,
                 animationRole: .squish,
                 pressedScale: 0.9,
                 pressedOpacity: 0.86
@@ -1300,7 +1300,7 @@ public struct GentleButtonStyle: ButtonStyle {
         // Resolve border color from border role
         let borderColor: Color? = {
             switch spec.borderRole {
-            case .none: return nil
+            case .hidden: return nil
             case .accent: return theme.color(for: .primaryCTA, scheme: colorScheme)
             case .subtle: return theme.color(for: .borderSubtle, scheme: colorScheme)
             }

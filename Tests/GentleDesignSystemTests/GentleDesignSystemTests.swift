@@ -2819,7 +2819,7 @@ struct GentleButtonRoleSpecExtendedTests {
         )
 
         #expect(spec.shape == .rounded)
-        #expect(spec.borderRole == .none)
+        #expect(spec.borderRole == .hidden)
         #expect(spec.animationRole == .squish)
         #expect(spec.pressedScale == 0.97)
         #expect(spec.pressedOpacity == 0.9)
