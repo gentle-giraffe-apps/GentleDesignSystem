@@ -642,6 +642,7 @@ private struct ButtonRoleEditorSheet: View {
 
 public struct GentleDesignSurfacesSection: View {
     @GentleDesignRuntime private var design
+    @State private var editingRole: GentleSurfaceRole?
 
     public init() {}
 
@@ -650,7 +651,7 @@ public struct GentleDesignSurfacesSection: View {
             Text("Surfaces")
                 .gentleText(.title_xl)
                 .opacity(0.7)
-            
+
             HStack(spacing: design.layout.stack.regular) {
                 surfaceCard(
                     title: "card",
@@ -666,6 +667,9 @@ public struct GentleDesignSurfacesSection: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .sheet(item: $editingRole) { role in
+            SurfaceRoleEditorSheet(role: role)
+        }
     }
 
     private func surfaceCard(
@@ -673,16 +677,62 @@ public struct GentleDesignSurfacesSection: View {
         subtitle: String,
         surface: GentleSurfaceRole
     ) -> some View {
-        VStack(alignment: .leading, spacing: design.layout.stack.tight) {
-            Text(title)
-                .gentleText(.headline_m)
+        Button {
+            editingRole = surface
+        } label: {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+                    Text(title)
+                        .gentleText(.headline_m)
 
-            Text(subtitle)
-                .gentleText(.caption_s)
-                .opacity(0.8)
+                    Text(subtitle)
+                        .gentleText(.caption_s)
+                        .opacity(0.8)
+                }
+                Spacer()
+                Image(systemName: "gearshape")
+                    .gentleText(.body_m)
+                    .opacity(0.5)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .gentleSurface(surface, inset: .card)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .gentleSurface(surface, inset: .card)
+        .buttonStyle(.plain)
+    }
+}
+
+extension GentleSurfaceRole: Identifiable {
+    public var id: String { rawValue }
+}
+
+// MARK: - Surface Role Editor Sheet
+
+private struct SurfaceRoleEditorSheet: View {
+    let role: GentleSurfaceRole
+    @Environment(\.dismiss) private var dismiss
+    @GentleDesignRuntime private var design
+
+    var body: some View {
+        NavigationStack {
+            VStack {
+                Text("Customize Surfaces")
+                    .gentleText(.title_xl)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .gentleSurface(.appBackground)
+            .navigationTitle("Surfaces")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                    }
+                }
+            }
+        }
+        .presentationDetents([.medium])
     }
 }
 
