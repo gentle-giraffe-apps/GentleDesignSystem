@@ -19,6 +19,7 @@ public struct GentleDesignFoundationView: View {
                 GentleDesignTypographySection()
                 GentleDesignButtonsSection()
                 GentleDesignSurfacesSection()
+                GentleDesignMaterialsSection()
             }
             .gentleInset(.screen)
         }
@@ -192,9 +193,11 @@ public struct GentleDesignTypographySection: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        #if canImport(UIKit)
         .sheet(item: $editingRole) { role in
             TypographyRoleEditorSheet(role: role)
         }
+        #endif
     }
 }
 
@@ -595,11 +598,15 @@ private struct ButtonRoleEditorSheet: View {
                         }
                     }
                 }
+                #if os(iOS)
                 .listStyle(.insetGrouped)
+                #endif
             }
             .gentleSurface(.appBackground)
             .navigationTitle("Customize Buttons")
+            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
@@ -823,11 +830,15 @@ private struct SurfaceRoleEditorSheet: View {
                         }
                     }
                 }
+                #if os(iOS)
                 .listStyle(.insetGrouped)
+                #endif
             }
             .gentleSurface(.appBackground)
             .navigationTitle("Customize Surface")
+            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
@@ -908,6 +919,317 @@ private struct SurfaceColorPairRow: View {
             }
         }
     }
+}
+
+// MARK: - Materials Section
+
+public struct GentleDesignMaterialsSection: View {
+    @GentleDesignRuntime private var design
+
+    public init() {}
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: design.layout.stack.regular) {
+            Text("Materials")
+                .gentleText(.title_xl)
+                .opacity(0.7)
+
+            // Raw Textures
+            VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+                Text("Procedural Textures (Raw)")
+                    .gentleText(.headline_m)
+
+                HStack(spacing: design.layout.stack.regular) {
+                    RawTextureCard(pattern: .noise, label: "Noise")
+                    RawTextureCard(pattern: .weave, label: "Weave")
+                    RawTextureCard(pattern: .brushed, label: "Brushed")
+                }
+            }
+            .gentleSurface(.card, inset: .card)
+
+            // Debug: High intensity textures
+            VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+                Text("Textures at 50% (Debug)")
+                    .gentleText(.headline_m)
+
+                HStack(spacing: design.layout.stack.regular) {
+                    DebugMaterialCard(pattern: .noise, label: "Noise")
+                    DebugMaterialCard(pattern: .weave, label: "Weave")
+                    DebugMaterialCard(pattern: .brushed, label: "Brushed")
+                }
+            }
+            .gentleSurface(.card, inset: .card)
+
+            // Material Presets
+            VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+                Text("Material Presets")
+                    .gentleText(.headline_m)
+
+                LazyVGrid(
+                    columns: [GridItem(.adaptive(minimum: 100), spacing: design.layout.grid.regular)],
+                    spacing: design.layout.grid.regular
+                ) {
+                    MaterialPresetCard(
+                        recipe: .cloth,
+                        color: Color(red: 0.96, green: 0.94, blue: 0.90),
+                        label: "Cloth"
+                    )
+                    MaterialPresetCard(
+                        recipe: .plastic,
+                        color: Color(red: 0.95, green: 0.95, blue: 0.96),
+                        label: "Plastic"
+                    )
+                    MaterialPresetCard(
+                        recipe: .silk,
+                        color: Color(red: 0.95, green: 0.90, blue: 0.92),
+                        label: "Silk"
+                    )
+                    MaterialPresetCard(
+                        recipe: .aluminum,
+                        color: Color(red: 0.85, green: 0.86, blue: 0.88),
+                        label: "Aluminum"
+                    )
+                    MaterialPresetCard(
+                        recipe: .linen,
+                        color: Color(red: 0.94, green: 0.91, blue: 0.86),
+                        label: "Linen"
+                    )
+                }
+            }
+            .gentleSurface(.card, inset: .card)
+
+            // Boosted Presets (more visible texture)
+            VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+                Text("Presets with Boosted Texture (25%)")
+                    .gentleText(.headline_m)
+
+                LazyVGrid(
+                    columns: [GridItem(.adaptive(minimum: 100), spacing: design.layout.grid.regular)],
+                    spacing: design.layout.grid.regular
+                ) {
+                    MaterialPresetCard(
+                        recipe: .clothBoosted,
+                        color: Color(red: 0.96, green: 0.94, blue: 0.90),
+                        label: "Cloth"
+                    )
+                    MaterialPresetCard(
+                        recipe: .plasticBoosted,
+                        color: Color(red: 0.95, green: 0.95, blue: 0.96),
+                        label: "Plastic"
+                    )
+                    MaterialPresetCard(
+                        recipe: .silkBoosted,
+                        color: Color(red: 0.95, green: 0.90, blue: 0.92),
+                        label: "Silk"
+                    )
+                    MaterialPresetCard(
+                        recipe: .aluminumBoosted,
+                        color: Color(red: 0.85, green: 0.86, blue: 0.88),
+                        label: "Aluminum"
+                    )
+                    MaterialPresetCard(
+                        recipe: .linenBoosted,
+                        color: Color(red: 0.94, green: 0.91, blue: 0.86),
+                        label: "Linen"
+                    )
+                }
+            }
+            .gentleSurface(.card, inset: .card)
+
+            // Full Materials at 50% texture (very visible debug)
+            VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+                Text("Full Materials at 50% Texture")
+                    .gentleText(.headline_m)
+
+                LazyVGrid(
+                    columns: [GridItem(.adaptive(minimum: 100), spacing: design.layout.grid.regular)],
+                    spacing: design.layout.grid.regular
+                ) {
+                    MaterialPresetCard(
+                        recipe: .clothMax,
+                        color: Color(red: 0.96, green: 0.94, blue: 0.90),
+                        label: "Cloth"
+                    )
+                    MaterialPresetCard(
+                        recipe: .plasticMax,
+                        color: Color(red: 0.95, green: 0.95, blue: 0.96),
+                        label: "Plastic"
+                    )
+                    MaterialPresetCard(
+                        recipe: .silkMax,
+                        color: Color(red: 0.95, green: 0.90, blue: 0.92),
+                        label: "Silk"
+                    )
+                    MaterialPresetCard(
+                        recipe: .aluminumMax,
+                        color: Color(red: 0.85, green: 0.86, blue: 0.88),
+                        label: "Aluminum"
+                    )
+                    MaterialPresetCard(
+                        recipe: .linenMax,
+                        color: Color(red: 0.94, green: 0.91, blue: 0.86),
+                        label: "Linen"
+                    )
+                }
+            }
+            .gentleSurface(.card, inset: .card)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+// MARK: - Material Helper Views
+
+private struct RawTextureCard: View {
+    let pattern: GentleMaterialSurface.Texture.Pattern
+    let label: String
+
+    var body: some View {
+        VStack(spacing: 4) {
+            textureView
+                .frame(width: 80, height: 80)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .strokeBorder(Color.gray.opacity(0.3), lineWidth: 1)
+                )
+
+            Text(label)
+                .gentleText(.caption_s)
+        }
+    }
+
+    @ViewBuilder
+    private var textureView: some View {
+        switch pattern {
+        case .none:
+            Color.clear
+        case .noise:
+            ProceduralTexture.noise
+                .resizable(resizingMode: .tile)
+        case .weave:
+            ProceduralTexture.weave
+                .resizable(resizingMode: .tile)
+        case .brushed:
+            ProceduralTexture.brushed
+                .resizable(resizingMode: .tile)
+        }
+    }
+}
+
+private struct DebugMaterialCard: View {
+    let pattern: GentleMaterialSurface.Texture.Pattern
+    let label: String
+
+    var body: some View {
+        VStack(spacing: 4) {
+            GentleMaterialSurface(
+                baseColor: Color(white: 0.85),
+                cornerRadius: 8,
+                recipe: .init(
+                    lighting: .init(style: .none, intensity: 0),
+                    texture: .init(pattern: pattern, intensity: 0.5, scale: 1.0),
+                    depth: .init(innerHighlight: 0, ambientOcclusion: 0)
+                )
+            )
+            .frame(width: 80, height: 80)
+
+            Text(label)
+                .gentleText(.caption_s)
+        }
+    }
+}
+
+private struct MaterialPresetCard: View {
+    let recipe: GentleMaterialSurface.Recipe
+    let color: Color
+    let label: String
+
+    var body: some View {
+        VStack(spacing: 4) {
+            GentleMaterialSurface(
+                baseColor: color,
+                cornerRadius: 12,
+                recipe: recipe
+            )
+            .frame(height: 80)
+
+            Text(label)
+                .gentleText(.caption_s)
+        }
+    }
+}
+
+// MARK: - Debug Material Presets
+//
+// These use the SAME texture mappings as production presets, just at higher
+// intensity for visibility testing. Cloth uses noise (not weave) to match
+// the "perceptual cloth" philosophy.
+
+private extension GentleMaterialSurface.Recipe {
+
+    // 25% intensity — visible but plausible
+    static let clothBoosted = Self(
+        lighting: .init(style: .softTop, intensity: 0.08),
+        texture: .init(pattern: .noise, intensity: 0.20, scale: 1.8),  // Noise, not weave!
+        depth: .init(innerHighlight: 0.04, ambientOcclusion: 0.08)
+    )
+
+    static let plasticBoosted = Self(
+        lighting: .init(style: .softTop, intensity: 0.12),
+        texture: .init(pattern: .noise, intensity: 0.15, scale: 0.8),
+        depth: .init(innerHighlight: 0.08, ambientOcclusion: 0.05)
+    )
+
+    static let silkBoosted = Self(
+        lighting: .init(style: .directional(angle: .degrees(-35)), intensity: 0.14),
+        texture: .init(pattern: .noise, intensity: 0.12, scale: 0.6),
+        depth: .init(innerHighlight: 0.10, ambientOcclusion: 0.04)
+    )
+
+    static let aluminumBoosted = Self(
+        lighting: .init(style: .directional(angle: .degrees(15)), intensity: 0.16),
+        texture: .init(pattern: .brushed, intensity: 0.18, scale: 1.0),
+        depth: .init(innerHighlight: 0.05, ambientOcclusion: 0.06)
+    )
+
+    // 50% intensity — very visible for debugging texture application
+    static let clothMax = Self(
+        lighting: .init(style: .softTop, intensity: 0.08),
+        texture: .init(pattern: .noise, intensity: 0.40, scale: 1.8),  // Noise, not weave!
+        depth: .init(innerHighlight: 0.04, ambientOcclusion: 0.08)
+    )
+
+    static let plasticMax = Self(
+        lighting: .init(style: .softTop, intensity: 0.12),
+        texture: .init(pattern: .noise, intensity: 0.35, scale: 0.8),
+        depth: .init(innerHighlight: 0.08, ambientOcclusion: 0.05)
+    )
+
+    static let silkMax = Self(
+        lighting: .init(style: .directional(angle: .degrees(-35)), intensity: 0.14),
+        texture: .init(pattern: .noise, intensity: 0.30, scale: 0.6),
+        depth: .init(innerHighlight: 0.10, ambientOcclusion: 0.04)
+    )
+
+    static let aluminumMax = Self(
+        lighting: .init(style: .directional(angle: .degrees(15)), intensity: 0.16),
+        texture: .init(pattern: .brushed, intensity: 0.40, scale: 1.0),
+        depth: .init(innerHighlight: 0.05, ambientOcclusion: 0.06)
+    )
+
+    // Linen variant (literal weave pattern) — for comparison/diagnostics only
+    static let linenBoosted = Self(
+        lighting: .init(style: .softTop, intensity: 0.06),
+        texture: .init(pattern: .weave, intensity: 0.25, scale: 1.0),
+        depth: .init(innerHighlight: 0.03, ambientOcclusion: 0.06)
+    )
+
+    static let linenMax = Self(
+        lighting: .init(style: .softTop, intensity: 0.06),
+        texture: .init(pattern: .weave, intensity: 0.45, scale: 1.0),
+        depth: .init(innerHighlight: 0.03, ambientOcclusion: 0.06)
+    )
 }
 
 // MARK: - Color to Hex conversion
