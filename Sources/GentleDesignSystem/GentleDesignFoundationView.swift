@@ -716,41 +716,15 @@ private struct SurfaceRoleEditorSheet: View {
     @Environment(\.dismiss) private var dismiss
     @GentleDesignRuntime private var design
     @GentleThemeManagerRuntime private var manager
-    @Environment(\.gentleTheme) private var theme
-    @Environment(\.colorScheme) private var colorScheme
 
+    /// The initial spec captured when the sheet appears, used to revert on cancel/drag-dismiss.
+    @State private var initialSpec: GentleSurfaceRoleSpec?
     /// Tracks whether the user explicitly saved changes.
     @State private var didSave = false
-    /// Initial color values for reverting
-    @State private var initialColors: [GentleColorRole: GentleColorPair] = [:]
-
-    /// The color roles relevant to this surface role
-    private var relevantColorRoles: [(String, GentleColorRole)] {
-        switch role {
-        case .card:
-            return [
-                ("Background", .surface),
-                ("Border", .borderSubtle)
-            ]
-        case .cardElevated:
-            return [
-                ("Background", .surfaceElevated),
-                ("Border", .borderSubtle)
-            ]
-        case .appBackground:
-            return [
-                ("Background", .background)
-            ]
-        case .surfaceOverlay:
-            return [
-                ("Overlay", .surfaceOverlay),
-                ("Primary Text", .onSurfaceOverlayPrimary),
-                ("Secondary Text", .onSurfaceOverlaySecondary)
-            ]
-        }
-    }
 
     var body: some View {
+        let binding = manager.bindingForSurfaceRole(role)
+
         NavigationStack {
             VStack(spacing: 0) {
                 // Preview section
@@ -775,16 +749,77 @@ private struct SurfaceRoleEditorSheet: View {
 
                 List {
                     Section("Colors") {
-                        ForEach(relevantColorRoles, id: \.1) { name, colorRole in
-                            SurfaceColorRow(name: name, colorRole: colorRole)
+                        SurfaceColorPairRow(name: "Background", binding: binding.background)
+                        SurfaceColorPairRow(name: "Border", binding: binding.border)
+                    }
+
+                    Section("Structure") {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Corner Radius")
+                                Spacer()
+                                Text(String(format: "%.0f", binding.cornerRadius.wrappedValue))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                            }
+                            Slider(value: binding.cornerRadius, in: 0...40, step: 1)
+                        }
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Border Width")
+                                Spacer()
+                                Text(String(format: "%.1f", binding.borderWidth.wrappedValue))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                            }
+                            Slider(value: binding.borderWidth, in: 0...4, step: 0.5)
                         }
                     }
 
-                    if role == .cardElevated {
-                        Section("Shadow") {
-                            Text("Shadow settings are controlled by the theme's shadow tokens.")
-                                .gentleText(.caption_s)
-                                .opacity(0.7)
+                    Section("Shadow") {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Shadow Radius")
+                                Spacer()
+                                Text(String(format: "%.0f", binding.shadowRadius.wrappedValue))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                            }
+                            Slider(value: binding.shadowRadius, in: 0...20, step: 1)
+                        }
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Shadow Opacity")
+                                Spacer()
+                                Text(String(format: "%.2f", binding.shadowOpacity.wrappedValue))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                            }
+                            Slider(value: binding.shadowOpacity, in: 0...0.5, step: 0.01)
+                        }
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Shadow Offset X")
+                                Spacer()
+                                Text(String(format: "%.0f", binding.shadowOffsetX.wrappedValue))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                            }
+                            Slider(value: binding.shadowOffsetX, in: -10...10, step: 1)
+                        }
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Shadow Offset Y")
+                                Spacer()
+                                Text(String(format: "%.0f", binding.shadowOffsetY.wrappedValue))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                            }
+                            Slider(value: binding.shadowOffsetY, in: -10...10, step: 1)
                         }
                     }
                 }
@@ -815,9 +850,7 @@ private struct SurfaceRoleEditorSheet: View {
         .presentationDetents([.large])
         .onAppear {
             // Capture initial state for potential revert
-            for (_, colorRole) in relevantColorRoles {
-                initialColors[colorRole] = manager.bindingForColorRole(colorRole).wrappedValue
-            }
+            initialSpec = manager.bindingForSurfaceRole(role).wrappedValue
         }
         .onDisappear {
             // If user dragged to dismiss without saving, revert changes
@@ -828,30 +861,25 @@ private struct SurfaceRoleEditorSheet: View {
     }
 
     private func revertChanges() {
-        for (colorRole, colorPair) in initialColors {
-            manager.bindingForColorRole(colorRole).wrappedValue = colorPair
-        }
+        guard let initialSpec else { return }
+        manager.bindingForSurfaceRole(role).wrappedValue = initialSpec
     }
 }
 
-// MARK: - Surface Color Row
+// MARK: - Surface Color Pair Row
 
-private struct SurfaceColorRow: View {
+private struct SurfaceColorPairRow: View {
     let name: String
-    let colorRole: GentleColorRole
-
-    @GentleDesignRuntime private var design
-    @GentleThemeManagerRuntime private var manager
+    @Binding var binding: GentleColorPair
 
     var body: some View {
-        let binding = manager.bindingForColorRole(colorRole)
         let lightBinding = Binding<Color>(
-            get: { Color(gentleHex: binding.lightHex.wrappedValue) },
-            set: { binding.lightHex.wrappedValue = $0.toGentleHexString() }
+            get: { Color(gentleHex: binding.lightHex) },
+            set: { binding.lightHex = $0.toGentleHexString() }
         )
         let darkBinding = Binding<Color>(
-            get: { Color(gentleHex: binding.darkHex.wrappedValue) },
-            set: { binding.darkHex.wrappedValue = $0.toGentleHexString() }
+            get: { Color(gentleHex: binding.darkHex) },
+            set: { binding.darkHex = $0.toGentleHexString() }
         )
 
         HStack {
