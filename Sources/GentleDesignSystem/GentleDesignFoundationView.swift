@@ -125,6 +125,8 @@ private struct ColorSwatchRow: View {
 
 public struct GentleDesignTypographySection: View {
     @GentleDesignRuntime private var design
+    @Environment(\.gentleTheme) private var theme
+    @Environment(\.colorScheme) private var colorScheme
     @State private var editingRole: GentleTextRole?
 
     public init() {}
@@ -164,27 +166,26 @@ public struct GentleDesignTypographySection: View {
                     Button {
                         editingRole = role
                     } label: {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 0) {
-                                HStack(alignment: .top) {
-                                    VStack(alignment: .leading) {
-                                        Text("Aa")
-                                            .gentleText(role)
-                                            .lineLimit(1)
-                                            .minimumScaleFactor(0.8)
-                                        Text(name.camelCaseBreakable)
-                                            .gentleText(.caption_s)
-                                    }
-                                    Spacer()
-                                    Image(systemName: "slider.horizontal.3")
-                                        .gentleText(.title3_ml)
-                                        .opacity(0.7)
-                                }
-                            }
+                        VStack(alignment: .leading) {
+                            Text("Aa")
+                                .gentleText(role)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                            Text(name.camelCaseBreakable)
+                                .gentleText(.caption_s)
                         }
+                        .frame(maxWidth: .infinity, minHeight: 60, alignment: .topLeading)
                         .padding(.vertical, design.layout.gap.s)
                         .padding(.horizontal, design.layout.gap.m)
                         .gentleSurface(.card)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: CGFloat(theme.radii.medium))
+                                .strokeBorder(
+                                    theme.color(for: .primaryCTA, scheme: colorScheme)
+                                        .opacity(0.5),
+                                    lineWidth: 1
+                                )
+                        )
                     }
                     .buttonStyle(.plain)
                 }
@@ -206,7 +207,7 @@ public struct GentleDesignButtonsSection: View {
     public init() {}
 
     private var columns: [GridItem] {
-        [GridItem(.adaptive(minimum: 150), spacing: design.layout.grid.regular)]
+        [GridItem(.adaptive(minimum: 100), spacing: design.layout.grid.regular)]
     }
 
     private let buttonStyles: [(String, GentleButtonRole)] = [
@@ -360,7 +361,7 @@ public struct GentleButtonPreview: View {
 
         // When usesNativeStyle is true, skip background/border/padding - just text styling with accent color
         if spec.usesNativeStyle {
-            Text("Customize")
+            Text("OK")
                 .gentleText(textRole, colorRole: labelColorRole)
                 .scaleEffect(isPressed ? spec.pressedScale : 1.0)
                 .opacity(isPressed ? spec.pressedOpacity : 1.0)
@@ -386,7 +387,7 @@ public struct GentleButtonPreview: View {
                 }
             }()
 
-            Text("Customize")
+            Text("OK")
                 .gentleText(textRole, colorRole: labelColorRole)
                 .padding(.horizontal, CGFloat(gap.xl))
                 .padding(.vertical, verticalPadding)
@@ -415,6 +416,8 @@ private struct ButtonPreviewCard: View {
     let action: () -> Void
 
     @GentleDesignRuntime private var design
+    @Environment(\.gentleTheme) private var theme
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         Button(action: action) {
@@ -422,6 +425,14 @@ private struct ButtonPreviewCard: View {
         }
         .buttonStyle(ButtonPreviewCardStyle())
         .gentleSurface(.card)
+        .overlay(
+            RoundedRectangle(cornerRadius: CGFloat(theme.radii.medium))
+                .strokeBorder(
+                    theme.color(for: .primaryCTA, scheme: colorScheme)
+                        .opacity(0.5),
+                    lineWidth: 1
+                )
+        )
     }
 }
 
@@ -433,15 +444,13 @@ private struct ButtonPreviewCardContent: View {
     @Environment(\.buttonPreviewCardIsPressed) private var isPressed
 
     var body: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: design.layout.stack.tight) {
-                GentleButtonPreview(role: role, isPressed: isPressed)
+        VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+            GentleButtonPreview(role: role, isPressed: isPressed)
 
-                Text(name.camelCaseBreakable)
-                    .gentleText(.caption_s)
-            }
-            Spacer()
+            Text(name.camelCaseBreakable)
+                .gentleText(.caption_s)
         }
+        .frame(maxWidth: .infinity, minHeight: 60, alignment: .topLeading)
         .padding(.vertical, design.layout.gap.s)
         .padding(.horizontal, design.layout.gap.m)
         .contentShape(Rectangle())
