@@ -14,15 +14,18 @@ public struct GentleMaterialSurface: View {
     public struct Recipe: Sendable {
         public var lighting: Lighting
         public var texture: Texture
+        public var secondaryTexture: SecondaryTexture?  // Optional fiber/detail layer
         public var depth: Depth
 
         public init(
             lighting: Lighting,
             texture: Texture,
+            secondaryTexture: SecondaryTexture? = nil,
             depth: Depth
         ) {
             self.lighting = lighting
             self.texture = texture
+            self.secondaryTexture = secondaryTexture
             self.depth = depth
         }
     }
@@ -56,17 +59,95 @@ public struct GentleMaterialSurface: View {
         }
 
         public var pattern: Pattern
-        public var intensity: Double // 0...0.20
-        public var scale: Double     // 0.5...3.0
+        public var intensity: Double // 0...0.50 (production ~0.05, debug up to 0.50)
+        public var scaleX: Double    // 0.3...3.0 — horizontal scale (smaller = finer grain)
+        public var scaleY: Double    // 0.3...3.0 — vertical scale
+        public var rotation: Angle   // Optional rotation for directional bias
+        public var blur: Double      // 0...2.0 — softens harsh edges (0 = sharp, 0.5-1.0 = soft)
 
+        /// Uniform scale (isotropic)
         public init(
             pattern: Pattern,
             intensity: Double,
-            scale: Double
+            scale: Double,
+            rotation: Angle = .zero,
+            blur: Double = 0
         ) {
             self.pattern = pattern
             self.intensity = intensity
-            self.scale = scale
+            self.scaleX = scale
+            self.scaleY = scale
+            self.rotation = rotation
+            self.blur = blur
+        }
+
+        /// Anisotropic scale — use different X/Y to create directional fiber feel
+        /// Lower scale values = finer grain (higher frequency)
+        public init(
+            pattern: Pattern,
+            intensity: Double,
+            scaleX: Double,
+            scaleY: Double,
+            rotation: Angle = .zero,
+            blur: Double = 0
+        ) {
+            self.pattern = pattern
+            self.intensity = intensity
+            self.scaleX = scaleX
+            self.scaleY = scaleY
+            self.rotation = rotation
+            self.blur = blur
+        }
+    }
+
+    // MARK: Secondary Texture (optional fiber/detail layer)
+    //
+    // For materials like cloth that benefit from multi-scale texture:
+    // - Primary texture: base grain
+    // - Secondary texture: fine fiber detail (smaller scale, often rotated)
+    //
+    // KEY INSIGHT: Use SMALL scale values for fine micro-fiber feel.
+    // scaleX/Y < 1.0 = finer grain, scaleX/Y > 1.0 = coarser grain
+
+    public struct SecondaryTexture: Sendable {
+        public var pattern: Texture.Pattern
+        public var intensity: Double
+        public var scaleX: Double
+        public var scaleY: Double
+        public var rotation: Angle
+        public var blur: Double
+
+        /// Uniform scale (isotropic)
+        public init(
+            pattern: Texture.Pattern,
+            intensity: Double,
+            scale: Double,
+            rotation: Angle = .zero,
+            blur: Double = 0
+        ) {
+            self.pattern = pattern
+            self.intensity = intensity
+            self.scaleX = scale
+            self.scaleY = scale
+            self.rotation = rotation
+            self.blur = blur
+        }
+
+        /// Anisotropic scale
+        public init(
+            pattern: Texture.Pattern,
+            intensity: Double,
+            scaleX: Double,
+            scaleY: Double,
+            rotation: Angle = .zero,
+            blur: Double = 0
+        ) {
+            self.pattern = pattern
+            self.intensity = intensity
+            self.scaleX = scaleX
+            self.scaleY = scaleY
+            self.rotation = rotation
+            self.blur = blur
         }
     }
 
@@ -149,15 +230,36 @@ public struct GentleMaterialSurface: View {
 
     @ViewBuilder
     private var textureLayer: some View {
-        if recipe.texture.pattern != .none,
-           recipe.texture.intensity > 0,
-           let texture = proceduralTexture(for: recipe.texture.pattern) {
-            texture
-                .resizable(resizingMode: .tile)
-                .scaleEffect(recipe.texture.scale)
-                .opacity(recipe.texture.intensity)
-                .blendMode(.softLight)
-                .accessibilityHidden(true)
+        ZStack {
+            // Primary texture layer
+            if recipe.texture.pattern != .none,
+               recipe.texture.intensity > 0,
+               let texture = proceduralTexture(for: recipe.texture.pattern) {
+                texture
+                    .resizable(resizingMode: .tile)
+                    .scaleEffect(x: recipe.texture.scaleX, y: recipe.texture.scaleY)
+                    .rotationEffect(recipe.texture.rotation)
+                    .blur(radius: recipe.texture.blur)  // Softens harsh edges
+                    .opacity(recipe.texture.intensity)
+                    .blendMode(.softLight)
+                    .accessibilityHidden(true)
+            }
+
+            // Secondary texture layer (optional fiber/detail)
+            // Used for cloth to add subtle directional micro-fiber cue
+            if let secondary = recipe.secondaryTexture,
+               secondary.pattern != .none,
+               secondary.intensity > 0,
+               let texture = proceduralTexture(for: secondary.pattern) {
+                texture
+                    .resizable(resizingMode: .tile)
+                    .scaleEffect(x: secondary.scaleX, y: secondary.scaleY)
+                    .rotationEffect(secondary.rotation)
+                    .blur(radius: secondary.blur)  // Softens harsh edges
+                    .opacity(secondary.intensity)
+                    .blendMode(.softLight)
+                    .accessibilityHidden(true)
+            }
         }
     }
 
@@ -312,7 +414,7 @@ enum ProceduralTexture {
 
     private static func generateWeave() -> Image {
         let size = 64
-        let threadSpacing: Double = 6.0  // Distance between thread centers
+        let threadSpacing: Double = 3.0  // 2x density (was 6.0)
         let threadSoftness: Double = 2.5 // Controls falloff width
 
         var pixels = [UInt8](repeating: 0, count: size * size * 4)
@@ -323,11 +425,11 @@ enum ProceduralTexture {
                 let fy = Double(y)
 
                 // Horizontal threads: sine-based intensity with slight y-jitter
-                let hPhase = (fy + sin(fx * 0.3) * 1.5) / threadSpacing
+                let hPhase = (fy + sin(fx * 0.4) * 0.8) / threadSpacing
                 let hThread = pow(abs(sin(hPhase * .pi)), threadSoftness)
 
                 // Vertical threads: sine-based intensity with slight x-jitter
-                let vPhase = (fx + sin(fy * 0.25) * 1.2) / threadSpacing
+                let vPhase = (fx + sin(fy * 0.35) * 0.7) / threadSpacing
                 let vThread = pow(abs(sin(vPhase * .pi)), threadSoftness)
 
                 // Over/under pattern: alternate which thread is "on top"
@@ -450,22 +552,64 @@ enum ProceduralTexture {
 public extension GentleMaterialSurface.Recipe {
 
     // MARK: - Cloth (soft, human, organic)
-    // Uses NOISE (not weave) at larger scale for coarse fiber feel
+    //
+    // CLOTH TEXTURE PHILOSOPHY: "Felt, not seen"
+    // ──────────────────────────────────────────
+    // Uses anisotropic noise (scaleX ≠ scaleY) for subtle directional fiber feel.
+    //
+    // KEY INSIGHT: Scale values must be >= 1.0 for texture to be visible on device.
+    // The ~20% anisotropy (scaleX/scaleY ratio) creates directional grain that
+    // differentiates cloth from paper's uniform isotropic texture.
+    //
+    // At production intensity (~5-7%), the texture should be barely perceptible
+    // but contribute to the overall "soft, fibrous" feel of the surface.
 
-    /// Soft, human, forgiving — perceptual cloth via coarse noise grain
+    /// Soft, human, forgiving — perceptual cloth via anisotropic noise
     static let cloth = Self(
         lighting: .init(
             style: .softTop,
-            intensity: 0.08
+            intensity: 0.07
         ),
         texture: .init(
-            pattern: .noise,        // Noise for organic micro-variation
-            intensity: 0.08,        // Subtle but present
-            scale: 1.8              // Larger scale = coarse fiber feel
+            pattern: .noise,
+            intensity: 0.06,
+            scaleX: 1.4,            // Visible grain (must be >= 1.0)
+            scaleY: 1.15            // ~20% anisotropy for directional fiber feel
+        ),
+        secondaryTexture: .init(
+            pattern: .noise,
+            intensity: 0.025,       // Very subtle micro-fiber layer
+            scaleX: 0.8,
+            scaleY: 0.65,
+            rotation: .degrees(22)  // Slight rotation = fiber alignment variation
         ),
         depth: .init(
             innerHighlight: 0.04,
-            ambientOcclusion: 0.08
+            ambientOcclusion: 0.07
+        )
+    )
+
+    // MARK: - Paper (flat, isotropic, uniform)
+    //
+    // Single-layer ISOTROPIC noise with diffuse lighting.
+    // NO anisotropy, NO secondary layer — reads as "flat sheet" not "woven".
+    // This uniform quality is what differentiates paper from cloth.
+
+    /// Flat, uniform, archival — isotropic noise like watercolor paper
+    static let paper = Self(
+        lighting: .init(
+            style: .softTop,
+            intensity: 0.05
+        ),
+        texture: .init(
+            pattern: .noise,
+            intensity: 0.07,
+            scale: 1.6              // Uniform scale = isotropic (no directional bias)
+        ),
+        // NO secondaryTexture — paper is single-layer
+        depth: .init(
+            innerHighlight: 0.03,
+            ambientOcclusion: 0.06
         )
     )
 
