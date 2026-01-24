@@ -423,11 +423,7 @@ public struct ColorRoleEditor: View {
 
 // MARK: - Color to Hex conversion
 
-#if canImport(UIKit)
 import UIKit
-#elseif canImport(AppKit)
-import AppKit
-#endif
 
 private extension Color {
     func toHexString() -> String {
