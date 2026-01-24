@@ -68,7 +68,7 @@ public struct GentleDesignColorsSection: View {
     }
 }
 
-private struct ColorSwatchRow: View {
+struct ColorSwatchRow: View {
     let role: GentleColorRole
     let name: String
 
@@ -400,7 +400,7 @@ public struct GentleButtonPreview: View {
 
 // MARK: - Button Preview Card
 
-private struct ButtonPreviewCard: View {
+struct ButtonPreviewCard: View {
     let name: String
     let role: GentleButtonRole
     let action: () -> Void
@@ -418,7 +418,7 @@ private struct ButtonPreviewCard: View {
     }
 }
 
-private struct ButtonPreviewCardContent: View {
+struct ButtonPreviewCardContent: View {
     let name: String
     let role: GentleButtonRole
 
@@ -439,7 +439,7 @@ private struct ButtonPreviewCardContent: View {
     }
 }
 
-private struct ButtonPreviewCardStyle: ButtonStyle {
+struct ButtonPreviewCardStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         // This is a workaround - we need to rebuild content with isPressed
         // The actual isPressed passing happens via environment or reconstruction
@@ -448,11 +448,11 @@ private struct ButtonPreviewCardStyle: ButtonStyle {
     }
 }
 
-private struct ButtonPreviewCardIsPressedKey: EnvironmentKey {
+struct ButtonPreviewCardIsPressedKey: EnvironmentKey {
     static let defaultValue: Bool = false
 }
 
-private extension EnvironmentValues {
+extension EnvironmentValues {
     var buttonPreviewCardIsPressed: Bool {
         get { self[ButtonPreviewCardIsPressedKey.self] }
         set { self[ButtonPreviewCardIsPressedKey.self] = newValue }
@@ -461,7 +461,7 @@ private extension EnvironmentValues {
 
 // MARK: - Button Role Editor Sheet
 
-private struct ButtonRoleEditorSheet: View {
+struct ButtonRoleEditorSheet: View {
     let role: GentleButtonRole
     @Environment(\.dismiss) private var dismiss
     @GentleDesignRuntime private var design
@@ -685,7 +685,7 @@ extension GentleSurfaceRole: Identifiable {
 
 // MARK: - Surface Role Editor Sheet
 
-private struct SurfaceRoleEditorSheet: View {
+struct SurfaceRoleEditorSheet: View {
     let role: GentleSurfaceRole
     @Environment(\.dismiss) private var dismiss
     @GentleDesignRuntime private var design
@@ -842,7 +842,7 @@ private struct SurfaceRoleEditorSheet: View {
 
 // MARK: - Surface Color Pair Row
 
-private struct SurfaceColorPairRow: View {
+struct SurfaceColorPairRow: View {
     let name: String
     @Binding var binding: GentleColorPair
 
@@ -946,7 +946,7 @@ public struct GentleDesignMaterialsSection: View {
 
 // MARK: - Material Helper Views
 
-private struct RawTextureCard: View {
+struct RawTextureCard: View {
     let pattern: GentleMaterialSurface.Texture.Pattern
     let label: String
 
@@ -983,7 +983,7 @@ private struct RawTextureCard: View {
     }
 }
 
-private struct DebugMaterialCard: View {
+struct DebugMaterialCard: View {
     let pattern: GentleMaterialSurface.Texture.Pattern
     let label: String
 
@@ -1006,7 +1006,7 @@ private struct DebugMaterialCard: View {
     }
 }
 
-private struct MaterialPresetCard: View {
+struct MaterialPresetCard: View {
     let recipe: GentleMaterialSurface.Recipe
     let color: Color
     let label: String
@@ -1031,7 +1031,7 @@ private struct MaterialPresetCard: View {
 }
 // MARK: - Color to Hex conversion
 
-private extension Color {
+extension Color {
     func toGentleHexString() -> String {
         var r: CGFloat = 0
         var g: CGFloat = 0
