@@ -3926,32 +3926,36 @@ struct GentleDesignShareSheetExtendedTests {
     }
 
     @Test("ShareSheet can be initialized with URL items")
-    func testShareSheetWithURLItems() {
-        let shareSheet = GentleDesignShareSheet(items: [URL(string: "https://example.com")!])
+    func testShareSheetWithURLItems() throws {
+        let url = try #require(URL(string: "https://example.com"))
+        let shareSheet = GentleDesignShareSheet(items: [url])
         renderViewForCoverage(shareSheet)
     }
 
     @Test("ShareSheet can be initialized with image items")
-    func testShareSheetWithImageItems() {
-        let image = UIImage(systemName: "star.fill")!
+    func testShareSheetWithImageItems() throws {
+        let image = try #require(UIImage(systemName: "star.fill"))
         let shareSheet = GentleDesignShareSheet(items: [image])
         renderViewForCoverage(shareSheet)
     }
 
     @Test("ShareSheet can be initialized with data items")
-    func testShareSheetWithDataItems() {
-        let data = "Test data".data(using: .utf8)!
+    func testShareSheetWithDataItems() throws {
+        let data = try #require("Test data".data(using: .utf8))
         let shareSheet = GentleDesignShareSheet(items: [data])
         renderViewForCoverage(shareSheet)
     }
 
     @Test("ShareSheet can be initialized with mixed items")
-    func testShareSheetWithMixedItems() {
+    func testShareSheetWithMixedItems() throws {
+        let url = try #require(URL(string: "https://example.com"))
+        let image = try #require(UIImage(systemName: "heart.fill"))
+        let data = try #require("More text".data(using: .utf8))
         let shareSheet = GentleDesignShareSheet(items: [
             "A string",
-            URL(string: "https://example.com")!,
-            UIImage(systemName: "heart.fill")!,
-            "More text".data(using: .utf8)!
+            url,
+            image,
+            data
         ])
         renderViewForCoverage(shareSheet)
     }
