@@ -3,6 +3,12 @@ import Testing
 import SwiftUI
 @testable import GentleDesignSystem
 
+// MARK: - Test Error
+
+enum MaterialTestError: Error {
+    case invalidTestData(String)
+}
+
 // MARK: - GentleDesignMaterial Tests
 
 @Suite("GentleDesignMaterial Tests")
@@ -160,9 +166,12 @@ struct GentleDesignMaterialTests {
 
     @Test("Material decoding throws on invalid JSON")
     func testMaterialDecodingThrowsOnInvalid() throws {
-        let invalidJSON = """
+        let jsonString = """
         {"id": "test", "base": {"invalid": "data"}}
-        """.data(using: .utf8)!
+        """
+        guard let invalidJSON = jsonString.data(using: .utf8) else {
+            throw MaterialTestError.invalidTestData("Could not convert JSON string to data")
+        }
 
         let decoder = JSONDecoder()
 
@@ -284,9 +293,12 @@ struct GentleAppleMaterialSpecTests {
 
     @Test("Apple material kind decoding throws on invalid value")
     func testAppleMaterialKindDecodingThrows() throws {
-        let invalidJSON = """
+        let jsonString = """
         {"kind": "invalidKind", "opacity": 1.0}
-        """.data(using: .utf8)!
+        """
+        guard let invalidJSON = jsonString.data(using: .utf8) else {
+            throw MaterialTestError.invalidTestData("Could not convert JSON string to data")
+        }
 
         let decoder = JSONDecoder()
 
@@ -382,9 +394,12 @@ struct GentleGlassSpecTests {
 
     @Test("Glass style decoding throws on invalid value")
     func testGlassStyleDecodingThrows() throws {
-        let invalidJSON = """
+        let jsonString = """
         {"style": "invalidStyle", "isInteractive": false}
-        """.data(using: .utf8)!
+        """
+        guard let invalidJSON = jsonString.data(using: .utf8) else {
+            throw MaterialTestError.invalidTestData("Could not convert JSON string to data")
+        }
 
         let decoder = JSONDecoder()
 
@@ -719,9 +734,12 @@ struct GentleSurfaceTokensTests {
 
     @Test("Surface tokens decode throws on invalid JSON")
     func testSurfaceTokensDecodeThrows() throws {
-        let invalidJSON = """
+        let jsonString = """
         {"roles": {"card": {"invalid": "structure"}}}
-        """.data(using: .utf8)!
+        """
+        guard let invalidJSON = jsonString.data(using: .utf8) else {
+            throw MaterialTestError.invalidTestData("Could not convert JSON string to data")
+        }
 
         let decoder = JSONDecoder()
 
