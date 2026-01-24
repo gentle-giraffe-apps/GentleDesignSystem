@@ -63,9 +63,9 @@ Theme:    themePrimary, themeSecondary
 Border:   borderSubtle
 ```
 
-### GentleButtonRole (4 roles)
+### GentleButtonRole (5 roles)
 ```
-primary, secondary, tertiary, destructive
+primary, secondary, tertiary, quaternary, destructive
 ```
 
 ### GentleButtonAnimationRole (6 roles)
@@ -119,7 +119,7 @@ let scaledSize = metrics.scaledValue(for: pointSize, compatibleWith: traits)
 
 ## Versioning
 
-Current version: `0.2.3` (in `GentleDesignSystemSpecVersion.current`)
+Current version: `0.3.0` (in `GentleDesignSystemSpecVersion.current`)
 
 Bump version when:
 - Adding new token types

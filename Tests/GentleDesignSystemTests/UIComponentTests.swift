@@ -224,15 +224,15 @@ struct GentleDesignCustomizeViewTests {
     }
 }
 
-// MARK: - GentleDesignFoundationView Tests
+// MARK: - GentleThemeEditor Tests
 
-@Suite("GentleDesignFoundationView Tests")
+@Suite("GentleThemeEditor Tests")
 @MainActor
-struct GentleDesignFoundationViewTests {
+struct GentleThemeEditorTests {
 
-    @Test("GentleDesignFoundationView can be created")
+    @Test("GentleThemeEditor can be created")
     func testFoundationView() {
-        _ = GentleDesignFoundationView()
+        _ = GentleThemeEditor()
     }
 }
 
