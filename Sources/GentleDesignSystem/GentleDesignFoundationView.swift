@@ -255,6 +255,7 @@ public struct GentleButtonPreview: View {
             miniatureBody(spec: spec)
         } else {
             fullSizeBody(spec: spec)
+                .padding(theme.buttons.roleSpec(for: role).usesNativeStyle ? 4 : 0)
         }
     }
 
@@ -938,139 +939,6 @@ public struct GentleDesignMaterialsSection: View {
                 }
             }
             .gentleSurface(.card, inset: .card)
-
-            // Boosted Presets (commented out for cleaner UI)
-            /*
-            VStack(alignment: .leading, spacing: design.layout.stack.tight) {
-                Text("Presets with Boosted Texture (25%)")
-                    .gentleText(.headline_m)
-
-                LazyVGrid(
-                    columns: [GridItem(.adaptive(minimum: 100), spacing: design.layout.grid.regular)],
-                    spacing: design.layout.grid.regular
-                ) {
-                    MaterialPresetCard(
-                        recipe: .clothBoosted,
-                        color: Color(red: 0.96, green: 0.94, blue: 0.90),
-                        label: "Cloth"
-                    )
-                    MaterialPresetCard(
-                        recipe: .paperBoosted,
-                        color: Color(red: 0.97, green: 0.96, blue: 0.94),
-                        label: "Paper"
-                    )
-                    MaterialPresetCard(
-                        recipe: .plasticBoosted,
-                        color: Color(red: 0.95, green: 0.95, blue: 0.96),
-                        label: "Plastic"
-                    )
-                    MaterialPresetCard(
-                        recipe: .silkBoosted,
-                        color: Color(red: 0.95, green: 0.90, blue: 0.92),
-                        label: "Silk"
-                    )
-                    MaterialPresetCard(
-                        recipe: .aluminumBoosted,
-                        color: Color(red: 0.85, green: 0.86, blue: 0.88),
-                        label: "Aluminum"
-                    )
-                    MaterialPresetCard(
-                        recipe: .linenBoosted,
-                        color: Color(red: 0.94, green: 0.91, blue: 0.86),
-                        label: "Linen"
-                    )
-                }
-            }
-            .gentleSurface(.card, inset: .card)
-            */
-
-            /*
-            // Full Materials at 50% texture (very visible debug)
-            VStack(alignment: .leading, spacing: design.layout.stack.tight) {
-                Text("Full Materials at 50% Texture")
-                    .gentleText(.headline_m)
-
-                LazyVGrid(
-                    columns: [GridItem(.adaptive(minimum: 100), spacing: design.layout.grid.regular)],
-                    spacing: design.layout.grid.regular
-                ) {
-                    MaterialPresetCard(
-                        recipe: .clothMax,
-                        color: Color(red: 0.96, green: 0.94, blue: 0.90),
-                        label: "Cloth"
-                    )
-                    MaterialPresetCard(
-                        recipe: .paperMax,
-                        color: Color(red: 0.97, green: 0.96, blue: 0.94),
-                        label: "Paper"
-                    )
-                    MaterialPresetCard(
-                        recipe: .plasticMax,
-                        color: Color(red: 0.95, green: 0.95, blue: 0.96),
-                        label: "Plastic"
-                    )
-                    MaterialPresetCard(
-                        recipe: .silkMax,
-                        color: Color(red: 0.95, green: 0.90, blue: 0.92),
-                        label: "Silk"
-                    )
-                    MaterialPresetCard(
-                        recipe: .aluminumMax,
-                        color: Color(red: 0.85, green: 0.86, blue: 0.88),
-                        label: "Aluminum"
-                    )
-                    MaterialPresetCard(
-                        recipe: .linenMax,
-                        color: Color(red: 0.94, green: 0.91, blue: 0.86),
-                        label: "Linen"
-                    )
-                }
-            }
-            .gentleSurface(.card, inset: .card)
-
-            // Full Materials at 100% texture (maximum visibility for inspection)
-            VStack(alignment: .leading, spacing: design.layout.stack.tight) {
-                Text("Full Materials at 100% Texture")
-                    .gentleText(.headline_m)
-
-                LazyVGrid(
-                    columns: [GridItem(.adaptive(minimum: 100), spacing: design.layout.grid.regular)],
-                    spacing: design.layout.grid.regular
-                ) {
-                    MaterialPresetCard(
-                        recipe: .clothFull,
-                        color: Color(red: 0.96, green: 0.94, blue: 0.90),
-                        label: "Cloth"
-                    )
-                    MaterialPresetCard(
-                        recipe: .paperFull,
-                        color: Color(red: 0.97, green: 0.96, blue: 0.94),
-                        label: "Paper"
-                    )
-                    MaterialPresetCard(
-                        recipe: .plasticFull,
-                        color: Color(red: 0.95, green: 0.95, blue: 0.96),
-                        label: "Plastic"
-                    )
-                    MaterialPresetCard(
-                        recipe: .silkFull,
-                        color: Color(red: 0.95, green: 0.90, blue: 0.92),
-                        label: "Silk"
-                    )
-                    MaterialPresetCard(
-                        recipe: .aluminumFull,
-                        color: Color(red: 0.85, green: 0.86, blue: 0.88),
-                        label: "Aluminum"
-                    )
-                    MaterialPresetCard(
-                        recipe: .linenFull,
-                        color: Color(red: 0.94, green: 0.91, blue: 0.86),
-                        label: "Linen"
-                    )
-                }
-            }
-            .gentleSurface(.card, inset: .card)
-             */
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
