@@ -103,6 +103,67 @@ public struct GentleTextFieldModifier: ViewModifier {
     }
 }
 
+// MARK: - Material View
+
+/// Renders a GentleDesignMaterial's base layer.
+/// Supports solid colors, Apple Materials, blur, and glass (iOS 26+).
+public struct GentleMaterialView: View {
+    let material: GentleDesignMaterial
+    let colorScheme: ColorScheme
+
+    public init(material: GentleDesignMaterial, colorScheme: ColorScheme) {
+        self.material = material
+        self.colorScheme = colorScheme
+    }
+
+    public var body: some View {
+        switch material.base {
+        case .solid(let colorPair):
+            Color(gentleHex: colorPair.hex(for: colorScheme))
+
+        case .appleMaterial(let spec):
+            applyAppleMaterial(spec)
+
+        case .blur(let spec):
+            // Blur is applied as a visual effect; for now use a semi-transparent color
+            // A full implementation would use UIVisualEffectView wrapper
+            Color.clear
+                .background(.ultraThinMaterial)
+                .opacity(spec.opacity)
+
+        case .glass(let spec):
+            // Glass is iOS 26+; provide a fallback
+            glassView(spec)
+        }
+    }
+
+    @ViewBuilder
+    private func applyAppleMaterial(_ spec: GentleAppleMaterialSpec) -> some View {
+        let material: Material = {
+            switch spec.kind {
+            case .ultraThin: return .ultraThinMaterial
+            case .thin: return .thinMaterial
+            case .regular: return .regularMaterial
+            case .thick: return .thickMaterial
+            case .ultraThick: return .ultraThickMaterial
+            case .bar: return .bar
+            }
+        }()
+
+        Color.clear
+            .background(material)
+            .opacity(spec.opacity)
+    }
+
+    @ViewBuilder
+    private func glassView(_ spec: GentleGlassSpec) -> some View {
+        // Glass effect is iOS 26+; provide a fallback using regular material
+        // When iOS 26 is available, this would use .glassEffect(...)
+        Color.clear
+            .background(.regularMaterial)
+    }
+}
+
 public struct GentleSurfaceModifier: ViewModifier {
     @Environment(\.gentleTheme) private var theme
     @Environment(\.colorScheme) private var colorScheme
@@ -123,7 +184,6 @@ public struct GentleSurfaceModifier: ViewModifier {
         let spec = theme.surfaces.roleSpec(for: role)
         let insetContent = inset.map { AnyView(content.gentleInset($0, variant: insetVariant)) } ?? AnyView(content)
 
-        let backgroundColor = Color(gentleHex: spec.background.hex(for: colorScheme))
         let borderColor = showTappableHint
         ? theme.color(for: .primaryCTA, scheme: colorScheme).opacity(0.4)
             : Color(gentleHex: spec.border.hex(for: colorScheme))
@@ -132,13 +192,16 @@ public struct GentleSurfaceModifier: ViewModifier {
         switch role {
         case .appBackground:
             return AnyView(
-                insetContent.background(backgroundColor.ignoresSafeArea())
+                insetContent.background(
+                    GentleMaterialView(material: spec.material, colorScheme: colorScheme)
+                        .ignoresSafeArea()
+                )
             )
 
         case .surfaceOverlay:
             return AnyView(
                 insetContent
-                    .background(backgroundColor)
+                    .background(GentleMaterialView(material: spec.material, colorScheme: colorScheme))
                     .cornerRadius(cornerRadius)
             )
 
@@ -150,7 +213,7 @@ public struct GentleSurfaceModifier: ViewModifier {
 
             return AnyView(
                 insetContent
-                    .background(backgroundColor)
+                    .background(GentleMaterialView(material: spec.material, colorScheme: colorScheme))
                     .cornerRadius(cornerRadius)
                     .overlay(
                         Group {
