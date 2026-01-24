@@ -1,11 +1,7 @@
 //  Jonathan Ritchey
 
 import SwiftUI
-#if canImport(UIKit)
 import UIKit
-#elseif canImport(AppKit)
-import AppKit
-#endif
 
 public struct GentleDesignFoundationView: View {
     @GentleDesignRuntime private var design
@@ -178,26 +174,16 @@ public struct GentleDesignTypographySection: View {
                         .frame(maxWidth: .infinity, minHeight: 60, alignment: .topLeading)
                         .padding(.vertical, design.layout.gap.s)
                         .padding(.horizontal, design.layout.gap.m)
-                        .gentleSurface(.card)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: CGFloat(theme.surfaces.roleSpec(for: .card).cornerRadius))
-                                .strokeBorder(
-                                    theme.color(for: .primaryCTA, scheme: colorScheme)
-                                        .opacity(0.5),
-                                    lineWidth: 1
-                                )
-                        )
+                        .gentleSurface(.card, showTappableHint: true)
                     }
                     .buttonStyle(.plain)
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        #if canImport(UIKit)
         .sheet(item: $editingRole) { role in
             TypographyRoleEditorSheet(role: role)
         }
-        #endif
     }
 }
 
@@ -427,15 +413,7 @@ private struct ButtonPreviewCard: View {
             ButtonPreviewCardContent(name: name, role: role)
         }
         .buttonStyle(ButtonPreviewCardStyle())
-        .gentleSurface(.card)
-        .overlay(
-            RoundedRectangle(cornerRadius: CGFloat(theme.surfaces.roleSpec(for: .card).cornerRadius))
-                .strokeBorder(
-                    theme.color(for: .primaryCTA, scheme: colorScheme)
-                        .opacity(0.5),
-                    lineWidth: 1
-                )
-        )
+        .gentleSurface(.card, showTappableHint: true)
     }
 }
 
@@ -598,15 +576,11 @@ private struct ButtonRoleEditorSheet: View {
                         }
                     }
                 }
-                #if os(iOS)
                 .listStyle(.insetGrouped)
-                #endif
             }
             .gentleSurface(.appBackground)
             .navigationTitle("Customize Buttons")
-            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
-            #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
@@ -698,15 +672,7 @@ public struct GentleDesignSurfacesSection: View {
                     .opacity(0.8)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .gentleSurface(surface, inset: .card)
-            .overlay(
-                RoundedRectangle(cornerRadius: CGFloat(theme.surfaces.roleSpec(for: surface).cornerRadius))
-                    .strokeBorder(
-                        theme.color(for: .primaryCTA, scheme: colorScheme)
-                            .opacity(0.5),
-                        lineWidth: 1
-                    )
-            )
+            .gentleSurface(surface, inset: .card, showTappableHint: true)
         }
         .buttonStyle(.plain)
     }
@@ -830,15 +796,11 @@ private struct SurfaceRoleEditorSheet: View {
                         }
                     }
                 }
-                #if os(iOS)
                 .listStyle(.insetGrouped)
-                #endif
             }
             .gentleSurface(.appBackground)
             .navigationTitle("Customize Surface")
-            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
-            #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
@@ -933,34 +895,6 @@ public struct GentleDesignMaterialsSection: View {
             Text("Materials")
                 .gentleText(.title_xl)
                 .opacity(0.7)
-
-            // Raw Textures (commented out for cleaner UI)
-            /*
-            VStack(alignment: .leading, spacing: design.layout.stack.tight) {
-                Text("Procedural Textures (Raw)")
-                    .gentleText(.headline_m)
-
-                HStack(spacing: design.layout.stack.regular) {
-                    RawTextureCard(pattern: .noise, label: "Noise")
-                    RawTextureCard(pattern: .weave, label: "Weave")
-                    RawTextureCard(pattern: .brushed, label: "Brushed")
-                }
-            }
-            .gentleSurface(.card, inset: .card)
-
-            // Debug: High intensity textures
-            VStack(alignment: .leading, spacing: design.layout.stack.tight) {
-                Text("Textures at 50% (Debug)")
-                    .gentleText(.headline_m)
-
-                HStack(spacing: design.layout.stack.regular) {
-                    DebugMaterialCard(pattern: .noise, label: "Noise")
-                    DebugMaterialCard(pattern: .weave, label: "Weave")
-                    DebugMaterialCard(pattern: .brushed, label: "Brushed")
-                }
-            }
-            .gentleSurface(.card, inset: .card)
-            */
 
             // Material Presets
             VStack(alignment: .leading, spacing: design.layout.stack.tight) {
@@ -1227,7 +1161,6 @@ private struct MaterialPresetCard: View {
         }
     }
 }
-
 // MARK: - Color to Hex conversion
 
 private extension Color {
@@ -1237,13 +1170,8 @@ private extension Color {
         var b: CGFloat = 0
         var a: CGFloat = 0
 
-        #if canImport(UIKit)
         let uiColor = UIColor(self)
         uiColor.getRed(&r, green: &g, blue: &b, alpha: &a)
-        #elseif canImport(AppKit)
-        let nsColor = NSColor(self).usingColorSpace(.deviceRGB) ?? NSColor(self)
-        nsColor.getRed(&r, green: &g, blue: &b, alpha: &a)
-        #endif
 
         if a < 1.0 {
             return String(

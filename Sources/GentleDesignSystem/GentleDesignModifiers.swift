@@ -110,11 +110,13 @@ public struct GentleSurfaceModifier: ViewModifier {
     private let role: GentleSurfaceRole
     private let inset: GentleInsetRole?
     private let insetVariant: GentleInsetVariant
+    private let showTappableHint: Bool
 
-    public init(role: GentleSurfaceRole, inset: GentleInsetRole? = nil, insetVariant: GentleInsetVariant = .regular) {
+    public init(role: GentleSurfaceRole, inset: GentleInsetRole? = nil, insetVariant: GentleInsetVariant = .regular, showTappableHint: Bool = false) {
         self.role = role
         self.inset = inset
         self.insetVariant = insetVariant
+        self.showTappableHint = showTappableHint
     }
 
     public func body(content: Content) -> some View {
@@ -122,7 +124,9 @@ public struct GentleSurfaceModifier: ViewModifier {
         let insetContent = inset.map { AnyView(content.gentleInset($0, variant: insetVariant)) } ?? AnyView(content)
 
         let backgroundColor = Color(gentleHex: spec.background.hex(for: colorScheme))
-        let borderColor = Color(gentleHex: spec.border.hex(for: colorScheme))
+        let borderColor = showTappableHint
+            ? theme.color(for: .primaryCTA, scheme: colorScheme).opacity(0.5)
+            : Color(gentleHex: spec.border.hex(for: colorScheme))
         let cornerRadius = CGFloat(spec.cornerRadius)
 
         switch role {
@@ -220,8 +224,8 @@ public extension View {
         modifier(GentleTextFieldModifier(role: role, overrideColorRole: colorRole, chrome: chrome))
     }
 
-    func gentleSurface(_ role: GentleSurfaceRole, inset: GentleInsetRole? = nil, insetVariant: GentleInsetVariant = .regular) -> some View {
-        modifier(GentleSurfaceModifier(role: role, inset: inset, insetVariant: insetVariant))
+    func gentleSurface(_ role: GentleSurfaceRole, inset: GentleInsetRole? = nil, insetVariant: GentleInsetVariant = .regular, showTappableHint: Bool = false) -> some View {
+        modifier(GentleSurfaceModifier(role: role, inset: inset, insetVariant: insetVariant, showTappableHint: showTappableHint))
     }
 
     func gentleButton(_ role: GentleButtonRole, expandsHorizontally: Bool = false, contentAlignment: Alignment = .center) -> some View {

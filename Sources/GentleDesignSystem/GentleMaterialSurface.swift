@@ -954,11 +954,7 @@ private struct MaterialCard: View {
 private extension Color {
     var isDark: Bool {
         var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
-        #if canImport(UIKit)
         UIColor(self).getRed(&r, green: &g, blue: &b, alpha: nil)
-        #elseif canImport(AppKit)
-        NSColor(self).usingColorSpace(.deviceRGB)?.getRed(&r, green: &g, blue: &b, alpha: nil)
-        #endif
         let luminance = 0.299 * r + 0.587 * g + 0.114 * b
         return luminance < 0.5
     }
