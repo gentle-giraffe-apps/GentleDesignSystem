@@ -706,3 +706,1192 @@ struct GentleDesignFoundationViewExtendedTests {
         renderViewForCoverage(darkView)
     }
 }
+
+// MARK: - GentleButtonPreview Comprehensive Coverage Tests
+
+@Suite("GentleButtonPreview Comprehensive Tests")
+@MainActor
+struct GentleButtonPreviewComprehensiveTests {
+
+    // MARK: - Material Role Coverage
+
+    @Test("GentleButtonPreview renders with solidFillPrimaryCTA material role")
+    func testButtonPreviewSolidFillPrimaryCTA() throws {
+        // Create a theme with solidFillPrimaryCTA for primary button
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        // Primary button uses solidFillPrimaryCTA by default
+        let view = GentleButtonPreview(role: .primary)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view)
+
+        // Also test miniature mode
+        let miniView = GentleButtonPreview(role: .primary, isMiniature: true)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(miniView)
+    }
+
+    @Test("GentleButtonPreview renders with solidFillDestructive material role")
+    func testButtonPreviewSolidFillDestructive() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        // Destructive button uses solidFillDestructive by default
+        let view = GentleButtonPreview(role: .destructive)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view)
+
+        // Also test miniature mode
+        let miniView = GentleButtonPreview(role: .destructive, isMiniature: true)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(miniView)
+    }
+
+    @Test("GentleButtonPreview renders with hollow material role")
+    func testButtonPreviewHollow() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        // Secondary button uses hollow by default
+        let view = GentleButtonPreview(role: .secondary)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view)
+
+        // Also test miniature mode for hollow
+        let miniView = GentleButtonPreview(role: .secondary, isMiniature: true)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(miniView)
+    }
+
+    // MARK: - Border Role Coverage
+
+    @Test("GentleButtonPreview renders with accent border")
+    func testButtonPreviewAccentBorder() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        // Secondary button has accent border by default
+        let view = GentleButtonPreview(role: .secondary)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view)
+
+        let miniView = GentleButtonPreview(role: .secondary, isMiniature: true)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(miniView)
+    }
+
+    @Test("GentleButtonPreview renders with subtle border")
+    func testButtonPreviewSubtleBorder() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        // Tertiary button has subtle border by default
+        let view = GentleButtonPreview(role: .tertiary)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view)
+
+        let miniView = GentleButtonPreview(role: .tertiary, isMiniature: true)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(miniView)
+    }
+
+    @Test("GentleButtonPreview renders with hidden border")
+    func testButtonPreviewHiddenBorder() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        // Primary button has hidden border (solid fill doesn't need border)
+        let view = GentleButtonPreview(role: .primary)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view)
+
+        let miniView = GentleButtonPreview(role: .primary, isMiniature: true)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(miniView)
+    }
+
+    // MARK: - Shape Coverage
+
+    @Test("GentleButtonPreview renders with rounded shape")
+    func testButtonPreviewRoundedShape() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        // Default buttons use rounded shape
+        for role in [GentleButtonRole.primary, .secondary, .tertiary, .quaternary, .destructive] {
+            let view = GentleButtonPreview(role: role)
+                .environment(\.gentleTheme, theme)
+                .environment(\.gentleThemeManager, manager)
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("GentleButtonPreview renders with pill shape via theme customization")
+    func testButtonPreviewPillShape() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        // Modify primary button to use pill shape
+        var spec = manager.bindingForButtonRole(.primary).wrappedValue
+        spec.shape = .pill
+        manager.bindingForButtonRole(.primary).wrappedValue = spec
+
+        let view = GentleButtonPreview(role: .primary)
+            .environment(\.gentleTheme, manager.theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view)
+
+        let miniView = GentleButtonPreview(role: .primary, isMiniature: true)
+            .environment(\.gentleTheme, manager.theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(miniView)
+    }
+
+    // MARK: - Native Style Coverage
+
+    @Test("GentleButtonPreview renders with native style enabled")
+    func testButtonPreviewNativeStyle() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        // Quaternary button uses native style by default
+        let view = GentleButtonPreview(role: .quaternary)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view)
+
+        // Test pressed state with native style
+        let pressedView = GentleButtonPreview(role: .quaternary, isPressed: true)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(pressedView)
+
+        // Test miniature with native style
+        let miniView = GentleButtonPreview(role: .quaternary, isMiniature: true)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(miniView)
+    }
+
+    @Test("GentleButtonPreview renders with native style in all modes")
+    func testButtonPreviewNativeStyleAllModes() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        // Customize primary to use native style
+        var spec = manager.bindingForButtonRole(.primary).wrappedValue
+        spec.usesNativeStyle = true
+        manager.bindingForButtonRole(.primary).wrappedValue = spec
+
+        // Full size, not pressed
+        let view1 = GentleButtonPreview(role: .primary, isPressed: false, isMiniature: false)
+            .environment(\.gentleTheme, manager.theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view1)
+
+        // Full size, pressed
+        let view2 = GentleButtonPreview(role: .primary, isPressed: true, isMiniature: false)
+            .environment(\.gentleTheme, manager.theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view2)
+
+        // Miniature, not pressed
+        let view3 = GentleButtonPreview(role: .primary, isPressed: false, isMiniature: true)
+            .environment(\.gentleTheme, manager.theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view3)
+
+        // Miniature, pressed
+        let view4 = GentleButtonPreview(role: .primary, isPressed: true, isMiniature: true)
+            .environment(\.gentleTheme, manager.theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view4)
+    }
+
+    // MARK: - Pressed Scale and Opacity Coverage
+
+    @Test("GentleButtonPreview renders with custom pressed scale")
+    func testButtonPreviewCustomPressedScale() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        // Customize pressed scale
+        var spec = manager.bindingForButtonRole(.primary).wrappedValue
+        spec.pressedScale = 0.85
+        manager.bindingForButtonRole(.primary).wrappedValue = spec
+
+        let view = GentleButtonPreview(role: .primary, isPressed: true)
+            .environment(\.gentleTheme, manager.theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleButtonPreview renders with custom pressed opacity")
+    func testButtonPreviewCustomPressedOpacity() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        // Customize pressed opacity
+        var spec = manager.bindingForButtonRole(.primary).wrappedValue
+        spec.pressedOpacity = 0.5
+        manager.bindingForButtonRole(.primary).wrappedValue = spec
+
+        let view = GentleButtonPreview(role: .primary, isPressed: true)
+            .environment(\.gentleTheme, manager.theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view)
+    }
+
+    // MARK: - Color Scheme Coverage
+
+    @Test("GentleButtonPreview renders in dark mode for all roles")
+    func testButtonPreviewDarkModeAllRoles() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        for role in [GentleButtonRole.primary, .secondary, .tertiary, .quaternary, .destructive] {
+            let view = GentleButtonPreview(role: role)
+                .environment(\.gentleTheme, theme)
+                .environment(\.gentleThemeManager, manager)
+                .environment(\.colorScheme, .dark)
+            renderViewForCoverage(view)
+
+            let miniView = GentleButtonPreview(role: role, isMiniature: true)
+                .environment(\.gentleTheme, theme)
+                .environment(\.gentleThemeManager, manager)
+                .environment(\.colorScheme, .dark)
+            renderViewForCoverage(miniView)
+        }
+    }
+
+    // MARK: - Comprehensive Role x Mode Matrix
+
+    @Test("GentleButtonPreview renders all role/mode combinations")
+    func testButtonPreviewAllCombinations() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+        let roles: [GentleButtonRole] = [.primary, .secondary, .tertiary, .quaternary, .destructive]
+        let pressedStates = [false, true]
+        let miniatureStates = [false, true]
+
+        for role in roles {
+            for isPressed in pressedStates {
+                for isMiniature in miniatureStates {
+                    let view = GentleButtonPreview(role: role, isPressed: isPressed, isMiniature: isMiniature)
+                        .environment(\.gentleTheme, theme)
+                        .environment(\.gentleThemeManager, manager)
+                    renderViewForCoverage(view)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - GentleDesignFoundationView Sections with Color Scheme Tests
+
+@Suite("GentleDesignFoundationView Color Scheme Tests")
+@MainActor
+struct GentleDesignFoundationViewColorSchemeTests {
+
+    @Test("All sections render in light mode")
+    func testAllSectionsLightMode() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        let colorsSection = GentleDesignColorsSection()
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+            .environment(\.colorScheme, .light)
+        renderViewForCoverage(colorsSection)
+
+        let typographySection = GentleDesignTypographySection()
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+            .environment(\.colorScheme, .light)
+        renderViewForCoverage(typographySection)
+
+        let buttonsSection = GentleDesignButtonsSection()
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+            .environment(\.colorScheme, .light)
+        renderViewForCoverage(buttonsSection)
+
+        let surfacesSection = GentleDesignSurfacesSection()
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+            .environment(\.colorScheme, .light)
+        renderViewForCoverage(surfacesSection)
+
+        let materialsSection = GentleDesignMaterialsSection()
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+            .environment(\.colorScheme, .light)
+        renderViewForCoverage(materialsSection)
+    }
+
+    @Test("All sections render in dark mode")
+    func testAllSectionsDarkMode() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        let colorsSection = GentleDesignColorsSection()
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+            .environment(\.colorScheme, .dark)
+        renderViewForCoverage(colorsSection)
+
+        let typographySection = GentleDesignTypographySection()
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+            .environment(\.colorScheme, .dark)
+        renderViewForCoverage(typographySection)
+
+        let buttonsSection = GentleDesignButtonsSection()
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+            .environment(\.colorScheme, .dark)
+        renderViewForCoverage(buttonsSection)
+
+        let surfacesSection = GentleDesignSurfacesSection()
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+            .environment(\.colorScheme, .dark)
+        renderViewForCoverage(surfacesSection)
+
+        let materialsSection = GentleDesignMaterialsSection()
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+            .environment(\.colorScheme, .dark)
+        renderViewForCoverage(materialsSection)
+    }
+}
+
+// MARK: - GentleMaterialSurface Recipe Tests
+
+@Suite("GentleMaterialSurface Recipe Tests")
+@MainActor
+struct GentleMaterialSurfaceRecipeTests {
+
+    @Test("GentleMaterialSurface renders with cloth recipe")
+    func testMaterialSurfaceCloth() throws {
+        let view = GentleMaterialSurface(
+            baseColor: Color(red: 0.96, green: 0.94, blue: 0.90),
+            cornerRadius: 12,
+            recipe: .cloth
+        )
+        .frame(width: 100, height: 100)
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleMaterialSurface renders with paper recipe")
+    func testMaterialSurfacePaper() throws {
+        let view = GentleMaterialSurface(
+            baseColor: Color(red: 0.97, green: 0.96, blue: 0.94),
+            cornerRadius: 12,
+            recipe: .paper
+        )
+        .frame(width: 100, height: 100)
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleMaterialSurface renders with plastic recipe")
+    func testMaterialSurfacePlastic() throws {
+        let view = GentleMaterialSurface(
+            baseColor: Color(red: 0.95, green: 0.95, blue: 0.96),
+            cornerRadius: 12,
+            recipe: .plastic
+        )
+        .frame(width: 100, height: 100)
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleMaterialSurface renders with silk recipe")
+    func testMaterialSurfaceSilk() throws {
+        let view = GentleMaterialSurface(
+            baseColor: Color(red: 0.95, green: 0.90, blue: 0.92),
+            cornerRadius: 12,
+            recipe: .silk
+        )
+        .frame(width: 100, height: 100)
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleMaterialSurface renders with aluminum recipe")
+    func testMaterialSurfaceAluminum() throws {
+        let view = GentleMaterialSurface(
+            baseColor: Color(red: 0.85, green: 0.86, blue: 0.88),
+            cornerRadius: 12,
+            recipe: .aluminum
+        )
+        .frame(width: 100, height: 100)
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleMaterialSurface renders with linen recipe")
+    func testMaterialSurfaceLinen() throws {
+        let view = GentleMaterialSurface(
+            baseColor: Color(red: 0.94, green: 0.91, blue: 0.86),
+            cornerRadius: 12,
+            recipe: .linen
+        )
+        .frame(width: 100, height: 100)
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleMaterialSurface renders with all texture patterns")
+    func testMaterialSurfaceAllTexturePatterns() throws {
+        let patterns: [GentleMaterialSurface.Texture.Pattern] = [.noPattern, .noise, .weave, .brushed]
+
+        for pattern in patterns {
+            let view = GentleMaterialSurface(
+                baseColor: .gray,
+                cornerRadius: 8,
+                recipe: .init(
+                    lighting: .init(style: .noLighting, intensity: 0),
+                    texture: .init(pattern: pattern, intensity: 0.5, scale: 1.0),
+                    depth: .init(innerHighlight: 0, ambientOcclusion: 0)
+                )
+            )
+            .frame(width: 80, height: 80)
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("GentleMaterialSurface renders with different lighting styles")
+    func testMaterialSurfaceLightingStyles() throws {
+        // Test noLighting
+        let noLightingView = GentleMaterialSurface(
+            baseColor: .gray,
+            cornerRadius: 8,
+            recipe: .init(
+                lighting: .init(style: .noLighting, intensity: 0),
+                texture: .init(pattern: .noPattern, intensity: 0, scale: 1.0),
+                depth: .init(innerHighlight: 0, ambientOcclusion: 0)
+            )
+        )
+        .frame(width: 80, height: 80)
+        renderViewForCoverage(noLightingView)
+
+        // Test softTop
+        let softTopView = GentleMaterialSurface(
+            baseColor: .gray,
+            cornerRadius: 8,
+            recipe: .init(
+                lighting: .init(style: .softTop, intensity: 0.5),
+                texture: .init(pattern: .noPattern, intensity: 0, scale: 1.0),
+                depth: .init(innerHighlight: 0, ambientOcclusion: 0)
+            )
+        )
+        .frame(width: 80, height: 80)
+        renderViewForCoverage(softTopView)
+
+        // Test directional with various angles
+        let angles: [Angle] = [.zero, .degrees(45), .degrees(90), .degrees(180)]
+        for angle in angles {
+            let directionalView = GentleMaterialSurface(
+                baseColor: .gray,
+                cornerRadius: 8,
+                recipe: .init(
+                    lighting: .init(style: .directional(angle: angle), intensity: 0.5),
+                    texture: .init(pattern: .noPattern, intensity: 0, scale: 1.0),
+                    depth: .init(innerHighlight: 0, ambientOcclusion: 0)
+                )
+            )
+            .frame(width: 80, height: 80)
+            renderViewForCoverage(directionalView)
+        }
+    }
+
+    @Test("GentleMaterialSurface renders with depth effects")
+    func testMaterialSurfaceDepthEffects() throws {
+        let view = GentleMaterialSurface(
+            baseColor: .gray,
+            cornerRadius: 8,
+            recipe: .init(
+                lighting: .init(style: .noLighting, intensity: 0),
+                texture: .init(pattern: .noPattern, intensity: 0, scale: 1.0),
+                depth: .init(innerHighlight: 0.5, ambientOcclusion: 0.3)
+            )
+        )
+        .frame(width: 80, height: 80)
+        renderViewForCoverage(view)
+    }
+}
+
+// MARK: - ProceduralTexture Tests
+
+@Suite("ProceduralTexture Tests")
+@MainActor
+struct ProceduralTextureTests {
+
+    @Test("ProceduralTexture noise renders")
+    func testProceduralTextureNoise() throws {
+        let view = ProceduralTexture.noise
+            .resizable(resizingMode: .tile)
+            .frame(width: 100, height: 100)
+        renderViewForCoverage(view)
+    }
+
+    @Test("ProceduralTexture weave renders")
+    func testProceduralTextureWeave() throws {
+        let view = ProceduralTexture.weave
+            .resizable(resizingMode: .tile)
+            .frame(width: 100, height: 100)
+        renderViewForCoverage(view)
+    }
+
+    @Test("ProceduralTexture brushed renders")
+    func testProceduralTextureBrushed() throws {
+        let view = ProceduralTexture.brushed
+            .resizable(resizingMode: .tile)
+            .frame(width: 100, height: 100)
+        renderViewForCoverage(view)
+    }
+}
+
+// MARK: - Theme Manager Button Binding Tests
+
+@Suite("Theme Manager Button Binding Tests")
+@MainActor
+struct ThemeManagerButtonBindingTests {
+
+    @Test("Button role binding updates shape")
+    func testButtonRoleBindingShape() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        var spec = manager.bindingForButtonRole(.primary).wrappedValue
+        spec.shape = .pill
+        manager.bindingForButtonRole(.primary).wrappedValue = spec
+
+        let updatedSpec = manager.bindingForButtonRole(.primary).wrappedValue
+        #expect(updatedSpec.shape == .pill)
+    }
+
+    @Test("Button role binding updates material role")
+    func testButtonRoleBindingMaterialRole() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        var spec = manager.bindingForButtonRole(.primary).wrappedValue
+        spec.materialRole = .hollow
+        manager.bindingForButtonRole(.primary).wrappedValue = spec
+
+        let updatedSpec = manager.bindingForButtonRole(.primary).wrappedValue
+        #expect(updatedSpec.materialRole == .hollow)
+    }
+
+    @Test("Button role binding updates border role")
+    func testButtonRoleBindingBorderRole() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        var spec = manager.bindingForButtonRole(.secondary).wrappedValue
+        spec.borderRole = .subtle
+        manager.bindingForButtonRole(.secondary).wrappedValue = spec
+
+        let updatedSpec = manager.bindingForButtonRole(.secondary).wrappedValue
+        #expect(updatedSpec.borderRole == .subtle)
+    }
+
+    @Test("Button role binding updates usesNativeStyle")
+    func testButtonRoleBindingNativeStyle() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        var spec = manager.bindingForButtonRole(.primary).wrappedValue
+        spec.usesNativeStyle = true
+        manager.bindingForButtonRole(.primary).wrappedValue = spec
+
+        let updatedSpec = manager.bindingForButtonRole(.primary).wrappedValue
+        #expect(updatedSpec.usesNativeStyle == true)
+    }
+
+    @Test("Button role binding updates pressed scale and opacity")
+    func testButtonRoleBindingPressedValues() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        var spec = manager.bindingForButtonRole(.primary).wrappedValue
+        spec.pressedScale = 0.75
+        spec.pressedOpacity = 0.6
+        manager.bindingForButtonRole(.primary).wrappedValue = spec
+
+        let updatedSpec = manager.bindingForButtonRole(.primary).wrappedValue
+        #expect(updatedSpec.pressedScale == 0.75)
+        #expect(updatedSpec.pressedOpacity == 0.6)
+    }
+}
+
+// MARK: - Theme Manager Surface Binding Tests
+
+@Suite("Theme Manager Surface Binding Tests")
+@MainActor
+struct ThemeManagerSurfaceBindingTests {
+
+    @Test("Surface role binding updates corner radius")
+    func testSurfaceRoleBindingCornerRadius() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        manager.bindingForSurfaceRole(.card).cornerRadius.wrappedValue = 20.0
+
+        let updatedRadius = manager.bindingForSurfaceRole(.card).cornerRadius.wrappedValue
+        #expect(updatedRadius == 20.0)
+    }
+
+    @Test("Surface role binding updates border width")
+    func testSurfaceRoleBindingBorderWidth() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        manager.bindingForSurfaceRole(.card).borderWidth.wrappedValue = 2.0
+
+        let updatedWidth = manager.bindingForSurfaceRole(.card).borderWidth.wrappedValue
+        #expect(updatedWidth == 2.0)
+    }
+
+    @Test("Surface role binding updates shadow properties")
+    func testSurfaceRoleBindingShadow() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        manager.bindingForSurfaceRole(.cardElevated).shadowRadius.wrappedValue = 15.0
+        manager.bindingForSurfaceRole(.cardElevated).shadowOpacity.wrappedValue = 0.25
+        manager.bindingForSurfaceRole(.cardElevated).shadowOffsetX.wrappedValue = 2.0
+        manager.bindingForSurfaceRole(.cardElevated).shadowOffsetY.wrappedValue = 4.0
+
+        let binding = manager.bindingForSurfaceRole(.cardElevated)
+        #expect(binding.shadowRadius.wrappedValue == 15.0)
+        #expect(binding.shadowOpacity.wrappedValue == 0.25)
+        #expect(binding.shadowOffsetX.wrappedValue == 2.0)
+        #expect(binding.shadowOffsetY.wrappedValue == 4.0)
+    }
+}
+
+// MARK: - Theme Manager Color Binding Tests
+
+@Suite("Theme Manager Color Binding Tests")
+@MainActor
+struct ThemeManagerColorBindingTests {
+
+    @Test("Color role binding updates light hex")
+    func testColorRoleBindingLightHex() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        manager.bindingForColorRole(.primaryCTA).lightHex.wrappedValue = "#FF0000"
+
+        let updatedHex = manager.bindingForColorRole(.primaryCTA).lightHex.wrappedValue
+        #expect(updatedHex == "#FF0000")
+    }
+
+    @Test("Color role binding updates dark hex")
+    func testColorRoleBindingDarkHex() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        manager.bindingForColorRole(.primaryCTA).darkHex.wrappedValue = "#00FF00"
+
+        let updatedHex = manager.bindingForColorRole(.primaryCTA).darkHex.wrappedValue
+        #expect(updatedHex == "#00FF00")
+    }
+
+    @Test("Color bindings work for all color roles")
+    func testColorBindingsAllRoles() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        for role in GentleColorRole.allCases {
+            let binding = manager.bindingForColorRole(role)
+            // Just verify we can access the bindings without crash
+            _ = binding.lightHex.wrappedValue
+            _ = binding.darkHex.wrappedValue
+        }
+    }
+}
+
+// MARK: - GentleColorPair View Integration Tests
+
+@Suite("GentleColorPair View Integration Tests")
+@MainActor
+struct GentleColorPairViewIntegrationTests {
+
+    @Test("GentleColorPair can be created with hex values and used in views")
+    func testColorPairCreationAndUsage() throws {
+        let pair = GentleColorPair(lightHex: "#FFFFFF", darkHex: "#000000")
+        #expect(pair.lightHex == "#FFFFFF")
+        #expect(pair.darkHex == "#000000")
+
+        // Verify colors can be created from the pair
+        let lightColor = Color(gentleHex: pair.lightHex)
+        let darkColor = Color(gentleHex: pair.darkHex)
+        let view = VStack {
+            lightColor.frame(width: 10, height: 10)
+            darkColor.frame(width: 10, height: 10)
+        }
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleColorPair hex values can be modified and render correctly")
+    func testColorPairModificationAndRender() throws {
+        var pair = GentleColorPair(lightHex: "#FFFFFF", darkHex: "#000000")
+        pair.lightHex = "#FF0000"
+        pair.darkHex = "#00FF00"
+        #expect(pair.lightHex == "#FF0000")
+        #expect(pair.darkHex == "#00FF00")
+
+        let view = VStack {
+            Color(gentleHex: pair.lightHex).frame(width: 10, height: 10)
+            Color(gentleHex: pair.darkHex).frame(width: 10, height: 10)
+        }
+        renderViewForCoverage(view)
+    }
+}
+
+// MARK: - Color Extension Tests
+
+@Suite("Color Hex Extension Tests")
+@MainActor
+struct ColorHexExtensionTests {
+
+    @Test("Color can be created from hex string")
+    func testColorFromHex() throws {
+        let color = Color(gentleHex: "#FF0000")
+        // Just verify creation doesn't crash
+        let view = color.frame(width: 10, height: 10)
+        renderViewForCoverage(view)
+    }
+
+    @Test("Color can be created from hex with alpha")
+    func testColorFromHexWithAlpha() throws {
+        let color = Color(gentleHex: "#FF000080")
+        let view = color.frame(width: 10, height: 10)
+        renderViewForCoverage(view)
+    }
+
+    @Test("Color can be created from short hex")
+    func testColorFromShortHex() throws {
+        let color = Color(gentleHex: "#F00")
+        let view = color.frame(width: 10, height: 10)
+        renderViewForCoverage(view)
+    }
+}
+
+// MARK: - String camelCaseBreakable Tests
+
+@Suite("String camelCaseBreakable Tests")
+@MainActor
+struct StringCamelCaseBreakableTests {
+
+    @Test("camelCaseBreakable inserts zero-width spaces")
+    func testCamelCaseBreakable() throws {
+        let input = "textPrimary"
+        let result = input.camelCaseBreakable
+        // Result should contain zero-width spaces for line breaking
+        #expect(result.contains("\u{200B}") || result == input)
+    }
+
+    @Test("camelCaseBreakable works with various strings")
+    func testCamelCaseBreakableVariations() throws {
+        let inputs = ["primaryCTA", "onPrimaryCTA", "borderSubtle", "surfaceElevated"]
+        for input in inputs {
+            _ = input.camelCaseBreakable
+        }
+    }
+}
+
+// MARK: - ButtonRoleEditorSheet Tests
+
+@Suite("ButtonRoleEditorSheet Tests")
+@MainActor
+struct ButtonRoleEditorSheetTests {
+
+    @Test("ButtonRoleEditorSheet renders for primary role")
+    func testButtonRoleEditorSheetPrimary() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+        let view = ButtonRoleEditorSheet(role: .primary)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view)
+    }
+
+    @Test("ButtonRoleEditorSheet renders for all button roles")
+    func testButtonRoleEditorSheetAllRoles() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+        let roles: [GentleButtonRole] = [.primary, .secondary, .tertiary, .quaternary, .destructive]
+
+        for role in roles {
+            let view = ButtonRoleEditorSheet(role: role)
+                .environment(\.gentleTheme, theme)
+                .environment(\.gentleThemeManager, manager)
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("ButtonRoleEditorSheet renders with hollow material role showing border picker")
+    func testButtonRoleEditorSheetHollowMaterial() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        // Secondary uses hollow material, which shows the border picker
+        let view = ButtonRoleEditorSheet(role: .secondary)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view)
+    }
+
+    @Test("ButtonRoleEditorSheet renders with native style showing note")
+    func testButtonRoleEditorSheetNativeStyle() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        // Quaternary uses native style by default
+        let view = ButtonRoleEditorSheet(role: .quaternary)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view)
+    }
+}
+
+// MARK: - SurfaceRoleEditorSheet Tests
+
+@Suite("SurfaceRoleEditorSheet Tests")
+@MainActor
+struct SurfaceRoleEditorSheetTests {
+
+    @Test("SurfaceRoleEditorSheet renders for card role")
+    func testSurfaceRoleEditorSheetCard() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+        let view = SurfaceRoleEditorSheet(role: .card)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view)
+    }
+
+    @Test("SurfaceRoleEditorSheet renders for cardElevated role")
+    func testSurfaceRoleEditorSheetCardElevated() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+        let view = SurfaceRoleEditorSheet(role: .cardElevated)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view)
+    }
+
+    @Test("SurfaceRoleEditorSheet renders for all surface roles")
+    func testSurfaceRoleEditorSheetAllRoles() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+        let roles: [GentleSurfaceRole] = [.appBackground, .card, .cardElevated, .surfaceOverlay]
+
+        for role in roles {
+            let view = SurfaceRoleEditorSheet(role: role)
+                .environment(\.gentleTheme, theme)
+                .environment(\.gentleThemeManager, manager)
+            renderViewForCoverage(view)
+        }
+    }
+}
+
+// MARK: - SurfaceColorPairRow Tests
+
+@Suite("SurfaceColorPairRow Tests")
+@MainActor
+struct SurfaceColorPairRowTests {
+
+    @Test("SurfaceColorPairRow renders with color pair")
+    func testSurfaceColorPairRow() throws {
+        var colorPair = GentleColorPair(lightHex: "#FFFFFF", darkHex: "#000000")
+        let view = SurfaceColorPairRow(name: "Background", binding: Binding(
+            get: { colorPair },
+            set: { colorPair = $0 }
+        ))
+        renderViewForCoverage(view)
+    }
+
+    @Test("SurfaceColorPairRow renders with different names")
+    func testSurfaceColorPairRowNames() throws {
+        var colorPair = GentleColorPair(lightHex: "#F0F0F0", darkHex: "#1A1A1A")
+        let names = ["Background", "Border", "Shadow", "Accent"]
+
+        for name in names {
+            let view = SurfaceColorPairRow(name: name, binding: Binding(
+                get: { colorPair },
+                set: { colorPair = $0 }
+            ))
+            renderViewForCoverage(view)
+        }
+    }
+}
+
+// MARK: - ColorSwatchRow Tests
+
+@Suite("ColorSwatchRow Tests")
+@MainActor
+struct ColorSwatchRowTests {
+
+    @Test("ColorSwatchRow renders for primary text role")
+    func testColorSwatchRowPrimary() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+        let view = ColorSwatchRow(role: .textPrimary, name: "textPrimary")
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view)
+    }
+
+    @Test("ColorSwatchRow renders for all color roles")
+    func testColorSwatchRowAllRoles() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        for role in GentleColorRole.allCases {
+            let view = ColorSwatchRow(role: role, name: role.rawValue)
+                .environment(\.gentleTheme, theme)
+                .environment(\.gentleThemeManager, manager)
+            renderViewForCoverage(view)
+        }
+    }
+}
+
+// MARK: - ButtonPreviewCard Tests
+
+@Suite("ButtonPreviewCard Tests")
+@MainActor
+struct ButtonPreviewCardTests {
+
+    @Test("ButtonPreviewCard renders for primary role")
+    func testButtonPreviewCardPrimary() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+        let view = ButtonPreviewCard(name: "Primary", role: .primary, action: {})
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view)
+    }
+
+    @Test("ButtonPreviewCard renders for all roles")
+    func testButtonPreviewCardAllRoles() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+        let roles: [GentleButtonRole] = [.primary, .secondary, .tertiary, .quaternary, .destructive]
+
+        for role in roles {
+            let view = ButtonPreviewCard(name: role.rawValue.capitalized, role: role, action: {})
+                .environment(\.gentleTheme, theme)
+                .environment(\.gentleThemeManager, manager)
+            renderViewForCoverage(view)
+        }
+    }
+}
+
+// MARK: - ButtonPreviewCardContent Tests
+
+@Suite("ButtonPreviewCardContent Tests")
+@MainActor
+struct ButtonPreviewCardContentTests {
+
+    @Test("ButtonPreviewCardContent renders for primary role")
+    func testButtonPreviewCardContentPrimary() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+        let view = ButtonPreviewCardContent(name: "Primary", role: .primary)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view)
+    }
+
+    @Test("ButtonPreviewCardContent renders with pressed state")
+    func testButtonPreviewCardContentPressed() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+        let view = ButtonPreviewCardContent(name: "Primary", role: .primary)
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+            .environment(\.buttonPreviewCardIsPressed, true)
+        renderViewForCoverage(view)
+    }
+}
+
+// MARK: - RawTextureCard Tests
+
+@Suite("RawTextureCard Tests")
+@MainActor
+struct RawTextureCardTests {
+
+    @Test("RawTextureCard renders with noPattern")
+    func testRawTextureCardNoPattern() throws {
+        let view = RawTextureCard(pattern: .noPattern, label: "None")
+        renderViewForCoverage(view)
+    }
+
+    @Test("RawTextureCard renders with noise pattern")
+    func testRawTextureCardNoise() throws {
+        let view = RawTextureCard(pattern: .noise, label: "Noise")
+        renderViewForCoverage(view)
+    }
+
+    @Test("RawTextureCard renders with weave pattern")
+    func testRawTextureCardWeave() throws {
+        let view = RawTextureCard(pattern: .weave, label: "Weave")
+        renderViewForCoverage(view)
+    }
+
+    @Test("RawTextureCard renders with brushed pattern")
+    func testRawTextureCardBrushed() throws {
+        let view = RawTextureCard(pattern: .brushed, label: "Brushed")
+        renderViewForCoverage(view)
+    }
+
+    @Test("RawTextureCard renders with all patterns")
+    func testRawTextureCardAllPatterns() throws {
+        let patterns: [GentleMaterialSurface.Texture.Pattern] = [.noPattern, .noise, .weave, .brushed]
+        for pattern in patterns {
+            let view = RawTextureCard(pattern: pattern, label: "Test")
+            renderViewForCoverage(view)
+        }
+    }
+}
+
+// MARK: - DebugMaterialCard Tests
+
+@Suite("DebugMaterialCard Tests")
+@MainActor
+struct DebugMaterialCardTests {
+
+    @Test("DebugMaterialCard renders with noPattern")
+    func testDebugMaterialCardNoPattern() throws {
+        let view = DebugMaterialCard(pattern: .noPattern, label: "None")
+        renderViewForCoverage(view)
+    }
+
+    @Test("DebugMaterialCard renders with noise pattern")
+    func testDebugMaterialCardNoise() throws {
+        let view = DebugMaterialCard(pattern: .noise, label: "Noise")
+        renderViewForCoverage(view)
+    }
+
+    @Test("DebugMaterialCard renders with weave pattern")
+    func testDebugMaterialCardWeave() throws {
+        let view = DebugMaterialCard(pattern: .weave, label: "Weave")
+        renderViewForCoverage(view)
+    }
+
+    @Test("DebugMaterialCard renders with brushed pattern")
+    func testDebugMaterialCardBrushed() throws {
+        let view = DebugMaterialCard(pattern: .brushed, label: "Brushed")
+        renderViewForCoverage(view)
+    }
+}
+
+// MARK: - MaterialPresetCard Tests
+
+@Suite("MaterialPresetCard Tests")
+@MainActor
+struct MaterialPresetCardTests {
+
+    @Test("MaterialPresetCard renders with cloth recipe")
+    func testMaterialPresetCardCloth() throws {
+        let view = MaterialPresetCard(
+            recipe: .cloth,
+            color: Color(red: 0.96, green: 0.94, blue: 0.90),
+            label: "Cloth"
+        )
+        renderViewForCoverage(view)
+    }
+
+    @Test("MaterialPresetCard renders with all recipes")
+    func testMaterialPresetCardAllRecipes() throws {
+        let recipes: [(GentleMaterialSurface.Recipe, Color, String)] = [
+            (.cloth, Color(red: 0.96, green: 0.94, blue: 0.90), "Cloth"),
+            (.paper, Color(red: 0.97, green: 0.96, blue: 0.94), "Paper"),
+            (.plastic, Color(red: 0.95, green: 0.95, blue: 0.96), "Plastic"),
+            (.silk, Color(red: 0.95, green: 0.90, blue: 0.92), "Silk"),
+            (.aluminum, Color(red: 0.85, green: 0.86, blue: 0.88), "Aluminum"),
+            (.linen, Color(red: 0.94, green: 0.91, blue: 0.86), "Linen")
+        ]
+
+        for (recipe, color, label) in recipes {
+            let view = MaterialPresetCard(recipe: recipe, color: color, label: label)
+            renderViewForCoverage(view)
+        }
+    }
+}
+
+// MARK: - Color toGentleHexString Tests
+
+@Suite("Color toGentleHexString Tests")
+@MainActor
+struct ColorToGentleHexStringTests {
+
+    @Test("toGentleHexString returns correct format for opaque color")
+    func testToGentleHexStringOpaque() throws {
+        let color = Color(red: 1.0, green: 0.0, blue: 0.0)
+        let hex = color.toGentleHexString()
+        // Should be #RRGGBB format for opaque
+        #expect(hex.hasPrefix("#"))
+        #expect(hex.count == 7 || hex.count == 9) // #RRGGBB or #RRGGBBAA
+    }
+
+    @Test("toGentleHexString returns correct format for semi-transparent color")
+    func testToGentleHexStringSemiTransparent() throws {
+        let color = Color(red: 0.0, green: 1.0, blue: 0.0).opacity(0.5)
+        let hex = color.toGentleHexString()
+        // Should include alpha channel
+        #expect(hex.hasPrefix("#"))
+    }
+
+    @Test("toGentleHexString handles various colors")
+    func testToGentleHexStringVariousColors() throws {
+        let colors: [Color] = [
+            .red,
+            .green,
+            .blue,
+            .white,
+            .black,
+            .gray,
+            Color(red: 0.5, green: 0.5, blue: 0.5),
+            Color(red: 0.2, green: 0.4, blue: 0.6)
+        ]
+
+        for color in colors {
+            let hex = color.toGentleHexString()
+            #expect(hex.hasPrefix("#"))
+        }
+    }
+}
+
+// MARK: - ButtonPreviewCardStyle Tests
+
+@Suite("ButtonPreviewCardStyle Tests")
+@MainActor
+struct ButtonPreviewCardStyleTests {
+
+    @Test("ButtonPreviewCardStyle makeBody evaluates")
+    func testButtonPreviewCardStyleMakeBody() throws {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+        let view = Button("Test") {}
+            .buttonStyle(ButtonPreviewCardStyle())
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+        renderViewForCoverage(view)
+    }
+}
