@@ -3,7 +3,7 @@
 import SwiftUI
 import UIKit
 
-public struct GentleDesignFoundationView: View {
+public struct GentleThemeEditor: View {
     @GentleDesignRuntime private var design
 
     public init() {}

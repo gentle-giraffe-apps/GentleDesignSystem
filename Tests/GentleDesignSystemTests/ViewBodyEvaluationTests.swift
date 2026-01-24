@@ -142,9 +142,9 @@ struct ViewBodyEvaluationTests {
 
     // MARK: - Foundation Views
 
-    @Test("GentleDesignFoundationView body evaluates without crash")
+    @Test("GentleThemeEditor body evaluates without crash")
     func testFoundationViewBodyEvaluates() {
-        let view = wrapWithGentleEnvironment(GentleDesignFoundationView())
+        let view = wrapWithGentleEnvironment(GentleThemeEditor())
         renderViewForCoverage(view)
     }
 
@@ -445,12 +445,12 @@ struct ViewBodyEvaluationWithPresetsTests {
         .editorial, .technical, .bold, .elegant, .compact
     ]
 
-    @Test("GentleDesignFoundationView body evaluates with all presets")
+    @Test("GentleThemeEditor body evaluates with all presets")
     func testFoundationViewBodyWithAllPresets() {
         for preset in Self.allPresets {
             let theme = GentleTheme(defaultSpec: preset)
             let manager = GentleThemeManager(theme: theme)
-            let view = GentleDesignFoundationView()
+            let view = GentleThemeEditor()
                 .environment(\.gentleTheme, theme)
                 .environment(\.gentleThemeManager, manager)
             renderViewForCoverage(view)
@@ -538,11 +538,11 @@ struct GentleDesignShareSheetExtendedTests {
     }
 }
 
-// MARK: - GentleDesignFoundationView Extended Tests
+// MARK: - GentleThemeEditor Extended Tests
 
-@Suite("GentleDesignFoundationView Extended Tests")
+@Suite("GentleThemeEditor Extended Tests")
 @MainActor
-struct GentleDesignFoundationViewExtendedTests {
+struct GentleThemeEditorExtendedTests {
 
     // MARK: - GentleDesignMaterialsSection Tests
 
@@ -661,18 +661,18 @@ struct GentleDesignFoundationViewExtendedTests {
 
     // MARK: - Complete Foundation View Tests
 
-    @Test("GentleDesignFoundationView body evaluates in both color schemes")
+    @Test("GentleThemeEditor body evaluates in both color schemes")
     func testFoundationViewColorSchemes() {
         let theme = GentleTheme(defaultSpec: .gentleDefault)
         let manager = GentleThemeManager(theme: theme)
 
-        let lightView = GentleDesignFoundationView()
+        let lightView = GentleThemeEditor()
             .environment(\.gentleTheme, theme)
             .environment(\.gentleThemeManager, manager)
             .environment(\.colorScheme, .light)
         renderViewForCoverage(lightView)
 
-        let darkView = GentleDesignFoundationView()
+        let darkView = GentleThemeEditor()
             .environment(\.gentleTheme, theme)
             .environment(\.gentleThemeManager, manager)
             .environment(\.colorScheme, .dark)
@@ -973,11 +973,11 @@ struct GentleButtonPreviewComprehensiveTests {
     }
 }
 
-// MARK: - GentleDesignFoundationView Sections with Color Scheme Tests
+// MARK: - GentleThemeEditor Sections with Color Scheme Tests
 
-@Suite("GentleDesignFoundationView Color Scheme Tests")
+@Suite("GentleThemeEditor Color Scheme Tests")
 @MainActor
-struct GentleDesignFoundationViewColorSchemeTests {
+struct GentleThemeEditorColorSchemeTests {
 
     @Test("All sections render in light mode")
     func testAllSectionsLightMode() throws {

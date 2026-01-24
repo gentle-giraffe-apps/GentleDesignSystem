@@ -80,12 +80,10 @@ Demo app has previews in `ContentView.swift`:
 4. Tap "Update and Save" to persist
 
 ### Verifying JSON Output
-`GentleDesignTypographySection` prints the full spec JSON on appear:
+To inspect the current theme spec as JSON, use the share/export feature in `GentleDesignStudioView`, or call `spec.encodedJSONString()` programmatically:
 ```swift
-.task {
-    let encodedJSONString = try spec.encodedJSONString()
-    print("spec: \(encodedJSONString)")
-}
+let jsonString = try themeManager.theme.spec.encodedJSONString()
+print(jsonString)
 ```
 
 ## Release Process

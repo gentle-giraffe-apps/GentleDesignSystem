@@ -82,8 +82,8 @@
 
 | Component | Purpose |
 |-----------|---------|
-| `GentleDesignFoundationView` | Shows all tokens (demo/showcase) |
-| `GentleDesignSettingsView` | Edits theme tokens |
+| `GentleThemeEditor` | Interactive editor for colors, typography, buttons, surfaces |
+| `GentleDesignStudioView` | Full design studio with save/revert/share toolbar |
 | `TypographyRoleEditor` | Edits one typography role |
 | `ColorRoleEditor` | Edits one color role |
 | `GentleNavigationBarStyler` | Applies theme to UINavigationBar |
