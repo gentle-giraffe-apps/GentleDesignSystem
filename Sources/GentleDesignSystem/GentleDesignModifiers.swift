@@ -125,7 +125,7 @@ public struct GentleSurfaceModifier: ViewModifier {
 
         let backgroundColor = Color(gentleHex: spec.background.hex(for: colorScheme))
         let borderColor = showTappableHint
-            ? theme.color(for: .primaryCTA, scheme: colorScheme).opacity(0.5)
+        ? theme.color(for: .primaryCTA, scheme: colorScheme).opacity(0.4)
             : Color(gentleHex: spec.border.hex(for: colorScheme))
         let cornerRadius = CGFloat(spec.cornerRadius)
 
@@ -143,7 +143,8 @@ public struct GentleSurfaceModifier: ViewModifier {
             )
 
         case .card, .cardElevated:
-            let hasBorder = spec.borderWidth > 0
+            let hasBorder = spec.borderWidth > 0 || showTappableHint
+            let borderWidth = (showTappableHint && role == .cardElevated) ? 1.0 : CGFloat(spec.borderWidth)
             let hasShadow = spec.shadowRadius > 0
             let shadowOpacity = colorScheme == .dark ? spec.shadowOpacity * 3.5 : spec.shadowOpacity
 
@@ -154,8 +155,10 @@ public struct GentleSurfaceModifier: ViewModifier {
                     .overlay(
                         Group {
                             if hasBorder {
-                                RoundedRectangle(cornerRadius: cornerRadius)
-                                    .stroke(borderColor, lineWidth: CGFloat(spec.borderWidth))
+                                let insetAmount: CGFloat = showTappableHint ? 0.5 : 0.0
+                                RoundedRectangle(cornerRadius: cornerRadius - insetAmount)
+                                    .strokeBorder(borderColor, lineWidth: borderWidth)
+                                    .padding(insetAmount)
                             }
                         }
                     )
