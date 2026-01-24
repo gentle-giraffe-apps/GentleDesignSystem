@@ -168,7 +168,7 @@ public struct ColorRoleEditorSheet: View {
 
     public var body: some View {
         NavigationStack {
-            if let initialPair, var workingPair {
+            if let initialPair, let workingPair {
                 let lightHexBinding = Binding<String>(
                     get: { workingPair.lightHex },
                     set: { self.workingPair?.lightHex = $0 }
