@@ -72,7 +72,7 @@ struct GentleColorRoleTests {
 
     @Test("All color roles are case iterable")
     func testColorRoleCaseIterable() {
-        #expect(GentleColorRole.allCases.count == 15)
+        #expect(GentleColorRole.allCases.count == 16)
     }
 
     @Test("Expected color roles exist")
@@ -80,7 +80,8 @@ struct GentleColorRoleTests {
         let expectedRoles: [GentleColorRole] = [
             .textPrimary, .textSecondary, .textTertiary,
             .onPrimaryCTA,
-            .background, .surface, .surfaceElevated,
+            .background, .surface,
+            .surfaceTint, .surfaceSpecular,
             .surfaceOverlay, .onSurfaceOverlayPrimary, .onSurfaceOverlaySecondary,
             .borderSubtle,
             .destructive,

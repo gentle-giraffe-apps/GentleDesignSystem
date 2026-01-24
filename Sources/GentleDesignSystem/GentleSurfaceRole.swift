@@ -102,7 +102,7 @@ public extension GentleSurfaceTokens {
             GentleSurfaceRole.cardElevated.rawValue: .init(
                 material: GentleDesignMaterial(
                     id: "cardElevated",
-                    base: .solid(GentleColorPair(lightHex: "#FFFFFF", darkHex: "#1F2937"))
+                    base: .solid(GentleColorPair(lightHex: "#FAFAFE", darkHex: "#111827"))
                 ),
                 border: GentleColorPair(lightHex: "#E5E7EB59", darkHex: "#37415159"),
                 cornerRadius: 20,

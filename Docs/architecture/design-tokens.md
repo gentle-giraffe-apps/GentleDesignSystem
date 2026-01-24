@@ -53,11 +53,11 @@ footnote_s, caption_s, caption2_s
 
 Naming: `{semantic}_{ramp}` where ramp = xxl > xl > l > ml > m > ms > s
 
-### GentleColorRole (15 roles)
+### GentleColorRole (16 roles)
 ```
 Text:     textPrimary, textSecondary, textTertiary
-Surface:  background, surface, surfaceElevated, surfaceOverlay
-          onSurfaceOverlayPrimary, onSurfaceOverlaySecondary
+Surface:  background, surface, surfaceTint, surfaceSpecular
+          surfaceOverlay, onSurfaceOverlayPrimary, onSurfaceOverlaySecondary
 Action:   primaryCTA, onPrimaryCTA, destructive
 Theme:    themePrimary, themeSecondary
 Border:   borderSubtle
