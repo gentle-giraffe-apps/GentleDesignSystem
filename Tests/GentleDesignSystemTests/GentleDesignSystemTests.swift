@@ -3911,3 +3911,608 @@ struct ViewBodyEvaluationWithPresetsTests {
         }
     }
 }
+
+// MARK: - GentleDesignShareSheet Tests (Low Coverage)
+
+@Suite("GentleDesignShareSheet Extended Tests")
+@MainActor
+struct GentleDesignShareSheetExtendedTests {
+
+    @Test("ShareSheet can be initialized with string items")
+    func testShareSheetWithStringItems() {
+        let shareSheet = GentleDesignShareSheet(items: ["Test string", "Another string"])
+        // Verify the view can be created without crash
+        renderViewForCoverage(shareSheet)
+    }
+
+    @Test("ShareSheet can be initialized with URL items")
+    func testShareSheetWithURLItems() throws {
+        let url = try #require(URL(string: "https://example.com"))
+        let shareSheet = GentleDesignShareSheet(items: [url])
+        renderViewForCoverage(shareSheet)
+    }
+
+    @Test("ShareSheet can be initialized with image items")
+    func testShareSheetWithImageItems() throws {
+        let image = try #require(UIImage(systemName: "star.fill"))
+        let shareSheet = GentleDesignShareSheet(items: [image])
+        renderViewForCoverage(shareSheet)
+    }
+
+    @Test("ShareSheet can be initialized with data items")
+    func testShareSheetWithDataItems() throws {
+        let data = try #require("Test data".data(using: .utf8))
+        let shareSheet = GentleDesignShareSheet(items: [data])
+        renderViewForCoverage(shareSheet)
+    }
+
+    @Test("ShareSheet can be initialized with mixed items")
+    func testShareSheetWithMixedItems() throws {
+        let url = try #require(URL(string: "https://example.com"))
+        let image = try #require(UIImage(systemName: "heart.fill"))
+        let data = try #require("More text".data(using: .utf8))
+        let shareSheet = GentleDesignShareSheet(items: [
+            "A string",
+            url,
+            image,
+            data
+        ])
+        renderViewForCoverage(shareSheet)
+    }
+}
+
+// MARK: - GentleMaterialSurface Tests (Moderate Coverage)
+
+@Suite("GentleMaterialSurface Extended Tests")
+@MainActor
+struct GentleMaterialSurfaceExtendedTests {
+
+    // MARK: - Recipe and Struct Tests
+
+    @Test("Recipe can be created with all parameters")
+    func testRecipeCreation() {
+        let recipe = GentleMaterialSurface.Recipe(
+            lighting: .init(style: .softTop, intensity: 0.1),
+            texture: .init(pattern: .noise, intensity: 0.2, scale: 1.0),
+            secondaryTexture: .init(pattern: .weave, intensity: 0.1, scale: 0.5),
+            depth: .init(innerHighlight: 0.05, ambientOcclusion: 0.08)
+        )
+
+        #expect(recipe.lighting.intensity == 0.1)
+        #expect(recipe.texture.intensity == 0.2)
+        #expect(recipe.secondaryTexture?.intensity == 0.1)
+        #expect(recipe.depth.innerHighlight == 0.05)
+    }
+
+    @Test("Lighting styles can be created")
+    func testLightingStyles() {
+        let noLighting = GentleMaterialSurface.Lighting(style: .noLighting, intensity: 0)
+        let softTop = GentleMaterialSurface.Lighting(style: .softTop, intensity: 0.15)
+        let directional = GentleMaterialSurface.Lighting(style: .directional(angle: .degrees(45)), intensity: 0.2)
+
+        #expect(noLighting.intensity == 0)
+        #expect(softTop.intensity == 0.15)
+        #expect(directional.intensity == 0.2)
+    }
+
+    @Test("Texture can be created with uniform scale")
+    func testTextureUniformScale() {
+        let texture = GentleMaterialSurface.Texture(
+            pattern: .noise,
+            intensity: 0.3,
+            scale: 1.5,
+            rotation: .degrees(30),
+            blur: 0.5
+        )
+
+        #expect(texture.scaleX == 1.5)
+        #expect(texture.scaleY == 1.5)
+        #expect(texture.blur == 0.5)
+    }
+
+    @Test("Texture can be created with anisotropic scale")
+    func testTextureAnisotropicScale() {
+        let texture = GentleMaterialSurface.Texture(
+            pattern: .brushed,
+            intensity: 0.25,
+            scaleX: 1.2,
+            scaleY: 0.8,
+            rotation: .degrees(15),
+            blur: 0.3
+        )
+
+        #expect(texture.scaleX == 1.2)
+        #expect(texture.scaleY == 0.8)
+    }
+
+    @Test("SecondaryTexture can be created with uniform scale")
+    func testSecondaryTextureUniformScale() {
+        let secondary = GentleMaterialSurface.SecondaryTexture(
+            pattern: .weave,
+            intensity: 0.1,
+            scale: 0.8,
+            rotation: .degrees(22),
+            blur: 0.2
+        )
+
+        #expect(secondary.scaleX == 0.8)
+        #expect(secondary.scaleY == 0.8)
+    }
+
+    @Test("SecondaryTexture can be created with anisotropic scale")
+    func testSecondaryTextureAnisotropicScale() {
+        let secondary = GentleMaterialSurface.SecondaryTexture(
+            pattern: .noise,
+            intensity: 0.08,
+            scaleX: 1.0,
+            scaleY: 0.85,
+            rotation: .degrees(22),
+            blur: 0.1
+        )
+
+        #expect(secondary.scaleX == 1.0)
+        #expect(secondary.scaleY == 0.85)
+    }
+
+    @Test("Depth struct stores values correctly")
+    func testDepthStruct() {
+        let depth = GentleMaterialSurface.Depth(
+            innerHighlight: 0.12,
+            ambientOcclusion: 0.18
+        )
+
+        #expect(depth.innerHighlight == 0.12)
+        #expect(depth.ambientOcclusion == 0.18)
+    }
+
+    // MARK: - View Body Evaluation Tests
+
+    @Test("GentleMaterialSurface body evaluates with noLighting")
+    func testSurfaceWithNoLighting() {
+        let view = GentleMaterialSurface(
+            baseColor: .blue,
+            cornerRadius: 12,
+            recipe: .init(
+                lighting: .init(style: .noLighting, intensity: 0),
+                texture: .init(pattern: .noise, intensity: 0.1, scale: 1.0),
+                depth: .init(innerHighlight: 0, ambientOcclusion: 0)
+            )
+        )
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleMaterialSurface body evaluates with softTop lighting")
+    func testSurfaceWithSoftTopLighting() {
+        let view = GentleMaterialSurface(
+            baseColor: .gray,
+            cornerRadius: 16,
+            recipe: .init(
+                lighting: .init(style: .softTop, intensity: 0.15),
+                texture: .init(pattern: .weave, intensity: 0.2, scale: 1.0),
+                depth: .init(innerHighlight: 0.05, ambientOcclusion: 0.08)
+            )
+        )
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleMaterialSurface body evaluates with directional lighting")
+    func testSurfaceWithDirectionalLighting() {
+        let view = GentleMaterialSurface(
+            baseColor: .white,
+            cornerRadius: 20,
+            recipe: .init(
+                lighting: .init(style: .directional(angle: .degrees(45)), intensity: 0.2),
+                texture: .init(pattern: .brushed, intensity: 0.15, scale: 1.0),
+                depth: .init(innerHighlight: 0.08, ambientOcclusion: 0.1)
+            )
+        )
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleMaterialSurface body evaluates with secondary texture")
+    func testSurfaceWithSecondaryTexture() {
+        let view = GentleMaterialSurface(
+            baseColor: Color(red: 0.96, green: 0.94, blue: 0.90),
+            cornerRadius: 12,
+            recipe: .init(
+                lighting: .init(style: .softTop, intensity: 0.08),
+                texture: .init(pattern: .noise, intensity: 0.22, scaleX: 1.40, scaleY: 1.15),
+                secondaryTexture: .init(pattern: .noise, intensity: 0.08, scaleX: 1.00, scaleY: 0.85, rotation: .degrees(22)),
+                depth: .init(innerHighlight: 0.05, ambientOcclusion: 0.10)
+            )
+        )
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleMaterialSurface body evaluates with noPattern texture")
+    func testSurfaceWithNoPatternTexture() {
+        let view = GentleMaterialSurface(
+            baseColor: .red,
+            cornerRadius: 8,
+            recipe: .init(
+                lighting: .init(style: .softTop, intensity: 0.1),
+                texture: .init(pattern: .noPattern, intensity: 0, scale: 1.0),
+                depth: .init(innerHighlight: 0.05, ambientOcclusion: 0.05)
+            )
+        )
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleMaterialSurface body evaluates with zero intensity texture")
+    func testSurfaceWithZeroIntensityTexture() {
+        let view = GentleMaterialSurface(
+            baseColor: .green,
+            cornerRadius: 10,
+            recipe: .init(
+                lighting: .init(style: .softTop, intensity: 0.1),
+                texture: .init(pattern: .noise, intensity: 0, scale: 1.0),
+                depth: .init(innerHighlight: 0, ambientOcclusion: 0)
+            )
+        )
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleMaterialSurface body evaluates with zero depth values")
+    func testSurfaceWithZeroDepth() {
+        let view = GentleMaterialSurface(
+            baseColor: .orange,
+            cornerRadius: 14,
+            recipe: .init(
+                lighting: .init(style: .softTop, intensity: 0.1),
+                texture: .init(pattern: .noise, intensity: 0.2, scale: 1.0),
+                depth: .init(innerHighlight: 0, ambientOcclusion: 0)
+            )
+        )
+        renderViewForCoverage(view)
+    }
+
+    // MARK: - All Preset Tests
+
+    @Test("GentleMaterialSurface body evaluates with cloth preset")
+    func testSurfaceWithClothPreset() {
+        let view = GentleMaterialSurface(
+            baseColor: Color(red: 0.96, green: 0.94, blue: 0.90),
+            cornerRadius: 12,
+            recipe: .cloth
+        )
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleMaterialSurface body evaluates with paper preset")
+    func testSurfaceWithPaperPreset() {
+        let view = GentleMaterialSurface(
+            baseColor: Color(red: 0.97, green: 0.96, blue: 0.94),
+            cornerRadius: 12,
+            recipe: .paper
+        )
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleMaterialSurface body evaluates with plastic preset")
+    func testSurfaceWithPlasticPreset() {
+        let view = GentleMaterialSurface(
+            baseColor: Color(red: 0.95, green: 0.95, blue: 0.96),
+            cornerRadius: 12,
+            recipe: .plastic
+        )
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleMaterialSurface body evaluates with silk preset")
+    func testSurfaceWithSilkPreset() {
+        let view = GentleMaterialSurface(
+            baseColor: Color(red: 0.95, green: 0.90, blue: 0.92),
+            cornerRadius: 12,
+            recipe: .silk
+        )
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleMaterialSurface body evaluates with aluminum preset")
+    func testSurfaceWithAluminumPreset() {
+        let view = GentleMaterialSurface(
+            baseColor: Color(red: 0.85, green: 0.86, blue: 0.88),
+            cornerRadius: 12,
+            recipe: .aluminum
+        )
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleMaterialSurface body evaluates with linen preset")
+    func testSurfaceWithLinenPreset() {
+        let view = GentleMaterialSurface(
+            baseColor: Color(red: 0.94, green: 0.91, blue: 0.86),
+            cornerRadius: 12,
+            recipe: .linen
+        )
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleMaterialSurface body evaluates with all boosted presets")
+    func testSurfaceWithBoostedPresets() {
+        let presets: [GentleMaterialSurface.Recipe] = [
+            .clothBoosted, .paperBoosted, .plasticBoosted,
+            .silkBoosted, .aluminumBoosted, .linenBoosted
+        ]
+        for preset in presets {
+            let view = GentleMaterialSurface(
+                baseColor: .gray,
+                cornerRadius: 12,
+                recipe: preset
+            )
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("GentleMaterialSurface body evaluates with all max presets")
+    func testSurfaceWithMaxPresets() {
+        let presets: [GentleMaterialSurface.Recipe] = [
+            .clothMax, .paperMax, .plasticMax,
+            .silkMax, .aluminumMax, .linenMax
+        ]
+        for preset in presets {
+            let view = GentleMaterialSurface(
+                baseColor: .gray,
+                cornerRadius: 12,
+                recipe: preset
+            )
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("GentleMaterialSurface body evaluates with all full presets")
+    func testSurfaceWithFullPresets() {
+        let presets: [GentleMaterialSurface.Recipe] = [
+            .clothFull, .paperFull, .plasticFull,
+            .silkFull, .aluminumFull, .linenFull
+        ]
+        for preset in presets {
+            let view = GentleMaterialSurface(
+                baseColor: .gray,
+                cornerRadius: 12,
+                recipe: preset
+            )
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("GentleMaterialSurface body evaluates with texture rotation and blur")
+    func testSurfaceWithTextureRotationAndBlur() {
+        let view = GentleMaterialSurface(
+            baseColor: .purple,
+            cornerRadius: 16,
+            recipe: .init(
+                lighting: .init(style: .softTop, intensity: 0.1),
+                texture: .init(pattern: .noise, intensity: 0.3, scale: 1.2, rotation: .degrees(45), blur: 1.0),
+                depth: .init(innerHighlight: 0.05, ambientOcclusion: 0.08)
+            )
+        )
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleMaterialSurface body evaluates with directional lighting at various angles")
+    func testSurfaceWithDirectionalAngles() {
+        let angles: [Angle] = [.degrees(0), .degrees(90), .degrees(180), .degrees(270), .degrees(-45)]
+        for angle in angles {
+            let view = GentleMaterialSurface(
+                baseColor: .cyan,
+                cornerRadius: 12,
+                recipe: .init(
+                    lighting: .init(style: .directional(angle: angle), intensity: 0.15),
+                    texture: .init(pattern: .brushed, intensity: 0.2, scale: 1.0),
+                    depth: .init(innerHighlight: 0.05, ambientOcclusion: 0.08)
+                )
+            )
+            renderViewForCoverage(view)
+        }
+    }
+}
+
+// MARK: - GentleDesignFoundationView Extended Tests (Low Coverage)
+
+@Suite("GentleDesignFoundationView Extended Tests")
+@MainActor
+struct GentleDesignFoundationViewExtendedTests {
+
+    // MARK: - GentleDesignMaterialsSection Tests
+
+    @Test("GentleDesignMaterialsSection can be created and body accessed")
+    func testMaterialsSectionCreation() {
+        let section = GentleDesignMaterialsSection()
+        // Just verify creation doesn't crash - struct is always non-nil
+        let view = wrapWithGentleEnvironment(section)
+        renderViewForCoverage(view)
+    }
+
+    @Test("GentleDesignMaterialsSection body evaluates without crash")
+    func testMaterialsSectionBodyEvaluates() {
+        let view = wrapWithGentleEnvironment(GentleDesignMaterialsSection())
+        renderViewForCoverage(view)
+    }
+
+    // MARK: - GentleButtonPreview Tests
+
+    @Test("GentleButtonPreview can be created with all button roles")
+    func testButtonPreviewAllRoles() {
+        let roles: [GentleButtonRole] = [.primary, .secondary, .tertiary, .quaternary, .destructive]
+        for role in roles {
+            let preview = GentleButtonPreview(role: role)
+            #expect(preview.role == role)
+        }
+    }
+
+    @Test("GentleButtonPreview can be created with isPressed true")
+    func testButtonPreviewPressed() {
+        let preview = GentleButtonPreview(role: .primary, isPressed: true)
+        #expect(preview.isPressed == true)
+    }
+
+    @Test("GentleButtonPreview can be created with isMiniature true")
+    func testButtonPreviewMiniature() {
+        let preview = GentleButtonPreview(role: .primary, isMiniature: true)
+        #expect(preview.isMiniature == true)
+    }
+
+    @Test("GentleButtonPreview body evaluates for all roles in full size mode")
+    func testButtonPreviewBodyFullSize() {
+        let roles: [GentleButtonRole] = [.primary, .secondary, .tertiary, .quaternary, .destructive]
+        for role in roles {
+            let view = wrapWithGentleEnvironment(GentleButtonPreview(role: role, isPressed: false, isMiniature: false))
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("GentleButtonPreview body evaluates for all roles in miniature mode")
+    func testButtonPreviewBodyMiniature() {
+        let roles: [GentleButtonRole] = [.primary, .secondary, .tertiary, .quaternary, .destructive]
+        for role in roles {
+            let view = wrapWithGentleEnvironment(GentleButtonPreview(role: role, isPressed: false, isMiniature: true))
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("GentleButtonPreview body evaluates for all roles when pressed")
+    func testButtonPreviewBodyPressed() {
+        let roles: [GentleButtonRole] = [.primary, .secondary, .tertiary, .quaternary, .destructive]
+        for role in roles {
+            let view = wrapWithGentleEnvironment(GentleButtonPreview(role: role, isPressed: true, isMiniature: false))
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("GentleButtonPreview body evaluates for miniature pressed state")
+    func testButtonPreviewBodyMiniaturePressed() {
+        let roles: [GentleButtonRole] = [.primary, .secondary, .tertiary, .quaternary, .destructive]
+        for role in roles {
+            let view = wrapWithGentleEnvironment(GentleButtonPreview(role: role, isPressed: true, isMiniature: true))
+            renderViewForCoverage(view)
+        }
+    }
+
+    // MARK: - Section Body Evaluation with Different Themes
+
+    @Test("GentleDesignColorsSection body evaluates with all presets")
+    func testColorsSectionWithAllPresets() {
+        let presets: [GentleDesignSystemSpec] = [.gentleDefault, .classic, .modern, .soft, .editorial, .technical, .bold, .elegant, .compact]
+        for preset in presets {
+            let theme = GentleTheme(defaultSpec: preset)
+            let manager = GentleThemeManager(theme: theme)
+            let view = GentleDesignColorsSection()
+                .environment(\.gentleTheme, theme)
+                .environment(\.gentleThemeManager, manager)
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("GentleDesignTypographySection body evaluates with all presets")
+    func testTypographySectionWithAllPresets() {
+        let presets: [GentleDesignSystemSpec] = [.gentleDefault, .classic, .modern, .soft, .editorial, .technical, .bold, .elegant, .compact]
+        for preset in presets {
+            let theme = GentleTheme(defaultSpec: preset)
+            let manager = GentleThemeManager(theme: theme)
+            let view = GentleDesignTypographySection()
+                .environment(\.gentleTheme, theme)
+                .environment(\.gentleThemeManager, manager)
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("GentleDesignButtonsSection body evaluates with all presets")
+    func testButtonsSectionWithAllPresets() {
+        let presets: [GentleDesignSystemSpec] = [.gentleDefault, .classic, .modern, .soft, .editorial, .technical, .bold, .elegant, .compact]
+        for preset in presets {
+            let theme = GentleTheme(defaultSpec: preset)
+            let manager = GentleThemeManager(theme: theme)
+            let view = GentleDesignButtonsSection()
+                .environment(\.gentleTheme, theme)
+                .environment(\.gentleThemeManager, manager)
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("GentleDesignSurfacesSection body evaluates with all presets")
+    func testSurfacesSectionWithAllPresets() {
+        let presets: [GentleDesignSystemSpec] = [.gentleDefault, .classic, .modern, .soft, .editorial, .technical, .bold, .elegant, .compact]
+        for preset in presets {
+            let theme = GentleTheme(defaultSpec: preset)
+            let manager = GentleThemeManager(theme: theme)
+            let view = GentleDesignSurfacesSection()
+                .environment(\.gentleTheme, theme)
+                .environment(\.gentleThemeManager, manager)
+            renderViewForCoverage(view)
+        }
+    }
+
+    @Test("GentleDesignMaterialsSection body evaluates with all presets")
+    func testMaterialsSectionWithAllPresets() {
+        let presets: [GentleDesignSystemSpec] = [.gentleDefault, .classic, .modern, .soft, .editorial, .technical, .bold, .elegant, .compact]
+        for preset in presets {
+            let theme = GentleTheme(defaultSpec: preset)
+            let manager = GentleThemeManager(theme: theme)
+            let view = GentleDesignMaterialsSection()
+                .environment(\.gentleTheme, theme)
+                .environment(\.gentleThemeManager, manager)
+            renderViewForCoverage(view)
+        }
+    }
+
+    // MARK: - Complete Foundation View Tests
+
+    @Test("GentleDesignFoundationView body evaluates in both color schemes")
+    func testFoundationViewColorSchemes() {
+        let theme = GentleTheme(defaultSpec: .gentleDefault)
+        let manager = GentleThemeManager(theme: theme)
+
+        let lightView = GentleDesignFoundationView()
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+            .environment(\.colorScheme, .light)
+        renderViewForCoverage(lightView)
+
+        let darkView = GentleDesignFoundationView()
+            .environment(\.gentleTheme, theme)
+            .environment(\.gentleThemeManager, manager)
+            .environment(\.colorScheme, .dark)
+        renderViewForCoverage(darkView)
+    }
+}
+
+// MARK: - GentleCustomizeSection Tests
+
+@Suite("GentleCustomizeSection Tests")
+struct GentleCustomizeSectionTests {
+
+    @Test("All customize sections have titles")
+    func testCustomizeSectionTitles() {
+        for section in GentleCustomizeSection.allCases {
+            #expect(!section.title.isEmpty)
+        }
+    }
+
+    @Test("Customize sections have correct titles")
+    func testCustomizeSectionCorrectTitles() {
+        #expect(GentleCustomizeSection.colors.title == "Colors")
+        #expect(GentleCustomizeSection.typography.title == "Typography")
+        #expect(GentleCustomizeSection.buttons.title == "Buttons")
+        #expect(GentleCustomizeSection.surfaces.title == "Surfaces")
+    }
+
+    @Test("Customize sections are case iterable")
+    func testCustomizeSectionCaseIterable() {
+        #expect(GentleCustomizeSection.allCases.count == 4)
+    }
+}
+
+// MARK: - GentleSurfaceRole Identifiable Tests
+
+@Suite("GentleSurfaceRole Identifiable Tests")
+struct GentleSurfaceRoleIdentifiableTests {
+
+    @Test("Surface roles are identifiable by rawValue")
+    func testSurfaceRoleIdentifiable() {
+        let roles: [GentleSurfaceRole] = [.appBackground, .card, .cardElevated, .surfaceOverlay]
+        for role in roles {
+            #expect(role.id == role.rawValue)
+        }
+    }
+}
