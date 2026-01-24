@@ -94,7 +94,8 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
 
     case textPrimary, textSecondary, textTertiary
     case onPrimaryCTA
-    case background, surface, surfaceElevated
+    case background, surface
+    case surfaceTint, surfaceSpecular
     case surfaceOverlay, onSurfaceOverlayPrimary, onSurfaceOverlaySecondary
     case borderSubtle
     case destructive
@@ -109,7 +110,8 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
         case .onPrimaryCTA: return "On Primary CTA"
         case .background: return "Background"
         case .surface: return "Surface"
-        case .surfaceElevated: return "Surface Elevated"
+        case .surfaceTint: return "Surface Tint"
+        case .surfaceSpecular: return "Surface Specular"
         case .surfaceOverlay: return "Surface Overlay"
         case .onSurfaceOverlayPrimary: return "On Overlay Primary"
         case .onSurfaceOverlaySecondary: return "On Overlay Secondary"
@@ -406,10 +408,11 @@ public extension GentleColorTokens {
             // Surfaces
             GentleColorRole.background.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#0B0F19"),
             GentleColorRole.surface.rawValue: .init(lightHex: "#FAFAFE", darkHex: "#111827"),
+            GentleColorRole.surfaceTint.rawValue: .init(lightHex: "#111827CC", darkHex: "#020617CC"),
+            GentleColorRole.surfaceSpecular.rawValue: .init(lightHex: "#FFFFFF66", darkHex: "#FFFFFF33"),
             GentleColorRole.surfaceOverlay.rawValue: .init(lightHex: "#111827CC", darkHex: "#020617CC"),
             GentleColorRole.onSurfaceOverlayPrimary.rawValue: .init(lightHex: "#F9FAFB", darkHex: "#F9FAFB"),
             GentleColorRole.onSurfaceOverlaySecondary.rawValue: .init(lightHex: "#D1D5DB", darkHex:  "#D1D5DB"),
-            GentleColorRole.surfaceElevated.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#1F2937"),
             GentleColorRole.borderSubtle.rawValue: .init(lightHex: "#E5E7EB", darkHex: "#374151"),
 
             // Actions / status
