@@ -177,15 +177,7 @@ public struct GentleDesignTypographySection: View {
                         .frame(maxWidth: .infinity, minHeight: 60, alignment: .topLeading)
                         .padding(.vertical, design.layout.gap.s)
                         .padding(.horizontal, design.layout.gap.m)
-                        .gentleSurface(.card)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: CGFloat(theme.radii.medium))
-                                .strokeBorder(
-                                    theme.color(for: .primaryCTA, scheme: colorScheme)
-                                        .opacity(0.5),
-                                    lineWidth: 1
-                                )
-                        )
+                        .gentleSurface(.card, showTappableHint: true)
                     }
                     .buttonStyle(.plain)
                 }
@@ -424,15 +416,7 @@ private struct ButtonPreviewCard: View {
             ButtonPreviewCardContent(name: name, role: role)
         }
         .buttonStyle(ButtonPreviewCardStyle())
-        .gentleSurface(.card)
-        .overlay(
-            RoundedRectangle(cornerRadius: CGFloat(theme.radii.large))
-                .strokeBorder(
-                    theme.color(for: .primaryCTA, scheme: colorScheme)
-                        .opacity(0.5),
-                    lineWidth: 1
-                )
-        )
+        .gentleSurface(.card, showTappableHint: true)
     }
 }
 
@@ -691,15 +675,7 @@ public struct GentleDesignSurfacesSection: View {
                     .opacity(0.8)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .gentleSurface(surface, inset: .card)
-            .overlay(
-                RoundedRectangle(cornerRadius: CGFloat(theme.radii.large))
-                    .strokeBorder(
-                        theme.color(for: .primaryCTA, scheme: colorScheme)
-                            .opacity(0.5),
-                        lineWidth: 1
-                    )
-            )
+            .gentleSurface(surface, inset: .card, showTappableHint: true)
         }
         .buttonStyle(.plain)
     }
