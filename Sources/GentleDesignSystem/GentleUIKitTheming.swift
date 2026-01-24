@@ -1,5 +1,8 @@
-//  Jonathan Ritchey
+//  Jonathan Ritchey
 import SwiftUI
+
+#if canImport(UIKit)
+import UIKit
 
 // MARK: - UI Kit Theming
 
@@ -28,7 +31,7 @@ public enum GentleUIKitTheming {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithDefaultBackground()
 
-        // ✅ This is the “divider line” culprit most of the time
+        // ✅ This is the "divider line" culprit most of the time
         appearance.shadowColor = .clear
 
         appearance.largeTitleTextAttributes = [
@@ -146,3 +149,5 @@ private extension Font.Weight {
         }
     }
 }
+
+#endif

@@ -19,6 +19,7 @@ public struct GentleDesignFoundationView: View {
                 GentleDesignTypographySection()
                 GentleDesignButtonsSection()
                 GentleDesignSurfacesSection()
+                GentleDesignMaterialsSection()
             }
             .gentleInset(.screen)
         }
