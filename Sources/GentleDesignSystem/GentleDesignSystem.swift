@@ -5,7 +5,7 @@ import Observation
 import UIKit
 
 public enum GentleDesignSystemSpecVersion {
-    public static let current = "0.4.0" // surfaces: fillRole replaces material recipe in specs
+    public static let current = "0.5.0" // color roles: onOverlay, onOverlaySecondary, onDestructive
 }
 
 // MARK: - Roles
@@ -91,10 +91,10 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
     public var id: String { rawValue }
 
     case textPrimary, textSecondary, textTertiary
-    case onPrimaryCTA
+    case onPrimaryCTA, onDestructive
     case background, surface
     case surfaceTint, surfaceSpecular
-    case surfaceOverlay, onSurfaceOverlayPrimary, onSurfaceOverlaySecondary
+    case surfaceOverlay, onOverlay, onOverlaySecondary
     case borderSubtle
     case destructive
     case primaryCTA
@@ -106,13 +106,14 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
         case .textSecondary: return "Text Secondary"
         case .textTertiary: return "Text Tertiary"
         case .onPrimaryCTA: return "On Primary CTA"
+        case .onDestructive: return "On Destructive"
         case .background: return "Background"
         case .surface: return "Surface"
         case .surfaceTint: return "Surface Tint"
         case .surfaceSpecular: return "Surface Specular"
         case .surfaceOverlay: return "Surface Overlay"
-        case .onSurfaceOverlayPrimary: return "On Overlay Primary"
-        case .onSurfaceOverlaySecondary: return "On Overlay Secondary"
+        case .onOverlay: return "On Overlay"
+        case .onOverlaySecondary: return "On Overlay Secondary"
         case .borderSubtle: return "Border Subtle"
         case .destructive: return "Destructive"
         case .primaryCTA: return "Primary CTA"
@@ -407,14 +408,15 @@ public extension GentleColorTokens {
             GentleColorRole.surfaceTint.rawValue: .init(lightHex: "#111827CC", darkHex: "#020617CC"),
             GentleColorRole.surfaceSpecular.rawValue: .init(lightHex: "#FFFFFF66", darkHex: "#FFFFFF33"),
             GentleColorRole.surfaceOverlay.rawValue: .init(lightHex: "#111827CC", darkHex: "#020617CC"),
-            GentleColorRole.onSurfaceOverlayPrimary.rawValue: .init(lightHex: "#F9FAFB", darkHex: "#F9FAFB"),
-            GentleColorRole.onSurfaceOverlaySecondary.rawValue: .init(lightHex: "#D1D5DB", darkHex:  "#D1D5DB"),
+            GentleColorRole.onOverlay.rawValue: .init(lightHex: "#F9FAFB", darkHex: "#F9FAFB"),
+            GentleColorRole.onOverlaySecondary.rawValue: .init(lightHex: "#D1D5DB", darkHex:  "#D1D5DB"),
             GentleColorRole.borderSubtle.rawValue: .init(lightHex: "#E5E7EB", darkHex: "#374151"),
 
             // Actions / status
             GentleColorRole.primaryCTA.rawValue: .init(lightHex: "#4A6EF5", darkHex: "#3B82F6"),
             GentleColorRole.onPrimaryCTA.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
             GentleColorRole.destructive.rawValue: .init(lightHex: "#E35D5B", darkHex: "#F87171"),
+            GentleColorRole.onDestructive.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
 
             // Theme Colors
             GentleColorRole.themePrimary.rawValue: .init(lightHex: "#4A6EF5", darkHex: "#3B82F6"),

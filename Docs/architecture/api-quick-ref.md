@@ -293,9 +293,9 @@ footnote_s, caption_s, caption2_s
 
 ### GentleColorRole (17)
 ```
-textPrimary, textSecondary, textTertiary, onPrimaryCTA,
-background, surface, surfaceTint, surfaceSpecular,
-surfaceOverlay, onSurfaceOverlayPrimary, onSurfaceOverlaySecondary,
+textPrimary, textSecondary, textTertiary,
+onPrimaryCTA, onDestructive, onOverlay, onOverlaySecondary,
+background, surface, surfaceTint, surfaceSpecular, surfaceOverlay,
 primaryCTA, destructive,
 themePrimary, themeSecondary,
 borderSubtle

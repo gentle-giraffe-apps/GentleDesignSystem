@@ -58,9 +58,9 @@ Naming: `{semantic}_{ramp}` where ramp = xxl > xl > l > ml > m > ms > s
 
 ### GentleColorRole (17 roles)
 ```
-Text:     textPrimary, textSecondary, textTertiary, onPrimaryCTA
-Surface:  background, surface, surfaceTint, surfaceSpecular
-          surfaceOverlay, onSurfaceOverlayPrimary, onSurfaceOverlaySecondary
+Text:     textPrimary, textSecondary, textTertiary
+On:       onPrimaryCTA, onDestructive, onOverlay, onOverlaySecondary
+Surface:  background, surface, surfaceTint, surfaceSpecular, surfaceOverlay
 Action:   primaryCTA, destructive
 Theme:    themePrimary, themeSecondary
 Border:   borderSubtle
@@ -75,6 +75,13 @@ primary, secondary, tertiary, quaternary, destructive
 ```
 unknown, subtlePress, squish, pop, bouncy, springBack
 ```
+
+### GentleButtonFillRole (3 roles)
+```
+solidFillPrimaryCTA, solidFillDestructive, hollow
+```
+
+Determines button background fill and label color strategy.
 
 ### GentleSurfaceRole (4 roles)
 ```

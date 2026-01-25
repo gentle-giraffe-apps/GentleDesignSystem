@@ -593,8 +593,8 @@ Each role resolves to a `GentleTypographyRoleSpec` containing: `pointSize`, `wei
 | Category | Roles |
 |----------|-------|
 | Text | `textPrimary`, `textSecondary`, `textTertiary` |
-| Surfaces | `background`, `surface`, `surfaceTint`, `surfaceSpecular`, `surfaceOverlay`, `onSurfaceOverlayPrimary`, `onSurfaceOverlaySecondary` |
-| Actions | `primaryCTA`, `onPrimaryCTA`, `destructive` |
+| Surfaces | `background`, `surface`, `surfaceTint`, `surfaceSpecular`, `surfaceOverlay`, `onOverlay`, `onOverlaySecondary` |
+| Actions | `primaryCTA`, `onPrimaryCTA`, `destructive`, `onDestructive` |
 | Theme | `themePrimary`, `themeSecondary` |
 | Structure | `borderSubtle` |
 

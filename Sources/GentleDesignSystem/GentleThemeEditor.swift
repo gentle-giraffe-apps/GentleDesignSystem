@@ -706,19 +706,79 @@ struct SurfaceRoleEditorSheet: View {
                     Text(role.rawValue.capitalized)
                         .gentleText(.title_xl)
 
-                    // Surface preview
-                    VStack(alignment: .leading, spacing: design.layout.stack.tight) {
-                        Text("Preview")
-                            .gentleText(.headline_m)
-                        Text("Sample content")
-                            .gentleText(.caption_s)
-                            .opacity(0.8)
+                    // Surface preview with background content to showcase blur/glass effects
+                    ZStack {
+                        // Background mock UI content (visible through blur/glass effects)
+                        HStack(spacing: 0) {
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack(spacing: 8) {
+                                    Circle().fill(design.color(.themePrimary)).frame(width: 20, height: 20)
+                                    VStack(alignment: .leading, spacing: 1) {
+                                        Text("Primary Action")
+                                            .gentleText(.caption_s)
+                                        Text("Theme primary color")
+                                            .gentleText(.caption2_s)
+                                    }
+                                }
+                                HStack(spacing: 8) {
+                                    Circle().fill(design.color(.themeSecondary)).frame(width: 20, height: 20)
+                                    VStack(alignment: .leading, spacing: 1) {
+                                        Text("Secondary Item")
+                                            .gentleText(.caption_s)
+                                        Text("Theme secondary color")
+                                            .gentleText(.caption2_s)
+                                    }
+                                }
+                                HStack(spacing: 8) {
+                                    Circle().fill(design.color(.primaryCTA)).frame(width: 20, height: 20)
+                                    VStack(alignment: .leading, spacing: 1) {
+                                        Text("Call to Action")
+                                            .gentleText(.caption_s)
+                                        Text("Primary CTA color")
+                                            .gentleText(.caption2_s)
+                                    }
+                                }
+                            }
+                            .padding(.leading)
+
+                            Spacer()
+
+                            // Mesh gradient to showcase blur effects
+                            MeshGradient(
+                                width: 3,
+                                height: 3,
+                                points: [
+                                    [0.0, 0.0], [0.5, 0.0], [1.0, 0.0],
+                                    [0.0, 0.5], [0.5, 0.5], [1.0, 0.5],
+                                    [0.0, 1.0], [0.5, 1.0], [1.0, 1.0]
+                                ],
+                                colors: [
+                                    .red, .purple, .indigo,
+                                    .orange, .pink, .blue,
+                                    .yellow, .green, .cyan
+                                ]
+                            )
+                            .frame(width: 80, height: 80)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                            Spacer()
+                        }
+                        .padding(.vertical)
+                        .frame(maxWidth: .infinity)
+
+                        // Surface preview overlay
+                        VStack(spacing: design.layout.stack.tight) {
+                            Text("Preview")
+                                .gentleText(.title2_l, colorRole: binding.visualEffect.wrappedValue == .surfaceOverlay ? .onOverlay : .textPrimary)
+                            Text("Sample content")
+                                .gentleText(.body_m, colorRole: binding.visualEffect.wrappedValue == .surfaceOverlay ? .onOverlaySecondary : .textSecondary)
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 100, alignment: .center)
+                        .gentleSurface(role, inset: .card)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .gentleSurface(role, inset: .card)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, design.layout.gap.m)
+                .padding(.horizontal, design.layout.gap.xl)
                 .padding(.vertical, design.layout.gap.s)
 
                 List {

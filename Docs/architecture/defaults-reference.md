@@ -118,12 +118,13 @@ All `.gentleDefault` values in one place.
 | `surfaceTint` | #111827CC | #020617CC | Surface tint overlay |
 | `surfaceSpecular` | #FFFFFF66 | #FFFFFF33 | Specular highlight |
 | `surfaceOverlay` | #111827CC | #020617CC | Modal overlay |
-| `onSurfaceOverlayPrimary` | #F9FAFB | #F9FAFB | Primary text on overlay |
-| `onSurfaceOverlaySecondary` | #D1D5DB | #D1D5DB | Secondary text on overlay |
+| `onOverlay` | #F9FAFB | #F9FAFB | Primary text on overlay |
+| `onOverlaySecondary` | #D1D5DB | #D1D5DB | Secondary text on overlay |
 | `borderSubtle` | #E5E7EB | #374151 | Subtle borders |
 | `primaryCTA` | #4A6EF5 | #3B82F6 | Primary action color |
 | `onPrimaryCTA` | #FFFFFF | #FFFFFF | Text on primary CTA |
 | `destructive` | #E35D5B | #F87171 | Destructive actions |
+| `onDestructive` | #FFFFFF | #FFFFFF | Text on destructive |
 | `themePrimary` | #4A6EF5 | #3B82F6 | Theme accent primary |
 | `themeSecondary` | #8FA2FF | #93C5FD | Theme accent secondary |
 

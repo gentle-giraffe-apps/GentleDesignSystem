@@ -27,6 +27,7 @@
 | `GentleTextRole` | Typography intent (17 roles) |
 | `GentleColorRole` | Color intent (17 roles) |
 | `GentleButtonRole` | Button style intent (5 roles) |
+| `GentleButtonFillRole` | Button fill strategy (solidFillPrimaryCTA, solidFillDestructive, hollow) |
 | `GentleButtonAnimationRole` | Button animation feel (6 roles) |
 | `GentleSurfaceRole` | Container/background intent (4 roles) |
 | `GentleVisualEffect` | Visual effect type (appBackground, surface, surfaceOverlay) |
