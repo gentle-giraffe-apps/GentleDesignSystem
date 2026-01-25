@@ -30,6 +30,9 @@
 | `GentleButtonFillRole` | Button fill strategy (solidFillPrimaryCTA, solidFillDestructive, hollow) |
 | `GentleButtonAnimationRole` | Button animation feel (6 roles) |
 | `GentleSurfaceRole` | Container/background intent (4 roles) |
+| `GentleSurfaceColorRole` | Restricted surface color roles: background, surface, surfaceOverlay |
+| `GentleAppleMaterial` | Apple's blur materials: noMaterial, ultraThin, thin, regular, thick, ultraThick, bar |
+| `GentleSpecularEffect` | Specular highlight types: noEffect, indent, highlight |
 | `GentleVisualEffect` | Visual effect type (appBackground, surface, surfaceOverlay) |
 | `GentleInsetRole` | Padding intent (4 roles) |
 | `GentleGapIntent` | Spacing intent (7 levels) |
@@ -41,7 +44,7 @@
 | `GentleColorTokens` | Map of role → `GentleColorPair` (light/dark hex) |
 | `GentleTypographyTokens` | Map of role → `GentleTypographyRoleSpec` |
 | `GentleButtonTokens` | Map of role → `GentleButtonRoleSpec` + animations |
-| `GentleSurfaceTokens` | Map of role → `GentleSurfaceRoleSpec` |
+| `GentleSurfaceTokens` | Map of role → `GentleSurfaceRoleSpec` (colorRole, appleMaterial, useGlass, specular, border, shadow) |
 | `GentleLayoutTokens` | Spacing scales, gaps, insets |
 | `GentleVisualTokens` | Radii, shadows |
 

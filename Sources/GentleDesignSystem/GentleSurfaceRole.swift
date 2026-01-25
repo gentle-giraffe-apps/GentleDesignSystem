@@ -97,42 +97,137 @@ public enum GentleSpecularEffect: String, Codable, Sendable, CaseIterable, Ident
     }
 }
 
+// MARK: - Surface Background Style
+
+/// Defines the background rendering style for a surface.
+/// Mutually exclusive options that make the relationship between solid, material, and glass explicit.
+public enum GentleSurfaceBackgroundStyle: Codable, Sendable, Equatable {
+    /// Solid color background
+    case solid(colorRole: GentleSurfaceColorRole)
+
+    /// Apple blur material with optional tint color
+    /// - material: The Apple blur material to use
+    /// - tintColorRole: Optional color to tint the material
+    /// - tintOpacity: Opacity of the tint (0.0...1.0), typically ~0.1 to allow blur to show through
+    case material(material: GentleAppleMaterial, tintColorRole: GentleSurfaceColorRole?, tintOpacity: Double)
+
+    /// iOS 26+ glass effect with fallback for older iOS versions
+    case glass(fallbackMaterial: GentleAppleMaterial?, fallbackColorRole: GentleSurfaceColorRole)
+
+    // MARK: - Coding
+
+    private enum CodingKeys: String, CodingKey {
+        case type
+        case colorRole
+        case material
+        case tintColorRole
+        case tintOpacity
+        case fallbackMaterial
+        case fallbackColorRole
+    }
+
+    private enum StyleType: String, Codable {
+        case solid
+        case material
+        case glass
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decode(StyleType.self, forKey: .type)
+
+        switch type {
+        case .solid:
+            let colorRole = try container.decode(GentleSurfaceColorRole.self, forKey: .colorRole)
+            self = .solid(colorRole: colorRole)
+
+        case .material:
+            let material = try container.decode(GentleAppleMaterial.self, forKey: .material)
+            let tintColorRole = try container.decodeIfPresent(GentleSurfaceColorRole.self, forKey: .tintColorRole)
+            let tintOpacity = try container.decodeIfPresent(Double.self, forKey: .tintOpacity) ?? 0.1
+            self = .material(material: material, tintColorRole: tintColorRole, tintOpacity: tintOpacity)
+
+        case .glass:
+            let fallbackMaterial = try container.decodeIfPresent(GentleAppleMaterial.self, forKey: .fallbackMaterial)
+            let fallbackColorRole = try container.decode(GentleSurfaceColorRole.self, forKey: .fallbackColorRole)
+            self = .glass(fallbackMaterial: fallbackMaterial, fallbackColorRole: fallbackColorRole)
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case .solid(let colorRole):
+            try container.encode(StyleType.solid, forKey: .type)
+            try container.encode(colorRole, forKey: .colorRole)
+
+        case .material(let material, let tintColorRole, let tintOpacity):
+            try container.encode(StyleType.material, forKey: .type)
+            try container.encode(material, forKey: .material)
+            try container.encodeIfPresent(tintColorRole, forKey: .tintColorRole)
+            try container.encode(tintOpacity, forKey: .tintOpacity)
+
+        case .glass(let fallbackMaterial, let fallbackColorRole):
+            try container.encode(StyleType.glass, forKey: .type)
+            try container.encodeIfPresent(fallbackMaterial, forKey: .fallbackMaterial)
+            try container.encode(fallbackColorRole, forKey: .fallbackColorRole)
+        }
+    }
+
+    // MARK: - Convenience
+
+    public var displayName: String {
+        switch self {
+        case .solid: return "Solid"
+        case .material: return "Material"
+        case .glass: return "Glass"
+        }
+    }
+
+    /// Returns true if this style uses iOS 26+ glass effect
+    public var isGlass: Bool {
+        if case .glass = self { return true }
+        return false
+    }
+}
+
 // MARK: - Surface specs
 
 /// Defines the visual appearance of a surface role.
 public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
-    /// Base color (restricted to surface-related roles for semantic clarity)
-    public var colorRole: GentleSurfaceColorRole
+    /// Background rendering style (solid, material, or glass)
+    public var backgroundStyle: GentleSurfaceBackgroundStyle
 
-    /// Apple's blur material
-    public var appleMaterial: GentleAppleMaterial
-
-    /// iOS 26+ glass effect (when true, specular options hidden in UI)
-    public var useGlass: Bool
-
-    /// Specular highlights (disabled when useGlass or thick material)
+    /// Specular highlights for depth cues
     public var specularEffect: GentleSpecularEffect
 
     /// Specular strength (0.0...1.0)
     public var specularStrength: Double
 
-    // Existing properties
+    /// Border color
     public var border: GentleColorPair
 
-    // Structure
+    /// Corner radius
     public var cornerRadius: Double
+
+    /// Border width
     public var borderWidth: Double
 
-    // Shadow
+    /// Shadow radius
     public var shadowRadius: Double
+
+    /// Shadow opacity
     public var shadowOpacity: Double
+
+    /// Shadow X offset
     public var shadowOffsetX: Double
+
+    /// Shadow Y offset
     public var shadowOffsetY: Double
 
     public init(
-        colorRole: GentleSurfaceColorRole = .surface,
-        appleMaterial: GentleAppleMaterial = .noMaterial,
-        useGlass: Bool = false,
+        backgroundStyle: GentleSurfaceBackgroundStyle,
         specularEffect: GentleSpecularEffect = .noEffect,
         specularStrength: Double = 0,
         border: GentleColorPair,
@@ -143,9 +238,7 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
         shadowOffsetX: Double = 0,
         shadowOffsetY: Double = 0
     ) {
-        self.colorRole = colorRole
-        self.appleMaterial = appleMaterial
-        self.useGlass = useGlass
+        self.backgroundStyle = backgroundStyle
         self.specularEffect = specularEffect
         self.specularStrength = specularStrength
         self.border = border
@@ -158,9 +251,7 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case colorRole
-        case appleMaterial
-        case useGlass
+        case backgroundStyle
         case specularEffect
         case specularStrength
         case border
@@ -170,38 +261,53 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
         case shadowOpacity
         case shadowOffsetX
         case shadowOffsetY
-        // Legacy key for migration
+        // Legacy keys for migration
         case visualEffect
+        case colorRole
+        case appleMaterial
+        case useGlass
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        // Migration: if old "visualEffect" key exists, convert to new properties
-        if let visualEffect = try? container.decode(GentleVisualEffect.self, forKey: .visualEffect) {
+        // Try to decode new backgroundStyle first
+        if let backgroundStyle = try? container.decode(GentleSurfaceBackgroundStyle.self, forKey: .backgroundStyle) {
+            self.backgroundStyle = backgroundStyle
+        }
+        // Migration: if old "visualEffect" key exists, convert to new backgroundStyle
+        else if let visualEffect = try? container.decode(GentleVisualEffect.self, forKey: .visualEffect) {
             switch visualEffect {
             case .appBackground:
-                self.colorRole = .background
-                self.appleMaterial = .noMaterial
+                self.backgroundStyle = .solid(colorRole: .background)
             case .surface:
-                self.colorRole = .surface
-                self.appleMaterial = .noMaterial
+                self.backgroundStyle = .solid(colorRole: .surface)
             case .surfaceOverlay:
-                self.colorRole = .surfaceOverlay
-                self.appleMaterial = .regular
+                self.backgroundStyle = .material(material: .regular, tintColorRole: .surfaceOverlay, tintOpacity: 0.1)
             }
-            self.useGlass = false
-            self.specularEffect = .noEffect
-            self.specularStrength = 0
-        } else {
-            // Decode new properties normally
-            self.colorRole = try container.decodeIfPresent(GentleSurfaceColorRole.self, forKey: .colorRole) ?? .surface
-            self.appleMaterial = try container.decodeIfPresent(GentleAppleMaterial.self, forKey: .appleMaterial) ?? .noMaterial
-            self.useGlass = try container.decodeIfPresent(Bool.self, forKey: .useGlass) ?? false
-            self.specularEffect = try container.decodeIfPresent(GentleSpecularEffect.self, forKey: .specularEffect) ?? .noEffect
-            self.specularStrength = try container.decodeIfPresent(Double.self, forKey: .specularStrength) ?? 0
+        }
+        // Migration: if old flat properties exist (colorRole, appleMaterial, useGlass)
+        else if container.contains(.colorRole) || container.contains(.appleMaterial) || container.contains(.useGlass) {
+            let colorRole = try container.decodeIfPresent(GentleSurfaceColorRole.self, forKey: .colorRole) ?? .surface
+            let appleMaterial = try container.decodeIfPresent(GentleAppleMaterial.self, forKey: .appleMaterial) ?? .noMaterial
+            let useGlass = try container.decodeIfPresent(Bool.self, forKey: .useGlass) ?? false
+
+            if useGlass {
+                let fallbackMaterial: GentleAppleMaterial? = appleMaterial != .noMaterial ? appleMaterial : nil
+                self.backgroundStyle = .glass(fallbackMaterial: fallbackMaterial, fallbackColorRole: colorRole)
+            } else if appleMaterial != .noMaterial {
+                self.backgroundStyle = .material(material: appleMaterial, tintColorRole: colorRole, tintOpacity: 0.1)
+            } else {
+                self.backgroundStyle = .solid(colorRole: colorRole)
+            }
+        }
+        // Default fallback
+        else {
+            self.backgroundStyle = .solid(colorRole: .surface)
         }
 
+        self.specularEffect = try container.decodeIfPresent(GentleSpecularEffect.self, forKey: .specularEffect) ?? .noEffect
+        self.specularStrength = try container.decodeIfPresent(Double.self, forKey: .specularStrength) ?? 0
         self.border = try container.decode(GentleColorPair.self, forKey: .border)
         self.cornerRadius = try container.decodeIfPresent(Double.self, forKey: .cornerRadius) ?? 20
         self.borderWidth = try container.decodeIfPresent(Double.self, forKey: .borderWidth) ?? 1
@@ -213,9 +319,7 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(colorRole, forKey: .colorRole)
-        try container.encode(appleMaterial, forKey: .appleMaterial)
-        try container.encode(useGlass, forKey: .useGlass)
+        try container.encode(backgroundStyle, forKey: .backgroundStyle)
         try container.encode(specularEffect, forKey: .specularEffect)
         try container.encode(specularStrength, forKey: .specularStrength)
         try container.encode(border, forKey: .border)
@@ -242,11 +346,7 @@ public struct GentleSurfaceTokens: Codable, Sendable {
         if let card = roles[GentleSurfaceRole.card.rawValue] { return card }
         // Last-resort defaults (should never happen with gentleDefault).
         return .init(
-            colorRole: .surface,
-            appleMaterial: .noMaterial,
-            useGlass: false,
-            specularEffect: .noEffect,
-            specularStrength: 0,
+            backgroundStyle: .solid(colorRole: .surface),
             border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151")
         )
     }
@@ -256,37 +356,19 @@ public extension GentleSurfaceTokens {
     static let gentleDefault: GentleSurfaceTokens = .init(
         roles: [
             GentleSurfaceRole.appBackground.rawValue: .init(
-                colorRole: .background,
-                appleMaterial: .noMaterial,
-                useGlass: false,
-                specularEffect: .noEffect,
-                specularStrength: 0,
+                backgroundStyle: .solid(colorRole: .background),
                 border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
                 cornerRadius: 0,
-                borderWidth: 0,
-                shadowRadius: 0,
-                shadowOpacity: 0,
-                shadowOffsetX: 0,
-                shadowOffsetY: 0
+                borderWidth: 0
             ),
             GentleSurfaceRole.card.rawValue: .init(
-                colorRole: .surface,
-                appleMaterial: .noMaterial,
-                useGlass: false,
-                specularEffect: .noEffect,
-                specularStrength: 0,
+                backgroundStyle: .solid(colorRole: .surface),
                 border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
                 cornerRadius: 20,
-                borderWidth: 1,
-                shadowRadius: 0,
-                shadowOpacity: 0,
-                shadowOffsetX: 0,
-                shadowOffsetY: 0
+                borderWidth: 1
             ),
             GentleSurfaceRole.cardElevated.rawValue: .init(
-                colorRole: .surface,
-                appleMaterial: .noMaterial,
-                useGlass: false,
+                backgroundStyle: .solid(colorRole: .surface),
                 specularEffect: .highlight,
                 specularStrength: 0.1,
                 border: GentleColorPair(lightHex: "#E5E7EB59", darkHex: "#37415159"),
@@ -294,22 +376,13 @@ public extension GentleSurfaceTokens {
                 borderWidth: 0.5,
                 shadowRadius: 8,
                 shadowOpacity: 0.08,
-                shadowOffsetX: 0,
                 shadowOffsetY: 6
             ),
             GentleSurfaceRole.surfaceOverlay.rawValue: .init(
-                colorRole: .surfaceOverlay,
-                appleMaterial: .regular,
-                useGlass: false,
-                specularEffect: .noEffect,
-                specularStrength: 0,
+                backgroundStyle: .material(material: .regular, tintColorRole: .surfaceOverlay, tintOpacity: 0.1),
                 border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
                 cornerRadius: 0,
-                borderWidth: 0,
-                shadowRadius: 0,
-                shadowOpacity: 0,
-                shadowOffsetX: 0,
-                shadowOffsetY: 0
+                borderWidth: 0
             )
         ]
     )

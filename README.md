@@ -261,7 +261,11 @@ GentleDesignSystemSpec
                 │
                 ├── key = GentleSurfaceRole.rawValue
                 └── value = GentleSurfaceRoleSpec
-                        ├── materialRole: GentleDesignMaterialRole
+                        ├── colorRole: GentleSurfaceColorRole
+                        ├── appleMaterial: GentleAppleMaterial
+                        ├── useGlass: Bool
+                        ├── specularEffect: GentleSpecularEffect
+                        ├── specularStrength: Double
                         ├── border: GentleColorPair
                         ├── cornerRadius: Double
                         ├── borderWidth: Double

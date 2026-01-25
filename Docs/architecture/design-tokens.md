@@ -88,7 +88,13 @@ Determines button background fill and label color strategy.
 appBackground, card, cardElevated, surfaceOverlay
 ```
 
-Each surface role references a `GentleVisualEffect` for its appearance.
+Each surface role is defined by a `GentleSurfaceRoleSpec` containing:
+- `colorRole`: `GentleSurfaceColorRole` (background, surface, surfaceOverlay)
+- `appleMaterial`: `GentleAppleMaterial` (Apple's blur materials)
+- `useGlass`: Bool (iOS 26+ glass effect)
+- `specularEffect`: `GentleSpecularEffect` (noEffect, indent, highlight)
+- `specularStrength`: Double (0.0...1.0)
+- Plus border, corner radius, and shadow properties
 
 ## Adding a New Token
 

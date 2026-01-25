@@ -81,12 +81,15 @@ Complete mapping of every public type to its file location, kind, and purpose.
 
 ---
 
-## GentleSurfaceRole.swift (~168 lines)
+## GentleSurfaceRole.swift (~317 lines)
 
 | Type | Kind | Cases/Properties | Purpose |
 |------|------|------------------|---------|
 | `GentleSurfaceRole` | enum | 4: appBackground, card, cardElevated, surfaceOverlay | Surface semantic roles |
-| `GentleSurfaceRoleSpec` | struct | materialRole, border, cornerRadius, borderWidth, shadowRadius, shadowOpacity, shadowOffsetX, shadowOffsetY | Surface style definition |
+| `GentleSurfaceColorRole` | enum | 3: background, surface, surfaceOverlay | Restricted color roles for surface backgrounds |
+| `GentleAppleMaterial` | enum | 7: noMaterial, ultraThin, thin, regular, thick, ultraThick, bar | Apple's built-in blur materials |
+| `GentleSpecularEffect` | enum | 3: noEffect, indent, highlight | Specular highlight effects for depth cues |
+| `GentleSurfaceRoleSpec` | struct | colorRole, appleMaterial, useGlass, specularEffect, specularStrength, border, cornerRadius, borderWidth, shadowRadius, shadowOpacity, shadowOffsetX, shadowOffsetY | Surface style definition |
 | `GentleSurfaceTokens` | struct | roles: [String: GentleSurfaceRoleSpec] | Surface role mapping |
 
 ---
