@@ -769,9 +769,9 @@ struct SurfaceRoleEditorSheet: View {
                         // Surface preview overlay
                         VStack(spacing: design.layout.stack.tight) {
                             Text("Preview")
-                                .gentleText(.title2_l, colorRole: binding.colorRole.wrappedValue == .surfaceOverlay ? .onOverlay : .textPrimary)
+                                .gentleText(.title2_l, colorRole: isOverlayStyle(binding.wrappedValue.backgroundStyle) ? .onOverlay : .textPrimary)
                             Text("Sample content")
-                                .gentleText(.body_m, colorRole: binding.colorRole.wrappedValue == .surfaceOverlay ? .onOverlaySecondary : .textSecondary)
+                                .gentleText(.body_m, colorRole: isOverlayStyle(binding.wrappedValue.backgroundStyle) ? .onOverlaySecondary : .textSecondary)
                         }
                         .frame(maxWidth: .infinity, minHeight: 100, alignment: .center)
                         .gentleSurface(role, inset: .card)
@@ -782,26 +782,66 @@ struct SurfaceRoleEditorSheet: View {
                 .padding(.vertical, design.layout.gap.s)
 
                 List {
-                    Section("Base Color") {
-                        Picker("Color Role", selection: binding.colorRole) {
-                            ForEach(GentleSurfaceColorRole.allCases, id: \.self) { colorRole in
-                                Text(colorRole.displayName).tag(colorRole)
+                    Section("Background Style") {
+                        Picker("Style", selection: backgroundStyleTypeBinding(binding)) {
+                            Text("Solid").tag(BackgroundStyleType.solid)
+                            Text("Material").tag(BackgroundStyleType.material)
+                            Text("Glass (iOS 26+)").tag(BackgroundStyleType.glass)
+                        }
+                        .pickerStyle(.segmented)
+
+                        // Show options based on selected style type
+                        switch binding.wrappedValue.backgroundStyle {
+                        case .solid:
+                            Picker("Color Role", selection: solidColorRoleBinding(binding)) {
+                                ForEach(GentleSurfaceColorRole.allCases, id: \.self) { colorRole in
+                                    Text(colorRole.displayName).tag(colorRole)
+                                }
+                            }
+
+                        case .material(let material, _, let tintOpacity):
+                            Picker("Material", selection: materialBinding(binding)) {
+                                ForEach(GentleAppleMaterial.allCases.filter { $0 != .noMaterial }, id: \.self) { mat in
+                                    Text(mat.displayName).tag(mat)
+                                }
+                            }
+
+                            Picker("Tint Color", selection: materialTintBinding(binding)) {
+                                Text("None").tag(Optional<GentleSurfaceColorRole>.none)
+                                ForEach(GentleSurfaceColorRole.allCases, id: \.self) { colorRole in
+                                    Text(colorRole.displayName).tag(Optional(colorRole))
+                                }
+                            }
+
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack {
+                                    Text("Tint Opacity")
+                                    Spacer()
+                                    Text(String(format: "%.0f%%", materialTintOpacityBinding(binding).wrappedValue * 100))
+                                        .monospacedDigit()
+                                        .foregroundStyle(.secondary)
+                                }
+                                Slider(value: materialTintOpacityBinding(binding), in: 0...1, step: 0.01)
+                            }
+
+                        case .glass:
+                            Picker("Fallback Material", selection: glassFallbackMaterialBinding(binding)) {
+                                Text("None (use color)").tag(Optional<GentleAppleMaterial>.none)
+                                ForEach(GentleAppleMaterial.allCases.filter { $0 != .noMaterial }, id: \.self) { mat in
+                                    Text(mat.displayName).tag(Optional(mat))
+                                }
+                            }
+
+                            Picker("Fallback Color", selection: glassFallbackColorBinding(binding)) {
+                                ForEach(GentleSurfaceColorRole.allCases, id: \.self) { colorRole in
+                                    Text(colorRole.displayName).tag(colorRole)
+                                }
                             }
                         }
                     }
 
-                    Section("Apple Material") {
-                        Picker("Material", selection: binding.appleMaterial) {
-                            ForEach(GentleAppleMaterial.allCases, id: \.self) { material in
-                                Text(material.displayName).tag(material)
-                            }
-                        }
-
-                        Toggle("Use Glass Effect (iOS 26+)", isOn: binding.useGlass)
-                    }
-
-                    // Specular section - hidden when useGlass is true
-                    if !binding.useGlass.wrappedValue {
+                    // Specular section - hidden when glass is selected
+                    if !binding.wrappedValue.backgroundStyle.isGlass {
                         Section("Specular") {
                             Picker("Effect", selection: binding.specularEffect) {
                                 ForEach(GentleSpecularEffect.allCases, id: \.self) { effect in
@@ -938,6 +978,181 @@ struct SurfaceRoleEditorSheet: View {
     private func revertChanges() {
         guard let initialSpec else { return }
         manager.bindingForSurfaceRole(role).wrappedValue = initialSpec
+    }
+
+    // MARK: - Background Style Helpers
+
+    private enum BackgroundStyleType: String, CaseIterable {
+        case solid, material, glass
+    }
+
+    private func isOverlayStyle(_ style: GentleSurfaceBackgroundStyle) -> Bool {
+        switch style {
+        case .solid(let colorRole):
+            return colorRole == .surfaceOverlay
+        case .material(_, let tintColorRole, _):
+            return tintColorRole == .surfaceOverlay
+        case .glass(_, let fallbackColorRole):
+            return fallbackColorRole == .surfaceOverlay
+        }
+    }
+
+    private func backgroundStyleTypeBinding(_ binding: Binding<GentleSurfaceRoleSpec>) -> Binding<BackgroundStyleType> {
+        Binding(
+            get: {
+                switch binding.wrappedValue.backgroundStyle {
+                case .solid: return .solid
+                case .material: return .material
+                case .glass: return .glass
+                }
+            },
+            set: { newType in
+                let currentStyle = binding.wrappedValue.backgroundStyle
+                switch newType {
+                case .solid:
+                    // Extract color role from current style for continuity
+                    let colorRole: GentleSurfaceColorRole
+                    switch currentStyle {
+                    case .solid(let cr): colorRole = cr
+                    case .material(_, let tcr, _): colorRole = tcr ?? .surface
+                    case .glass(_, let fcr): colorRole = fcr
+                    }
+                    binding.wrappedValue.backgroundStyle = .solid(colorRole: colorRole)
+
+                case .material:
+                    // Extract values from current style
+                    let material: GentleAppleMaterial
+                    let tintColor: GentleSurfaceColorRole?
+                    let tintOpacity: Double
+                    switch currentStyle {
+                    case .solid(let cr):
+                        material = .regular
+                        tintColor = cr
+                        tintOpacity = 0.1
+                    case .material(let m, let tcr, let to):
+                        material = m
+                        tintColor = tcr
+                        tintOpacity = to
+                    case .glass(let fm, let fcr):
+                        material = fm ?? .regular
+                        tintColor = fcr
+                        tintOpacity = 0.1
+                    }
+                    binding.wrappedValue.backgroundStyle = .material(material: material, tintColorRole: tintColor, tintOpacity: tintOpacity)
+
+                case .glass:
+                    // Extract values from current style for fallback
+                    let fallbackMaterial: GentleAppleMaterial?
+                    let fallbackColor: GentleSurfaceColorRole
+                    switch currentStyle {
+                    case .solid(let cr):
+                        fallbackMaterial = nil
+                        fallbackColor = cr
+                    case .material(let m, let tcr, _):
+                        fallbackMaterial = m
+                        fallbackColor = tcr ?? .surface
+                    case .glass(let fm, let fcr):
+                        fallbackMaterial = fm
+                        fallbackColor = fcr
+                    }
+                    binding.wrappedValue.backgroundStyle = .glass(fallbackMaterial: fallbackMaterial, fallbackColorRole: fallbackColor)
+                }
+            }
+        )
+    }
+
+    private func solidColorRoleBinding(_ binding: Binding<GentleSurfaceRoleSpec>) -> Binding<GentleSurfaceColorRole> {
+        Binding(
+            get: {
+                if case .solid(let colorRole) = binding.wrappedValue.backgroundStyle {
+                    return colorRole
+                }
+                return .surface
+            },
+            set: { newValue in
+                binding.wrappedValue.backgroundStyle = .solid(colorRole: newValue)
+            }
+        )
+    }
+
+    private func materialBinding(_ binding: Binding<GentleSurfaceRoleSpec>) -> Binding<GentleAppleMaterial> {
+        Binding(
+            get: {
+                if case .material(let material, _, _) = binding.wrappedValue.backgroundStyle {
+                    return material
+                }
+                return .regular
+            },
+            set: { newValue in
+                if case .material(_, let tintColorRole, let tintOpacity) = binding.wrappedValue.backgroundStyle {
+                    binding.wrappedValue.backgroundStyle = .material(material: newValue, tintColorRole: tintColorRole, tintOpacity: tintOpacity)
+                }
+            }
+        )
+    }
+
+    private func materialTintBinding(_ binding: Binding<GentleSurfaceRoleSpec>) -> Binding<GentleSurfaceColorRole?> {
+        Binding(
+            get: {
+                if case .material(_, let tintColorRole, _) = binding.wrappedValue.backgroundStyle {
+                    return tintColorRole
+                }
+                return nil
+            },
+            set: { newValue in
+                if case .material(let material, _, let tintOpacity) = binding.wrappedValue.backgroundStyle {
+                    binding.wrappedValue.backgroundStyle = .material(material: material, tintColorRole: newValue, tintOpacity: tintOpacity)
+                }
+            }
+        )
+    }
+
+    private func materialTintOpacityBinding(_ binding: Binding<GentleSurfaceRoleSpec>) -> Binding<Double> {
+        Binding(
+            get: {
+                if case .material(_, _, let tintOpacity) = binding.wrappedValue.backgroundStyle {
+                    return tintOpacity
+                }
+                return 0.1
+            },
+            set: { newValue in
+                if case .material(let material, let tintColorRole, _) = binding.wrappedValue.backgroundStyle {
+                    binding.wrappedValue.backgroundStyle = .material(material: material, tintColorRole: tintColorRole, tintOpacity: newValue)
+                }
+            }
+        )
+    }
+
+    private func glassFallbackMaterialBinding(_ binding: Binding<GentleSurfaceRoleSpec>) -> Binding<GentleAppleMaterial?> {
+        Binding(
+            get: {
+                if case .glass(let fallbackMaterial, _) = binding.wrappedValue.backgroundStyle {
+                    return fallbackMaterial
+                }
+                return nil
+            },
+            set: { newValue in
+                if case .glass(_, let fallbackColorRole) = binding.wrappedValue.backgroundStyle {
+                    binding.wrappedValue.backgroundStyle = .glass(fallbackMaterial: newValue, fallbackColorRole: fallbackColorRole)
+                }
+            }
+        )
+    }
+
+    private func glassFallbackColorBinding(_ binding: Binding<GentleSurfaceRoleSpec>) -> Binding<GentleSurfaceColorRole> {
+        Binding(
+            get: {
+                if case .glass(_, let fallbackColorRole) = binding.wrappedValue.backgroundStyle {
+                    return fallbackColorRole
+                }
+                return .surface
+            },
+            set: { newValue in
+                if case .glass(let fallbackMaterial, _) = binding.wrappedValue.backgroundStyle {
+                    binding.wrappedValue.backgroundStyle = .glass(fallbackMaterial: fallbackMaterial, fallbackColorRole: newValue)
+                }
+            }
+        )
     }
 }
 

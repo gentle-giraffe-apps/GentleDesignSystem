@@ -192,17 +192,25 @@ public struct GentleSurfaceModifier: ViewModifier {
         switch role {
         case .appBackground:
             return AnyView(
-                insetContent.background(
-                    surfaceBackground(spec: spec)
-                        .ignoresSafeArea()
+                applyGlassIfNeeded(
+                    insetContent.background(
+                        surfaceBackground(spec: spec)
+                            .ignoresSafeArea()
+                    ),
+                    spec: spec,
+                    cornerRadius: cornerRadius
                 )
             )
 
         case .surfaceOverlay:
             return AnyView(
-                insetContent
-                    .background(surfaceBackground(spec: spec))
-                    .cornerRadius(cornerRadius)
+                applyGlassIfNeeded(
+                    insetContent
+                        .background(surfaceBackground(spec: spec))
+                        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)),
+                    spec: spec,
+                    cornerRadius: cornerRadius
+                )
             )
 
         case .card, .cardElevated:
@@ -212,49 +220,90 @@ public struct GentleSurfaceModifier: ViewModifier {
             let shadowOpacity = colorScheme == .dark ? spec.shadowOpacity * 3.5 : spec.shadowOpacity
 
             return AnyView(
-                insetContent
-                    .background(surfaceBackground(spec: spec))
-                    .cornerRadius(cornerRadius)
-                    .overlay(
-                        Group {
-                            if hasBorder {
-                                let insetAmount: CGFloat = showTappableHint ? 0.5 : 0.0
-                                RoundedRectangle(cornerRadius: cornerRadius - insetAmount)
-                                    .strokeBorder(borderColor, lineWidth: borderWidth)
-                                    .padding(insetAmount)
+                applyGlassIfNeeded(
+                    insetContent
+                        .background(surfaceBackground(spec: spec))
+                        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                        .overlay(
+                            Group {
+                                if hasBorder {
+                                    let insetAmount: CGFloat = showTappableHint ? 0.5 : 0.0
+                                    RoundedRectangle(cornerRadius: cornerRadius - insetAmount, style: .continuous)
+                                        .strokeBorder(borderColor, lineWidth: borderWidth)
+                                        .padding(insetAmount)
+                                }
                             }
-                        }
-                    )
-                    .shadow(
-                        color: hasShadow ? Color.black.opacity(shadowOpacity) : Color.clear,
-                        radius: CGFloat(spec.shadowRadius),
-                        x: CGFloat(spec.shadowOffsetX),
-                        y: CGFloat(spec.shadowOffsetY)
-                    )
+                        )
+                        .shadow(
+                            color: hasShadow ? Color.black.opacity(shadowOpacity) : Color.clear,
+                            radius: CGFloat(spec.shadowRadius),
+                            x: CGFloat(spec.shadowOffsetX),
+                            y: CGFloat(spec.shadowOffsetY)
+                        ),
+                    spec: spec,
+                    cornerRadius: cornerRadius
+                )
             )
+        }
+    }
+
+    /// Applies glass effect when enabled and available (iOS 26+)
+    @ViewBuilder
+    private func applyGlassIfNeeded<V: View>(_ view: V, spec: GentleSurfaceRoleSpec, cornerRadius: CGFloat) -> some View {
+        if spec.backgroundStyle.isGlass {
+            if #available(iOS 26.0, *) {
+                view.glassEffect(.regular, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            } else {
+                view
+            }
+        } else {
+            view
         }
     }
 
     /// Builds the surface background from spec properties
     @ViewBuilder
     private func surfaceBackground(spec: GentleSurfaceRoleSpec) -> some View {
-        // Get the base color from the color role
-        let baseColor = theme.color(for: spec.colorRole.colorRole, scheme: colorScheme)
+        switch spec.backgroundStyle {
+        case .solid(let colorRole):
+            theme.color(for: colorRole.colorRole, scheme: colorScheme)
 
-        if spec.useGlass {
-            // Glass effect (iOS 26+ future-proofing)
-            // For now, fall back to material or solid color
-            if spec.appleMaterial != .noMaterial, let material = spec.appleMaterial.swiftUIMaterial {
-                Color.clear.background(material)
+        case .material(let material, let tintColorRole, let tintOpacity):
+            if let swiftUIMaterial = material.swiftUIMaterial {
+                if let tintColorRole {
+                    // Material with semi-transparent tint color on top
+                    // The tint is layered above the material so blur shows through
+                    Color.clear
+                        .background(swiftUIMaterial)
+                        .overlay(
+                            theme.color(for: tintColorRole.colorRole, scheme: colorScheme)
+                                .opacity(tintOpacity)
+                        )
+                } else {
+                    Color.clear.background(swiftUIMaterial)
+                }
             } else {
-                baseColor
+                // Fallback if material is somehow invalid
+                if let tintColorRole {
+                    theme.color(for: tintColorRole.colorRole, scheme: colorScheme)
+                        .opacity(tintOpacity)
+                } else {
+                    Color.clear
+                }
             }
-        } else if spec.appleMaterial != .noMaterial, let material = spec.appleMaterial.swiftUIMaterial {
-            // Apple material background
-            Color.clear.background(material)
-        } else {
-            // Solid color background
-            baseColor
+
+        case .glass(let fallbackMaterial, let fallbackColorRole):
+            // Glass effect - background is clear on iOS 26+, fallback on older iOS
+            if #available(iOS 26.0, *) {
+                Color.clear
+            } else {
+                // Fallback for pre-iOS 26
+                if let fallbackMaterial, let swiftUIMaterial = fallbackMaterial.swiftUIMaterial {
+                    Color.clear.background(swiftUIMaterial)
+                } else {
+                    theme.color(for: fallbackColorRole.colorRole, scheme: colorScheme)
+                }
+            }
         }
     }
 }
