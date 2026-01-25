@@ -41,9 +41,22 @@ GentleDesignSystem/
 | Add/modify token types | `GentleDesignSystem.swift` |
 | Change default token values | `GentleDesignSystem.swift` (`.gentleDefault` statics) |
 | Add view modifiers | `GentleDesignModifiers.swift` |
+| Add surface roles | `GentleSurfaceRole.swift` |
+| Add material types | `GentleDesignMaterial.swift` |
+| Add theme presets | `GentleDesignSystemSpec+Presets.swift` |
 | Add theme editor sections | `GentleThemeEditor.swift` |
 | Add role editors | `ColorRoleEditor.swift`, `TypographyRoleEditor.swift` |
+| Modify persistence | `GentleDesignPersistence.swift` |
 | UIKit navigation styling | `GentleUIKitTheming.swift` |
+
+## Related Documentation
+
+| Document | Purpose |
+|----------|---------|
+| [type-inventory.md](type-inventory.md) | Complete list of all types by file |
+| [api-quick-ref.md](api-quick-ref.md) | All public API signatures |
+| [defaults-reference.md](defaults-reference.md) | All default token values |
+| [common-tasks.md](common-tasks.md) | Step-by-step how-to guides |
 
 ## Files That Should Not Be Edited Casually
 

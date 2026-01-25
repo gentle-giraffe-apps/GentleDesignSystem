@@ -29,9 +29,11 @@ GentleDesignSystemSpec (top-level, versioned)
 ├── visual: GentleVisualTokens
 │   ├── radii: GentleRadiusTokens
 │   └── shadows: GentleShadowTokens
-└── buttons: GentleButtonTokens
-    ├── roles: [String: GentleButtonRoleSpec]
-    └── animations: [String: GentleButtonAnimationSpec]
+├── buttons: GentleButtonTokens
+│   ├── roles: [String: GentleButtonRoleSpec]
+│   └── animations: [String: GentleButtonAnimationSpec]
+└── surfaces: GentleSurfaceTokens
+    └── roles: [String: GentleSurfaceRoleSpec]
 ```
 
 ## JSON Schema Notes
@@ -43,22 +45,23 @@ GentleDesignSystemSpec (top-level, versioned)
 
 ## Role Enums
 
-### GentleTextRole (13 roles)
+### GentleTextRole (17 roles)
 ```
 largeTitle_xxl, title_xl, title2_l, title3_ml,
 headline_m, body_m, bodySecondary_m, monoCode_m,
+primaryButtonTitle_m, secondaryButtonTitle_m, tertiaryButtonTitle_m, quaternaryButtonTitle_m,
 callout_ms, subheadline_ms,
 footnote_s, caption_s, caption2_s
 ```
 
 Naming: `{semantic}_{ramp}` where ramp = xxl > xl > l > ml > m > ms > s
 
-### GentleColorRole (16 roles)
+### GentleColorRole (17 roles)
 ```
-Text:     textPrimary, textSecondary, textTertiary
+Text:     textPrimary, textSecondary, textTertiary, onPrimaryCTA
 Surface:  background, surface, surfaceTint, surfaceSpecular
           surfaceOverlay, onSurfaceOverlayPrimary, onSurfaceOverlaySecondary
-Action:   primaryCTA, onPrimaryCTA, destructive
+Action:   primaryCTA, destructive
 Theme:    themePrimary, themeSecondary
 Border:   borderSubtle
 ```
@@ -70,7 +73,7 @@ primary, secondary, tertiary, quaternary, destructive
 
 ### GentleButtonAnimationRole (6 roles)
 ```
-none, subtlePress, squish, pop, bouncy, springBack
+unknown, subtlePress, squish, pop, bouncy, springBack
 ```
 
 ### GentleSurfaceRole (4 roles)
