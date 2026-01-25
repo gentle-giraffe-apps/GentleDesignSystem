@@ -2,9 +2,7 @@
 import SwiftUI
 import Foundation
 import Observation
-#if canImport(UIKit)
 import UIKit
-#endif
 
 public enum GentleDesignSystemSpecVersion {
     public static let current = "0.4.0" // surfaces: materialRole replaces material recipe in specs
@@ -273,7 +271,6 @@ public enum GentleFontTextStyle: String, Codable, Sendable {
     case largeTitle, title, title2, title3, headline, body, callout, subheadline, footnote, caption, caption2
 }
 
-#if canImport(UIKit)
 public extension GentleFontTextStyle {
     /// UIKit semantic anchor used by UIFontMetrics for Dynamic Type scaling.
     var uiKitTextStyle: UIFont.TextStyle {
@@ -312,7 +309,6 @@ private extension ContentSizeCategory {
         }
     }
 }
-#endif
 
 // MARK: - Codable token structs (JSON-friendly)
 
@@ -1056,33 +1052,18 @@ public struct GentleTheme: Sendable {
     public func textStyle(for role: GentleTextRole, sizeCategory: ContentSizeCategory) -> GentleResolvedTextStyle {
         let roleSpec = activeSpec.typography.roleSpec(for: role)
 
-        #if canImport(UIKit)
         let metrics = UIFontMetrics(forTextStyle: roleSpec.relativeTo.uiKitTextStyle)
         let traits = UITraitCollection(preferredContentSizeCategory: sizeCategory.uiContentSizeCategory)
         let scaledSize = metrics.scaledValue(for: CGFloat(roleSpec.pointSize), compatibleWith: traits)
-        #else
-        // On macOS, use the base point size without Dynamic Type scaling
-        let scaledSize = CGFloat(roleSpec.pointSize)
-        #endif
 
         var baseFont = Font.system(size: scaledSize,
                                    weight: roleSpec.weight.swiftUIWeight,
                                    design: roleSpec.design.swiftUIDesign)
 
         if let width = roleSpec.width {
-            #if os(iOS)
-            if #available(iOS 17.0, *) {
-                if roleSpec.design == .default {
-                    baseFont = baseFont.width(width.swiftUIWidth)
-                }
+            if roleSpec.design == .default {
+                baseFont = baseFont.width(width.swiftUIWidth)
             }
-            #elseif os(macOS)
-            if #available(macOS 14.0, *) {
-                if roleSpec.design == .default {
-                    baseFont = baseFont.width(width.swiftUIWidth)
-                }
-            }
-            #endif
         }
 
         return GentleResolvedTextStyle(

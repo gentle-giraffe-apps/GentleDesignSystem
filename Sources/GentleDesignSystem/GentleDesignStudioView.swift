@@ -1,6 +1,6 @@
 import SwiftUI
+import UIKit
 
-#if canImport(UIKit)
 public struct GentleDesignStudioView: View {
     enum ActiveSheet: Identifiable {
         case settings
@@ -138,4 +138,4 @@ public struct GentleDesignStudioView: View {
         }
     }
 }
-#endif
+

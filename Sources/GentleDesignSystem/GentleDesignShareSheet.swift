@@ -1,7 +1,5 @@
 //  Jonathan Ritchey
 import SwiftUI
-
-#if canImport(UIKit)
 import UIKit
 
 public struct GentleDesignShareSheet: UIViewControllerRepresentable {
@@ -20,4 +18,3 @@ public struct GentleDesignShareSheet: UIViewControllerRepresentable {
         // no-op
     }
 }
-#endif

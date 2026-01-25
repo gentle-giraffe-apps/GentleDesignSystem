@@ -1,7 +1,6 @@
 //  Jonathan Ritchey
 import SwiftUI
 
-#if canImport(UIKit)
 /// Compact grid cell for displaying a typography role.
 /// Tapping opens a sheet for editing.
 public struct TypographyRoleCell: View {
@@ -449,4 +448,4 @@ private struct WeightOptionRow: View {
         .buttonStyle(.plain)
     }
 }
-#endif
+

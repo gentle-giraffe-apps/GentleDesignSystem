@@ -18,7 +18,6 @@ public enum GentleCustomizeSection: String, CaseIterable {
     }
 }
 
-#if canImport(UIKit)
 public struct GentleDesignCustomizeView: View {
     @GentleDesignRuntime private var design
     @GentleThemeManagerRuntime private var themeManager
@@ -146,4 +145,3 @@ public struct GentleDesignCustomizeView: View {
         }
     }
 }
-#endif

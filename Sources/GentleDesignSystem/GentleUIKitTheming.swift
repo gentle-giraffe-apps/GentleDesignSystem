@@ -1,7 +1,5 @@
 //  Jonathan Ritchey
 import SwiftUI
-
-#if canImport(UIKit)
 import UIKit
 
 // MARK: - UI Kit Theming
@@ -149,5 +147,3 @@ private extension Font.Weight {
         }
     }
 }
-
-#endif
