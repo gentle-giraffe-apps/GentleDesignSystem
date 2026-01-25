@@ -5,7 +5,7 @@ import Observation
 import UIKit
 
 public enum GentleDesignSystemSpecVersion {
-    public static let current = "0.5.0" // color roles: onOverlay, onOverlaySecondary, onDestructive
+    public static let current = "0.6.0" // surface roles: composable properties (colorRole, appleMaterial, useGlass, specularEffect, specularStrength)
 }
 
 // MARK: - Roles
