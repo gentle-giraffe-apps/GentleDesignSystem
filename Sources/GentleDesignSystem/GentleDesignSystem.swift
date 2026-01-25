@@ -121,6 +121,18 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
         case .themeSecondary: return "Theme Secondary"
         }
     }
+
+    /// Color roles typically used for surface backgrounds
+    public static let surfaceColorRoles: [GentleColorRole] = [
+        .background,
+        .surface,
+        .surfaceOverlay
+    ]
+
+    /// Returns true if this color role is typically used for surface backgrounds
+    public var isSurfaceColorRole: Bool {
+        Self.surfaceColorRoles.contains(self)
+    }
 }
 
 public enum GentleButtonRole: String, Codable, Sendable, Identifiable {

@@ -66,6 +66,8 @@ Theme:    themePrimary, themeSecondary
 Border:   borderSubtle
 ```
 
+**Surface Color Roles**: `GentleColorRole.surfaceColorRoles` identifies the subset of color roles appropriate for surface backgrounds: `background`, `surface`, `surfaceOverlay`. Use `role.isSurfaceColorRole` to check if a role is surface-appropriate.
+
 ### GentleButtonRole (5 roles)
 ```
 primary, secondary, tertiary, quaternary, destructive
@@ -83,15 +85,18 @@ solidFillPrimaryCTA, solidFillDestructive, hollow
 
 Determines button background fill and label color strategy.
 
-### GentleSurfaceRole (4 roles)
+### GentleSurfaceRole (9 roles)
 ```
-appBackground, card, cardElevated, surfaceOverlay
+appBackground, card, cardElevated, cardSecondary,
+chrome, overlaySheet, overlayPopover,
+floatingPanel, floatingWidget
 ```
 
 Each surface role is defined by a `GentleSurfaceRoleSpec` containing:
-- `colorRole`: `GentleSurfaceColorRole` (background, surface, surfaceOverlay)
-- `appleMaterial`: `GentleAppleMaterial` (Apple's blur materials)
-- `useGlass`: Bool (iOS 26+ glass effect)
+- `backgroundStyle`: `GentleSurfaceBackgroundStyle` - mutually exclusive:
+  - `.solid(colorRole:)` - solid color
+  - `.material(material:tintColorRole:tintOpacity:)` - Apple blur material
+  - `.glass(fallbackMaterial:fallbackColorRole:)` - iOS 26+ liquid glass
 - `specularEffect`: `GentleSpecularEffect` (noEffect, indent, highlight)
 - `specularStrength`: Double (0.0...1.0)
 - Plus border, corner radius, and shadow properties

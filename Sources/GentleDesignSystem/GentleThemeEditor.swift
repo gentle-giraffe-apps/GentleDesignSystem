@@ -794,7 +794,7 @@ struct SurfaceRoleEditorSheet: View {
                         switch binding.wrappedValue.backgroundStyle {
                         case .solid:
                             Picker("Color Role", selection: solidColorRoleBinding(binding)) {
-                                ForEach(GentleSurfaceColorRole.allCases, id: \.self) { colorRole in
+                                ForEach(GentleColorRole.surfaceColorRoles, id: \.self) { colorRole in
                                     Text(colorRole.displayName).tag(colorRole)
                                 }
                             }
@@ -807,8 +807,8 @@ struct SurfaceRoleEditorSheet: View {
                             }
 
                             Picker("Tint Color", selection: materialTintBinding(binding)) {
-                                Text("None").tag(Optional<GentleSurfaceColorRole>.none)
-                                ForEach(GentleSurfaceColorRole.allCases, id: \.self) { colorRole in
+                                Text("None").tag(Optional<GentleColorRole>.none)
+                                ForEach(GentleColorRole.surfaceColorRoles, id: \.self) { colorRole in
                                     Text(colorRole.displayName).tag(Optional(colorRole))
                                 }
                             }
@@ -833,7 +833,7 @@ struct SurfaceRoleEditorSheet: View {
                             }
 
                             Picker("Fallback Color", selection: glassFallbackColorBinding(binding)) {
-                                ForEach(GentleSurfaceColorRole.allCases, id: \.self) { colorRole in
+                                ForEach(GentleColorRole.surfaceColorRoles, id: \.self) { colorRole in
                                     Text(colorRole.displayName).tag(colorRole)
                                 }
                             }
@@ -1011,7 +1011,7 @@ struct SurfaceRoleEditorSheet: View {
                 switch newType {
                 case .solid:
                     // Extract color role from current style for continuity
-                    let colorRole: GentleSurfaceColorRole
+                    let colorRole: GentleColorRole
                     switch currentStyle {
                     case .solid(let cr): colorRole = cr
                     case .material(_, let tcr, _): colorRole = tcr ?? .surface
@@ -1022,7 +1022,7 @@ struct SurfaceRoleEditorSheet: View {
                 case .material:
                     // Extract values from current style
                     let material: GentleAppleMaterial
-                    let tintColor: GentleSurfaceColorRole?
+                    let tintColor: GentleColorRole?
                     let tintOpacity: Double
                     switch currentStyle {
                     case .solid(let cr):
@@ -1043,7 +1043,7 @@ struct SurfaceRoleEditorSheet: View {
                 case .glass:
                     // Extract values from current style for fallback
                     let fallbackMaterial: GentleAppleMaterial?
-                    let fallbackColor: GentleSurfaceColorRole
+                    let fallbackColor: GentleColorRole
                     switch currentStyle {
                     case .solid(let cr):
                         fallbackMaterial = nil
@@ -1061,7 +1061,7 @@ struct SurfaceRoleEditorSheet: View {
         )
     }
 
-    private func solidColorRoleBinding(_ binding: Binding<GentleSurfaceRoleSpec>) -> Binding<GentleSurfaceColorRole> {
+    private func solidColorRoleBinding(_ binding: Binding<GentleSurfaceRoleSpec>) -> Binding<GentleColorRole> {
         Binding(
             get: {
                 if case .solid(let colorRole) = binding.wrappedValue.backgroundStyle {
@@ -1091,7 +1091,7 @@ struct SurfaceRoleEditorSheet: View {
         )
     }
 
-    private func materialTintBinding(_ binding: Binding<GentleSurfaceRoleSpec>) -> Binding<GentleSurfaceColorRole?> {
+    private func materialTintBinding(_ binding: Binding<GentleSurfaceRoleSpec>) -> Binding<GentleColorRole?> {
         Binding(
             get: {
                 if case .material(_, let tintColorRole, _) = binding.wrappedValue.backgroundStyle {
@@ -1139,7 +1139,7 @@ struct SurfaceRoleEditorSheet: View {
         )
     }
 
-    private func glassFallbackColorBinding(_ binding: Binding<GentleSurfaceRoleSpec>) -> Binding<GentleSurfaceColorRole> {
+    private func glassFallbackColorBinding(_ binding: Binding<GentleSurfaceRoleSpec>) -> Binding<GentleColorRole> {
         Binding(
             get: {
                 if case .glass(_, let fallbackColorRole) = binding.wrappedValue.backgroundStyle {

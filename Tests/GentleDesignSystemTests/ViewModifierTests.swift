@@ -70,7 +70,11 @@ struct GentleSurfaceModifierTests {
 
     @Test("Surface modifier can be created with all roles")
     func testSurfaceModifierCreation() {
-        let roles: [GentleSurfaceRole] = [.appBackground, .card, .cardElevated, .surfaceOverlay]
+        let roles: [GentleSurfaceRole] = [
+            .appBackground, .card, .cardElevated, .cardSecondary,
+            .chrome, .overlaySheet, .overlayPopover,
+            .floatingPanel, .floatingWidget
+        ]
 
         for role in roles {
             _ = GentleSurfaceModifier(role: role)

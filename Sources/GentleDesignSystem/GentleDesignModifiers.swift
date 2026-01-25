@@ -202,7 +202,8 @@ public struct GentleSurfaceModifier: ViewModifier {
                 )
             )
 
-        case .surfaceOverlay:
+        case .chrome:
+            // Edge-to-edge surfaces without shadows
             return AnyView(
                 applyGlassIfNeeded(
                     insetContent
@@ -213,7 +214,19 @@ public struct GentleSurfaceModifier: ViewModifier {
                 )
             )
 
-        case .card, .cardElevated:
+        case .overlaySheet:
+            // Sheets with corner radius but no shadow
+            return AnyView(
+                applyGlassIfNeeded(
+                    insetContent
+                        .background(surfaceBackground(spec: spec))
+                        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)),
+                    spec: spec,
+                    cornerRadius: cornerRadius
+                )
+            )
+
+        case .card, .cardElevated, .cardSecondary, .overlayPopover, .floatingPanel, .floatingWidget:
             let hasBorder = spec.borderWidth > 0 || showTappableHint
             let borderWidth = (showTappableHint && role == .cardElevated) ? 1.0 : CGFloat(spec.borderWidth)
             let hasShadow = spec.shadowRadius > 0
@@ -266,7 +279,7 @@ public struct GentleSurfaceModifier: ViewModifier {
     private func surfaceBackground(spec: GentleSurfaceRoleSpec) -> some View {
         switch spec.backgroundStyle {
         case .solid(let colorRole):
-            theme.color(for: colorRole.colorRole, scheme: colorScheme)
+            theme.color(for: colorRole, scheme: colorScheme)
 
         case .material(let material, let tintColorRole, let tintOpacity):
             if let swiftUIMaterial = material.swiftUIMaterial {
@@ -276,7 +289,7 @@ public struct GentleSurfaceModifier: ViewModifier {
                     Color.clear
                         .background(swiftUIMaterial)
                         .overlay(
-                            theme.color(for: tintColorRole.colorRole, scheme: colorScheme)
+                            theme.color(for: tintColorRole, scheme: colorScheme)
                                 .opacity(tintOpacity)
                         )
                 } else {
@@ -285,7 +298,7 @@ public struct GentleSurfaceModifier: ViewModifier {
             } else {
                 // Fallback if material is somehow invalid
                 if let tintColorRole {
-                    theme.color(for: tintColorRole.colorRole, scheme: colorScheme)
+                    theme.color(for: tintColorRole, scheme: colorScheme)
                         .opacity(tintOpacity)
                 } else {
                     Color.clear
@@ -301,7 +314,7 @@ public struct GentleSurfaceModifier: ViewModifier {
                 if let fallbackMaterial, let swiftUIMaterial = fallbackMaterial.swiftUIMaterial {
                     Color.clear.background(swiftUIMaterial)
                 } else {
-                    theme.color(for: fallbackColorRole.colorRole, scheme: colorScheme)
+                    theme.color(for: fallbackColorRole, scheme: colorScheme)
                 }
             }
         }

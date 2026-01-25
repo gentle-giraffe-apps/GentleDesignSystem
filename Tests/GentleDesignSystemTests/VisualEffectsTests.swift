@@ -694,7 +694,7 @@ struct GentleSurfaceTokensTests {
     @Test("Default surface tokens contain all roles")
     func testDefaultSurfaceTokensContainAllRoles() {
         let tokens = GentleSurfaceTokens.gentleDefault
-        let roles: [GentleSurfaceRole] = [.appBackground, .card, .cardElevated, .surfaceOverlay]
+        let roles: [GentleSurfaceRole] = [.appBackground, .card, .cardElevated, .cardSecondary, .chrome, .overlaySheet, .overlayPopover, .floatingPanel, .floatingWidget]
 
         for role in roles {
             let spec = tokens.roleSpec(for: role)
@@ -745,7 +745,7 @@ struct GentleSurfaceTokensTests {
         let data = try encoder.encode(original)
         let decoded = try decoder.decode(GentleSurfaceTokens.self, from: data)
 
-        let roles: [GentleSurfaceRole] = [.appBackground, .card, .cardElevated, .surfaceOverlay]
+        let roles: [GentleSurfaceRole] = [.appBackground, .card, .cardElevated, .cardSecondary, .chrome, .overlaySheet, .overlayPopover, .floatingPanel, .floatingWidget]
         for role in roles {
             let originalSpec = original.roleSpec(for: role)
             let decodedSpec = decoded.roleSpec(for: role)
@@ -784,7 +784,7 @@ struct MaterialJSONRoundTripTests {
         let decoded = try GentleDesignSystemSpec.fromJSONData(jsonData)
 
         // Verify surfaces
-        let roles: [GentleSurfaceRole] = [.appBackground, .card, .cardElevated, .surfaceOverlay]
+        let roles: [GentleSurfaceRole] = [.appBackground, .card, .cardElevated, .cardSecondary, .chrome, .overlaySheet, .overlayPopover, .floatingPanel, .floatingWidget]
         for role in roles {
             let originalSpec = original.surfaces.roleSpec(for: role)
             let decodedSpec = decoded.surfaces.roleSpec(for: role)

@@ -3,39 +3,22 @@ import Foundation
 import SwiftUI
 
 public enum GentleSurfaceRole: String, Codable, Sendable {
+    // Structure
     case appBackground
     case card
     case cardElevated
-    case surfaceOverlay
-}
+    case cardSecondary
 
-// MARK: - Surface Color Role
+    // Chrome (navigation elements)
+    case chrome             // Nav bars, tab bars, toolbars - ultraThin material
 
-/// Restricted color roles for surface backgrounds.
-/// Maps to GentleColorRole but limited to surface-appropriate colors.
-public enum GentleSurfaceColorRole: String, Codable, Sendable, CaseIterable, Identifiable {
-    case background
-    case surface
-    case surfaceOverlay
+    // Overlays
+    case overlaySheet       // Modal sheets - regular material or glass
+    case overlayPopover     // Menus, popovers, dropdowns - regular material
 
-    public var id: String { rawValue }
-
-    public var displayName: String {
-        switch self {
-        case .background: return "Background"
-        case .surface: return "Surface"
-        case .surfaceOverlay: return "Surface Overlay"
-        }
-    }
-
-    /// Maps to the corresponding GentleColorRole
-    public var colorRole: GentleColorRole {
-        switch self {
-        case .background: return .background
-        case .surface: return .surface
-        case .surfaceOverlay: return .surfaceOverlay
-        }
-    }
+    // Floating
+    case floatingPanel      // Picture-in-picture, floating panels - glass
+    case floatingWidget     // Home screen widget style - glass
 }
 
 // MARK: - Apple Material
@@ -103,16 +86,16 @@ public enum GentleSpecularEffect: String, Codable, Sendable, CaseIterable, Ident
 /// Mutually exclusive options that make the relationship between solid, material, and glass explicit.
 public enum GentleSurfaceBackgroundStyle: Codable, Sendable, Equatable {
     /// Solid color background
-    case solid(colorRole: GentleSurfaceColorRole)
+    case solid(colorRole: GentleColorRole)
 
     /// Apple blur material with optional tint color
     /// - material: The Apple blur material to use
     /// - tintColorRole: Optional color to tint the material
     /// - tintOpacity: Opacity of the tint (0.0...1.0), typically ~0.1 to allow blur to show through
-    case material(material: GentleAppleMaterial, tintColorRole: GentleSurfaceColorRole?, tintOpacity: Double)
+    case material(material: GentleAppleMaterial, tintColorRole: GentleColorRole?, tintOpacity: Double)
 
     /// iOS 26+ glass effect with fallback for older iOS versions
-    case glass(fallbackMaterial: GentleAppleMaterial?, fallbackColorRole: GentleSurfaceColorRole)
+    case glass(fallbackMaterial: GentleAppleMaterial?, fallbackColorRole: GentleColorRole)
 
     // MARK: - Coding
 
@@ -138,18 +121,18 @@ public enum GentleSurfaceBackgroundStyle: Codable, Sendable, Equatable {
 
         switch type {
         case .solid:
-            let colorRole = try container.decode(GentleSurfaceColorRole.self, forKey: .colorRole)
+            let colorRole = try container.decode(GentleColorRole.self, forKey: .colorRole)
             self = .solid(colorRole: colorRole)
 
         case .material:
             let material = try container.decode(GentleAppleMaterial.self, forKey: .material)
-            let tintColorRole = try container.decodeIfPresent(GentleSurfaceColorRole.self, forKey: .tintColorRole)
+            let tintColorRole = try container.decodeIfPresent(GentleColorRole.self, forKey: .tintColorRole)
             let tintOpacity = try container.decodeIfPresent(Double.self, forKey: .tintOpacity) ?? 0.1
             self = .material(material: material, tintColorRole: tintColorRole, tintOpacity: tintOpacity)
 
         case .glass:
             let fallbackMaterial = try container.decodeIfPresent(GentleAppleMaterial.self, forKey: .fallbackMaterial)
-            let fallbackColorRole = try container.decode(GentleSurfaceColorRole.self, forKey: .fallbackColorRole)
+            let fallbackColorRole = try container.decode(GentleColorRole.self, forKey: .fallbackColorRole)
             self = .glass(fallbackMaterial: fallbackMaterial, fallbackColorRole: fallbackColorRole)
         }
     }
@@ -288,7 +271,7 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
         }
         // Migration: if old flat properties exist (colorRole, appleMaterial, useGlass)
         else if container.contains(.colorRole) || container.contains(.appleMaterial) || container.contains(.useGlass) {
-            let colorRole = try container.decodeIfPresent(GentleSurfaceColorRole.self, forKey: .colorRole) ?? .surface
+            let colorRole = try container.decodeIfPresent(GentleColorRole.self, forKey: .colorRole) ?? .surface
             let appleMaterial = try container.decodeIfPresent(GentleAppleMaterial.self, forKey: .appleMaterial) ?? .noMaterial
             let useGlass = try container.decodeIfPresent(Bool.self, forKey: .useGlass) ?? false
 
@@ -378,11 +361,58 @@ public extension GentleSurfaceTokens {
                 shadowOpacity: 0.08,
                 shadowOffsetY: 6
             ),
-            GentleSurfaceRole.surfaceOverlay.rawValue: .init(
-                backgroundStyle: .material(material: .regular, tintColorRole: .surfaceOverlay, tintOpacity: 0.1),
+            GentleSurfaceRole.cardSecondary.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceOverlay),
+                specularEffect: .indent,
+                specularStrength: 0.05,
+                border: GentleColorPair(lightHex: "#E5E7EB40", darkHex: "#37415140"),
+                cornerRadius: 12,
+                borderWidth: 0.5
+            ),
+
+            // Chrome
+            GentleSurfaceRole.chrome.rawValue: .init(
+                backgroundStyle: .material(material: .ultraThin, tintColorRole: nil, tintOpacity: 0),
                 border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
                 cornerRadius: 0,
                 borderWidth: 0
+            ),
+
+            // Overlays
+            GentleSurfaceRole.overlaySheet.rawValue: .init(
+                backgroundStyle: .material(material: .regular, tintColorRole: .surfaceOverlay, tintOpacity: 0.1),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 32,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.overlayPopover.rawValue: .init(
+                backgroundStyle: .material(material: .regular, tintColorRole: .surface, tintOpacity: 0.15),
+                border: GentleColorPair(lightHex: "#E5E7EB30", darkHex: "#37415130"),
+                cornerRadius: 14,
+                borderWidth: 0.5,
+                shadowRadius: 16,
+                shadowOpacity: 0.15,
+                shadowOffsetY: 8
+            ),
+
+            // Floating
+            GentleSurfaceRole.floatingPanel.rawValue: .init(
+                backgroundStyle: .glass(fallbackMaterial: .regular, fallbackColorRole: .surface),
+                border: GentleColorPair(lightHex: "#FFFFFF20", darkHex: "#FFFFFF10"),
+                cornerRadius: 20,
+                borderWidth: 0.5,
+                shadowRadius: 24,
+                shadowOpacity: 0.2,
+                shadowOffsetY: 12
+            ),
+            GentleSurfaceRole.floatingWidget.rawValue: .init(
+                backgroundStyle: .glass(fallbackMaterial: .thick, fallbackColorRole: .surface),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 24,
+                borderWidth: 0,
+                shadowRadius: 8,
+                shadowOpacity: 0.1,
+                shadowOffsetY: 4
             )
         ]
     )
