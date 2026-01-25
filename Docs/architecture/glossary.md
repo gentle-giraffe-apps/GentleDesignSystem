@@ -24,11 +24,11 @@
 
 | Type | What it defines |
 |------|-----------------|
-| `GentleTextRole` | Typography intent (13 roles) |
-| `GentleColorRole` | Color intent (15 roles) |
-| `GentleButtonRole` | Button style intent (4 roles) |
+| `GentleTextRole` | Typography intent (17 roles) |
+| `GentleColorRole` | Color intent (17 roles) |
+| `GentleButtonRole` | Button style intent (5 roles) |
 | `GentleButtonAnimationRole` | Button animation feel (6 roles) |
-| `GentleSurfaceRole` | Container/background intent (5 roles) |
+| `GentleSurfaceRole` | Container/background intent (4 roles) |
 | `GentleInsetRole` | Padding intent (4 roles) |
 | `GentleGapIntent` | Spacing intent (7 levels) |
 
@@ -39,6 +39,7 @@
 | `GentleColorTokens` | Map of role → `GentleColorPair` (light/dark hex) |
 | `GentleTypographyTokens` | Map of role → `GentleTypographyRoleSpec` |
 | `GentleButtonTokens` | Map of role → `GentleButtonRoleSpec` + animations |
+| `GentleSurfaceTokens` | Map of role → `GentleSurfaceRoleSpec` |
 | `GentleLayoutTokens` | Spacing scales, gaps, insets |
 | `GentleVisualTokens` | Radii, shadows |
 

@@ -13,6 +13,10 @@
 
 | Task | Read First |
 |------|------------|
+| Find a type/file | [docs/architecture/type-inventory.md](architecture/type-inventory.md) |
+| Use the API | [docs/architecture/api-quick-ref.md](architecture/api-quick-ref.md) |
+| Check default values | [docs/architecture/defaults-reference.md](architecture/defaults-reference.md) |
+| Add/modify tokens | [docs/architecture/common-tasks.md](architecture/common-tasks.md) |
 | Structural changes | [docs/architecture/repo-map.md](architecture/repo-map.md) |
 | Token/theming work | [docs/architecture/design-tokens.md](architecture/design-tokens.md) |
 | Boundary questions | [docs/architecture/architecture.md](architecture/architecture.md) |
@@ -66,6 +70,10 @@ cd Demo && bundle exec fastlane ios build  # Build demo
 
 | Topic | File |
 |-------|------|
+| All types by file | `docs/architecture/type-inventory.md` |
+| API signatures | `docs/architecture/api-quick-ref.md` |
+| Default values | `docs/architecture/defaults-reference.md` |
+| How-to guides | `docs/architecture/common-tasks.md` |
 | File locations | `docs/architecture/repo-map.md` |
 | Architecture | `docs/architecture/architecture.md` |
 | Token model | `docs/architecture/design-tokens.md` |
