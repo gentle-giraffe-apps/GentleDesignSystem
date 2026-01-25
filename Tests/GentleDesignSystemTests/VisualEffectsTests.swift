@@ -5,24 +5,24 @@ import SwiftUI
 
 // MARK: - Test Error
 
-enum MaterialTestError: Error {
+enum VisualEffectTestError: Error {
     case invalidTestData(String)
 }
 
-// MARK: - GentleDesignMaterial Tests
+// MARK: - GentleVisualEffectRecipe Tests
 
-@Suite("GentleDesignMaterial Tests")
-struct GentleDesignMaterialTests {
+@Suite("GentleVisualEffectRecipe Tests")
+struct GentleVisualEffectRecipeTests {
 
-    @Test("Material can be created with solid base")
-    func testMaterialWithSolidBase() {
-        let material = GentleDesignMaterial(
+    @Test("Recipe can be created with solid base")
+    func testRecipeWithSolidBase() {
+        let recipe = GentleVisualEffectRecipe(
             id: "testSolid",
             base: .solid(GentleColorPair(lightHex: "#FFFFFF", darkHex: "#000000"))
         )
 
-        #expect(material.id == "testSolid")
-        if case .solid(let colorPair) = material.base {
+        #expect(recipe.id == "testSolid")
+        if case .solid(let colorPair) = recipe.base {
             #expect(colorPair.lightHex == "#FFFFFF")
             #expect(colorPair.darkHex == "#000000")
         } else {
@@ -30,9 +30,9 @@ struct GentleDesignMaterialTests {
         }
     }
 
-    @Test("Material can be created with all optional properties")
-    func testMaterialWithAllProperties() {
-        let material = GentleDesignMaterial(
+    @Test("Recipe can be created with all optional properties")
+    func testRecipeWithAllProperties() {
+        let recipe = GentleVisualEffectRecipe(
             id: "testFull",
             base: .solid(GentleColorPair(lightHex: "#FFFFFF", darkHex: "#000000")),
             tint: GentleColorPair(lightHex: "#FF000010", darkHex: "#00FF0010"),
@@ -40,44 +40,44 @@ struct GentleDesignMaterialTests {
             innerEdges: GentleInnerEdgeSpec(highlightOpacity: 0.15, shadowOpacity: 0.08, inset: 2.0, blur: 8.0)
         )
 
-        #expect(material.id == "testFull")
-        #expect(material.tint != nil)
-        #expect(material.specular != nil)
-        #expect(material.innerEdges != nil)
+        #expect(recipe.id == "testFull")
+        #expect(recipe.tint != nil)
+        #expect(recipe.specular != nil)
+        #expect(recipe.innerEdges != nil)
     }
 
-    @Test("Material is identifiable")
-    func testMaterialIdentifiable() {
-        let material = GentleDesignMaterial(
+    @Test("Recipe is identifiable")
+    func testRecipeIdentifiable() {
+        let recipe = GentleVisualEffectRecipe(
             id: "uniqueId",
             base: .solid(GentleColorPair(lightHex: "#FFFFFF", darkHex: "#000000"))
         )
 
-        #expect(material.id == "uniqueId")
+        #expect(recipe.id == "uniqueId")
     }
 
-    @Test("Material is equatable")
-    func testMaterialEquatable() {
-        let material1 = GentleDesignMaterial(
+    @Test("Recipe is equatable")
+    func testRecipeEquatable() {
+        let recipe1 = GentleVisualEffectRecipe(
             id: "test",
             base: .solid(GentleColorPair(lightHex: "#FFFFFF", darkHex: "#000000"))
         )
-        let material2 = GentleDesignMaterial(
+        let recipe2 = GentleVisualEffectRecipe(
             id: "test",
             base: .solid(GentleColorPair(lightHex: "#FFFFFF", darkHex: "#000000"))
         )
-        let material3 = GentleDesignMaterial(
+        let recipe3 = GentleVisualEffectRecipe(
             id: "different",
             base: .solid(GentleColorPair(lightHex: "#FFFFFF", darkHex: "#000000"))
         )
 
-        #expect(material1 == material2)
-        #expect(material1 != material3)
+        #expect(recipe1 == recipe2)
+        #expect(recipe1 != recipe3)
     }
 
-    @Test("Material is codable with solid base")
-    func testMaterialCodableSolid() throws {
-        let original = GentleDesignMaterial(
+    @Test("Recipe is codable with solid base")
+    func testRecipeCodableSolid() throws {
+        let original = GentleVisualEffectRecipe(
             id: "testSolid",
             base: .solid(GentleColorPair(lightHex: "#FF0000", darkHex: "#00FF00"))
         )
@@ -86,7 +86,7 @@ struct GentleDesignMaterialTests {
         let decoder = JSONDecoder()
 
         let data = try encoder.encode(original)
-        let decoded = try decoder.decode(GentleDesignMaterial.self, from: data)
+        let decoded = try decoder.decode(GentleVisualEffectRecipe.self, from: data)
 
         #expect(decoded.id == original.id)
         if case .solid(let colorPair) = decoded.base {
@@ -97,9 +97,9 @@ struct GentleDesignMaterialTests {
         }
     }
 
-    @Test("Material is codable with appleMaterial base")
-    func testMaterialCodableAppleMaterial() throws {
-        let original = GentleDesignMaterial(
+    @Test("Recipe is codable with appleMaterial base")
+    func testRecipeCodableAppleMaterial() throws {
+        let original = GentleVisualEffectRecipe(
             id: "testApple",
             base: .appleMaterial(GentleAppleMaterialSpec(kind: .regular, opacity: 0.8))
         )
@@ -108,7 +108,7 @@ struct GentleDesignMaterialTests {
         let decoder = JSONDecoder()
 
         let data = try encoder.encode(original)
-        let decoded = try decoder.decode(GentleDesignMaterial.self, from: data)
+        let decoded = try decoder.decode(GentleVisualEffectRecipe.self, from: data)
 
         #expect(decoded.id == original.id)
         if case .appleMaterial(let spec) = decoded.base {
@@ -119,9 +119,9 @@ struct GentleDesignMaterialTests {
         }
     }
 
-    @Test("Material is codable with blur base")
-    func testMaterialCodableBlur() throws {
-        let original = GentleDesignMaterial(
+    @Test("Recipe is codable with blur base")
+    func testRecipeCodableBlur() throws {
+        let original = GentleVisualEffectRecipe(
             id: "testBlur",
             base: .blur(GentleBlurSpec(radius: 15, isBackgroundOnly: true, opacity: 0.9))
         )
@@ -130,7 +130,7 @@ struct GentleDesignMaterialTests {
         let decoder = JSONDecoder()
 
         let data = try encoder.encode(original)
-        let decoded = try decoder.decode(GentleDesignMaterial.self, from: data)
+        let decoded = try decoder.decode(GentleVisualEffectRecipe.self, from: data)
 
         #expect(decoded.id == original.id)
         if case .blur(let spec) = decoded.base {
@@ -142,9 +142,9 @@ struct GentleDesignMaterialTests {
         }
     }
 
-    @Test("Material is codable with glass base")
-    func testMaterialCodableGlass() throws {
-        let original = GentleDesignMaterial(
+    @Test("Recipe is codable with glass base")
+    func testRecipeCodableGlass() throws {
+        let original = GentleVisualEffectRecipe(
             id: "testGlass",
             base: .glass(GentleGlassSpec(style: .clear, isInteractive: true, tint: nil))
         )
@@ -153,7 +153,7 @@ struct GentleDesignMaterialTests {
         let decoder = JSONDecoder()
 
         let data = try encoder.encode(original)
-        let decoded = try decoder.decode(GentleDesignMaterial.self, from: data)
+        let decoded = try decoder.decode(GentleVisualEffectRecipe.self, from: data)
 
         #expect(decoded.id == original.id)
         if case .glass(let spec) = decoded.base {
@@ -164,31 +164,31 @@ struct GentleDesignMaterialTests {
         }
     }
 
-    @Test("Material decoding throws on invalid JSON")
-    func testMaterialDecodingThrowsOnInvalid() throws {
+    @Test("Recipe decoding throws on invalid JSON")
+    func testRecipeDecodingThrowsOnInvalid() throws {
         let jsonString = """
         {"id": "test", "base": {"invalid": "data"}}
         """
         guard let invalidJSON = jsonString.data(using: .utf8) else {
-            throw MaterialTestError.invalidTestData("Could not convert JSON string to data")
+            throw VisualEffectTestError.invalidTestData("Could not convert JSON string to data")
         }
 
         let decoder = JSONDecoder()
 
         #expect(throws: DecodingError.self) {
-            _ = try decoder.decode(GentleDesignMaterial.self, from: invalidJSON)
+            _ = try decoder.decode(GentleVisualEffectRecipe.self, from: invalidJSON)
         }
     }
 }
 
-// MARK: - GentleMaterialBaseSpec Tests
+// MARK: - GentleVisualEffectBase Tests
 
-@Suite("GentleMaterialBaseSpec Tests")
-struct GentleMaterialBaseSpecTests {
+@Suite("GentleVisualEffectBase Tests")
+struct GentleVisualEffectBaseTests {
 
     @Test("Solid base spec stores color pair")
     func testSolidBase() {
-        let base = GentleMaterialBaseSpec.solid(GentleColorPair(lightHex: "#AABBCC", darkHex: "#112233"))
+        let base = GentleVisualEffectBase.solid(GentleColorPair(lightHex: "#AABBCC", darkHex: "#112233"))
 
         if case .solid(let colorPair) = base {
             #expect(colorPair.lightHex == "#AABBCC")
@@ -200,7 +200,7 @@ struct GentleMaterialBaseSpecTests {
 
     @Test("AppleMaterial base spec stores spec")
     func testAppleMaterialBase() {
-        let base = GentleMaterialBaseSpec.appleMaterial(GentleAppleMaterialSpec(kind: .thick, opacity: 0.5))
+        let base = GentleVisualEffectBase.appleMaterial(GentleAppleMaterialSpec(kind: .thick, opacity: 0.5))
 
         if case .appleMaterial(let spec) = base {
             #expect(spec.kind == .thick)
@@ -212,7 +212,7 @@ struct GentleMaterialBaseSpecTests {
 
     @Test("Blur base spec stores spec")
     func testBlurBase() {
-        let base = GentleMaterialBaseSpec.blur(GentleBlurSpec(radius: 20, isBackgroundOnly: false, opacity: 0.7))
+        let base = GentleVisualEffectBase.blur(GentleBlurSpec(radius: 20, isBackgroundOnly: false, opacity: 0.7))
 
         if case .blur(let spec) = base {
             #expect(spec.radius == 20)
@@ -226,7 +226,7 @@ struct GentleMaterialBaseSpecTests {
     @Test("Glass base spec stores spec")
     func testGlassBase() {
         let tint = GentleColorPair(lightHex: "#FF000020", darkHex: "#0000FF20")
-        let base = GentleMaterialBaseSpec.glass(GentleGlassSpec(style: .identity, isInteractive: false, tint: tint))
+        let base = GentleVisualEffectBase.glass(GentleGlassSpec(style: .identity, isInteractive: false, tint: tint))
 
         if case .glass(let spec) = base {
             #expect(spec.style == .identity)
@@ -239,9 +239,9 @@ struct GentleMaterialBaseSpecTests {
 
     @Test("Base spec is equatable")
     func testBaseSpecEquatable() {
-        let base1 = GentleMaterialBaseSpec.solid(GentleColorPair(lightHex: "#FFF", darkHex: "#000"))
-        let base2 = GentleMaterialBaseSpec.solid(GentleColorPair(lightHex: "#FFF", darkHex: "#000"))
-        let base3 = GentleMaterialBaseSpec.appleMaterial(GentleAppleMaterialSpec(kind: .regular, opacity: 1.0))
+        let base1 = GentleVisualEffectBase.solid(GentleColorPair(lightHex: "#FFF", darkHex: "#000"))
+        let base2 = GentleVisualEffectBase.solid(GentleColorPair(lightHex: "#FFF", darkHex: "#000"))
+        let base3 = GentleVisualEffectBase.appleMaterial(GentleAppleMaterialSpec(kind: .regular, opacity: 1.0))
 
         #expect(base1 == base2)
         #expect(base1 != base3)
@@ -297,7 +297,7 @@ struct GentleAppleMaterialSpecTests {
         {"kind": "invalidKind", "opacity": 1.0}
         """
         guard let invalidJSON = jsonString.data(using: .utf8) else {
-            throw MaterialTestError.invalidTestData("Could not convert JSON string to data")
+            throw VisualEffectTestError.invalidTestData("Could not convert JSON string to data")
         }
 
         let decoder = JSONDecoder()
@@ -398,7 +398,7 @@ struct GentleGlassSpecTests {
         {"style": "invalidStyle", "isInteractive": false}
         """
         guard let invalidJSON = jsonString.data(using: .utf8) else {
-            throw MaterialTestError.invalidTestData("Could not convert JSON string to data")
+            throw VisualEffectTestError.invalidTestData("Could not convert JSON string to data")
         }
 
         let decoder = JSONDecoder()
@@ -558,9 +558,9 @@ struct GentleSurfaceRoleSpecTests {
     func testSurfaceRoleSpec() {
         let border = GentleColorPair(lightHex: "#CCCCCC", darkHex: "#333333")
 
-        let spec = GentleSurfaceRoleSpec(materialRole: .surface, border: border)
+        let spec = GentleSurfaceRoleSpec(visualEffect: .surface, border: border)
 
-        #expect(spec.materialRole == .surface)
+        #expect(spec.visualEffect == .surface)
         #expect(spec.border.lightHex == "#CCCCCC")
     }
 
@@ -568,7 +568,7 @@ struct GentleSurfaceRoleSpecTests {
     func testSurfaceRoleSpecDefaults() {
         let border = GentleColorPair(lightHex: "#CCCCCC", darkHex: "#333333")
 
-        let spec = GentleSurfaceRoleSpec(materialRole: .surface, border: border)
+        let spec = GentleSurfaceRoleSpec(visualEffect: .surface, border: border)
 
         #expect(spec.cornerRadius == 20)
         #expect(spec.borderWidth == 1)
@@ -581,7 +581,7 @@ struct GentleSurfaceRoleSpecTests {
     @Test("Surface role spec with all properties")
     func testSurfaceRoleSpecAllProperties() {
         let spec = GentleSurfaceRoleSpec(
-            materialRole: .surface,
+            visualEffect: .surface,
             border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
             cornerRadius: 24,
             borderWidth: 0.5,
@@ -602,7 +602,7 @@ struct GentleSurfaceRoleSpecTests {
     @Test("Surface role spec is codable")
     func testSurfaceRoleSpecCodable() throws {
         let original = GentleSurfaceRoleSpec(
-            materialRole: .surface,
+            visualEffect: .surface,
             border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
             cornerRadius: 16,
             borderWidth: 1.5
@@ -614,7 +614,7 @@ struct GentleSurfaceRoleSpecTests {
         let data = try encoder.encode(original)
         let decoded = try decoder.decode(GentleSurfaceRoleSpec.self, from: data)
 
-        #expect(decoded.materialRole == .surface)
+        #expect(decoded.visualEffect == .surface)
         #expect(decoded.cornerRadius == 16)
         #expect(decoded.borderWidth == 1.5)
     }
@@ -622,7 +622,7 @@ struct GentleSurfaceRoleSpecTests {
     @Test("Surface role spec with material role is codable")
     func testSurfaceRoleSpecWithMaterialRoleCodable() throws {
         let original = GentleSurfaceRoleSpec(
-            materialRole: .surfaceOverlay,
+            visualEffect: .surfaceOverlay,
             border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000")
         )
 
@@ -632,7 +632,7 @@ struct GentleSurfaceRoleSpecTests {
         let data = try encoder.encode(original)
         let decoded = try decoder.decode(GentleSurfaceRoleSpec.self, from: data)
 
-        #expect(decoded.materialRole == .surfaceOverlay)
+        #expect(decoded.visualEffect == .surfaceOverlay)
     }
 }
 
@@ -648,7 +648,7 @@ struct GentleSurfaceTokensTests {
 
         for role in roles {
             let spec = tokens.roleSpec(for: role)
-            #expect(!spec.materialRole.rawValue.isEmpty, "Missing surface spec for role: \(role)")
+            #expect(!spec.visualEffect.rawValue.isEmpty, "Missing surface spec for role: \(role)")
         }
     }
 
@@ -656,14 +656,14 @@ struct GentleSurfaceTokensTests {
     func testSurfaceTokensFallbackToCard() {
         let tokens = GentleSurfaceTokens(roles: [
             GentleSurfaceRole.card.rawValue: GentleSurfaceRoleSpec(
-                materialRole: .surface,
+                visualEffect: .surface,
                 border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151")
             )
         ])
 
         // Request missing role should fallback to card
         let spec = tokens.roleSpec(for: .appBackground)
-        #expect(spec.materialRole == .surface)
+        #expect(spec.visualEffect == .surface)
     }
 
     @Test("Surface tokens fallback to hardcoded defaults when empty")
@@ -671,7 +671,7 @@ struct GentleSurfaceTokensTests {
         let tokens = GentleSurfaceTokens(roles: [:])
         let spec = tokens.roleSpec(for: .card)
 
-        #expect(spec.materialRole == .surface)
+        #expect(spec.visualEffect == .surface)
     }
 
     @Test("Surface tokens are codable")
@@ -687,7 +687,7 @@ struct GentleSurfaceTokensTests {
         for role in roles {
             let originalSpec = original.roleSpec(for: role)
             let decodedSpec = decoded.roleSpec(for: role)
-            #expect(originalSpec.materialRole == decodedSpec.materialRole)
+            #expect(originalSpec.visualEffect == decodedSpec.visualEffect)
             #expect(originalSpec.cornerRadius == decodedSpec.cornerRadius)
         }
     }
@@ -698,7 +698,7 @@ struct GentleSurfaceTokensTests {
         {"roles": {"card": {"invalid": "structure"}}}
         """
         guard let invalidJSON = jsonString.data(using: .utf8) else {
-            throw MaterialTestError.invalidTestData("Could not convert JSON string to data")
+            throw VisualEffectTestError.invalidTestData("Could not convert JSON string to data")
         }
 
         let decoder = JSONDecoder()
@@ -711,7 +711,7 @@ struct GentleSurfaceTokensTests {
 
 // MARK: - Material JSON Round-Trip Tests
 
-@Suite("Material JSON Round-Trip Tests")
+@Suite("Visual Effect JSON Round-Trip Tests")
 struct MaterialJSONRoundTripTests {
 
     @Test("Full spec with materials round-trips through JSON")
@@ -727,7 +727,7 @@ struct MaterialJSONRoundTripTests {
             let originalSpec = original.surfaces.roleSpec(for: role)
             let decodedSpec = decoded.surfaces.roleSpec(for: role)
 
-            #expect(originalSpec.materialRole == decodedSpec.materialRole)
+            #expect(originalSpec.visualEffect == decodedSpec.visualEffect)
             #expect(originalSpec.cornerRadius == decodedSpec.cornerRadius)
             #expect(originalSpec.borderWidth == decodedSpec.borderWidth)
             #expect(originalSpec.shadowRadius == decodedSpec.shadowRadius)
@@ -738,9 +738,9 @@ struct MaterialJSONRoundTripTests {
     func testCustomSpecWithMaterialRoleRoundTrip() throws {
         var spec = GentleDesignSystemSpec.gentleDefault
 
-        // Replace card with a different material role
+        // Replace card with a different visual effect
         spec.surfaces.roles[GentleSurfaceRole.card.rawValue] = GentleSurfaceRoleSpec(
-            materialRole: .surfaceOverlay,
+            visualEffect: .surfaceOverlay,
             border: GentleColorPair(lightHex: "#FFFFFF20", darkHex: "#00000020"),
             cornerRadius: 16
         )
@@ -749,7 +749,7 @@ struct MaterialJSONRoundTripTests {
         let decoded = try GentleDesignSystemSpec.fromJSONData(jsonData)
 
         let decodedCardSpec = decoded.surfaces.roleSpec(for: .card)
-        #expect(decodedCardSpec.materialRole == .surfaceOverlay)
+        #expect(decodedCardSpec.visualEffect == .surfaceOverlay)
     }
 
     @Test("Spec JSON contains surfaces key")
@@ -758,6 +758,6 @@ struct MaterialJSONRoundTripTests {
         let jsonString = try spec.encodedJSONString()
 
         #expect(jsonString.contains("\"surfaces\""))
-        #expect(jsonString.contains("\"materialRole\""))
+        #expect(jsonString.contains("\"visualEffect\""))
     }
 }

@@ -265,7 +265,7 @@ public struct GentleButtonPreview: View {
     private func miniatureBody(spec: GentleButtonRoleSpec) -> some View {
         // Derive colors from material role
         let (backgroundColor, iconColorRole): (Color, GentleColorRole) = {
-            switch spec.materialRole {
+            switch spec.fillRole {
             case .solidFillPrimaryCTA:
                 return (theme.color(for: .primaryCTA, scheme: colorScheme), .onPrimaryCTA)
             case .solidFillDestructive:
@@ -338,7 +338,7 @@ public struct GentleButtonPreview: View {
 
         // Derive colors from material role
         let (backgroundColor, labelColorRole): (Color, GentleColorRole) = {
-            switch spec.materialRole {
+            switch spec.fillRole {
             case .solidFillPrimaryCTA:
                 return (theme.color(for: .primaryCTA, scheme: colorScheme), .onPrimaryCTA)
             case .solidFillDestructive:
@@ -473,7 +473,7 @@ struct ButtonRoleEditorSheet: View {
     @State private var didSave = false
 
     private let shapes: [GentleButtonShape] = [.rounded, .pill]
-    private let materialRoles: [GentleButtonMaterialRole] = GentleButtonMaterialRole.allCases
+    private let fillRoles: [GentleButtonFillRole] = GentleButtonFillRole.allCases
     private let borderRoles: [GentleButtonBorderRole] = GentleButtonBorderRole.allCases
     private let animationRoles: [GentleButtonAnimationRole] = GentleButtonAnimationRole.allCases
 
@@ -515,13 +515,13 @@ struct ButtonRoleEditorSheet: View {
                         }
                         .disabled(binding.usesNativeStyle.wrappedValue)
 
-                        Picker("Material", selection: binding.materialRole) {
-                            ForEach(materialRoles, id: \.self) { material in
-                                Text(material.displayName).tag(material)
+                        Picker("Fill", selection: binding.fillRole) {
+                            ForEach(fillRoles, id: \.self) { fill in
+                                Text(fill.displayName).tag(fill)
                             }
                         }
                         .disabled(binding.usesNativeStyle.wrappedValue)
-                        .onChange(of: binding.materialRole.wrappedValue) { _, newValue in
+                        .onChange(of: binding.fillRole.wrappedValue) { _, newValue in
                             // Solid fills don't need borders
                             if newValue != .hollow {
                                 binding.borderRole.wrappedValue = .hidden
@@ -529,7 +529,7 @@ struct ButtonRoleEditorSheet: View {
                         }
 
                         // Only show border picker for hollow buttons
-                        if binding.materialRole.wrappedValue == .hollow {
+                        if binding.fillRole.wrappedValue == .hollow {
                             Picker("Border", selection: binding.borderRole) {
                                 ForEach(borderRoles, id: \.self) { border in
                                     Text(border.displayName).tag(border)
@@ -722,9 +722,9 @@ struct SurfaceRoleEditorSheet: View {
                 .padding(.vertical, design.layout.gap.s)
 
                 List {
-                    Section("Material") {
-                        Picker("Material", selection: binding.materialRole) {
-                            ForEach(GentleDesignMaterialRole.allCases, id: \.self) { role in
+                    Section("Visual Effect") {
+                        Picker("Visual Effect", selection: binding.visualEffect) {
+                            ForEach(GentleVisualEffect.allCases, id: \.self) { role in
                                 Text(role.displayName).tag(role)
                             }
                         }
@@ -856,7 +856,7 @@ private enum MaterialBaseType: String, CaseIterable {
     case blur = "Blur"
     case glass = "Glass"
 
-    static func from(_ base: GentleMaterialBaseSpec) -> MaterialBaseType {
+    static func from(_ base: GentleVisualEffectBase) -> MaterialBaseType {
         switch base {
         case .solid: return .solid
         case .appleMaterial: return .appleMaterial
@@ -867,7 +867,7 @@ private enum MaterialBaseType: String, CaseIterable {
 }
 
 struct SurfaceMaterialEditor: View {
-    @Binding var binding: GentleDesignMaterial
+    @Binding var binding: GentleVisualEffectRecipe
 
     var body: some View {
         let baseType = MaterialBaseType.from(binding.base)

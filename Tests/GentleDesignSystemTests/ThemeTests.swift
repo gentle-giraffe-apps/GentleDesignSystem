@@ -117,7 +117,7 @@ struct GentleThemeExtendedTests {
         let theme = GentleTheme.default
 
         let buttons = theme.buttons
-        #expect(buttons.roleSpec(for: .primary).materialRole == .solidFillPrimaryCTA)
+        #expect(buttons.roleSpec(for: .primary).fillRole == .solidFillPrimaryCTA)
     }
 
     @Test("Theme inset accessor works")
@@ -332,7 +332,7 @@ struct GentleDesignRuntimeTests {
         let theme = GentleTheme.default
         let resolver = GentleDesignRuntime.Resolver(theme: theme, colorScheme: .light)
 
-        #expect(resolver.buttons.roleSpec(for: .primary).materialRole == .solidFillPrimaryCTA)
+        #expect(resolver.buttons.roleSpec(for: .primary).fillRole == .solidFillPrimaryCTA)
     }
 
     @Test("Resolver color function works")

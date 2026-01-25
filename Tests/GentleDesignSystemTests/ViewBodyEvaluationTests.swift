@@ -1065,11 +1065,11 @@ struct ThemeManagerButtonBindingTests {
         let manager = GentleThemeManager(theme: theme)
 
         var spec = manager.bindingForButtonRole(.primary).wrappedValue
-        spec.materialRole = .hollow
+        spec.fillRole = .hollow
         manager.bindingForButtonRole(.primary).wrappedValue = spec
 
         let updatedSpec = manager.bindingForButtonRole(.primary).wrappedValue
-        #expect(updatedSpec.materialRole == .hollow)
+        #expect(updatedSpec.fillRole == .hollow)
     }
 
     @Test("Button role binding updates border role")

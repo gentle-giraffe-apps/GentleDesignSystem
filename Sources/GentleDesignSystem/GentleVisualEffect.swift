@@ -1,21 +1,21 @@
-//  Jonathan Ritchey
+//  Jonathan Ritchey
 
 
-//  Jonathan Ritchey
-// GentleDesignMaterial.swift
+//  Jonathan Ritchey
+// GentleVisualEffect.swift
 //
-// Core material model for GentleDesignSystem.
-// This file defines reusable optical "material recipes" that surfaces reference.
+// Core visual effect model for GentleDesignSystem.
+// This file defines reusable optical "effect recipes" that surfaces reference.
 // - Supports: solid color, Apple Materials, explicit blur, future glass
 // - Includes: specular edge cues + inner edge cues
 // - Excludes: surface geometry, surface roles, rendering code, noise/grain
 
 import Foundation
 
-// MARK: - Material Roles
+// MARK: - Visual Effects
 
-/// Role-based material identifiers used by surfaces.
-public enum GentleDesignMaterialRole: String, Codable, Sendable, CaseIterable, Identifiable {
+/// Role-based visual effect identifiers used by surfaces.
+public enum GentleVisualEffect: String, Codable, Sendable, CaseIterable, Identifiable {
     case appBackground
     case surface
     case surfaceOverlay
@@ -31,17 +31,17 @@ public enum GentleDesignMaterialRole: String, Codable, Sendable, CaseIterable, I
     }
 }
 
-// MARK: - GentleDesignMaterial
+// MARK: - GentleVisualEffectRecipe
 
 /// A reusable visual "recipe" describing optical behavior and edge cues.
 /// Surfaces (cards, panels, chrome, etc.) should reference these by id.
-public struct GentleDesignMaterial: Codable, Sendable, Equatable, Identifiable {
+public struct GentleVisualEffectRecipe: Codable, Sendable, Equatable, Identifiable {
 
     /// Stable identifier (e.g. "cardRegular", "chromeUltraThin").
     public var id: String
 
     /// Base optical behavior.
-    public var base: GentleMaterialBaseSpec
+    public var base: GentleVisualEffectBase
 
     /// Optional subtle wash above the base (keep opacity low).
     public var tint: GentleColorPair?
@@ -54,7 +54,7 @@ public struct GentleDesignMaterial: Codable, Sendable, Equatable, Identifiable {
 
     public init(
         id: String,
-        base: GentleMaterialBaseSpec,
+        base: GentleVisualEffectBase,
         tint: GentleColorPair? = nil,
         specular: GentleSpecularSpec? = nil,
         innerEdges: GentleInnerEdgeSpec? = nil
@@ -67,10 +67,10 @@ public struct GentleDesignMaterial: Codable, Sendable, Equatable, Identifiable {
     }
 }
 
-// MARK: - Material Base
+// MARK: - Visual Effect Base
 
-/// Base optical behavior for a material recipe.
-public enum GentleMaterialBaseSpec: Codable, Sendable, Equatable {
+/// Base optical behavior for a visual effect recipe.
+public enum GentleVisualEffectBase: Codable, Sendable, Equatable {
 
     /// Solid fill color (light/dark pair).
     case solid(GentleColorPair)

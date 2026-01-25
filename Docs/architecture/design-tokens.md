@@ -81,6 +81,8 @@ unknown, subtlePress, squish, pop, bouncy, springBack
 appBackground, card, cardElevated, surfaceOverlay
 ```
 
+Each surface role references a `GentleVisualEffect` for its appearance.
+
 ## Adding a New Token
 
 ### New Color Role

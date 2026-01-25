@@ -72,7 +72,7 @@ struct GentleButtonRoleSpecTests {
     func testButtonRoleSpecProperties() {
         let spec = GentleButtonRoleSpec(
             shape: .pill,
-            materialRole: .solidFillPrimaryCTA,
+            fillRole: .solidFillPrimaryCTA,
             borderRole: .subtle,
             animationRole: .bouncy,
             pressedScale: 0.95,
@@ -80,7 +80,7 @@ struct GentleButtonRoleSpecTests {
         )
 
         #expect(spec.shape == .pill)
-        #expect(spec.materialRole == .solidFillPrimaryCTA)
+        #expect(spec.fillRole == .solidFillPrimaryCTA)
         #expect(spec.borderRole == .subtle)
         #expect(spec.animationRole == .bouncy)
         #expect(spec.pressedScale == 0.95)
@@ -91,7 +91,7 @@ struct GentleButtonRoleSpecTests {
     func testButtonRoleSpecCodable() throws {
         let original = GentleButtonRoleSpec(
             shape: .pill,
-            materialRole: .solidFillPrimaryCTA,
+            fillRole: .solidFillPrimaryCTA,
             borderRole: .subtle,
             animationRole: .bouncy,
             pressedScale: 0.9,
@@ -105,7 +105,7 @@ struct GentleButtonRoleSpecTests {
         let decoded = try decoder.decode(GentleButtonRoleSpec.self, from: data)
 
         #expect(decoded.shape == .pill)
-        #expect(decoded.materialRole == .solidFillPrimaryCTA)
+        #expect(decoded.fillRole == .solidFillPrimaryCTA)
         #expect(decoded.borderRole == .subtle)
         #expect(decoded.animationRole == .bouncy)
         #expect(decoded.pressedScale == 0.9)
@@ -115,7 +115,7 @@ struct GentleButtonRoleSpecTests {
     @Test("Button role spec default values")
     func testButtonRoleSpecDefaults() {
         let spec = GentleButtonRoleSpec(
-            materialRole: .hollow
+            fillRole: .hollow
         )
 
         #expect(spec.shape == .rounded)
@@ -134,22 +134,22 @@ struct GentleButtonTokensTests {
         let tokens = GentleButtonTokens.gentleDefault
 
         let primary = tokens.roleSpec(for: .primary)
-        #expect(primary.materialRole == .solidFillPrimaryCTA)
+        #expect(primary.fillRole == .solidFillPrimaryCTA)
 
         let secondary = tokens.roleSpec(for: .secondary)
         #expect(secondary.borderRole == .accent)
 
         let tertiary = tokens.roleSpec(for: .tertiary)
-        #expect(tertiary.materialRole == .hollow)
+        #expect(tertiary.fillRole == .hollow)
 
         let destructive = tokens.roleSpec(for: .destructive)
-        #expect(destructive.materialRole == .solidFillDestructive)
+        #expect(destructive.fillRole == .solidFillDestructive)
     }
 
     @Test("Button tokens fallback to primary for missing role")
     func testButtonTokensFallback() {
         let primarySpec = GentleButtonRoleSpec(
-            materialRole: .solidFillPrimaryCTA
+            fillRole: .solidFillPrimaryCTA
         )
 
         let tokens = GentleButtonTokens(
@@ -158,7 +158,7 @@ struct GentleButtonTokensTests {
         )
 
         let spec = tokens.roleSpec(for: .destructive)
-        #expect(spec.materialRole == .solidFillPrimaryCTA)
+        #expect(spec.fillRole == .solidFillPrimaryCTA)
     }
 
     @Test("Default button tokens contain animation specs")
@@ -179,7 +179,7 @@ struct GentleButtonTokensTests {
 
         // Should return hardcoded defaults
         #expect(spec.shape == .rounded)
-        #expect(spec.materialRole == .solidFillPrimaryCTA)
+        #expect(spec.fillRole == .solidFillPrimaryCTA)
     }
 
     @Test("Animation spec fallback for missing role")

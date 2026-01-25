@@ -5,7 +5,7 @@ import Observation
 import UIKit
 
 public enum GentleDesignSystemSpecVersion {
-    public static let current = "0.4.0" // surfaces: materialRole replaces material recipe in specs
+    public static let current = "0.4.0" // surfaces: fillRole replaces material recipe in specs
 }
 
 // MARK: - Roles
@@ -142,7 +142,7 @@ public extension GentleButtonRole {
 
 /// Defines the visual surface treatment of a button.
 /// Determines both the background appearance and the appropriate label color.
-public enum GentleButtonMaterialRole: String, Codable, Sendable, CaseIterable, Identifiable {
+public enum GentleButtonFillRole: String, Codable, Sendable, CaseIterable, Identifiable {
     public var id: String { rawValue }
 
     /// Solid fill using primaryCTA color, with onPrimaryCTA text.
@@ -431,7 +431,7 @@ public struct GentleButtonRoleSpec: Codable, Sendable {
     public var shape: GentleButtonShape
 
     /// The visual surface treatment (determines background and label colors).
-    public var materialRole: GentleButtonMaterialRole
+    public var fillRole: GentleButtonFillRole
 
     /// The border treatment.
     public var borderRole: GentleButtonBorderRole
@@ -449,7 +449,7 @@ public struct GentleButtonRoleSpec: Codable, Sendable {
 
     public init(
         shape: GentleButtonShape = .rounded,
-        materialRole: GentleButtonMaterialRole,
+        fillRole: GentleButtonFillRole,
         borderRole: GentleButtonBorderRole = .hidden,
         animationRole: GentleButtonAnimationRole = .squish,
         pressedScale: Double = 0.97,
@@ -457,7 +457,7 @@ public struct GentleButtonRoleSpec: Codable, Sendable {
         usesNativeStyle: Bool = false
     ) {
         self.shape = shape
-        self.materialRole = materialRole
+        self.fillRole = fillRole
         self.borderRole = borderRole
         self.animationRole = animationRole
         self.pressedScale = pressedScale
@@ -486,7 +486,7 @@ public struct GentleButtonTokens: Codable, Sendable {
         // Last-resort defaults (should never happen with gentleDefault).
         return .init(
             shape: .rounded,
-            materialRole: .solidFillPrimaryCTA,
+            fillRole: .solidFillPrimaryCTA,
             borderRole: .hidden,
             animationRole: .squish,
             pressedScale: 0.97,
@@ -506,7 +506,7 @@ public extension GentleButtonTokens {
         roles: [
             GentleButtonRole.primary.rawValue: .init(
                 shape: .pill,
-                materialRole: .solidFillPrimaryCTA,
+                fillRole: .solidFillPrimaryCTA,
                 borderRole: .hidden,
                 animationRole: .springBack,
                 pressedScale: 0.9,
@@ -514,7 +514,7 @@ public extension GentleButtonTokens {
             ),
             GentleButtonRole.secondary.rawValue: .init(
                 shape: .pill,
-                materialRole: .hollow,
+                fillRole: .hollow,
                 borderRole: .accent,
                 animationRole: .subtlePress,
                 pressedScale: 0.85,
@@ -522,7 +522,7 @@ public extension GentleButtonTokens {
             ),
             GentleButtonRole.tertiary.rawValue: .init(
                 shape: .pill,
-                materialRole: .hollow,
+                fillRole: .hollow,
                 borderRole: .hidden,
                 animationRole: .subtlePress,
                 pressedScale: 0.85,
@@ -531,7 +531,7 @@ public extension GentleButtonTokens {
             ),
             GentleButtonRole.quaternary.rawValue: .init(
                 shape: .pill,
-                materialRole: .hollow,
+                fillRole: .hollow,
                 borderRole: .hidden,
                 animationRole: .subtlePress,
                 pressedScale: 0.95,
@@ -540,7 +540,7 @@ public extension GentleButtonTokens {
             ),
             GentleButtonRole.destructive.rawValue: .init(
                 shape: .pill,
-                materialRole: .solidFillDestructive,
+                fillRole: .solidFillDestructive,
                 borderRole: .hidden,
                 animationRole: .squish,
                 pressedScale: 0.9,
@@ -1023,27 +1023,27 @@ public struct GentleTheme: Sendable {
         return Color(gentleHex: pair.hex(for: scheme))
     }
 
-    public func material(for role: GentleDesignMaterialRole) -> GentleDesignMaterial {
+    public func visualEffectRecipe(for effect: GentleVisualEffect) -> GentleVisualEffectRecipe {
         let colors = activeSpec.colors
 
         func pair(_ role: GentleColorRole, fallback: GentleColorPair) -> GentleColorPair {
             colors.pair(for: role) ?? fallback
         }
 
-        switch role {
+        switch effect {
         case .appBackground:
-            return GentleDesignMaterial(
-                id: role.rawValue,
+            return GentleVisualEffectRecipe(
+                id: effect.rawValue,
                 base: .solid(pair(.background, fallback: .init(lightHex: "#F3F4F6", darkHex: "#030712")))
             )
         case .surface:
-            return GentleDesignMaterial(
-                id: role.rawValue,
+            return GentleVisualEffectRecipe(
+                id: effect.rawValue,
                 base: .solid(pair(.surface, fallback: .init(lightHex: "#FAFAFE", darkHex: "#111827")))
             )
         case .surfaceOverlay:
-            return GentleDesignMaterial(
-                id: role.rawValue,
+            return GentleVisualEffectRecipe(
+                id: effect.rawValue,
                 base: .solid(pair(.surfaceOverlay, fallback: .init(lightHex: "#111827CC", darkHex: "#020617CC")))
             )
         }
@@ -1262,7 +1262,7 @@ public struct GentleButtonStyle: ButtonStyle {
 
         // Derive colors from material role
         let (backgroundColor, labelColorRole): (Color, GentleColorRole) = {
-            switch spec.materialRole {
+            switch spec.fillRole {
             case .solidFillPrimaryCTA:
                 return (theme.color(for: .primaryCTA, scheme: colorScheme), .onPrimaryCTA)
             case .solidFillDestructive:
@@ -1323,7 +1323,7 @@ public struct GentleButtonStyle: ButtonStyle {
             saturation = 1.0
             disabledOpacity = 1.0
         } else {
-            switch spec.materialRole {
+            switch spec.fillRole {
             case .solidFillPrimaryCTA, .solidFillDestructive:
                 saturation = 1.0
                 disabledOpacity = 0.4

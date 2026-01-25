@@ -36,7 +36,7 @@ struct GentleDesignSystemSpecTests {
         #expect(spec.visual.radii.medium == 12)
 
         // Buttons
-        #expect(spec.buttons.roleSpec(for: .primary).materialRole == .solidFillPrimaryCTA)
+        #expect(spec.buttons.roleSpec(for: .primary).fillRole == .solidFillPrimaryCTA)
     }
 
     @Test("Spec is codable")
