@@ -25,7 +25,7 @@ GentleDesignSystem/
 | `ColorRoleEditor.swift` | Collapsible color editor component | ~460 |
 | `TypographyRoleEditor.swift` | Collapsible typography editor | ~450 |
 | `GentleDesignModifiers.swift` | SwiftUI view modifiers | ~370 |
-| `GentleDesignMaterial.swift` | Material/blur/glass background specs | ~255 |
+| `GentleVisualEffect.swift` | Visual effect/blur/glass background specs | ~255 |
 | `GentleDesignPersistence.swift` | JSON file persistence | ~155 |
 | `GentleUIKitTheming.swift` | UIKit integration (nav bar) | ~155 |
 | `GentleDesignCustomizeView.swift` | Section-based customization view | ~150 |

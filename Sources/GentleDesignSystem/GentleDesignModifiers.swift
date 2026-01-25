@@ -103,21 +103,21 @@ public struct GentleTextFieldModifier: ViewModifier {
     }
 }
 
-// MARK: - Material View
+// MARK: - Visual Effect View
 
-/// Renders a GentleDesignMaterial's base layer.
+/// Renders a GentleVisualEffectRecipe's base layer.
 /// Supports solid colors, Apple Materials, blur, and glass (iOS 26+).
-public struct GentleMaterialView: View {
-    let material: GentleDesignMaterial
+public struct GentleVisualEffectView: View {
+    let recipe: GentleVisualEffectRecipe
     let colorScheme: ColorScheme
 
-    public init(material: GentleDesignMaterial, colorScheme: ColorScheme) {
-        self.material = material
+    public init(recipe: GentleVisualEffectRecipe, colorScheme: ColorScheme) {
+        self.recipe = recipe
         self.colorScheme = colorScheme
     }
 
     public var body: some View {
-        switch material.base {
+        switch recipe.base {
         case .solid(let colorPair):
             Color(gentleHex: colorPair.hex(for: colorScheme))
 
@@ -184,7 +184,7 @@ public struct GentleSurfaceModifier: ViewModifier {
         let spec = theme.surfaces.roleSpec(for: role)
         let insetContent = inset.map { AnyView(content.gentleInset($0, variant: insetVariant)) } ?? AnyView(content)
 
-        let material = theme.material(for: spec.materialRole)
+        let effectRecipe = theme.visualEffectRecipe(for: spec.visualEffect)
         let borderColor = showTappableHint
         ? theme.color(for: .primaryCTA, scheme: colorScheme).opacity(0.4)
             : Color(gentleHex: spec.border.hex(for: colorScheme))
@@ -194,7 +194,7 @@ public struct GentleSurfaceModifier: ViewModifier {
         case .appBackground:
             return AnyView(
                 insetContent.background(
-                    GentleMaterialView(material: material, colorScheme: colorScheme)
+                    GentleVisualEffectView(recipe: effectRecipe, colorScheme: colorScheme)
                         .ignoresSafeArea()
                 )
             )
@@ -202,7 +202,7 @@ public struct GentleSurfaceModifier: ViewModifier {
         case .surfaceOverlay:
             return AnyView(
                 insetContent
-                    .background(GentleMaterialView(material: material, colorScheme: colorScheme))
+                    .background(GentleVisualEffectView(recipe: effectRecipe, colorScheme: colorScheme))
                     .cornerRadius(cornerRadius)
             )
 
@@ -214,7 +214,7 @@ public struct GentleSurfaceModifier: ViewModifier {
 
             return AnyView(
                 insetContent
-                    .background(GentleMaterialView(material: material, colorScheme: colorScheme))
+                    .background(GentleVisualEffectView(recipe: effectRecipe, colorScheme: colorScheme))
                     .cornerRadius(cornerRadius)
                     .overlay(
                         Group {

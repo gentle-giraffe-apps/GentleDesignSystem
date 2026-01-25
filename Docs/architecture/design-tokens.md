@@ -73,10 +73,12 @@ primary, secondary, tertiary, quaternary, destructive
 none, subtlePress, squish, pop, bouncy, springBack
 ```
 
-### GentleSurfaceRole (5 roles)
+### GentleSurfaceRole (4 roles)
 ```
-appBackground, card, cardChrome, cardElevated, surfaceOverlay
+appBackground, card, cardElevated, surfaceOverlay
 ```
+
+Each surface role references a `GentleVisualEffect` for its appearance.
 
 ## Adding a New Token
 

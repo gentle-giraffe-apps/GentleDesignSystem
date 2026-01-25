@@ -28,7 +28,8 @@
 | `GentleColorRole` | Color intent (15 roles) |
 | `GentleButtonRole` | Button style intent (4 roles) |
 | `GentleButtonAnimationRole` | Button animation feel (6 roles) |
-| `GentleSurfaceRole` | Container/background intent (5 roles) |
+| `GentleSurfaceRole` | Container/background intent (4 roles) |
+| `GentleVisualEffect` | Visual effect type (appBackground, surface, surfaceOverlay) |
 | `GentleInsetRole` | Padding intent (4 roles) |
 | `GentleGapIntent` | Spacing intent (7 levels) |
 

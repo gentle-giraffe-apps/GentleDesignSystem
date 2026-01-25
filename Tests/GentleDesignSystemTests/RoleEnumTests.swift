@@ -143,7 +143,7 @@ struct GentleButtonRoleTests {
 
         for role in roles {
             let spec = tokens.roleSpec(for: role)
-            #expect(!spec.materialRole.rawValue.isEmpty)
+            #expect(!spec.fillRole.rawValue.isEmpty)
         }
     }
 }

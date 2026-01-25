@@ -130,7 +130,7 @@ struct JSONEncodingEdgeCasesTests {
                 roles: [
                     GentleButtonRole.primary.rawValue: GentleButtonRoleSpec(
                         shape: .pill,
-                        materialRole: .solidFillDestructive,
+                        fillRole: .solidFillDestructive,
                         borderRole: .accent,
                         animationRole: .pop,
                         pressedScale: 0.8,
