@@ -121,6 +121,7 @@ flowchart TB
         Spec --> Layout[GentleLayoutTokens]
         Spec --> Visual[GentleVisualTokens]
         Spec --> Buttons[GentleButtonTokens]
+        Spec --> Surfaces[GentleSurfaceTokens]
     end
 
     subgraph Runtime["Runtime Layer"]
@@ -229,30 +230,45 @@ GentleDesignSystemSpec
 │               ├── small:  Double
 │               └── medium: Double
 │
-└── buttons: GentleButtonTokens
+├── buttons: GentleButtonTokens
+│       │
+│       ├── roles: [String: GentleButtonRoleSpec]
+│       │       │
+│       │       ├── key = GentleButtonRole.rawValue
+│       │       └── value = GentleButtonRoleSpec
+│       │               ├── shape: GentleButtonShape
+│       │               ├── materialRole: GentleButtonMaterialRole
+│       │               ├── borderRole: GentleButtonBorderRole
+│       │               ├── animationRole: GentleButtonAnimationRole
+│       │               ├── pressedScale: Double
+│       │               ├── pressedOpacity: Double
+│       │               └── usesNativeStyle: Bool
+│       │
+│       └── animations: [String: GentleButtonAnimationSpec]
+│               │
+│               ├── key = GentleButtonAnimationRole.rawValue
+│               └── value = GentleButtonAnimationSpec
+│                       ├── pressedScale: Double
+│                       ├── pressedOpacity: Double
+│                       ├── duration: Double
+│                       ├── springResponse: Double
+│                       ├── springDamping: Double
+│                       └── springBlend: Double
+│
+└── surfaces: GentleSurfaceTokens
         │
-        ├── roles: [String: GentleButtonRoleSpec]
-        │       │
-        │       ├── key = GentleButtonRole.rawValue
-        │       └── value = GentleButtonRoleSpec
-        │               ├── shape: GentleButtonShape
-        │               ├── materialRole: GentleButtonMaterialRole
-        │               ├── borderRole: GentleButtonBorderRole
-        │               ├── animationRole: GentleButtonAnimationRole
-        │               ├── pressedScale: Double
-        │               ├── pressedOpacity: Double
-        │               └── usesNativeStyle: Bool
-        │
-        └── animations: [String: GentleButtonAnimationSpec]
+        └── roles: [String: GentleSurfaceRoleSpec]
                 │
-                ├── key = GentleButtonAnimationRole.rawValue
-                └── value = GentleButtonAnimationSpec
-                        ├── pressedScale: Double
-                        ├── pressedOpacity: Double
-                        ├── duration: Double
-                        ├── springResponse: Double
-                        ├── springDamping: Double
-                        └── springBlend: Double
+                ├── key = GentleSurfaceRole.rawValue
+                └── value = GentleSurfaceRoleSpec
+                        ├── materialRole: GentleDesignMaterialRole
+                        ├── border: GentleColorPair
+                        ├── cornerRadius: Double
+                        ├── borderWidth: Double
+                        ├── shadowRadius: Double
+                        ├── shadowOpacity: Double
+                        ├── shadowOffsetX: Double
+                        └── shadowOffsetY: Double
 ```
 
 > **Why roles instead of direct values?**  
@@ -275,7 +291,7 @@ The token layer defines *what* your design system means — not how it is render
 | **Layout** | `GentleLayoutTokens`, `GentleSpacingToken`, `GentleGapTokens`, `GentleInsetTokens` |
 | **Visual** | `GentleVisualTokens`, `GentleRadiusTokens`, `GentleShadowTokens` |
 | **Buttons** | `GentleButtonRole`, `GentleButtonRoleSpec`, `GentleButtonTokens`, `GentleButtonAnimationRole` |
-| **Surfaces** | `GentleSurfaceRole` |
+| **Surfaces** | `GentleSurfaceRole`, `GentleSurfaceRoleSpec`, `GentleSurfaceTokens` |
 
 All tokens are:
 - `Codable`
@@ -295,6 +311,7 @@ public struct GentleDesignSystemSpec: Codable, Sendable {
     public var layout: GentleLayoutTokens
     public var visual: GentleVisualTokens
     public var buttons: GentleButtonTokens
+    public var surfaces: GentleSurfaceTokens
 }
 ```
 
@@ -538,7 +555,7 @@ ForEach(presets, id: \.name) { preset in
 
 ### Typography Roles
 
-13 semantic text roles organized by size ramp (xxl > xl > l > ml > m > ms > s):
+17 semantic text roles organized by size ramp (xxl > xl > l > ml > m > ms > s):
 
 | Ramp | Roles |
 |------|-------|
@@ -546,7 +563,7 @@ ForEach(presets, id: \.name) { preset in
 | XL | `title_xl` |
 | L | `title2_l` |
 | ML | `title3_ml` |
-| M | `headline_m`, `body_m`, `bodySecondary_m`, `monoCode_m` |
+| M | `headline_m`, `body_m`, `bodySecondary_m`, `monoCode_m`, `primaryButtonTitle_m`, `secondaryButtonTitle_m`, `tertiaryButtonTitle_m`, `quaternaryButtonTitle_m` |
 | MS | `callout_ms`, `subheadline_ms` |
 | S | `footnote_s`, `caption_s`, `caption2_s` |
 
@@ -560,7 +577,7 @@ Each role resolves to a `GentleTypographyRoleSpec` containing: `pointSize`, `wei
 
 | Animation | Description |
 |-----------|-------------|
-| `none` | No animation |
+| `unknown` | No animation |
 | `subtlePress` | Subtle press feedback |
 | `squish` | Squish effect on press |
 | `pop` | Pop effect |
@@ -569,7 +586,7 @@ Each role resolves to a `GentleTypographyRoleSpec` containing: `pointSize`, `wei
 
 ### Surface Roles
 
-`appBackground` · `card` · `cardChrome` (no padding) · `cardElevated` · `surfaceOverlay`
+`appBackground` · `card` · `cardElevated` · `surfaceOverlay`
 
 ### Color Roles
 
