@@ -809,7 +809,7 @@ struct SurfaceRoleEditorSheet: View {
                                 }
                             }
 
-                            if binding.specularEffect.wrappedValue != .none {
+                            if binding.specularEffect.wrappedValue != .noEffect {
                                 VStack(alignment: .leading, spacing: 6) {
                                     HStack {
                                         Text("Strength")

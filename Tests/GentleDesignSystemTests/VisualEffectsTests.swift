@@ -576,9 +576,9 @@ struct GentleSurfaceRoleSpecTests {
         #expect(spec.shadowOpacity == 0)
         #expect(spec.shadowOffsetX == 0)
         #expect(spec.shadowOffsetY == 0)
-        #expect(spec.appleMaterial == .none)
+        #expect(spec.appleMaterial == .noMaterial)
         #expect(spec.useGlass == false)
-        #expect(spec.specularEffect == .none)
+        #expect(spec.specularEffect == .noEffect)
         #expect(spec.specularStrength == 0)
     }
 

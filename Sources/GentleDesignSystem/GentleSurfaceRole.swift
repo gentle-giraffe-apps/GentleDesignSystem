@@ -42,7 +42,7 @@ public enum GentleSurfaceColorRole: String, Codable, Sendable, CaseIterable, Ide
 
 /// Apple's built-in blur materials for surface backgrounds.
 public enum GentleAppleMaterial: String, Codable, Sendable, CaseIterable, Identifiable {
-    case none
+    case noMaterial
     case ultraThin
     case thin
     case regular
@@ -54,7 +54,7 @@ public enum GentleAppleMaterial: String, Codable, Sendable, CaseIterable, Identi
 
     public var displayName: String {
         switch self {
-        case .none: return "None"
+        case .noMaterial: return "None"
         case .ultraThin: return "Ultra Thin"
         case .thin: return "Thin"
         case .regular: return "Regular"
@@ -67,7 +67,7 @@ public enum GentleAppleMaterial: String, Codable, Sendable, CaseIterable, Identi
     @available(iOS 15.0, *)
     public var swiftUIMaterial: Material? {
         switch self {
-        case .none: return nil
+        case .noMaterial: return nil
         case .ultraThin: return .ultraThinMaterial
         case .thin: return .thinMaterial
         case .regular: return .regularMaterial
@@ -82,7 +82,7 @@ public enum GentleAppleMaterial: String, Codable, Sendable, CaseIterable, Identi
 
 /// Specular highlight effect for surface depth cues.
 public enum GentleSpecularEffect: String, Codable, Sendable, CaseIterable, Identifiable {
-    case none
+    case noEffect
     case indent      // Inset/pressed appearance
     case highlight   // Raised/lit appearance
 
@@ -90,7 +90,7 @@ public enum GentleSpecularEffect: String, Codable, Sendable, CaseIterable, Ident
 
     public var displayName: String {
         switch self {
-        case .none: return "None"
+        case .noEffect: return "None"
         case .indent: return "Indent"
         case .highlight: return "Highlight"
         }
@@ -131,9 +131,9 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
 
     public init(
         colorRole: GentleSurfaceColorRole = .surface,
-        appleMaterial: GentleAppleMaterial = .none,
+        appleMaterial: GentleAppleMaterial = .noMaterial,
         useGlass: Bool = false,
-        specularEffect: GentleSpecularEffect = .none,
+        specularEffect: GentleSpecularEffect = .noEffect,
         specularStrength: Double = 0,
         border: GentleColorPair,
         cornerRadius: Double = 20,
@@ -182,23 +182,23 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
             switch visualEffect {
             case .appBackground:
                 self.colorRole = .background
-                self.appleMaterial = .none
+                self.appleMaterial = .noMaterial
             case .surface:
                 self.colorRole = .surface
-                self.appleMaterial = .none
+                self.appleMaterial = .noMaterial
             case .surfaceOverlay:
                 self.colorRole = .surfaceOverlay
                 self.appleMaterial = .regular
             }
             self.useGlass = false
-            self.specularEffect = .none
+            self.specularEffect = .noEffect
             self.specularStrength = 0
         } else {
             // Decode new properties normally
             self.colorRole = try container.decodeIfPresent(GentleSurfaceColorRole.self, forKey: .colorRole) ?? .surface
-            self.appleMaterial = try container.decodeIfPresent(GentleAppleMaterial.self, forKey: .appleMaterial) ?? .none
+            self.appleMaterial = try container.decodeIfPresent(GentleAppleMaterial.self, forKey: .appleMaterial) ?? .noMaterial
             self.useGlass = try container.decodeIfPresent(Bool.self, forKey: .useGlass) ?? false
-            self.specularEffect = try container.decodeIfPresent(GentleSpecularEffect.self, forKey: .specularEffect) ?? .none
+            self.specularEffect = try container.decodeIfPresent(GentleSpecularEffect.self, forKey: .specularEffect) ?? .noEffect
             self.specularStrength = try container.decodeIfPresent(Double.self, forKey: .specularStrength) ?? 0
         }
 
@@ -243,9 +243,9 @@ public struct GentleSurfaceTokens: Codable, Sendable {
         // Last-resort defaults (should never happen with gentleDefault).
         return .init(
             colorRole: .surface,
-            appleMaterial: .none,
+            appleMaterial: .noMaterial,
             useGlass: false,
-            specularEffect: .none,
+            specularEffect: .noEffect,
             specularStrength: 0,
             border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151")
         )
@@ -257,9 +257,9 @@ public extension GentleSurfaceTokens {
         roles: [
             GentleSurfaceRole.appBackground.rawValue: .init(
                 colorRole: .background,
-                appleMaterial: .none,
+                appleMaterial: .noMaterial,
                 useGlass: false,
-                specularEffect: .none,
+                specularEffect: .noEffect,
                 specularStrength: 0,
                 border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
                 cornerRadius: 0,
@@ -271,9 +271,9 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.card.rawValue: .init(
                 colorRole: .surface,
-                appleMaterial: .none,
+                appleMaterial: .noMaterial,
                 useGlass: false,
-                specularEffect: .none,
+                specularEffect: .noEffect,
                 specularStrength: 0,
                 border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
                 cornerRadius: 20,
@@ -285,7 +285,7 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.cardElevated.rawValue: .init(
                 colorRole: .surface,
-                appleMaterial: .none,
+                appleMaterial: .noMaterial,
                 useGlass: false,
                 specularEffect: .highlight,
                 specularStrength: 0.1,
@@ -301,7 +301,7 @@ public extension GentleSurfaceTokens {
                 colorRole: .surfaceOverlay,
                 appleMaterial: .regular,
                 useGlass: false,
-                specularEffect: .none,
+                specularEffect: .noEffect,
                 specularStrength: 0,
                 border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
                 cornerRadius: 0,

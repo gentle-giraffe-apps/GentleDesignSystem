@@ -244,12 +244,12 @@ public struct GentleSurfaceModifier: ViewModifier {
         if spec.useGlass {
             // Glass effect (iOS 26+ future-proofing)
             // For now, fall back to material or solid color
-            if spec.appleMaterial != .none, let material = spec.appleMaterial.swiftUIMaterial {
+            if spec.appleMaterial != .noMaterial, let material = spec.appleMaterial.swiftUIMaterial {
                 Color.clear.background(material)
             } else {
                 baseColor
             }
-        } else if spec.appleMaterial != .none, let material = spec.appleMaterial.swiftUIMaterial {
+        } else if spec.appleMaterial != .noMaterial, let material = spec.appleMaterial.swiftUIMaterial {
             // Apple material background
             Color.clear.background(material)
         } else {
