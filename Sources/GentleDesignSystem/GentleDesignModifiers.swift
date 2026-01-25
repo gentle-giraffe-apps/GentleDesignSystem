@@ -184,7 +184,6 @@ public struct GentleSurfaceModifier: ViewModifier {
         let spec = theme.surfaces.roleSpec(for: role)
         let insetContent = inset.map { AnyView(content.gentleInset($0, variant: insetVariant)) } ?? AnyView(content)
 
-        let effectRecipe = theme.visualEffectRecipe(for: spec.visualEffect)
         let borderColor = showTappableHint
         ? theme.color(for: .primaryCTA, scheme: colorScheme).opacity(0.4)
             : Color(gentleHex: spec.border.hex(for: colorScheme))
@@ -194,7 +193,7 @@ public struct GentleSurfaceModifier: ViewModifier {
         case .appBackground:
             return AnyView(
                 insetContent.background(
-                    GentleVisualEffectView(recipe: effectRecipe, colorScheme: colorScheme)
+                    surfaceBackground(spec: spec)
                         .ignoresSafeArea()
                 )
             )
@@ -202,7 +201,7 @@ public struct GentleSurfaceModifier: ViewModifier {
         case .surfaceOverlay:
             return AnyView(
                 insetContent
-                    .background(GentleVisualEffectView(recipe: effectRecipe, colorScheme: colorScheme))
+                    .background(surfaceBackground(spec: spec))
                     .cornerRadius(cornerRadius)
             )
 
@@ -214,7 +213,7 @@ public struct GentleSurfaceModifier: ViewModifier {
 
             return AnyView(
                 insetContent
-                    .background(GentleVisualEffectView(recipe: effectRecipe, colorScheme: colorScheme))
+                    .background(surfaceBackground(spec: spec))
                     .cornerRadius(cornerRadius)
                     .overlay(
                         Group {
@@ -233,6 +232,29 @@ public struct GentleSurfaceModifier: ViewModifier {
                         y: CGFloat(spec.shadowOffsetY)
                     )
             )
+        }
+    }
+
+    /// Builds the surface background from spec properties
+    @ViewBuilder
+    private func surfaceBackground(spec: GentleSurfaceRoleSpec) -> some View {
+        // Get the base color from the color role
+        let baseColor = theme.color(for: spec.colorRole.colorRole, scheme: colorScheme)
+
+        if spec.useGlass {
+            // Glass effect (iOS 26+ future-proofing)
+            // For now, fall back to material or solid color
+            if spec.appleMaterial != .noMaterial, let material = spec.appleMaterial.swiftUIMaterial {
+                Color.clear.background(material)
+            } else {
+                baseColor
+            }
+        } else if spec.appleMaterial != .noMaterial, let material = spec.appleMaterial.swiftUIMaterial {
+            // Apple material background
+            Color.clear.background(material)
+        } else {
+            // Solid color background
+            baseColor
         }
     }
 }

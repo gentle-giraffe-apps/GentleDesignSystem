@@ -769,9 +769,9 @@ struct SurfaceRoleEditorSheet: View {
                         // Surface preview overlay
                         VStack(spacing: design.layout.stack.tight) {
                             Text("Preview")
-                                .gentleText(.title2_l, colorRole: binding.visualEffect.wrappedValue == .surfaceOverlay ? .onOverlay : .textPrimary)
+                                .gentleText(.title2_l, colorRole: binding.colorRole.wrappedValue == .surfaceOverlay ? .onOverlay : .textPrimary)
                             Text("Sample content")
-                                .gentleText(.body_m, colorRole: binding.visualEffect.wrappedValue == .surfaceOverlay ? .onOverlaySecondary : .textSecondary)
+                                .gentleText(.body_m, colorRole: binding.colorRole.wrappedValue == .surfaceOverlay ? .onOverlaySecondary : .textSecondary)
                         }
                         .frame(maxWidth: .infinity, minHeight: 100, alignment: .center)
                         .gentleSurface(role, inset: .card)
@@ -782,10 +782,44 @@ struct SurfaceRoleEditorSheet: View {
                 .padding(.vertical, design.layout.gap.s)
 
                 List {
-                    Section("Visual Effect") {
-                        Picker("Visual Effect", selection: binding.visualEffect) {
-                            ForEach(GentleVisualEffect.allCases, id: \.self) { role in
-                                Text(role.displayName).tag(role)
+                    Section("Base Color") {
+                        Picker("Color Role", selection: binding.colorRole) {
+                            ForEach(GentleSurfaceColorRole.allCases, id: \.self) { colorRole in
+                                Text(colorRole.displayName).tag(colorRole)
+                            }
+                        }
+                    }
+
+                    Section("Apple Material") {
+                        Picker("Material", selection: binding.appleMaterial) {
+                            ForEach(GentleAppleMaterial.allCases, id: \.self) { material in
+                                Text(material.displayName).tag(material)
+                            }
+                        }
+
+                        Toggle("Use Glass Effect (iOS 26+)", isOn: binding.useGlass)
+                    }
+
+                    // Specular section - hidden when useGlass is true
+                    if !binding.useGlass.wrappedValue {
+                        Section("Specular") {
+                            Picker("Effect", selection: binding.specularEffect) {
+                                ForEach(GentleSpecularEffect.allCases, id: \.self) { effect in
+                                    Text(effect.displayName).tag(effect)
+                                }
+                            }
+
+                            if binding.specularEffect.wrappedValue != .noEffect {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    HStack {
+                                        Text("Strength")
+                                        Spacer()
+                                        Text(String(format: "%.0f%%", binding.specularStrength.wrappedValue * 100))
+                                            .monospacedDigit()
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    Slider(value: binding.specularStrength, in: 0...1, step: 0.05)
+                                }
                             }
                         }
                     }
@@ -904,210 +938,6 @@ struct SurfaceRoleEditorSheet: View {
     private func revertChanges() {
         guard let initialSpec else { return }
         manager.bindingForSurfaceRole(role).wrappedValue = initialSpec
-    }
-}
-
-// MARK: - Surface Material Editor
-
-/// Enum to represent the material base type for the picker
-private enum MaterialBaseType: String, CaseIterable {
-    case solid = "Solid Color"
-    case appleMaterial = "Apple Material"
-    case blur = "Blur"
-    case glass = "Glass"
-
-    static func from(_ base: GentleVisualEffectBase) -> MaterialBaseType {
-        switch base {
-        case .solid: return .solid
-        case .appleMaterial: return .appleMaterial
-        case .blur: return .blur
-        case .glass: return .glass
-        }
-    }
-}
-
-struct SurfaceMaterialEditor: View {
-    @Binding var binding: GentleVisualEffectRecipe
-
-    var body: some View {
-        let baseType = MaterialBaseType.from(binding.base)
-
-        Picker("Type", selection: Binding(
-            get: { baseType },
-            set: { newType in
-                // Convert to the new base type with default values
-                switch newType {
-                case .solid:
-                    binding.base = .solid(GentleColorPair(lightHex: "#FFFFFF", darkHex: "#1F2937"))
-                case .appleMaterial:
-                    binding.base = .appleMaterial(GentleAppleMaterialSpec(kind: .regular, opacity: 1.0))
-                case .blur:
-                    binding.base = .blur(GentleBlurSpec(radius: 10, isBackgroundOnly: true, opacity: 1.0))
-                case .glass:
-                    binding.base = .glass(GentleGlassSpec(style: .regular, isInteractive: false, tint: nil))
-                }
-            }
-        )) {
-            ForEach(MaterialBaseType.allCases, id: \.self) { type in
-                Text(type.rawValue).tag(type)
-            }
-        }
-
-        // Show appropriate controls based on base type
-        switch binding.base {
-        case .solid(let colorPair):
-            solidColorEditor(colorPair: colorPair)
-
-        case .appleMaterial(let spec):
-            appleMaterialEditor(spec: spec)
-
-        case .blur(let spec):
-            blurEditor(spec: spec)
-
-        case .glass(let spec):
-            glassEditor(spec: spec)
-        }
-    }
-
-    @ViewBuilder
-    private func solidColorEditor(colorPair: GentleColorPair) -> some View {
-        let lightBinding = Binding<Color>(
-            get: { Color(gentleHex: colorPair.lightHex) },
-            set: { newColor in
-                if case .solid(var pair) = binding.base {
-                    pair.lightHex = newColor.toGentleHexString()
-                    binding.base = .solid(pair)
-                }
-            }
-        )
-        let darkBinding = Binding<Color>(
-            get: { Color(gentleHex: colorPair.darkHex) },
-            set: { newColor in
-                if case .solid(var pair) = binding.base {
-                    pair.darkHex = newColor.toGentleHexString()
-                    binding.base = .solid(pair)
-                }
-            }
-        )
-
-        HStack {
-            Text("Color")
-
-            Spacer()
-
-            HStack(spacing: 4) {
-                ZStack {
-                    lightBinding.wrappedValue
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                    ColorPicker("", selection: lightBinding, supportsOpacity: true)
-                        .labelsHidden()
-                        .opacity(0.1)
-                }
-                .frame(width: 36, height: 36)
-
-                ZStack {
-                    darkBinding.wrappedValue
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                    ColorPicker("", selection: darkBinding, supportsOpacity: true)
-                        .labelsHidden()
-                        .opacity(0.1)
-                }
-                .frame(width: 36, height: 36)
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func appleMaterialEditor(spec: GentleAppleMaterialSpec) -> some View {
-        Picker("Style", selection: Binding(
-            get: { spec.kind },
-            set: { newKind in
-                binding.base = .appleMaterial(GentleAppleMaterialSpec(kind: newKind, opacity: spec.opacity))
-            }
-        )) {
-            Text("Ultra Thin").tag(GentleAppleMaterialSpec.Kind.ultraThin)
-            Text("Thin").tag(GentleAppleMaterialSpec.Kind.thin)
-            Text("Regular").tag(GentleAppleMaterialSpec.Kind.regular)
-            Text("Thick").tag(GentleAppleMaterialSpec.Kind.thick)
-            Text("Ultra Thick").tag(GentleAppleMaterialSpec.Kind.ultraThick)
-            Text("Bar").tag(GentleAppleMaterialSpec.Kind.bar)
-        }
-
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text("Opacity")
-                Spacer()
-                Text(String(format: "%.2f", spec.opacity))
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
-            }
-            Slider(value: Binding(
-                get: { spec.opacity },
-                set: { newOpacity in
-                    binding.base = .appleMaterial(GentleAppleMaterialSpec(kind: spec.kind, opacity: newOpacity))
-                }
-            ), in: 0...1, step: 0.05)
-        }
-    }
-
-    @ViewBuilder
-    private func blurEditor(spec: GentleBlurSpec) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text("Blur Radius")
-                Spacer()
-                Text(String(format: "%.0f", spec.radius))
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
-            }
-            Slider(value: Binding(
-                get: { spec.radius },
-                set: { newRadius in
-                    binding.base = .blur(GentleBlurSpec(radius: newRadius, isBackgroundOnly: spec.isBackgroundOnly, opacity: spec.opacity))
-                }
-            ), in: 0...30, step: 1)
-        }
-
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text("Opacity")
-                Spacer()
-                Text(String(format: "%.2f", spec.opacity))
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
-            }
-            Slider(value: Binding(
-                get: { spec.opacity },
-                set: { newOpacity in
-                    binding.base = .blur(GentleBlurSpec(radius: spec.radius, isBackgroundOnly: spec.isBackgroundOnly, opacity: newOpacity))
-                }
-            ), in: 0...1, step: 0.05)
-        }
-    }
-
-    @ViewBuilder
-    private func glassEditor(spec: GentleGlassSpec) -> some View {
-        Picker("Style", selection: Binding(
-            get: { spec.style },
-            set: { newStyle in
-                binding.base = .glass(GentleGlassSpec(style: newStyle, isInteractive: spec.isInteractive, tint: spec.tint))
-            }
-        )) {
-            Text("Regular").tag(GentleGlassSpec.Style.regular)
-            Text("Clear").tag(GentleGlassSpec.Style.clear)
-            Text("Identity").tag(GentleGlassSpec.Style.identity)
-        }
-
-        Toggle("Interactive", isOn: Binding(
-            get: { spec.isInteractive },
-            set: { newValue in
-                binding.base = .glass(GentleGlassSpec(style: spec.style, isInteractive: newValue, tint: spec.tint))
-            }
-        ))
-
-        Text("Glass effects require iOS 26+")
-            .font(.caption)
-            .foregroundStyle(.secondary)
     }
 }
 

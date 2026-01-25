@@ -554,13 +554,13 @@ struct GentleInnerEdgeSpecTests {
 @Suite("GentleSurfaceRoleSpec Tests")
 struct GentleSurfaceRoleSpecTests {
 
-    @Test("Surface role spec stores material and border")
+    @Test("Surface role spec stores color role and border")
     func testSurfaceRoleSpec() {
         let border = GentleColorPair(lightHex: "#CCCCCC", darkHex: "#333333")
 
-        let spec = GentleSurfaceRoleSpec(visualEffect: .surface, border: border)
+        let spec = GentleSurfaceRoleSpec(colorRole: .surface, border: border)
 
-        #expect(spec.visualEffect == .surface)
+        #expect(spec.colorRole == .surface)
         #expect(spec.border.lightHex == "#CCCCCC")
     }
 
@@ -568,7 +568,7 @@ struct GentleSurfaceRoleSpecTests {
     func testSurfaceRoleSpecDefaults() {
         let border = GentleColorPair(lightHex: "#CCCCCC", darkHex: "#333333")
 
-        let spec = GentleSurfaceRoleSpec(visualEffect: .surface, border: border)
+        let spec = GentleSurfaceRoleSpec(colorRole: .surface, border: border)
 
         #expect(spec.cornerRadius == 20)
         #expect(spec.borderWidth == 1)
@@ -576,12 +576,20 @@ struct GentleSurfaceRoleSpecTests {
         #expect(spec.shadowOpacity == 0)
         #expect(spec.shadowOffsetX == 0)
         #expect(spec.shadowOffsetY == 0)
+        #expect(spec.appleMaterial == .noMaterial)
+        #expect(spec.useGlass == false)
+        #expect(spec.specularEffect == .noEffect)
+        #expect(spec.specularStrength == 0)
     }
 
     @Test("Surface role spec with all properties")
     func testSurfaceRoleSpecAllProperties() {
         let spec = GentleSurfaceRoleSpec(
-            visualEffect: .surface,
+            colorRole: .surface,
+            appleMaterial: .thin,
+            useGlass: false,
+            specularEffect: .highlight,
+            specularStrength: 0.5,
             border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
             cornerRadius: 24,
             borderWidth: 0.5,
@@ -597,12 +605,16 @@ struct GentleSurfaceRoleSpecTests {
         #expect(spec.shadowOpacity == 0.1)
         #expect(spec.shadowOffsetX == 2)
         #expect(spec.shadowOffsetY == 4)
+        #expect(spec.appleMaterial == .thin)
+        #expect(spec.specularEffect == .highlight)
+        #expect(spec.specularStrength == 0.5)
     }
 
     @Test("Surface role spec is codable")
     func testSurfaceRoleSpecCodable() throws {
         let original = GentleSurfaceRoleSpec(
-            visualEffect: .surface,
+            colorRole: .surface,
+            appleMaterial: .regular,
             border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
             cornerRadius: 16,
             borderWidth: 1.5
@@ -614,15 +626,17 @@ struct GentleSurfaceRoleSpecTests {
         let data = try encoder.encode(original)
         let decoded = try decoder.decode(GentleSurfaceRoleSpec.self, from: data)
 
-        #expect(decoded.visualEffect == .surface)
+        #expect(decoded.colorRole == .surface)
+        #expect(decoded.appleMaterial == .regular)
         #expect(decoded.cornerRadius == 16)
         #expect(decoded.borderWidth == 1.5)
     }
 
-    @Test("Surface role spec with material role is codable")
-    func testSurfaceRoleSpecWithMaterialRoleCodable() throws {
+    @Test("Surface role spec with material is codable")
+    func testSurfaceRoleSpecWithMaterialCodable() throws {
         let original = GentleSurfaceRoleSpec(
-            visualEffect: .surfaceOverlay,
+            colorRole: .surfaceOverlay,
+            appleMaterial: .thick,
             border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000")
         )
 
@@ -632,7 +646,8 @@ struct GentleSurfaceRoleSpecTests {
         let data = try encoder.encode(original)
         let decoded = try decoder.decode(GentleSurfaceRoleSpec.self, from: data)
 
-        #expect(decoded.visualEffect == .surfaceOverlay)
+        #expect(decoded.colorRole == .surfaceOverlay)
+        #expect(decoded.appleMaterial == .thick)
     }
 }
 
@@ -648,7 +663,7 @@ struct GentleSurfaceTokensTests {
 
         for role in roles {
             let spec = tokens.roleSpec(for: role)
-            #expect(!spec.visualEffect.rawValue.isEmpty, "Missing surface spec for role: \(role)")
+            #expect(!spec.colorRole.rawValue.isEmpty, "Missing surface spec for role: \(role)")
         }
     }
 
@@ -656,14 +671,14 @@ struct GentleSurfaceTokensTests {
     func testSurfaceTokensFallbackToCard() {
         let tokens = GentleSurfaceTokens(roles: [
             GentleSurfaceRole.card.rawValue: GentleSurfaceRoleSpec(
-                visualEffect: .surface,
+                colorRole: .surface,
                 border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151")
             )
         ])
 
         // Request missing role should fallback to card
         let spec = tokens.roleSpec(for: .appBackground)
-        #expect(spec.visualEffect == .surface)
+        #expect(spec.colorRole == .surface)
     }
 
     @Test("Surface tokens fallback to hardcoded defaults when empty")
@@ -671,7 +686,7 @@ struct GentleSurfaceTokensTests {
         let tokens = GentleSurfaceTokens(roles: [:])
         let spec = tokens.roleSpec(for: .card)
 
-        #expect(spec.visualEffect == .surface)
+        #expect(spec.colorRole == .surface)
     }
 
     @Test("Surface tokens are codable")
@@ -687,7 +702,8 @@ struct GentleSurfaceTokensTests {
         for role in roles {
             let originalSpec = original.roleSpec(for: role)
             let decodedSpec = decoded.roleSpec(for: role)
-            #expect(originalSpec.visualEffect == decodedSpec.visualEffect)
+            #expect(originalSpec.colorRole == decodedSpec.colorRole)
+            #expect(originalSpec.appleMaterial == decodedSpec.appleMaterial)
             #expect(originalSpec.cornerRadius == decodedSpec.cornerRadius)
         }
     }
@@ -727,7 +743,8 @@ struct MaterialJSONRoundTripTests {
             let originalSpec = original.surfaces.roleSpec(for: role)
             let decodedSpec = decoded.surfaces.roleSpec(for: role)
 
-            #expect(originalSpec.visualEffect == decodedSpec.visualEffect)
+            #expect(originalSpec.colorRole == decodedSpec.colorRole)
+            #expect(originalSpec.appleMaterial == decodedSpec.appleMaterial)
             #expect(originalSpec.cornerRadius == decodedSpec.cornerRadius)
             #expect(originalSpec.borderWidth == decodedSpec.borderWidth)
             #expect(originalSpec.shadowRadius == decodedSpec.shadowRadius)
@@ -738,9 +755,10 @@ struct MaterialJSONRoundTripTests {
     func testCustomSpecWithMaterialRoleRoundTrip() throws {
         var spec = GentleDesignSystemSpec.gentleDefault
 
-        // Replace card with a different visual effect
+        // Replace card with a different color role and material
         spec.surfaces.roles[GentleSurfaceRole.card.rawValue] = GentleSurfaceRoleSpec(
-            visualEffect: .surfaceOverlay,
+            colorRole: .surfaceOverlay,
+            appleMaterial: .regular,
             border: GentleColorPair(lightHex: "#FFFFFF20", darkHex: "#00000020"),
             cornerRadius: 16
         )
@@ -749,7 +767,8 @@ struct MaterialJSONRoundTripTests {
         let decoded = try GentleDesignSystemSpec.fromJSONData(jsonData)
 
         let decodedCardSpec = decoded.surfaces.roleSpec(for: .card)
-        #expect(decodedCardSpec.visualEffect == .surfaceOverlay)
+        #expect(decodedCardSpec.colorRole == .surfaceOverlay)
+        #expect(decodedCardSpec.appleMaterial == .regular)
     }
 
     @Test("Spec JSON contains surfaces key")
@@ -758,6 +777,7 @@ struct MaterialJSONRoundTripTests {
         let jsonString = try spec.encodedJSONString()
 
         #expect(jsonString.contains("\"surfaces\""))
-        #expect(jsonString.contains("\"visualEffect\""))
+        #expect(jsonString.contains("\"colorRole\""))
+        #expect(jsonString.contains("\"appleMaterial\""))
     }
 }
