@@ -12,6 +12,25 @@
 
 import Foundation
 
+// MARK: - Material Roles
+
+/// Role-based material identifiers used by surfaces.
+public enum GentleDesignMaterialRole: String, Codable, Sendable, CaseIterable, Identifiable {
+    case appBackground
+    case surface
+    case surfaceOverlay
+
+    public var id: String { rawValue }
+
+    public var displayName: String {
+        switch self {
+        case .appBackground: return "App Background"
+        case .surface: return "Surface"
+        case .surfaceOverlay: return "Surface Overlay"
+        }
+    }
+}
+
 // MARK: - GentleDesignMaterial
 
 /// A reusable visual "recipe" describing optical behavior and edge cues.

@@ -1,7 +1,6 @@
 //  Jonathan Ritchey
 import SwiftUI
 
-#if canImport(UIKit)
 /// Compact grid cell for displaying a color role.
 /// Tapping opens a sheet for editing.
 public struct ColorRoleCell: View {
@@ -432,13 +431,8 @@ private extension Color {
         var b: CGFloat = 0
         var a: CGFloat = 0
 
-        #if canImport(UIKit)
         let uiColor = UIColor(self)
         uiColor.getRed(&r, green: &g, blue: &b, alpha: &a)
-        #elseif canImport(AppKit)
-        let nsColor = NSColor(self).usingColorSpace(.deviceRGB) ?? NSColor(self)
-        nsColor.getRed(&r, green: &g, blue: &b, alpha: &a)
-        #endif
 
         if a < 1.0 {
             return String(
@@ -458,4 +452,3 @@ private extension Color {
         }
     }
 }
-#endif

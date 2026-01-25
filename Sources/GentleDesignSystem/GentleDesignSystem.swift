@@ -2,12 +2,10 @@
 import SwiftUI
 import Foundation
 import Observation
-#if canImport(UIKit)
 import UIKit
-#endif
 
 public enum GentleDesignSystemSpecVersion {
-    public static let current = "0.3.0" // simplify button spec: materialRole + borderRole replace textRole/backgroundRole/labelColorRole/borderRole
+    public static let current = "0.4.0" // surfaces: materialRole replaces material recipe in specs
 }
 
 // MARK: - Roles
@@ -273,7 +271,6 @@ public enum GentleFontTextStyle: String, Codable, Sendable {
     case largeTitle, title, title2, title3, headline, body, callout, subheadline, footnote, caption, caption2
 }
 
-#if canImport(UIKit)
 public extension GentleFontTextStyle {
     /// UIKit semantic anchor used by UIFontMetrics for Dynamic Type scaling.
     var uiKitTextStyle: UIFont.TextStyle {
@@ -312,7 +309,6 @@ private extension ContentSizeCategory {
         }
     }
 }
-#endif
 
 // MARK: - Codable token structs (JSON-friendly)
 
@@ -1027,36 +1023,47 @@ public struct GentleTheme: Sendable {
         return Color(gentleHex: pair.hex(for: scheme))
     }
 
+    public func material(for role: GentleDesignMaterialRole) -> GentleDesignMaterial {
+        let colors = activeSpec.colors
+
+        func pair(_ role: GentleColorRole, fallback: GentleColorPair) -> GentleColorPair {
+            colors.pair(for: role) ?? fallback
+        }
+
+        switch role {
+        case .appBackground:
+            return GentleDesignMaterial(
+                id: role.rawValue,
+                base: .solid(pair(.background, fallback: .init(lightHex: "#F3F4F6", darkHex: "#030712")))
+            )
+        case .surface:
+            return GentleDesignMaterial(
+                id: role.rawValue,
+                base: .solid(pair(.surface, fallback: .init(lightHex: "#FAFAFE", darkHex: "#111827")))
+            )
+        case .surfaceOverlay:
+            return GentleDesignMaterial(
+                id: role.rawValue,
+                base: .solid(pair(.surfaceOverlay, fallback: .init(lightHex: "#111827CC", darkHex: "#020617CC")))
+            )
+        }
+    }
+
     public func textStyle(for role: GentleTextRole, sizeCategory: ContentSizeCategory) -> GentleResolvedTextStyle {
         let roleSpec = activeSpec.typography.roleSpec(for: role)
 
-        #if canImport(UIKit)
         let metrics = UIFontMetrics(forTextStyle: roleSpec.relativeTo.uiKitTextStyle)
         let traits = UITraitCollection(preferredContentSizeCategory: sizeCategory.uiContentSizeCategory)
         let scaledSize = metrics.scaledValue(for: CGFloat(roleSpec.pointSize), compatibleWith: traits)
-        #else
-        // On macOS, use the base point size without Dynamic Type scaling
-        let scaledSize = CGFloat(roleSpec.pointSize)
-        #endif
 
         var baseFont = Font.system(size: scaledSize,
                                    weight: roleSpec.weight.swiftUIWeight,
                                    design: roleSpec.design.swiftUIDesign)
 
         if let width = roleSpec.width {
-            #if os(iOS)
-            if #available(iOS 17.0, *) {
-                if roleSpec.design == .default {
-                    baseFont = baseFont.width(width.swiftUIWidth)
-                }
+            if roleSpec.design == .default {
+                baseFont = baseFont.width(width.swiftUIWidth)
             }
-            #elseif os(macOS)
-            if #available(macOS 14.0, *) {
-                if roleSpec.design == .default {
-                    baseFont = baseFont.width(width.swiftUIWidth)
-                }
-            }
-            #endif
         }
 
         return GentleResolvedTextStyle(
@@ -1412,11 +1419,16 @@ public final class GentleThemeManager {
 
     /// Loads the persisted editable spec (if present) into `theme.editableSpec`.
     public func load() throws {
-        if let savedSpec = try store.loadEditableSpec() {
-            var t = theme
+        var t = theme
+        if let presetName = currentPresetName,
+           let savedSpec = try store.loadEditableSpec(forPreset: presetName) {
             t.editableSpec = savedSpec
-            theme = t
+        } else if let savedSpec = try store.loadEditableSpec() {
+            t.editableSpec = savedSpec
+        } else {
+            t.editableSpec = t.defaultSpec
         }
+        theme = t
         hasUnsavedChanges = false
     }
 

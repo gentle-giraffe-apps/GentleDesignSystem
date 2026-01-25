@@ -184,6 +184,7 @@ public struct GentleSurfaceModifier: ViewModifier {
         let spec = theme.surfaces.roleSpec(for: role)
         let insetContent = inset.map { AnyView(content.gentleInset($0, variant: insetVariant)) } ?? AnyView(content)
 
+        let material = theme.material(for: spec.materialRole)
         let borderColor = showTappableHint
         ? theme.color(for: .primaryCTA, scheme: colorScheme).opacity(0.4)
             : Color(gentleHex: spec.border.hex(for: colorScheme))
@@ -193,7 +194,7 @@ public struct GentleSurfaceModifier: ViewModifier {
         case .appBackground:
             return AnyView(
                 insetContent.background(
-                    GentleMaterialView(material: spec.material, colorScheme: colorScheme)
+                    GentleMaterialView(material: material, colorScheme: colorScheme)
                         .ignoresSafeArea()
                 )
             )
@@ -201,7 +202,7 @@ public struct GentleSurfaceModifier: ViewModifier {
         case .surfaceOverlay:
             return AnyView(
                 insetContent
-                    .background(GentleMaterialView(material: spec.material, colorScheme: colorScheme))
+                    .background(GentleMaterialView(material: material, colorScheme: colorScheme))
                     .cornerRadius(cornerRadius)
             )
 
@@ -213,7 +214,7 @@ public struct GentleSurfaceModifier: ViewModifier {
 
             return AnyView(
                 insetContent
-                    .background(GentleMaterialView(material: spec.material, colorScheme: colorScheme))
+                    .background(GentleMaterialView(material: material, colorScheme: colorScheme))
                     .cornerRadius(cornerRadius)
                     .overlay(
                         Group {

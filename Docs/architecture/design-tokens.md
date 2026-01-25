@@ -119,7 +119,7 @@ let scaledSize = metrics.scaledValue(for: pointSize, compatibleWith: traits)
 
 ## Versioning
 
-Current version: `0.3.0` (in `GentleDesignSystemSpecVersion.current`)
+Current version: `0.4.0` (in `GentleDesignSystemSpecVersion.current`)
 
 Bump version when:
 - Adding new token types
