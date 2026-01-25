@@ -172,12 +172,21 @@ struct GentleSurfaceRoleTests {
         #expect(GentleSurfaceRole.appBackground.rawValue == "appBackground")
         #expect(GentleSurfaceRole.card.rawValue == "card")
         #expect(GentleSurfaceRole.cardElevated.rawValue == "cardElevated")
-        #expect(GentleSurfaceRole.surfaceOverlay.rawValue == "surfaceOverlay")
+        #expect(GentleSurfaceRole.cardSecondary.rawValue == "cardSecondary")
+        #expect(GentleSurfaceRole.chrome.rawValue == "chrome")
+        #expect(GentleSurfaceRole.overlaySheet.rawValue == "overlaySheet")
+        #expect(GentleSurfaceRole.overlayPopover.rawValue == "overlayPopover")
+        #expect(GentleSurfaceRole.floatingPanel.rawValue == "floatingPanel")
+        #expect(GentleSurfaceRole.floatingWidget.rawValue == "floatingWidget")
     }
 
     @Test("All surface roles have unique raw values")
     func testSurfaceRoleUniqueRawValues() {
-        let allRoles: [GentleSurfaceRole] = [.appBackground, .card, .cardElevated, .surfaceOverlay]
+        let allRoles: [GentleSurfaceRole] = [
+            .appBackground, .card, .cardElevated, .cardSecondary,
+            .chrome, .overlaySheet, .overlayPopover,
+            .floatingPanel, .floatingWidget
+        ]
         let rawValues = allRoles.map { $0.rawValue }
         let uniqueValues = Set(rawValues)
         #expect(rawValues.count == uniqueValues.count)
@@ -189,7 +198,11 @@ struct GentleSurfaceRoleIdentifiableTests {
 
     @Test("Surface roles are identifiable by rawValue")
     func testSurfaceRoleIdentifiable() {
-        let roles: [GentleSurfaceRole] = [.appBackground, .card, .cardElevated, .surfaceOverlay]
+        let roles: [GentleSurfaceRole] = [
+            .appBackground, .card, .cardElevated, .cardSecondary,
+            .chrome, .overlaySheet, .overlayPopover,
+            .floatingPanel, .floatingWidget
+        ]
         for role in roles {
             #expect(role.id == role.rawValue)
         }

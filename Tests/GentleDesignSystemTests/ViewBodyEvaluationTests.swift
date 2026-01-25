@@ -296,7 +296,7 @@ struct ModifierBodyEvaluationTests {
 
     @Test("GentleSurfaceModifier body evaluates for all surface roles")
     func testSurfaceModifierBodyAllRoles() {
-        let surfaceRoles: [GentleSurfaceRole] = [.appBackground, .card, .cardElevated, .surfaceOverlay]
+        let surfaceRoles: [GentleSurfaceRole] = [.appBackground, .card, .cardElevated, .cardSecondary, .chrome, .overlaySheet, .overlayPopover, .floatingPanel, .floatingWidget]
         for role in surfaceRoles {
             let view = wrapWithGentleEnvironment(
                 Text("Content").modifier(GentleSurfaceModifier(role: role))
@@ -1377,7 +1377,7 @@ struct SurfaceRoleEditorSheetTests {
     func testSurfaceRoleEditorSheetAllRoles() throws {
         let theme = GentleTheme(defaultSpec: .gentleDefault)
         let manager = GentleThemeManager(theme: theme)
-        let roles: [GentleSurfaceRole] = [.appBackground, .card, .cardElevated, .surfaceOverlay]
+        let roles: [GentleSurfaceRole] = [.appBackground, .card, .cardElevated, .cardSecondary, .chrome, .overlaySheet, .overlayPopover, .floatingPanel, .floatingWidget]
 
         for role in roles {
             let view = SurfaceRoleEditorSheet(role: role)
