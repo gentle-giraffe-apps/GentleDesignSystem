@@ -7,7 +7,7 @@ import UIKit
 #endif
 
 public enum GentleDesignSystemSpecVersion {
-    public static let current = "0.3.0" // simplify button spec: materialRole + borderRole replace textRole/backgroundRole/labelColorRole/borderRole
+    public static let current = "0.4.0" // surfaces: materialRole replaces material recipe in specs
 }
 
 // MARK: - Roles
@@ -1027,6 +1027,32 @@ public struct GentleTheme: Sendable {
         return Color(gentleHex: pair.hex(for: scheme))
     }
 
+    public func material(for role: GentleDesignMaterialRole) -> GentleDesignMaterial {
+        let colors = activeSpec.colors
+
+        func pair(_ role: GentleColorRole, fallback: GentleColorPair) -> GentleColorPair {
+            colors.pair(for: role) ?? fallback
+        }
+
+        switch role {
+        case .appBackground:
+            return GentleDesignMaterial(
+                id: role.rawValue,
+                base: .solid(pair(.background, fallback: .init(lightHex: "#F3F4F6", darkHex: "#030712")))
+            )
+        case .surface:
+            return GentleDesignMaterial(
+                id: role.rawValue,
+                base: .solid(pair(.surface, fallback: .init(lightHex: "#FAFAFE", darkHex: "#111827")))
+            )
+        case .surfaceOverlay:
+            return GentleDesignMaterial(
+                id: role.rawValue,
+                base: .solid(pair(.surfaceOverlay, fallback: .init(lightHex: "#111827CC", darkHex: "#020617CC")))
+            )
+        }
+    }
+
     public func textStyle(for role: GentleTextRole, sizeCategory: ContentSizeCategory) -> GentleResolvedTextStyle {
         let roleSpec = activeSpec.typography.roleSpec(for: role)
 
@@ -1412,11 +1438,16 @@ public final class GentleThemeManager {
 
     /// Loads the persisted editable spec (if present) into `theme.editableSpec`.
     public func load() throws {
-        if let savedSpec = try store.loadEditableSpec() {
-            var t = theme
+        var t = theme
+        if let presetName = currentPresetName,
+           let savedSpec = try store.loadEditableSpec(forPreset: presetName) {
             t.editableSpec = savedSpec
-            theme = t
+        } else if let savedSpec = try store.loadEditableSpec() {
+            t.editableSpec = savedSpec
+        } else {
+            t.editableSpec = t.defaultSpec
         }
+        theme = t
         hasUnsavedChanges = false
     }
 

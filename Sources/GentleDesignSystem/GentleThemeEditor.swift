@@ -723,7 +723,11 @@ struct SurfaceRoleEditorSheet: View {
 
                 List {
                     Section("Material") {
-                        SurfaceMaterialEditor(binding: binding.material)
+                        Picker("Material", selection: binding.materialRole) {
+                            ForEach(GentleDesignMaterialRole.allCases, id: \.self) { role in
+                                Text(role.displayName).tag(role)
+                            }
+                        }
                     }
 
                     Section("Border") {

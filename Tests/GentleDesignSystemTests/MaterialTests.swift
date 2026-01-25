@@ -556,27 +556,19 @@ struct GentleSurfaceRoleSpecTests {
 
     @Test("Surface role spec stores material and border")
     func testSurfaceRoleSpec() {
-        let material = GentleDesignMaterial(
-            id: "test",
-            base: .solid(GentleColorPair(lightHex: "#FFFFFF", darkHex: "#000000"))
-        )
         let border = GentleColorPair(lightHex: "#CCCCCC", darkHex: "#333333")
 
-        let spec = GentleSurfaceRoleSpec(material: material, border: border)
+        let spec = GentleSurfaceRoleSpec(materialRole: .surface, border: border)
 
-        #expect(spec.material.id == "test")
+        #expect(spec.materialRole == .surface)
         #expect(spec.border.lightHex == "#CCCCCC")
     }
 
     @Test("Surface role spec has default values")
     func testSurfaceRoleSpecDefaults() {
-        let material = GentleDesignMaterial(
-            id: "test",
-            base: .solid(GentleColorPair(lightHex: "#FFFFFF", darkHex: "#000000"))
-        )
         let border = GentleColorPair(lightHex: "#CCCCCC", darkHex: "#333333")
 
-        let spec = GentleSurfaceRoleSpec(material: material, border: border)
+        let spec = GentleSurfaceRoleSpec(materialRole: .surface, border: border)
 
         #expect(spec.cornerRadius == 20)
         #expect(spec.borderWidth == 1)
@@ -588,13 +580,8 @@ struct GentleSurfaceRoleSpecTests {
 
     @Test("Surface role spec with all properties")
     func testSurfaceRoleSpecAllProperties() {
-        let material = GentleDesignMaterial(
-            id: "elevated",
-            base: .solid(GentleColorPair(lightHex: "#FFFFFF", darkHex: "#1F2937"))
-        )
-
         let spec = GentleSurfaceRoleSpec(
-            material: material,
+            materialRole: .surface,
             border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
             cornerRadius: 24,
             borderWidth: 0.5,
@@ -614,13 +601,8 @@ struct GentleSurfaceRoleSpecTests {
 
     @Test("Surface role spec is codable")
     func testSurfaceRoleSpecCodable() throws {
-        let material = GentleDesignMaterial(
-            id: "card",
-            base: .solid(GentleColorPair(lightHex: "#FAFAFE", darkHex: "#111827"))
-        )
-
         let original = GentleSurfaceRoleSpec(
-            material: material,
+            materialRole: .surface,
             border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
             cornerRadius: 16,
             borderWidth: 1.5
@@ -632,20 +614,15 @@ struct GentleSurfaceRoleSpecTests {
         let data = try encoder.encode(original)
         let decoded = try decoder.decode(GentleSurfaceRoleSpec.self, from: data)
 
-        #expect(decoded.material.id == "card")
+        #expect(decoded.materialRole == .surface)
         #expect(decoded.cornerRadius == 16)
         #expect(decoded.borderWidth == 1.5)
     }
 
-    @Test("Surface role spec with appleMaterial is codable")
-    func testSurfaceRoleSpecWithAppleMaterialCodable() throws {
-        let material = GentleDesignMaterial(
-            id: "frosted",
-            base: .appleMaterial(GentleAppleMaterialSpec(kind: .thin, opacity: 0.9))
-        )
-
+    @Test("Surface role spec with material role is codable")
+    func testSurfaceRoleSpecWithMaterialRoleCodable() throws {
         let original = GentleSurfaceRoleSpec(
-            material: material,
+            materialRole: .surfaceOverlay,
             border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000")
         )
 
@@ -655,13 +632,7 @@ struct GentleSurfaceRoleSpecTests {
         let data = try encoder.encode(original)
         let decoded = try decoder.decode(GentleSurfaceRoleSpec.self, from: data)
 
-        #expect(decoded.material.id == "frosted")
-        if case .appleMaterial(let spec) = decoded.material.base {
-            #expect(spec.kind == .thin)
-            #expect(spec.opacity == 0.9)
-        } else {
-            Issue.record("Expected appleMaterial base after decoding")
-        }
+        #expect(decoded.materialRole == .surfaceOverlay)
     }
 }
 
@@ -677,27 +648,22 @@ struct GentleSurfaceTokensTests {
 
         for role in roles {
             let spec = tokens.roleSpec(for: role)
-            #expect(!spec.material.id.isEmpty, "Missing surface spec for role: \(role)")
+            #expect(!spec.materialRole.rawValue.isEmpty, "Missing surface spec for role: \(role)")
         }
     }
 
     @Test("Surface tokens fallback to card when role missing")
     func testSurfaceTokensFallbackToCard() {
-        let cardMaterial = GentleDesignMaterial(
-            id: "cardFallback",
-            base: .solid(GentleColorPair(lightHex: "#FAFAFE", darkHex: "#111827"))
-        )
-
         let tokens = GentleSurfaceTokens(roles: [
             GentleSurfaceRole.card.rawValue: GentleSurfaceRoleSpec(
-                material: cardMaterial,
+                materialRole: .surface,
                 border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151")
             )
         ])
 
         // Request missing role should fallback to card
         let spec = tokens.roleSpec(for: .appBackground)
-        #expect(spec.material.id == "cardFallback")
+        #expect(spec.materialRole == .surface)
     }
 
     @Test("Surface tokens fallback to hardcoded defaults when empty")
@@ -705,13 +671,7 @@ struct GentleSurfaceTokensTests {
         let tokens = GentleSurfaceTokens(roles: [:])
         let spec = tokens.roleSpec(for: .card)
 
-        #expect(spec.material.id == "fallback")
-        if case .solid(let colorPair) = spec.material.base {
-            #expect(colorPair.lightHex == "#FAFAFE")
-            #expect(colorPair.darkHex == "#111827")
-        } else {
-            Issue.record("Expected solid base in fallback")
-        }
+        #expect(spec.materialRole == .surface)
     }
 
     @Test("Surface tokens are codable")
@@ -727,7 +687,7 @@ struct GentleSurfaceTokensTests {
         for role in roles {
             let originalSpec = original.roleSpec(for: role)
             let decodedSpec = decoded.roleSpec(for: role)
-            #expect(originalSpec.material.id == decodedSpec.material.id)
+            #expect(originalSpec.materialRole == decodedSpec.materialRole)
             #expect(originalSpec.cornerRadius == decodedSpec.cornerRadius)
         }
     }
@@ -767,24 +727,20 @@ struct MaterialJSONRoundTripTests {
             let originalSpec = original.surfaces.roleSpec(for: role)
             let decodedSpec = decoded.surfaces.roleSpec(for: role)
 
-            #expect(originalSpec.material.id == decodedSpec.material.id)
+            #expect(originalSpec.materialRole == decodedSpec.materialRole)
             #expect(originalSpec.cornerRadius == decodedSpec.cornerRadius)
             #expect(originalSpec.borderWidth == decodedSpec.borderWidth)
             #expect(originalSpec.shadowRadius == decodedSpec.shadowRadius)
         }
     }
 
-    @Test("Custom spec with appleMaterial surfaces round-trips")
-    func testCustomSpecWithAppleMaterialRoundTrip() throws {
+    @Test("Custom spec with material role round-trips")
+    func testCustomSpecWithMaterialRoleRoundTrip() throws {
         var spec = GentleDesignSystemSpec.gentleDefault
 
-        // Replace card with appleMaterial
-        let frostedMaterial = GentleDesignMaterial(
-            id: "frostedCard",
-            base: .appleMaterial(GentleAppleMaterialSpec(kind: .regular, opacity: 0.95))
-        )
+        // Replace card with a different material role
         spec.surfaces.roles[GentleSurfaceRole.card.rawValue] = GentleSurfaceRoleSpec(
-            material: frostedMaterial,
+            materialRole: .surfaceOverlay,
             border: GentleColorPair(lightHex: "#FFFFFF20", darkHex: "#00000020"),
             cornerRadius: 16
         )
@@ -793,14 +749,7 @@ struct MaterialJSONRoundTripTests {
         let decoded = try GentleDesignSystemSpec.fromJSONData(jsonData)
 
         let decodedCardSpec = decoded.surfaces.roleSpec(for: .card)
-        #expect(decodedCardSpec.material.id == "frostedCard")
-
-        if case .appleMaterial(let appleMaterial) = decodedCardSpec.material.base {
-            #expect(appleMaterial.kind == .regular)
-            #expect(appleMaterial.opacity == 0.95)
-        } else {
-            Issue.record("Expected appleMaterial base after round-trip")
-        }
+        #expect(decodedCardSpec.materialRole == .surfaceOverlay)
     }
 
     @Test("Spec JSON contains surfaces key")
@@ -809,7 +758,6 @@ struct MaterialJSONRoundTripTests {
         let jsonString = try spec.encodedJSONString()
 
         #expect(jsonString.contains("\"surfaces\""))
-        #expect(jsonString.contains("\"material\""))
-        #expect(jsonString.contains("\"base\""))
+        #expect(jsonString.contains("\"materialRole\""))
     }
 }

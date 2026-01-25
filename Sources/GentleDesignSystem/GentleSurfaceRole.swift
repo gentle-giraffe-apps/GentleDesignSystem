@@ -12,8 +12,8 @@ public enum GentleSurfaceRole: String, Codable, Sendable {
 
 /// Defines the visual appearance of a surface role.
 public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
-    // Material (replaces simple background color)
-    public var material: GentleDesignMaterial
+    // Material role (resolved into a material recipe at runtime)
+    public var materialRole: GentleDesignMaterialRole
     public var border: GentleColorPair
 
     // Structure
@@ -27,7 +27,7 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
     public var shadowOffsetY: Double
 
     public init(
-        material: GentleDesignMaterial,
+        materialRole: GentleDesignMaterialRole,
         border: GentleColorPair,
         cornerRadius: Double = 20,
         borderWidth: Double = 1,
@@ -36,7 +36,7 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
         shadowOffsetX: Double = 0,
         shadowOffsetY: Double = 0
     ) {
-        self.material = material
+        self.materialRole = materialRole
         self.border = border
         self.cornerRadius = cornerRadius
         self.borderWidth = borderWidth
@@ -44,6 +44,58 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
         self.shadowOpacity = shadowOpacity
         self.shadowOffsetX = shadowOffsetX
         self.shadowOffsetY = shadowOffsetY
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case materialRole
+        case material // legacy payload (GentleDesignMaterial)
+        case border
+        case cornerRadius
+        case borderWidth
+        case shadowRadius
+        case shadowOpacity
+        case shadowOffsetX
+        case shadowOffsetY
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        if let role = try container.decodeIfPresent(GentleDesignMaterialRole.self, forKey: .materialRole) {
+            self.materialRole = role
+        } else if let legacyMaterial = try container.decodeIfPresent(GentleDesignMaterial.self, forKey: .material) {
+            if legacyMaterial.id == "card" || legacyMaterial.id == "cardElevated" {
+                self.materialRole = .surface
+            } else if legacyMaterial.id == "appBackground" {
+                self.materialRole = .appBackground
+            } else if legacyMaterial.id == "surfaceOverlay" {
+                self.materialRole = .surfaceOverlay
+            } else {
+                self.materialRole = .surface
+            }
+        } else {
+            self.materialRole = .surface
+        }
+
+        self.border = try container.decode(GentleColorPair.self, forKey: .border)
+        self.cornerRadius = try container.decodeIfPresent(Double.self, forKey: .cornerRadius) ?? 20
+        self.borderWidth = try container.decodeIfPresent(Double.self, forKey: .borderWidth) ?? 1
+        self.shadowRadius = try container.decodeIfPresent(Double.self, forKey: .shadowRadius) ?? 0
+        self.shadowOpacity = try container.decodeIfPresent(Double.self, forKey: .shadowOpacity) ?? 0
+        self.shadowOffsetX = try container.decodeIfPresent(Double.self, forKey: .shadowOffsetX) ?? 0
+        self.shadowOffsetY = try container.decodeIfPresent(Double.self, forKey: .shadowOffsetY) ?? 0
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(materialRole, forKey: .materialRole)
+        try container.encode(border, forKey: .border)
+        try container.encode(cornerRadius, forKey: .cornerRadius)
+        try container.encode(borderWidth, forKey: .borderWidth)
+        try container.encode(shadowRadius, forKey: .shadowRadius)
+        try container.encode(shadowOpacity, forKey: .shadowOpacity)
+        try container.encode(shadowOffsetX, forKey: .shadowOffsetX)
+        try container.encode(shadowOffsetY, forKey: .shadowOffsetY)
     }
 }
 
@@ -61,10 +113,7 @@ public struct GentleSurfaceTokens: Codable, Sendable {
         if let card = roles[GentleSurfaceRole.card.rawValue] { return card }
         // Last-resort defaults (should never happen with gentleDefault).
         return .init(
-            material: GentleDesignMaterial(
-                id: "fallback",
-                base: .solid(GentleColorPair(lightHex: "#FAFAFE", darkHex: "#111827"))
-            ),
+            materialRole: .surface,
             border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151")
         )
     }
@@ -74,10 +123,7 @@ public extension GentleSurfaceTokens {
     static let gentleDefault: GentleSurfaceTokens = .init(
         roles: [
             GentleSurfaceRole.appBackground.rawValue: .init(
-                material: GentleDesignMaterial(
-                    id: "appBackground",
-                    base: .solid(GentleColorPair(lightHex: "#F3F4F6", darkHex: "#030712"))
-                ),
+                materialRole: .appBackground,
                 border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
                 cornerRadius: 0,
                 borderWidth: 0,
@@ -87,10 +133,7 @@ public extension GentleSurfaceTokens {
                 shadowOffsetY: 0
             ),
             GentleSurfaceRole.card.rawValue: .init(
-                material: GentleDesignMaterial(
-                    id: "card",
-                    base: .solid(GentleColorPair(lightHex: "#FAFAFE", darkHex: "#111827"))
-                ),
+                materialRole: .surface,
                 border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
                 cornerRadius: 20,
                 borderWidth: 1,
@@ -100,10 +143,7 @@ public extension GentleSurfaceTokens {
                 shadowOffsetY: 0
             ),
             GentleSurfaceRole.cardElevated.rawValue: .init(
-                material: GentleDesignMaterial(
-                    id: "cardElevated",
-                    base: .solid(GentleColorPair(lightHex: "#FAFAFE", darkHex: "#111827"))
-                ),
+                materialRole: .surface,
                 border: GentleColorPair(lightHex: "#E5E7EB59", darkHex: "#37415159"),
                 cornerRadius: 20,
                 borderWidth: 0.5,
@@ -113,10 +153,7 @@ public extension GentleSurfaceTokens {
                 shadowOffsetY: 6
             ),
             GentleSurfaceRole.surfaceOverlay.rawValue: .init(
-                material: GentleDesignMaterial(
-                    id: "surfaceOverlay",
-                    base: .solid(GentleColorPair(lightHex: "#111827CC", darkHex: "#020617CC"))
-                ),
+                materialRole: .surfaceOverlay,
                 border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
                 cornerRadius: 0,
                 borderWidth: 0,
