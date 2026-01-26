@@ -1285,7 +1285,7 @@ struct StringCamelCaseBreakableTests {
 
     @Test("camelCaseBreakable works with various strings")
     func testCamelCaseBreakableVariations() throws {
-        let inputs = ["primaryCTA", "onPrimaryCTA", "borderSubtle", "surfaceSpecular"]
+        let inputs = ["primaryCTA", "textOnPrimaryCTA", "borderSubtle", "surfaceSpecular"]
         for input in inputs {
             _ = input.camelCaseBreakable
         }

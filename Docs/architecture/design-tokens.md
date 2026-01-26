@@ -58,15 +58,21 @@ Naming: `{semantic}_{ramp}` where ramp = xxl > xl > l > ml > m > ms > s
 
 ### GentleColorRole (17 roles)
 ```
-Text:     textPrimary, textSecondary, textTertiary
-On:       onPrimaryCTA, onDestructive, onOverlay, onOverlaySecondary
-Surface:  background, surface, surfaceTint, surfaceSpecular, surfaceOverlay
+Text:     textPrimary, textSecondary, textTertiary,
+          textOnPrimaryCTA, textOnDestructive, textOnOverlay, textOnOverlaySecondary
+Surface:  background, surface, surfaceOverlay, surfaceTint, surfaceSpecular, borderSubtle
 Action:   primaryCTA, destructive
 Theme:    themePrimary, themeSecondary
-Border:   borderSubtle
 ```
 
-**Surface Color Roles**: `GentleColorRole.surfaceColorRoles` identifies the subset of color roles appropriate for surface backgrounds: `background`, `surface`, `surfaceOverlay`. Use `role.isSurfaceColorRole` to check if a role is surface-appropriate.
+**Semantic Groupings**:
+- `GentleColorRole.textRoles` - all text/foreground colors (7)
+- `GentleColorRole.surfaceRoles` - container/background/border colors (6)
+- `GentleColorRole.actionRoles` - interactive element colors (2)
+- `GentleColorRole.themeRoles` - brand/accent colors (2)
+- `GentleColorRole.surfaceBackgroundRoles` - subset valid for surface backgrounds (3): `background`, `surface`, `surfaceOverlay`
+
+Use `role.isTextRole`, `role.isSurfaceRole`, `role.isActionRole`, `role.isThemeRole`, or `role.isSurfaceBackgroundRole` for membership checks.
 
 ### GentleButtonRole (5 roles)
 ```
