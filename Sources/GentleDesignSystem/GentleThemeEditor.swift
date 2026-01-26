@@ -636,18 +636,14 @@ public struct GentleDesignSurfacesSection: View {
                 .gentleText(.title_xl)
                 .opacity(0.7)
 
-            HStack(spacing: design.layout.stack.regular) {
-                surfaceCard(
-                    title: "card",
-                    subtitle: "Subtle border",
-                    surface: .card
-                )
+            ForEach(GentleSurfaceRole.groupedByCategory, id: \.category) { group in
+                VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+                    Text(group.category.rawValue)
+                        .gentleText(.subheadline_ms)
+                        .opacity(0.6)
 
-                surfaceCard(
-                    title: "elevated",
-                    subtitle: "Shadow",
-                    surface: .cardElevated
-                )
+                    surfaceRow(for: group.roles)
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -656,24 +652,43 @@ public struct GentleDesignSurfacesSection: View {
         }
     }
 
-    private func surfaceCard(
-        title: String,
-        subtitle: String,
-        surface: GentleSurfaceRole
-    ) -> some View {
+    @ViewBuilder
+    private func surfaceRow(for roles: [GentleSurfaceRole]) -> some View {
+        let columns = min(roles.count, 3)
+        let rows = (roles.count + columns - 1) / columns
+
+        VStack(spacing: design.layout.stack.tight) {
+            ForEach(0..<rows, id: \.self) { rowIndex in
+                HStack(spacing: design.layout.stack.tight) {
+                    ForEach(0..<columns, id: \.self) { colIndex in
+                        let index = rowIndex * columns + colIndex
+                        if index < roles.count {
+                            surfaceCard(for: roles[index])
+                        } else {
+                            Color.clear
+                                .frame(maxWidth: .infinity)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func surfaceCard(for role: GentleSurfaceRole) -> some View {
         Button {
-            editingRole = surface
+            editingRole = role
         } label: {
             VStack(alignment: .leading, spacing: design.layout.stack.tight) {
-                Text(title)
-                    .gentleText(.headline_m)
-
-                Text(subtitle)
+                Text(role.displayName)
                     .gentleText(.caption_s)
-                    .opacity(0.8)
+                    .fontWeight(.semibold)
+
+                Text(role.subtitle)
+                    .gentleText(.caption2_s)
+                    .opacity(0.7)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .gentleSurface(surface, inset: .card, showTappableHint: true)
+            .gentleSurface(role, inset: .card, showTappableHint: true)
         }
         .buttonStyle(.plain)
     }
