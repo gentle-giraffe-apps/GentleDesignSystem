@@ -29,23 +29,9 @@ public struct GentleDesignColorsSection: View {
     @GentleThemeManagerRuntime private var manager
 
     private var columns: [GridItem] { [
-        GridItem(.adaptive(minimum: 135), spacing: design.layout.grid.regular)
-        ]
-    }
-
-    private var items: [(String, GentleColorRole)] {
-        [
-            ("textPrimary", .textPrimary),
-            ("textSecondary", .textSecondary),
-            ("textTertiary", .textTertiary),
-            ("background", .background),
-            ("surface", .surface),
-            ("surfaceTint", .surfaceTint),
-            ("surfaceSpecular", .surfaceSpecular),
-            ("borderSubtle", .borderSubtle),
-            ("primaryCTA", .primaryCTA),
-            ("onPrimaryCTA", .onPrimaryCTA),
-            ("destructive", .destructive)
+        GridItem(.flexible(), spacing: design.layout.grid.regular),
+        GridItem(.flexible(), spacing: design.layout.grid.regular),
+        GridItem(.flexible(), spacing: design.layout.grid.regular)
         ]
     }
 
@@ -56,15 +42,43 @@ public struct GentleDesignColorsSection: View {
             Text("Colors")
                 .gentleText(.title_xl)
                 .opacity(0.7)
-            
-            LazyVGrid(columns: columns, spacing: design.layout.grid.tight) {
-                ForEach(items, id: \.0) { name, role in
-                    ColorSwatchRow(role: role, name: name)
+
+            // Text Colors
+            ColorGroupSection(title: "Text", roles: GentleColorRole.textRoles, columns: columns)
+
+            // Surface Colors
+            ColorGroupSection(title: "Surface", roles: GentleColorRole.surfaceRoles, columns: columns)
+
+            // Action Colors
+            ColorGroupSection(title: "Action", roles: GentleColorRole.actionRoles, columns: columns)
+
+            // Theme Colors
+            ColorGroupSection(title: "Theme", roles: GentleColorRole.themeRoles, columns: columns)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+struct ColorGroupSection: View {
+    let title: String
+    let roles: [GentleColorRole]
+    let columns: [GridItem]
+
+    @GentleDesignRuntime private var design
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+            Text(title)
+                .gentleText(.subheadline_ms)
+                .opacity(0.5)
+
+            LazyVGrid(columns: columns, spacing: design.layout.grid.regular) {
+                ForEach(roles, id: \.rawValue) { role in
+                    ColorSwatchRow(role: role, name: role.rawValue)
                 }
             }
             .gentleSurface(.card, inset: .card)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -86,35 +100,34 @@ struct ColorSwatchRow: View {
             set: { binding.darkHex.wrappedValue = $0.toGentleHexString() }
         )
 
-        HStack(spacing: design.layout.stack.tight) {
+        VStack(spacing: 4) {
             HStack(spacing: 2) {
                 ZStack {
-                    lightBinding.wrappedValue.clipShape(RoundedRectangle(cornerRadius: 4))
+                    lightBinding.wrappedValue.clipShape(RoundedRectangle(cornerRadius: 6))
 
                     ColorPicker("", selection: lightBinding, supportsOpacity: true)
                         .labelsHidden()
                         .opacity(0.1)
                 }
-                .frame(width: 32, height: 32)
+                .frame(width: 28, height: 28)
 
                 ZStack {
-                    darkBinding.wrappedValue.clipShape(RoundedRectangle(cornerRadius: 4))
+                    darkBinding.wrappedValue.clipShape(RoundedRectangle(cornerRadius: 6))
 
                     ColorPicker("", selection: darkBinding, supportsOpacity: true)
                         .labelsHidden()
                         .opacity(0.1)
                 }
-                .frame(width: 32, height: 32)
+                .frame(width: 28, height: 28)
             }
 
             Text(name.camelCaseBreakable)
-                .gentleText(.caption_s)
+                .gentleText(.caption2_s)
                 .lineLimit(2)
-                .minimumScaleFactor(0.75)
-
-            Spacer(minLength: 0)
+                .multilineTextAlignment(.center)
+                .minimumScaleFactor(0.7)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -267,9 +280,9 @@ public struct GentleButtonPreview: View {
         let (backgroundColor, iconColorRole): (Color, GentleColorRole) = {
             switch spec.fillRole {
             case .solidFillPrimaryCTA:
-                return (theme.color(for: .primaryCTA, scheme: colorScheme), .onPrimaryCTA)
+                return (theme.color(for: .primaryCTA, scheme: colorScheme), .textOnPrimaryCTA)
             case .solidFillDestructive:
-                return (theme.color(for: .destructive, scheme: colorScheme), .onPrimaryCTA)
+                return (theme.color(for: .destructive, scheme: colorScheme), .textOnPrimaryCTA)
             case .hollow:
                 // Use surface color for miniature chips so they're visible
                 return (theme.color(for: .surface, scheme: colorScheme), .primaryCTA)
@@ -340,9 +353,9 @@ public struct GentleButtonPreview: View {
         let (backgroundColor, labelColorRole): (Color, GentleColorRole) = {
             switch spec.fillRole {
             case .solidFillPrimaryCTA:
-                return (theme.color(for: .primaryCTA, scheme: colorScheme), .onPrimaryCTA)
+                return (theme.color(for: .primaryCTA, scheme: colorScheme), .textOnPrimaryCTA)
             case .solidFillDestructive:
-                return (theme.color(for: .destructive, scheme: colorScheme), .onPrimaryCTA)
+                return (theme.color(for: .destructive, scheme: colorScheme), .textOnPrimaryCTA)
             case .hollow:
                 return (Color.clear, .primaryCTA)
             }
@@ -769,9 +782,9 @@ struct SurfaceRoleEditorSheet: View {
                         // Surface preview overlay
                         VStack(spacing: design.layout.stack.tight) {
                             Text("Preview")
-                                .gentleText(.title2_l, colorRole: isOverlayStyle(binding.wrappedValue.backgroundStyle) ? .onOverlay : .textPrimary)
+                                .gentleText(.title2_l, colorRole: isOverlayStyle(binding.wrappedValue.backgroundStyle) ? .textOnOverlay : .textPrimary)
                             Text("Sample content")
-                                .gentleText(.body_m, colorRole: isOverlayStyle(binding.wrappedValue.backgroundStyle) ? .onOverlaySecondary : .textSecondary)
+                                .gentleText(.body_m, colorRole: isOverlayStyle(binding.wrappedValue.backgroundStyle) ? .textOnOverlaySecondary : .textSecondary)
                         }
                         .frame(maxWidth: .infinity, minHeight: 100, alignment: .center)
                         .gentleSurface(role, inset: .card)
@@ -794,7 +807,7 @@ struct SurfaceRoleEditorSheet: View {
                         switch binding.wrappedValue.backgroundStyle {
                         case .solid:
                             Picker("Color Role", selection: solidColorRoleBinding(binding)) {
-                                ForEach(GentleColorRole.surfaceColorRoles, id: \.self) { colorRole in
+                                ForEach(GentleColorRole.surfaceBackgroundRoles, id: \.self) { colorRole in
                                     Text(colorRole.displayName).tag(colorRole)
                                 }
                             }
@@ -808,7 +821,7 @@ struct SurfaceRoleEditorSheet: View {
 
                             Picker("Tint Color", selection: materialTintBinding(binding)) {
                                 Text("None").tag(Optional<GentleColorRole>.none)
-                                ForEach(GentleColorRole.surfaceColorRoles, id: \.self) { colorRole in
+                                ForEach(GentleColorRole.surfaceBackgroundRoles, id: \.self) { colorRole in
                                     Text(colorRole.displayName).tag(Optional(colorRole))
                                 }
                             }
@@ -833,7 +846,7 @@ struct SurfaceRoleEditorSheet: View {
                             }
 
                             Picker("Fallback Color", selection: glassFallbackColorBinding(binding)) {
-                                ForEach(GentleColorRole.surfaceColorRoles, id: \.self) { colorRole in
+                                ForEach(GentleColorRole.surfaceBackgroundRoles, id: \.self) { colorRole in
                                     Text(colorRole.displayName).tag(colorRole)
                                 }
                             }

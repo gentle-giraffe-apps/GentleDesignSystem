@@ -597,11 +597,13 @@ Each role resolves to a `GentleTypographyRoleSpec` containing: `pointSize`, `wei
 
 | Category | Roles |
 |----------|-------|
-| Text | `textPrimary`, `textSecondary`, `textTertiary` |
-| Surfaces | `background`, `surface`, `surfaceTint`, `surfaceSpecular`, `surfaceOverlay`, `onOverlay`, `onOverlaySecondary` |
-| Actions | `primaryCTA`, `onPrimaryCTA`, `destructive`, `onDestructive` |
-| Theme | `themePrimary`, `themeSecondary` |
-| Structure | `borderSubtle` |
+| Text (7) | `textPrimary`, `textSecondary`, `textTertiary`, `textOnPrimaryCTA`, `textOnDestructive`, `textOnOverlay`, `textOnOverlaySecondary` |
+| Surfaces (6) | `background`, `surface`, `surfaceOverlay`, `surfaceTint`, `surfaceSpecular`, `borderSubtle` |
+| Actions (2) | `primaryCTA`, `destructive` |
+| Theme (2) | `themePrimary`, `themeSecondary` |
+
+Use semantic groupings: `GentleColorRole.textRoles`, `.surfaceRoles`, `.actionRoles`, `.themeRoles`
+Use membership checks: `role.isTextRole`, `.isSurfaceRole`, `.isActionRole`, `.isThemeRole`
 
 ### Spacing Tokens
 

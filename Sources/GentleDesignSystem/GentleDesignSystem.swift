@@ -91,10 +91,10 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
     public var id: String { rawValue }
 
     case textPrimary, textSecondary, textTertiary
-    case onPrimaryCTA, onDestructive
+    case textOnPrimaryCTA, textOnDestructive
     case background, surface
     case surfaceTint, surfaceSpecular
-    case surfaceOverlay, onOverlay, onOverlaySecondary
+    case surfaceOverlay, textOnOverlay, textOnOverlaySecondary
     case borderSubtle
     case destructive
     case primaryCTA
@@ -105,15 +105,15 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
         case .textPrimary: return "Text Primary"
         case .textSecondary: return "Text Secondary"
         case .textTertiary: return "Text Tertiary"
-        case .onPrimaryCTA: return "On Primary CTA"
-        case .onDestructive: return "On Destructive"
+        case .textOnPrimaryCTA: return "Text On Primary CTA"
+        case .textOnDestructive: return "Text On Destructive"
         case .background: return "Background"
         case .surface: return "Surface"
         case .surfaceTint: return "Surface Tint"
         case .surfaceSpecular: return "Surface Specular"
         case .surfaceOverlay: return "Surface Overlay"
-        case .onOverlay: return "On Overlay"
-        case .onOverlaySecondary: return "On Overlay Secondary"
+        case .textOnOverlay: return "Text On Overlay"
+        case .textOnOverlaySecondary: return "Text On Overlay Secondary"
         case .borderSubtle: return "Border Subtle"
         case .destructive: return "Destructive"
         case .primaryCTA: return "Primary CTA"
@@ -122,17 +122,44 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
         }
     }
 
-    /// Color roles typically used for surface backgrounds
-    public static let surfaceColorRoles: [GentleColorRole] = [
-        .background,
-        .surface,
-        .surfaceOverlay
+    // MARK: - Semantic Groupings
+
+    /// All text/foreground colors
+    public static let textRoles: [GentleColorRole] = [
+        .textPrimary, .textSecondary, .textTertiary,
+        .textOnPrimaryCTA, .textOnDestructive,
+        .textOnOverlay, .textOnOverlaySecondary
     ]
 
-    /// Returns true if this color role is typically used for surface backgrounds
-    public var isSurfaceColorRole: Bool {
-        Self.surfaceColorRoles.contains(self)
-    }
+    /// Container/background colors
+    public static let surfaceRoles: [GentleColorRole] = [
+        .background, .surface, .surfaceOverlay,
+        .surfaceTint, .surfaceSpecular,
+        .borderSubtle
+    ]
+
+    /// Interactive element colors (button fills)
+    public static let actionRoles: [GentleColorRole] = [
+        .primaryCTA, .destructive
+    ]
+
+    /// Brand/accent colors
+    public static let themeRoles: [GentleColorRole] = [
+        .themePrimary, .themeSecondary
+    ]
+
+    /// Subset of surface roles valid for surface backgrounds (excludes effect colors)
+    public static let surfaceBackgroundRoles: [GentleColorRole] = [
+        .background, .surface, .surfaceOverlay
+    ]
+
+    // MARK: - Membership Checks
+
+    public var isTextRole: Bool { Self.textRoles.contains(self) }
+    public var isSurfaceRole: Bool { Self.surfaceRoles.contains(self) }
+    public var isActionRole: Bool { Self.actionRoles.contains(self) }
+    public var isThemeRole: Bool { Self.themeRoles.contains(self) }
+    public var isSurfaceBackgroundRole: Bool { Self.surfaceBackgroundRoles.contains(self) }
 }
 
 public enum GentleButtonRole: String, Codable, Sendable, Identifiable {
@@ -158,10 +185,10 @@ public extension GentleButtonRole {
 public enum GentleButtonFillRole: String, Codable, Sendable, CaseIterable, Identifiable {
     public var id: String { rawValue }
 
-    /// Solid fill using primaryCTA color, with onPrimaryCTA text.
+    /// Solid fill using primaryCTA color, with textOnPrimaryCTA text.
     case solidFillPrimaryCTA
 
-    /// Solid fill using destructive color, with onPrimaryCTA text.
+    /// Solid fill using destructive color, with textOnPrimaryCTA text.
     case solidFillDestructive
 
     /// No background fill, with primaryCTA text.
@@ -420,15 +447,15 @@ public extension GentleColorTokens {
             GentleColorRole.surfaceTint.rawValue: .init(lightHex: "#111827CC", darkHex: "#020617CC"),
             GentleColorRole.surfaceSpecular.rawValue: .init(lightHex: "#FFFFFF66", darkHex: "#FFFFFF33"),
             GentleColorRole.surfaceOverlay.rawValue: .init(lightHex: "#111827CC", darkHex: "#020617CC"),
-            GentleColorRole.onOverlay.rawValue: .init(lightHex: "#F9FAFB", darkHex: "#F9FAFB"),
-            GentleColorRole.onOverlaySecondary.rawValue: .init(lightHex: "#D1D5DB", darkHex:  "#D1D5DB"),
+            GentleColorRole.textOnOverlay.rawValue: .init(lightHex: "#F9FAFB", darkHex: "#F9FAFB"),
+            GentleColorRole.textOnOverlaySecondary.rawValue: .init(lightHex: "#D1D5DB", darkHex:  "#D1D5DB"),
             GentleColorRole.borderSubtle.rawValue: .init(lightHex: "#E5E7EB", darkHex: "#374151"),
 
             // Actions / status
             GentleColorRole.primaryCTA.rawValue: .init(lightHex: "#4A6EF5", darkHex: "#3B82F6"),
-            GentleColorRole.onPrimaryCTA.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnPrimaryCTA.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
             GentleColorRole.destructive.rawValue: .init(lightHex: "#E35D5B", darkHex: "#F87171"),
-            GentleColorRole.onDestructive.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnDestructive.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
 
             // Theme Colors
             GentleColorRole.themePrimary.rawValue: .init(lightHex: "#4A6EF5", darkHex: "#3B82F6"),
@@ -1278,9 +1305,9 @@ public struct GentleButtonStyle: ButtonStyle {
         let (backgroundColor, labelColorRole): (Color, GentleColorRole) = {
             switch spec.fillRole {
             case .solidFillPrimaryCTA:
-                return (theme.color(for: .primaryCTA, scheme: colorScheme), .onPrimaryCTA)
+                return (theme.color(for: .primaryCTA, scheme: colorScheme), .textOnPrimaryCTA)
             case .solidFillDestructive:
-                return (theme.color(for: .destructive, scheme: colorScheme), .onPrimaryCTA)
+                return (theme.color(for: .destructive, scheme: colorScheme), .textOnPrimaryCTA)
             case .hollow:
                 return (Color.clear, .primaryCTA)
             }

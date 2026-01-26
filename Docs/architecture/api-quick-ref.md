@@ -294,12 +294,19 @@ footnote_s, caption_s, caption2_s
 ### GentleColorRole (17)
 ```
 textPrimary, textSecondary, textTertiary,
-onPrimaryCTA, onDestructive, onOverlay, onOverlaySecondary,
-background, surface, surfaceTint, surfaceSpecular, surfaceOverlay,
+textOnPrimaryCTA, textOnDestructive, textOnOverlay, textOnOverlaySecondary,
+background, surface, surfaceOverlay, surfaceTint, surfaceSpecular, borderSubtle,
 primaryCTA, destructive,
-themePrimary, themeSecondary,
-borderSubtle
+themePrimary, themeSecondary
 ```
+
+**Semantic Groupings:**
+- `.textRoles` (7) - text/foreground colors
+- `.surfaceRoles` (6) - container/background/border colors
+- `.actionRoles` (2) - interactive element colors
+- `.themeRoles` (2) - brand/accent colors
+
+**Membership checks:** `role.isTextRole`, `.isSurfaceRole`, `.isActionRole`, `.isThemeRole`
 
 ### GentleButtonRole (5)
 ```
