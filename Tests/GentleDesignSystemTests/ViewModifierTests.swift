@@ -100,7 +100,7 @@ struct GentleBackgroundModifierTests {
 
     @Test("View extension gentleBackground creates modifier")
     func testGentleBackgroundExtension() {
-        _ = Text("Hello").gentleBackground(.surface)
+        _ = Text("Hello").gentleBackground(.surfaceBase)
     }
 
     @Test("View extension gentleBackground with ignoresSafeArea")

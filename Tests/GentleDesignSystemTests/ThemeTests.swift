@@ -350,7 +350,7 @@ struct GentleDesignRuntimeTests {
         let theme = GentleTheme.default
         let resolver = GentleDesignRuntime.Resolver(theme: theme, colorScheme: .light)
 
-        #expect(resolver.surface != Color.clear)
+        #expect(resolver.surfaceBase != Color.clear)
         #expect(resolver.background != Color.clear)
         #expect(resolver.borderSubtle != Color.clear)
         #expect(resolver.textPrimary != Color.clear)

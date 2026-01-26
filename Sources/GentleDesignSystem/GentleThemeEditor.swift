@@ -26,14 +26,6 @@ public struct GentleThemeEditor: View {
 
 public struct GentleDesignColorsSection: View {
     @GentleDesignRuntime private var design
-    @GentleThemeManagerRuntime private var manager
-
-    private var columns: [GridItem] { [
-        GridItem(.flexible(), spacing: design.layout.grid.regular),
-        GridItem(.flexible(), spacing: design.layout.grid.regular),
-        GridItem(.flexible(), spacing: design.layout.grid.regular)
-        ]
-    }
 
     public init() {}
 
@@ -43,51 +35,50 @@ public struct GentleDesignColorsSection: View {
                 .gentleText(.title_xl)
                 .opacity(0.7)
 
-            // Text Colors
-            ColorGroupSection(title: "Text", roles: GentleColorRole.textRoles, columns: columns)
-
-            // Surface Colors
-            ColorGroupSection(title: "Surface", roles: GentleColorRole.surfaceRoles, columns: columns)
-
-            // Action Colors
-            ColorGroupSection(title: "Action", roles: GentleColorRole.actionRoles, columns: columns)
-
-            // Theme Colors
-            ColorGroupSection(title: "Theme", roles: GentleColorRole.themeRoles, columns: columns)
+            HStack(alignment: .top, spacing: design.layout.stack.tight) {
+                ColorGroupColumn(title: "Text", roles: GentleColorRole.textRoles)
+                ColorGroupColumn(title: "Surface", roles: GentleColorRole.surfaceRoles)
+                ColorGroupColumn(title: "Action", roles: GentleColorRole.actionRoles)
+                ColorGroupColumn(title: "Theme", roles: GentleColorRole.themeRoles)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
-struct ColorGroupSection: View {
+struct ColorGroupColumn: View {
     let title: String
     let roles: [GentleColorRole]
-    let columns: [GridItem]
 
     @GentleDesignRuntime private var design
 
     var body: some View {
-        VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+        VStack(alignment: .center, spacing: design.layout.stack.tight) {
             Text(title)
-                .gentleText(.subheadline_ms)
-                .opacity(0.5)
+                .gentleText(.headline_m)
+                .opacity(0.7)
 
-            LazyVGrid(columns: columns, spacing: design.layout.grid.regular) {
+            VStack(spacing: design.layout.stack.regular) {
                 ForEach(roles, id: \.rawValue) { role in
-                    ColorSwatchRow(role: role, name: role.rawValue)
+                    ColorSwatchRow(role: role)
                 }
             }
-            .gentleSurface(.card, inset: .card)
         }
+        .frame(maxWidth: .infinity)
     }
 }
 
 struct ColorSwatchRow: View {
     let role: GentleColorRole
-    let name: String
 
     @GentleDesignRuntime private var design
     @GentleThemeManagerRuntime private var manager
+
+    private var abbreviatedName: String {
+        role.rawValue
+            .replacingOccurrences(of: "text", with: "")
+            .replacingOccurrences(of: "surface", with: "")
+    }
 
     var body: some View {
         let binding = manager.bindingForColorRole(role)
@@ -100,34 +91,30 @@ struct ColorSwatchRow: View {
             set: { binding.darkHex.wrappedValue = $0.toGentleHexString() }
         )
 
-        VStack(spacing: 4) {
-            HStack(spacing: 2) {
+        VStack(alignment: .center, spacing: 4) {
+            HStack(spacing: 12) {
                 ZStack {
                     lightBinding.wrappedValue.clipShape(RoundedRectangle(cornerRadius: 6))
-
                     ColorPicker("", selection: lightBinding, supportsOpacity: true)
                         .labelsHidden()
                         .opacity(0.1)
                 }
-                .frame(width: 28, height: 28)
+                .frame(width: 22, height: 22)
 
                 ZStack {
                     darkBinding.wrappedValue.clipShape(RoundedRectangle(cornerRadius: 6))
-
                     ColorPicker("", selection: darkBinding, supportsOpacity: true)
                         .labelsHidden()
                         .opacity(0.1)
                 }
-                .frame(width: 28, height: 28)
+                .frame(width: 22, height: 22)
             }
 
-            Text(name.camelCaseBreakable)
+            Text(abbreviatedName.camelCaseBreakable)
                 .gentleText(.caption2_s)
                 .lineLimit(2)
-                .multilineTextAlignment(.center)
-                .minimumScaleFactor(0.7)
+                .minimumScaleFactor(0.6)
         }
-        .frame(maxWidth: .infinity)
     }
 }
 
@@ -285,7 +272,7 @@ public struct GentleButtonPreview: View {
                 return (theme.color(for: .destructive, scheme: colorScheme), .textOnPrimaryCTA)
             case .hollow:
                 // Use surface color for miniature chips so they're visible
-                return (theme.color(for: .surface, scheme: colorScheme), .primaryCTA)
+                return (theme.color(for: .surfaceBase, scheme: colorScheme), .primaryCTA)
             }
         }()
         let iconColor = theme.color(for: iconColorRole, scheme: colorScheme)
@@ -1027,7 +1014,7 @@ struct SurfaceRoleEditorSheet: View {
                     let colorRole: GentleColorRole
                     switch currentStyle {
                     case .solid(let cr): colorRole = cr
-                    case .material(_, let tcr, _): colorRole = tcr ?? .surface
+                    case .material(_, let tcr, _): colorRole = tcr ?? .surfaceBase
                     case .glass(_, let fcr): colorRole = fcr
                     }
                     binding.wrappedValue.backgroundStyle = .solid(colorRole: colorRole)
@@ -1063,7 +1050,7 @@ struct SurfaceRoleEditorSheet: View {
                         fallbackColor = cr
                     case .material(let m, let tcr, _):
                         fallbackMaterial = m
-                        fallbackColor = tcr ?? .surface
+                        fallbackColor = tcr ?? .surfaceBase
                     case .glass(let fm, let fcr):
                         fallbackMaterial = fm
                         fallbackColor = fcr
@@ -1080,7 +1067,7 @@ struct SurfaceRoleEditorSheet: View {
                 if case .solid(let colorRole) = binding.wrappedValue.backgroundStyle {
                     return colorRole
                 }
-                return .surface
+                return .surfaceBase
             },
             set: { newValue in
                 binding.wrappedValue.backgroundStyle = .solid(colorRole: newValue)
@@ -1158,7 +1145,7 @@ struct SurfaceRoleEditorSheet: View {
                 if case .glass(_, let fallbackColorRole) = binding.wrappedValue.backgroundStyle {
                     return fallbackColorRole
                 }
-                return .surface
+                return .surfaceBase
             },
             set: { newValue in
                 if case .glass(let fallbackMaterial, _) = binding.wrappedValue.backgroundStyle {

@@ -54,7 +54,7 @@ public struct GentleTextFieldModifier: ViewModifier {
         let textColor = theme.color(for: resolvedColorRole, scheme: colorScheme)
         let gap = theme.gap
 
-        let fill = theme.color(for: .surface, scheme: colorScheme)
+        let fill = theme.color(for: .surfaceBase, scheme: colorScheme)
         let border = theme.color(for: .borderSubtle, scheme: colorScheme)
 
         let base = content

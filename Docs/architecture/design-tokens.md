@@ -60,7 +60,7 @@ Naming: `{semantic}_{ramp}` where ramp = xxl > xl > l > ml > m > ms > s
 ```
 Text:     textPrimary, textSecondary, textTertiary,
           textOnPrimaryCTA, textOnDestructive, textOnOverlay, textOnOverlaySecondary
-Surface:  background, surface, surfaceOverlay, surfaceTint, surfaceSpecular, borderSubtle
+Surface:  background, surfaceBase, surfaceOverlay, surfaceTint, surfaceSpecular, borderSubtle
 Action:   primaryCTA, destructive
 Theme:    themePrimary, themeSecondary
 ```

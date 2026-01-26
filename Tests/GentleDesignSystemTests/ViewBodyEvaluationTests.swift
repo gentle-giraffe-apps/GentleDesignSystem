@@ -336,7 +336,7 @@ struct ModifierBodyEvaluationTests {
     @Test("gentleBackground extension body evaluates")
     func testGentleBackgroundExtensionBody() {
         let view = wrapWithGentleEnvironment(
-            Text("Content").gentleBackground(.surface)
+            Text("Content").gentleBackground(.surfaceBase)
         )
         renderViewForCoverage(view)
     }
@@ -1429,7 +1429,7 @@ struct ColorSwatchRowTests {
     func testColorSwatchRowPrimary() throws {
         let theme = GentleTheme(defaultSpec: .gentleDefault)
         let manager = GentleThemeManager(theme: theme)
-        let view = ColorSwatchRow(role: .textPrimary, name: "textPrimary")
+        let view = ColorSwatchRow(role: .textPrimary)
             .environment(\.gentleTheme, theme)
             .environment(\.gentleThemeManager, manager)
         renderViewForCoverage(view)
@@ -1441,7 +1441,7 @@ struct ColorSwatchRowTests {
         let manager = GentleThemeManager(theme: theme)
 
         for role in GentleColorRole.allCases {
-            let view = ColorSwatchRow(role: role, name: role.rawValue)
+            let view = ColorSwatchRow(role: role)
                 .environment(\.gentleTheme, theme)
                 .environment(\.gentleThemeManager, manager)
             renderViewForCoverage(view)

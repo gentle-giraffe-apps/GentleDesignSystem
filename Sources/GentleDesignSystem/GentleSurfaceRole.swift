@@ -264,14 +264,14 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
             case .appBackground:
                 self.backgroundStyle = .solid(colorRole: .background)
             case .surface:
-                self.backgroundStyle = .solid(colorRole: .surface)
+                self.backgroundStyle = .solid(colorRole: .surfaceBase)
             case .surfaceOverlay:
                 self.backgroundStyle = .material(material: .regular, tintColorRole: .surfaceOverlay, tintOpacity: 0.1)
             }
         }
         // Migration: if old flat properties exist (colorRole, appleMaterial, useGlass)
         else if container.contains(.colorRole) || container.contains(.appleMaterial) || container.contains(.useGlass) {
-            let colorRole = try container.decodeIfPresent(GentleColorRole.self, forKey: .colorRole) ?? .surface
+            let colorRole = try container.decodeIfPresent(GentleColorRole.self, forKey: .colorRole) ?? .surfaceBase
             let appleMaterial = try container.decodeIfPresent(GentleAppleMaterial.self, forKey: .appleMaterial) ?? .noMaterial
             let useGlass = try container.decodeIfPresent(Bool.self, forKey: .useGlass) ?? false
 
@@ -286,7 +286,7 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
         }
         // Default fallback
         else {
-            self.backgroundStyle = .solid(colorRole: .surface)
+            self.backgroundStyle = .solid(colorRole: .surfaceBase)
         }
 
         self.specularEffect = try container.decodeIfPresent(GentleSpecularEffect.self, forKey: .specularEffect) ?? .noEffect
@@ -329,7 +329,7 @@ public struct GentleSurfaceTokens: Codable, Sendable {
         if let card = roles[GentleSurfaceRole.card.rawValue] { return card }
         // Last-resort defaults (should never happen with gentleDefault).
         return .init(
-            backgroundStyle: .solid(colorRole: .surface),
+            backgroundStyle: .solid(colorRole: .surfaceBase),
             border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151")
         )
     }
@@ -345,13 +345,13 @@ public extension GentleSurfaceTokens {
                 borderWidth: 0
             ),
             GentleSurfaceRole.card.rawValue: .init(
-                backgroundStyle: .solid(colorRole: .surface),
+                backgroundStyle: .solid(colorRole: .surfaceBase),
                 border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
                 cornerRadius: 20,
                 borderWidth: 1
             ),
             GentleSurfaceRole.cardElevated.rawValue: .init(
-                backgroundStyle: .solid(colorRole: .surface),
+                backgroundStyle: .solid(colorRole: .surfaceBase),
                 specularEffect: .highlight,
                 specularStrength: 0.1,
                 border: GentleColorPair(lightHex: "#E5E7EB59", darkHex: "#37415159"),
@@ -386,7 +386,7 @@ public extension GentleSurfaceTokens {
                 borderWidth: 0
             ),
             GentleSurfaceRole.overlayPopover.rawValue: .init(
-                backgroundStyle: .material(material: .regular, tintColorRole: .surface, tintOpacity: 0.15),
+                backgroundStyle: .material(material: .regular, tintColorRole: .surfaceBase, tintOpacity: 0.15),
                 border: GentleColorPair(lightHex: "#E5E7EB30", darkHex: "#37415130"),
                 cornerRadius: 14,
                 borderWidth: 0.5,
@@ -397,7 +397,7 @@ public extension GentleSurfaceTokens {
 
             // Floating
             GentleSurfaceRole.floatingPanel.rawValue: .init(
-                backgroundStyle: .glass(fallbackMaterial: .regular, fallbackColorRole: .surface),
+                backgroundStyle: .glass(fallbackMaterial: .regular, fallbackColorRole: .surfaceBase),
                 border: GentleColorPair(lightHex: "#FFFFFF20", darkHex: "#FFFFFF10"),
                 cornerRadius: 20,
                 borderWidth: 0.5,
@@ -406,7 +406,7 @@ public extension GentleSurfaceTokens {
                 shadowOffsetY: 12
             ),
             GentleSurfaceRole.floatingWidget.rawValue: .init(
-                backgroundStyle: .glass(fallbackMaterial: .thick, fallbackColorRole: .surface),
+                backgroundStyle: .glass(fallbackMaterial: .thick, fallbackColorRole: .surfaceBase),
                 border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
                 cornerRadius: 24,
                 borderWidth: 0,

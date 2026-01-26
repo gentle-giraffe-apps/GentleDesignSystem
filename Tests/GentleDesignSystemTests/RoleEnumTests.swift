@@ -80,7 +80,7 @@ struct GentleColorRoleTests {
         let expectedRoles: [GentleColorRole] = [
             .textPrimary, .textSecondary, .textTertiary,
             .textOnPrimaryCTA, .textOnDestructive,
-            .background, .surface,
+            .background, .surfaceBase,
             .surfaceTint, .surfaceSpecular,
             .surfaceOverlay, .textOnOverlay, .textOnOverlaySecondary,
             .borderSubtle,

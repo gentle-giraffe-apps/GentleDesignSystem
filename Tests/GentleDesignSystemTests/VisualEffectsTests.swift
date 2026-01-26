@@ -558,10 +558,10 @@ struct GentleSurfaceRoleSpecTests {
     func testSurfaceRoleSpec() {
         let border = GentleColorPair(lightHex: "#CCCCCC", darkHex: "#333333")
 
-        let spec = GentleSurfaceRoleSpec(backgroundStyle: .solid(colorRole: .surface), border: border)
+        let spec = GentleSurfaceRoleSpec(backgroundStyle: .solid(colorRole: .surfaceBase), border: border)
 
         if case .solid(let colorRole) = spec.backgroundStyle {
-            #expect(colorRole == .surface)
+            #expect(colorRole == .surfaceBase)
         } else {
             Issue.record("Expected solid background style")
         }
@@ -572,7 +572,7 @@ struct GentleSurfaceRoleSpecTests {
     func testSurfaceRoleSpecDefaults() {
         let border = GentleColorPair(lightHex: "#CCCCCC", darkHex: "#333333")
 
-        let spec = GentleSurfaceRoleSpec(backgroundStyle: .solid(colorRole: .surface), border: border)
+        let spec = GentleSurfaceRoleSpec(backgroundStyle: .solid(colorRole: .surfaceBase), border: border)
 
         #expect(spec.cornerRadius == 20)
         #expect(spec.borderWidth == 1)
@@ -587,7 +587,7 @@ struct GentleSurfaceRoleSpecTests {
     @Test("Surface role spec with all properties")
     func testSurfaceRoleSpecAllProperties() {
         let spec = GentleSurfaceRoleSpec(
-            backgroundStyle: .material(material: .thin, tintColorRole: .surface, tintOpacity: 0.15),
+            backgroundStyle: .material(material: .thin, tintColorRole: .surfaceBase, tintOpacity: 0.15),
             specularEffect: .highlight,
             specularStrength: 0.5,
             border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
@@ -618,7 +618,7 @@ struct GentleSurfaceRoleSpecTests {
     @Test("Surface role spec is codable")
     func testSurfaceRoleSpecCodable() throws {
         let original = GentleSurfaceRoleSpec(
-            backgroundStyle: .material(material: .regular, tintColorRole: .surface, tintOpacity: 0.2),
+            backgroundStyle: .material(material: .regular, tintColorRole: .surfaceBase, tintOpacity: 0.2),
             border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
             cornerRadius: 16,
             borderWidth: 1.5
@@ -632,7 +632,7 @@ struct GentleSurfaceRoleSpecTests {
 
         if case .material(let material, let tintColorRole, let tintOpacity) = decoded.backgroundStyle {
             #expect(material == .regular)
-            #expect(tintColorRole == .surface)
+            #expect(tintColorRole == .surfaceBase)
             #expect(tintOpacity == 0.2)
         } else {
             Issue.record("Expected material background style")
@@ -666,7 +666,7 @@ struct GentleSurfaceRoleSpecTests {
     @Test("Surface role spec with glass is codable")
     func testSurfaceRoleSpecWithGlassCodable() throws {
         let original = GentleSurfaceRoleSpec(
-            backgroundStyle: .glass(fallbackMaterial: .regular, fallbackColorRole: .surface),
+            backgroundStyle: .glass(fallbackMaterial: .regular, fallbackColorRole: .surfaceBase),
             border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000")
         )
 
@@ -678,7 +678,7 @@ struct GentleSurfaceRoleSpecTests {
 
         if case .glass(let fallbackMaterial, let fallbackColorRole) = decoded.backgroundStyle {
             #expect(fallbackMaterial == .regular)
-            #expect(fallbackColorRole == .surface)
+            #expect(fallbackColorRole == .surfaceBase)
         } else {
             Issue.record("Expected glass background style")
         }
@@ -710,7 +710,7 @@ struct GentleSurfaceTokensTests {
     func testSurfaceTokensFallbackToCard() {
         let tokens = GentleSurfaceTokens(roles: [
             GentleSurfaceRole.card.rawValue: GentleSurfaceRoleSpec(
-                backgroundStyle: .solid(colorRole: .surface),
+                backgroundStyle: .solid(colorRole: .surfaceBase),
                 border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151")
             )
         ])
@@ -718,7 +718,7 @@ struct GentleSurfaceTokensTests {
         // Request missing role should fallback to card
         let spec = tokens.roleSpec(for: .appBackground)
         if case .solid(let colorRole) = spec.backgroundStyle {
-            #expect(colorRole == .surface)
+            #expect(colorRole == .surfaceBase)
         } else {
             Issue.record("Expected solid background style")
         }
@@ -730,7 +730,7 @@ struct GentleSurfaceTokensTests {
         let spec = tokens.roleSpec(for: .card)
 
         if case .solid(let colorRole) = spec.backgroundStyle {
-            #expect(colorRole == .surface)
+            #expect(colorRole == .surfaceBase)
         } else {
             Issue.record("Expected solid background style")
         }
