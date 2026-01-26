@@ -1,5 +1,632 @@
-//  Jonathan Ritchey
+//  Jonathan Ritchey
 import SwiftUI
+
+// MARK: - Surface Preset Tokens
+
+public extension GentleSurfaceTokens {
+
+    // MARK: Classic - Traditional warmth, subtle depth
+    /// Warm, traditional surfaces with gentle highlight effects and classic proportions
+    static let classic: GentleSurfaceTokens = .init(
+        roles: [
+            GentleSurfaceRole.appBackground.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .background),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.card.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                specularEffect: .highlight,
+                specularStrength: 0.05,
+                border: GentleColorPair(lightHex: "#D4C8B4", darkHex: "#4A4030"),
+                cornerRadius: 16,
+                borderWidth: 1
+            ),
+            GentleSurfaceRole.cardElevated.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                specularEffect: .highlight,
+                specularStrength: 0.12,
+                border: GentleColorPair(lightHex: "#D4C8B450", darkHex: "#4A403050"),
+                cornerRadius: 16,
+                borderWidth: 0.5,
+                shadowRadius: 12,
+                shadowOpacity: 0.12,
+                shadowOffsetY: 6
+            ),
+            GentleSurfaceRole.cardSecondary.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceOverlay),
+                specularEffect: .indent,
+                specularStrength: 0.04,
+                border: GentleColorPair(lightHex: "#D4C8B430", darkHex: "#4A403030"),
+                cornerRadius: 12,
+                borderWidth: 0.5
+            ),
+            GentleSurfaceRole.chrome.rawValue: .init(
+                backgroundStyle: .material(material: .thin, tintColorRole: .surfaceBase, tintOpacity: 0.05),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.overlaySheet.rawValue: .init(
+                backgroundStyle: .material(material: .regular, tintColorRole: .surfaceBase, tintOpacity: 0.15),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 24,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.overlayPopover.rawValue: .init(
+                backgroundStyle: .material(material: .thick, tintColorRole: .surfaceBase, tintOpacity: 0.2),
+                border: GentleColorPair(lightHex: "#D4C8B440", darkHex: "#4A403040"),
+                cornerRadius: 12,
+                borderWidth: 0.5,
+                shadowRadius: 16,
+                shadowOpacity: 0.15,
+                shadowOffsetY: 8
+            ),
+            GentleSurfaceRole.floatingPanel.rawValue: .init(
+                backgroundStyle: .glass(fallbackMaterial: .thick, fallbackColorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#FFFFFF30", darkHex: "#FFFFFF15"),
+                cornerRadius: 16,
+                borderWidth: 0.5,
+                shadowRadius: 20,
+                shadowOpacity: 0.18,
+                shadowOffsetY: 10
+            ),
+            GentleSurfaceRole.floatingWidget.rawValue: .init(
+                backgroundStyle: .glass(fallbackMaterial: .thick, fallbackColorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 20,
+                borderWidth: 0,
+                shadowRadius: 10,
+                shadowOpacity: 0.1,
+                shadowOffsetY: 4
+            )
+        ]
+    )
+
+    // MARK: Modern - Clean, minimal, precise
+    /// Crisp surfaces with subtle shadows and precise geometry
+    static let modern: GentleSurfaceTokens = .init(
+        roles: [
+            GentleSurfaceRole.appBackground.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .background),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.card.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#E0E0E8", darkHex: "#3A3A4E"),
+                cornerRadius: 12,
+                borderWidth: 1
+            ),
+            GentleSurfaceRole.cardElevated.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                specularEffect: .highlight,
+                specularStrength: 0.06,
+                border: GentleColorPair(lightHex: "#E0E0E840", darkHex: "#3A3A4E40"),
+                cornerRadius: 12,
+                borderWidth: 0.5,
+                shadowRadius: 6,
+                shadowOpacity: 0.06,
+                shadowOffsetY: 4
+            ),
+            GentleSurfaceRole.cardSecondary.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceOverlay),
+                border: GentleColorPair(lightHex: "#E0E0E830", darkHex: "#3A3A4E30"),
+                cornerRadius: 8,
+                borderWidth: 0.5
+            ),
+            GentleSurfaceRole.chrome.rawValue: .init(
+                backgroundStyle: .material(material: .ultraThin, tintColorRole: nil, tintOpacity: 0),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.overlaySheet.rawValue: .init(
+                backgroundStyle: .material(material: .regular, tintColorRole: .surfaceOverlay, tintOpacity: 0.08),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 20,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.overlayPopover.rawValue: .init(
+                backgroundStyle: .material(material: .regular, tintColorRole: .surfaceBase, tintOpacity: 0.12),
+                border: GentleColorPair(lightHex: "#E0E0E825", darkHex: "#3A3A4E25"),
+                cornerRadius: 10,
+                borderWidth: 0.5,
+                shadowRadius: 12,
+                shadowOpacity: 0.1,
+                shadowOffsetY: 6
+            ),
+            GentleSurfaceRole.floatingPanel.rawValue: .init(
+                backgroundStyle: .glass(fallbackMaterial: .regular, fallbackColorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#FFFFFF18", darkHex: "#FFFFFF0C"),
+                cornerRadius: 12,
+                borderWidth: 0.5,
+                shadowRadius: 16,
+                shadowOpacity: 0.12,
+                shadowOffsetY: 8
+            ),
+            GentleSurfaceRole.floatingWidget.rawValue: .init(
+                backgroundStyle: .glass(fallbackMaterial: .regular, fallbackColorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 16,
+                borderWidth: 0,
+                shadowRadius: 6,
+                shadowOpacity: 0.08,
+                shadowOffsetY: 3
+            )
+        ]
+    )
+
+    // MARK: Soft - Rounded, friendly, gentle
+    /// Very rounded corners with soft shadows for a friendly, approachable feel
+    static let soft: GentleSurfaceTokens = .init(
+        roles: [
+            GentleSurfaceRole.appBackground.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .background),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.card.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                specularEffect: .highlight,
+                specularStrength: 0.04,
+                border: GentleColorPair(lightHex: "#C5E0D4", darkHex: "#2A4D3D"),
+                cornerRadius: 24,
+                borderWidth: 1
+            ),
+            GentleSurfaceRole.cardElevated.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                specularEffect: .highlight,
+                specularStrength: 0.08,
+                border: GentleColorPair(lightHex: "#C5E0D450", darkHex: "#2A4D3D50"),
+                cornerRadius: 24,
+                borderWidth: 0.5,
+                shadowRadius: 16,
+                shadowOpacity: 0.08,
+                shadowOffsetY: 8
+            ),
+            GentleSurfaceRole.cardSecondary.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceOverlay),
+                specularEffect: .indent,
+                specularStrength: 0.03,
+                border: GentleColorPair(lightHex: "#C5E0D430", darkHex: "#2A4D3D30"),
+                cornerRadius: 16,
+                borderWidth: 0.5
+            ),
+            GentleSurfaceRole.chrome.rawValue: .init(
+                backgroundStyle: .material(material: .thin, tintColorRole: .surfaceBase, tintOpacity: 0.03),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.overlaySheet.rawValue: .init(
+                backgroundStyle: .material(material: .regular, tintColorRole: .surfaceOverlay, tintOpacity: 0.1),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 36,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.overlayPopover.rawValue: .init(
+                backgroundStyle: .material(material: .regular, tintColorRole: .surfaceBase, tintOpacity: 0.12),
+                border: GentleColorPair(lightHex: "#C5E0D425", darkHex: "#2A4D3D25"),
+                cornerRadius: 18,
+                borderWidth: 0.5,
+                shadowRadius: 20,
+                shadowOpacity: 0.1,
+                shadowOffsetY: 10
+            ),
+            GentleSurfaceRole.floatingPanel.rawValue: .init(
+                backgroundStyle: .glass(fallbackMaterial: .regular, fallbackColorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#FFFFFF25", darkHex: "#FFFFFF12"),
+                cornerRadius: 28,
+                borderWidth: 0.5,
+                shadowRadius: 24,
+                shadowOpacity: 0.12,
+                shadowOffsetY: 12
+            ),
+            GentleSurfaceRole.floatingWidget.rawValue: .init(
+                backgroundStyle: .glass(fallbackMaterial: .thick, fallbackColorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 28,
+                borderWidth: 0,
+                shadowRadius: 10,
+                shadowOpacity: 0.08,
+                shadowOffsetY: 5
+            )
+        ]
+    )
+
+    // MARK: Editorial - Sharp, print-inspired, high contrast
+    /// Magazine-like surfaces with sharp corners and strong contrast
+    static let editorial: GentleSurfaceTokens = .init(
+        roles: [
+            GentleSurfaceRole.appBackground.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .background),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.card.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#000000", darkHex: "#404040"),
+                cornerRadius: 0,
+                borderWidth: 1
+            ),
+            GentleSurfaceRole.cardElevated.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#000000", darkHex: "#404040"),
+                cornerRadius: 0,
+                borderWidth: 1,
+                shadowRadius: 0,
+                shadowOpacity: 0,
+                shadowOffsetX: 4,
+                shadowOffsetY: 4
+            ),
+            GentleSurfaceRole.cardSecondary.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceOverlay),
+                border: GentleColorPair(lightHex: "#00000020", darkHex: "#40404020"),
+                cornerRadius: 0,
+                borderWidth: 1
+            ),
+            GentleSurfaceRole.chrome.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#E0E0E0", darkHex: "#404040"),
+                cornerRadius: 0,
+                borderWidth: 1
+            ),
+            GentleSurfaceRole.overlaySheet.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#000000", darkHex: "#FFFFFF"),
+                cornerRadius: 0,
+                borderWidth: 2
+            ),
+            GentleSurfaceRole.overlayPopover.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#000000", darkHex: "#FFFFFF"),
+                cornerRadius: 0,
+                borderWidth: 1,
+                shadowRadius: 0,
+                shadowOpacity: 0.2,
+                shadowOffsetX: 4,
+                shadowOffsetY: 4
+            ),
+            GentleSurfaceRole.floatingPanel.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#000000", darkHex: "#FFFFFF"),
+                cornerRadius: 0,
+                borderWidth: 2,
+                shadowRadius: 0,
+                shadowOpacity: 0.3,
+                shadowOffsetX: 8,
+                shadowOffsetY: 8
+            ),
+            GentleSurfaceRole.floatingWidget.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#000000", darkHex: "#FFFFFF"),
+                cornerRadius: 0,
+                borderWidth: 1,
+                shadowRadius: 0,
+                shadowOpacity: 0.2,
+                shadowOffsetX: 3,
+                shadowOffsetY: 3
+            )
+        ]
+    )
+
+    // MARK: Technical - Precise, developer-focused
+    /// Sharp, precise surfaces with defined borders for data-focused interfaces
+    static let technical: GentleSurfaceTokens = .init(
+        roles: [
+            GentleSurfaceRole.appBackground.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .background),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.card.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#C4DCF0", darkHex: "#1E4060"),
+                cornerRadius: 6,
+                borderWidth: 1
+            ),
+            GentleSurfaceRole.cardElevated.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                specularEffect: .highlight,
+                specularStrength: 0.04,
+                border: GentleColorPair(lightHex: "#C4DCF0", darkHex: "#1E4060"),
+                cornerRadius: 6,
+                borderWidth: 1,
+                shadowRadius: 4,
+                shadowOpacity: 0.08,
+                shadowOffsetY: 2
+            ),
+            GentleSurfaceRole.cardSecondary.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceOverlay),
+                specularEffect: .indent,
+                specularStrength: 0.03,
+                border: GentleColorPair(lightHex: "#C4DCF050", darkHex: "#1E406050"),
+                cornerRadius: 4,
+                borderWidth: 1
+            ),
+            GentleSurfaceRole.chrome.rawValue: .init(
+                backgroundStyle: .material(material: .ultraThin, tintColorRole: .surfaceBase, tintOpacity: 0.05),
+                border: GentleColorPair(lightHex: "#C4DCF0", darkHex: "#1E4060"),
+                cornerRadius: 0,
+                borderWidth: 1
+            ),
+            GentleSurfaceRole.overlaySheet.rawValue: .init(
+                backgroundStyle: .material(material: .regular, tintColorRole: .surfaceOverlay, tintOpacity: 0.1),
+                border: GentleColorPair(lightHex: "#C4DCF0", darkHex: "#1E4060"),
+                cornerRadius: 8,
+                borderWidth: 1
+            ),
+            GentleSurfaceRole.overlayPopover.rawValue: .init(
+                backgroundStyle: .material(material: .regular, tintColorRole: .surfaceBase, tintOpacity: 0.15),
+                border: GentleColorPair(lightHex: "#C4DCF0", darkHex: "#1E4060"),
+                cornerRadius: 6,
+                borderWidth: 1,
+                shadowRadius: 8,
+                shadowOpacity: 0.12,
+                shadowOffsetY: 4
+            ),
+            GentleSurfaceRole.floatingPanel.rawValue: .init(
+                backgroundStyle: .glass(fallbackMaterial: .regular, fallbackColorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#C4DCF0", darkHex: "#1E4060"),
+                cornerRadius: 8,
+                borderWidth: 1,
+                shadowRadius: 12,
+                shadowOpacity: 0.15,
+                shadowOffsetY: 6
+            ),
+            GentleSurfaceRole.floatingWidget.rawValue: .init(
+                backgroundStyle: .glass(fallbackMaterial: .regular, fallbackColorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#C4DCF080", darkHex: "#1E406080"),
+                cornerRadius: 6,
+                borderWidth: 1,
+                shadowRadius: 4,
+                shadowOpacity: 0.1,
+                shadowOffsetY: 2
+            )
+        ]
+    )
+
+    // MARK: Bold - Strong presence, pronounced shadows
+    /// High-impact surfaces with bold shadows and strong specular effects
+    static let bold: GentleSurfaceTokens = .init(
+        roles: [
+            GentleSurfaceRole.appBackground.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .background),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.card.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                specularEffect: .highlight,
+                specularStrength: 0.08,
+                border: GentleColorPair(lightHex: "#F0D4C0", darkHex: "#4D3020"),
+                cornerRadius: 16,
+                borderWidth: 2
+            ),
+            GentleSurfaceRole.cardElevated.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                specularEffect: .highlight,
+                specularStrength: 0.15,
+                border: GentleColorPair(lightHex: "#F0D4C080", darkHex: "#4D302080"),
+                cornerRadius: 16,
+                borderWidth: 2,
+                shadowRadius: 16,
+                shadowOpacity: 0.2,
+                shadowOffsetY: 8
+            ),
+            GentleSurfaceRole.cardSecondary.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceOverlay),
+                specularEffect: .indent,
+                specularStrength: 0.08,
+                border: GentleColorPair(lightHex: "#F0D4C060", darkHex: "#4D302060"),
+                cornerRadius: 12,
+                borderWidth: 1.5
+            ),
+            GentleSurfaceRole.chrome.rawValue: .init(
+                backgroundStyle: .material(material: .thin, tintColorRole: .surfaceBase, tintOpacity: 0.1),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.overlaySheet.rawValue: .init(
+                backgroundStyle: .material(material: .thick, tintColorRole: .surfaceOverlay, tintOpacity: 0.15),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 24,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.overlayPopover.rawValue: .init(
+                backgroundStyle: .material(material: .thick, tintColorRole: .surfaceBase, tintOpacity: 0.2),
+                border: GentleColorPair(lightHex: "#F0D4C060", darkHex: "#4D302060"),
+                cornerRadius: 14,
+                borderWidth: 1.5,
+                shadowRadius: 20,
+                shadowOpacity: 0.25,
+                shadowOffsetY: 10
+            ),
+            GentleSurfaceRole.floatingPanel.rawValue: .init(
+                backgroundStyle: .glass(fallbackMaterial: .thick, fallbackColorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#FFFFFF40", darkHex: "#FFFFFF20"),
+                cornerRadius: 20,
+                borderWidth: 1,
+                shadowRadius: 32,
+                shadowOpacity: 0.3,
+                shadowOffsetY: 16
+            ),
+            GentleSurfaceRole.floatingWidget.rawValue: .init(
+                backgroundStyle: .glass(fallbackMaterial: .thick, fallbackColorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 20,
+                borderWidth: 0,
+                shadowRadius: 12,
+                shadowOpacity: 0.18,
+                shadowOffsetY: 6
+            )
+        ]
+    )
+
+    // MARK: Elegant - Light, airy, refined
+    /// Delicate surfaces with subtle shadows and refined borders
+    static let elegant: GentleSurfaceTokens = .init(
+        roles: [
+            GentleSurfaceRole.appBackground.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .background),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.card.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                specularEffect: .highlight,
+                specularStrength: 0.03,
+                border: GentleColorPair(lightHex: "#E0D0F0", darkHex: "#3D2D60"),
+                cornerRadius: 20,
+                borderWidth: 0.5
+            ),
+            GentleSurfaceRole.cardElevated.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                specularEffect: .highlight,
+                specularStrength: 0.06,
+                border: GentleColorPair(lightHex: "#E0D0F040", darkHex: "#3D2D6040"),
+                cornerRadius: 20,
+                borderWidth: 0.5,
+                shadowRadius: 20,
+                shadowOpacity: 0.06,
+                shadowOffsetY: 10
+            ),
+            GentleSurfaceRole.cardSecondary.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceOverlay),
+                specularEffect: .indent,
+                specularStrength: 0.02,
+                border: GentleColorPair(lightHex: "#E0D0F025", darkHex: "#3D2D6025"),
+                cornerRadius: 14,
+                borderWidth: 0.5
+            ),
+            GentleSurfaceRole.chrome.rawValue: .init(
+                backgroundStyle: .material(material: .ultraThin, tintColorRole: nil, tintOpacity: 0),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.overlaySheet.rawValue: .init(
+                backgroundStyle: .material(material: .thin, tintColorRole: .surfaceOverlay, tintOpacity: 0.05),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 32,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.overlayPopover.rawValue: .init(
+                backgroundStyle: .material(material: .thin, tintColorRole: .surfaceBase, tintOpacity: 0.08),
+                border: GentleColorPair(lightHex: "#E0D0F020", darkHex: "#3D2D6020"),
+                cornerRadius: 16,
+                borderWidth: 0.5,
+                shadowRadius: 24,
+                shadowOpacity: 0.08,
+                shadowOffsetY: 12
+            ),
+            GentleSurfaceRole.floatingPanel.rawValue: .init(
+                backgroundStyle: .glass(fallbackMaterial: .thin, fallbackColorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#FFFFFF15", darkHex: "#FFFFFF08"),
+                cornerRadius: 24,
+                borderWidth: 0.5,
+                shadowRadius: 32,
+                shadowOpacity: 0.1,
+                shadowOffsetY: 16
+            ),
+            GentleSurfaceRole.floatingWidget.rawValue: .init(
+                backgroundStyle: .glass(fallbackMaterial: .thin, fallbackColorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 24,
+                borderWidth: 0,
+                shadowRadius: 12,
+                shadowOpacity: 0.06,
+                shadowOffsetY: 6
+            )
+        ]
+    )
+
+    // MARK: Compact - Dense, efficient, tight
+    /// Tight corners and minimal shadows for information-dense interfaces
+    static let compact: GentleSurfaceTokens = .init(
+        roles: [
+            GentleSurfaceRole.appBackground.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .background),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.card.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#C4DCD0", darkHex: "#2D4D3D"),
+                cornerRadius: 8,
+                borderWidth: 1
+            ),
+            GentleSurfaceRole.cardElevated.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceBase),
+                specularEffect: .highlight,
+                specularStrength: 0.05,
+                border: GentleColorPair(lightHex: "#C4DCD060", darkHex: "#2D4D3D60"),
+                cornerRadius: 8,
+                borderWidth: 0.5,
+                shadowRadius: 4,
+                shadowOpacity: 0.06,
+                shadowOffsetY: 2
+            ),
+            GentleSurfaceRole.cardSecondary.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceOverlay),
+                specularEffect: .indent,
+                specularStrength: 0.03,
+                border: GentleColorPair(lightHex: "#C4DCD040", darkHex: "#2D4D3D40"),
+                cornerRadius: 6,
+                borderWidth: 0.5
+            ),
+            GentleSurfaceRole.chrome.rawValue: .init(
+                backgroundStyle: .material(material: .ultraThin, tintColorRole: nil, tintOpacity: 0),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.overlaySheet.rawValue: .init(
+                backgroundStyle: .material(material: .regular, tintColorRole: .surfaceOverlay, tintOpacity: 0.1),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 12,
+                borderWidth: 0
+            ),
+            GentleSurfaceRole.overlayPopover.rawValue: .init(
+                backgroundStyle: .material(material: .regular, tintColorRole: .surfaceBase, tintOpacity: 0.12),
+                border: GentleColorPair(lightHex: "#C4DCD030", darkHex: "#2D4D3D30"),
+                cornerRadius: 8,
+                borderWidth: 0.5,
+                shadowRadius: 8,
+                shadowOpacity: 0.1,
+                shadowOffsetY: 4
+            ),
+            GentleSurfaceRole.floatingPanel.rawValue: .init(
+                backgroundStyle: .glass(fallbackMaterial: .regular, fallbackColorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#FFFFFF18", darkHex: "#FFFFFF0C"),
+                cornerRadius: 10,
+                borderWidth: 0.5,
+                shadowRadius: 12,
+                shadowOpacity: 0.12,
+                shadowOffsetY: 6
+            ),
+            GentleSurfaceRole.floatingWidget.rawValue: .init(
+                backgroundStyle: .glass(fallbackMaterial: .regular, fallbackColorRole: .surfaceBase),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 10,
+                borderWidth: 0,
+                shadowRadius: 4,
+                shadowOpacity: 0.08,
+                shadowOffsetY: 2
+            )
+        ]
+    )
+}
 
 // MARK: - Theme Presets
 
@@ -28,6 +655,8 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#8B4513", darkHex: "#CD853F"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#B8860B", darkHex: "#DAA520"),
         ])
+        // Use classic surface tokens
+        spec.surfaces = .classic
         // Serif titles, traditional typography
         var typo = GentleTypographyTokens.gentleDefault
         typo.roles[GentleTextRole.largeTitle_xxl.rawValue] = .init(
@@ -98,6 +727,8 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#3B5BDB", darkHex: "#5C7CFA"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#748FFC", darkHex: "#91A7FF"),
         ])
+        // Use modern surface tokens
+        spec.surfaces = .modern
         // Clean default design, medium weights
         var typo = GentleTypographyTokens.gentleDefault
         typo.roles[GentleTextRole.largeTitle_xxl.rawValue] = .init(
@@ -168,6 +799,8 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#2E8B6E", darkHex: "#4ADE9F"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#6FCF97", darkHex: "#7EEAB8"),
         ])
+        // Use soft surface tokens
+        spec.surfaces = .soft
         // All rounded, soft weights
         var typo = GentleTypographyTokens.gentleDefault
         typo.roles[GentleTextRole.largeTitle_xxl.rawValue] = .init(
@@ -250,6 +883,8 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#000000", darkHex: "#FFFFFF"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#666666", darkHex: "#999999"),
         ])
+        // Use editorial surface tokens
+        spec.surfaces = .editorial
         // All serif, editorial typography
         var typo = GentleTypographyTokens.gentleDefault
         typo.roles[GentleTextRole.largeTitle_xxl.rawValue] = .init(
@@ -328,6 +963,8 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#0066CC", darkHex: "#4DA6FF"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#4D94DB", darkHex: "#80C0FF"),
         ])
+        // Use technical surface tokens
+        spec.surfaces = .technical
         // Monospace titles, condensed
         var typo = GentleTypographyTokens.gentleDefault
         typo.roles[GentleTextRole.largeTitle_xxl.rawValue] = .init(
@@ -402,6 +1039,8 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#E85D04", darkHex: "#FF8C42"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#F5A060", darkHex: "#FFB87A"),
         ])
+        // Use bold surface tokens
+        spec.surfaces = .bold
         // Heavy weights throughout
         var typo = GentleTypographyTokens.gentleDefault
         typo.roles[GentleTextRole.largeTitle_xxl.rawValue] = .init(
@@ -476,6 +1115,8 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#7C4DFF", darkHex: "#A580FF"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#B388FF", darkHex: "#C9A0FF"),
         ])
+        // Use elegant surface tokens
+        spec.surfaces = .elegant
         // Light weights, expanded, generous spacing
         var typo = GentleTypographyTokens.gentleDefault
         typo.roles[GentleTextRole.largeTitle_xxl.rawValue] = .init(
@@ -550,6 +1191,8 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#166534", darkHex: "#4ADE80"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#22C55E", darkHex: "#86EFAC"),
         ])
+        // Use compact surface tokens
+        spec.surfaces = .compact
         // Condensed, smaller sizes, tight spacing
         var typo = GentleTypographyTokens.gentleDefault
         typo.roles[GentleTextRole.largeTitle_xxl.rawValue] = .init(

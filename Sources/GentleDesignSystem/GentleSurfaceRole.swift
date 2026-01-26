@@ -2,7 +2,7 @@
 import Foundation
 import SwiftUI
 
-public enum GentleSurfaceRole: String, Codable, Sendable {
+public enum GentleSurfaceRole: String, Codable, Sendable, CaseIterable {
     // Structure
     case appBackground
     case card
@@ -19,6 +19,64 @@ public enum GentleSurfaceRole: String, Codable, Sendable {
     // Floating
     case floatingPanel      // Picture-in-picture, floating panels - glass
     case floatingWidget     // Home screen widget style - glass
+
+    /// Human-readable display name for the surface role
+    public var displayName: String {
+        switch self {
+        case .appBackground: return "App Background"
+        case .card: return "Card"
+        case .cardElevated: return "Card Elevated"
+        case .cardSecondary: return "Card Secondary"
+        case .chrome: return "Chrome"
+        case .overlaySheet: return "Overlay Sheet"
+        case .overlayPopover: return "Overlay Popover"
+        case .floatingPanel: return "Floating Panel"
+        case .floatingWidget: return "Floating Widget"
+        }
+    }
+
+    /// Short description of the surface role's purpose
+    public var subtitle: String {
+        switch self {
+        case .appBackground: return "Full-screen background"
+        case .card: return "Standard content card"
+        case .cardElevated: return "Elevated with shadow"
+        case .cardSecondary: return "Nested/secondary content"
+        case .chrome: return "Nav bars, toolbars"
+        case .overlaySheet: return "Modal sheets"
+        case .overlayPopover: return "Menus, popovers"
+        case .floatingPanel: return "Floating panels"
+        case .floatingWidget: return "Widget style"
+        }
+    }
+
+    /// Semantic grouping for organization in editors
+    public var category: SurfaceCategory {
+        switch self {
+        case .appBackground, .card, .cardElevated, .cardSecondary:
+            return .structure
+        case .chrome:
+            return .chrome
+        case .overlaySheet, .overlayPopover:
+            return .overlay
+        case .floatingPanel, .floatingWidget:
+            return .floating
+        }
+    }
+
+    public enum SurfaceCategory: String, CaseIterable {
+        case structure = "Structure"
+        case chrome = "Chrome"
+        case overlay = "Overlays"
+        case floating = "Floating"
+    }
+
+    /// Surfaces grouped by category
+    public static var groupedByCategory: [(category: SurfaceCategory, roles: [GentleSurfaceRole])] {
+        SurfaceCategory.allCases.map { category in
+            (category, allCases.filter { $0.category == category })
+        }
+    }
 }
 
 // MARK: - Apple Material
