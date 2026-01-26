@@ -88,7 +88,7 @@ struct ThemePresetCard: View {
     // Row 2: Surface/Text colors
     private static let surfaceColors: [(GentleColorRole, String)] = [
         (.background, "Background"),
-        (.surface, "Surface"),
+        (.surfaceBase, "SurfaceBase"),
         (.textPrimary, "Text"),
         (.borderSubtle, "Border")
     ]
@@ -148,7 +148,7 @@ struct ThemePresetCard: View {
             }
             .frame(maxWidth: .infinity)
             .padding(design.layout.gap.regular)
-            .background(theme.color(for: .surface, scheme: colorScheme))
+            .background(theme.color(for: .surfaceBase, scheme: colorScheme))
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .shadow(color: .black.opacity(0.25), radius: 6, x: 4, y: 4)
         } label: {
@@ -221,7 +221,7 @@ struct ThemePresetCard: View {
                 }
             }
             // .padding(design.layout.gap.regular)
-            .background(theme.color(for: .surface, scheme: colorScheme))
+            .background(theme.color(for: .surfaceBase, scheme: colorScheme))
             .clipShape(RoundedRectangle(cornerRadius: 12))
         } label: {
             HStack(spacing: 0) {

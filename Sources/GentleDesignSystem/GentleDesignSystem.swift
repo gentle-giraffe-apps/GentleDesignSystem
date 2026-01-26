@@ -92,7 +92,7 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
 
     case textPrimary, textSecondary, textTertiary
     case textOnPrimaryCTA, textOnDestructive
-    case background, surface
+    case background, surfaceBase
     case surfaceTint, surfaceSpecular
     case surfaceOverlay, textOnOverlay, textOnOverlaySecondary
     case borderSubtle
@@ -108,7 +108,7 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
         case .textOnPrimaryCTA: return "Text On Primary CTA"
         case .textOnDestructive: return "Text On Destructive"
         case .background: return "Background"
-        case .surface: return "Surface"
+        case .surfaceBase: return "Surface Base"
         case .surfaceTint: return "Surface Tint"
         case .surfaceSpecular: return "Surface Specular"
         case .surfaceOverlay: return "Surface Overlay"
@@ -133,7 +133,7 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
 
     /// Container/background colors
     public static let surfaceRoles: [GentleColorRole] = [
-        .background, .surface, .surfaceOverlay,
+        .background, .surfaceBase, .surfaceOverlay,
         .surfaceTint, .surfaceSpecular,
         .borderSubtle
     ]
@@ -150,7 +150,7 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
 
     /// Subset of surface roles valid for surface backgrounds (excludes effect colors)
     public static let surfaceBackgroundRoles: [GentleColorRole] = [
-        .background, .surface, .surfaceOverlay
+        .background, .surfaceBase, .surfaceOverlay
     ]
 
     // MARK: - Membership Checks
@@ -443,7 +443,7 @@ public extension GentleColorTokens {
 
             // Surfaces
             GentleColorRole.background.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#0B0F19"),
-            GentleColorRole.surface.rawValue: .init(lightHex: "#FAFAFE", darkHex: "#111827"),
+            GentleColorRole.surfaceBase.rawValue: .init(lightHex: "#FAFAFE", darkHex: "#111827"),
             GentleColorRole.surfaceTint.rawValue: .init(lightHex: "#111827CC", darkHex: "#020617CC"),
             GentleColorRole.surfaceSpecular.rawValue: .init(lightHex: "#FFFFFF66", darkHex: "#FFFFFF33"),
             GentleColorRole.surfaceOverlay.rawValue: .init(lightHex: "#111827CC", darkHex: "#020617CC"),
@@ -1080,7 +1080,7 @@ public struct GentleTheme: Sendable {
         case .surface:
             return GentleVisualEffectRecipe(
                 id: effect.rawValue,
-                base: .solid(pair(.surface, fallback: .init(lightHex: "#FAFAFE", darkHex: "#111827")))
+                base: .solid(pair(.surfaceBase, fallback: .init(lightHex: "#FAFAFE", darkHex: "#111827")))
             )
         case .surfaceOverlay:
             return GentleVisualEffectRecipe(
@@ -1434,7 +1434,7 @@ public struct GentleDesignRuntime: DynamicProperty {
 
         public func color(_ role: GentleColorRole) -> Color { theme.color(for: role, scheme: colorScheme) }
 
-        public var surface: Color { color(.surface) }
+        public var surfaceBase: Color { color(.surfaceBase) }
         public var background: Color { color(.background) }
         public var borderSubtle: Color { color(.borderSubtle) }
         public var textPrimary: Color { color(.textPrimary) }

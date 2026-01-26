@@ -114,7 +114,7 @@ All `.gentleDefault` values in one place.
 | `textSecondary` | #4B5563 | #C7CDD4 | Secondary text |
 | `textTertiary` | #6B7280 | #9AA0A6 | Tertiary/hint text |
 | `background` | #FFFFFF | #0B0F19 | App background |
-| `surface` | #FAFAFE | #111827 | Card/container background |
+| `surfaceBase` | #FAFAFE | #111827 | Card/container background |
 | `surfaceTint` | #111827CC | #020617CC | Surface tint overlay |
 | `surfaceSpecular` | #FFFFFF66 | #FFFFFF33 | Specular highlight |
 | `surfaceOverlay` | #111827CC | #020617CC | Modal overlay |
@@ -171,5 +171,5 @@ All `.gentleDefault` values in one place.
 | Material Role | Color Role Used |
 |---------------|-----------------|
 | `appBackground` | background |
-| `surface` | surface |
+| `surface` | surfaceBase |
 | `surfaceOverlay` | surfaceOverlay |

@@ -295,7 +295,7 @@ footnote_s, caption_s, caption2_s
 ```
 textPrimary, textSecondary, textTertiary,
 textOnPrimaryCTA, textOnDestructive, textOnOverlay, textOnOverlaySecondary,
-background, surface, surfaceOverlay, surfaceTint, surfaceSpecular, borderSubtle,
+background, surfaceBase, surfaceOverlay, surfaceTint, surfaceSpecular, borderSubtle,
 primaryCTA, destructive,
 themePrimary, themeSecondary
 ```
