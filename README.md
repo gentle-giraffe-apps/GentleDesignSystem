@@ -13,9 +13,9 @@ A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to fe
 [![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=active+issues&show_trend=true&token=usGsRQEFEVnvMC62c6ekIHCT)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/)
 [![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=resolved+issues&show_trend=true&token=usGsRQEFEVnvMC62c6ekIHCT)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/)<br/>
 <sub><strong>Codecov Snapshot</strong></sub><br/>
-<a href="https://codecov.io/gh/gentle-giraffe-apps/GentleNetworking">
+<a href="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem">
   <img
-    src="https://codecov.io/gh/gentle-giraffe-apps/GentleNetworking/graphs/icicle.svg"
+    src="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/graphs/icicle.svg"
     height="72"
     style="max-width: 420px;"
     alt="Codecov coverage history icicle chart"

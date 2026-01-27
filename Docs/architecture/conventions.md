@@ -7,6 +7,14 @@
 - Use `@MainActor` for UI-bound classes
 - All public types need `public` access modifier
 
+## Strict Rules (Never Violate)
+
+| Rule | Rationale |
+|------|-----------|
+| **Never force unwrap (`!`)** | No force unwrapping anywhere in the codebase, including tests. Use `guard let`, `if let`, optional chaining, or nil-coalescing instead. |
+| **Always build for iOS Simulator** | This project uses UIKit. Do not use `#if canImport(UIKit)` or platform availability checks for UIKit—it is always available. |
+| **Never use `case none` in enums** | Causes static analysis warnings due to conflict with `Optional.none`. Use alternative names like `noEffect`, `hidden`, `unknown`, or `unspecified`. |
+
 ## Naming
 
 | Pattern | Example |
