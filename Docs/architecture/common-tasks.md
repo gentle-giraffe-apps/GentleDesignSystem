@@ -124,7 +124,9 @@ Step-by-step guides for common modifications.
 1. Add case to `GentleSurfaceRole` enum:
    ```swift
    public enum GentleSurfaceRole: String, Codable, Sendable {
-       case appBackground, card, cardElevated, surfaceOverlay
+       case appBackground, card, cardElevated, cardSecondary
+       case chrome, overlaySheet, overlayPopover
+       case floatingPanel, floatingWidget
        case myNewSurface  // ← add here
    }
    ```
@@ -132,7 +134,9 @@ Step-by-step guides for common modifications.
 2. Add spec in `GentleSurfaceTokens.gentleDefault.roles`:
    ```swift
    GentleSurfaceRole.myNewSurface.rawValue: .init(
-       materialRole: .surface,
+       backgroundStyle: .solid(colorRole: .surfaceBase),
+       specularEffect: .noEffect,
+       specularStrength: 0.0,
        border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
        cornerRadius: 12,
        borderWidth: 1,

@@ -313,9 +313,11 @@ themePrimary, themeSecondary
 primary, secondary, tertiary, quaternary, destructive
 ```
 
-### GentleSurfaceRole (4)
+### GentleSurfaceRole (9)
 ```
-appBackground, card, cardElevated, surfaceOverlay
+appBackground, card, cardElevated, cardSecondary,
+chrome, overlaySheet, overlayPopover,
+floatingPanel, floatingWidget
 ```
 
 ### GentleSpacingToken (6)
