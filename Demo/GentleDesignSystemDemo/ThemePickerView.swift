@@ -323,10 +323,6 @@ struct ThemePresetCard: View {
                 }
             }
             .padding(design.layout.gap.regular)
-            .background(
-                DiagonalStripesBackground()
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-            )
             .padding(.leading, 12)
             .padding(.top, design.layout.gap.tight)
         } label: {
@@ -335,39 +331,55 @@ struct ThemePresetCard: View {
                     .gentleText(.headline_m)
                 Spacer()
                 surfaceChips
-                    .opacity(0.7)
             }
         }
         .disclosureGroupStyle(GentleDisclosureStyle())
     }
 
     private func surfacePreview(role: GentleSurfaceRole, label: String) -> some View {
-        VStack(spacing: 4) {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(.clear)
-                .frame(height: 40)
-                .gentleSurface(role)
+        let cornerRadius = theme.surfaces.roleSpec(for: role).cornerRadius
+        return VStack(spacing: 4) {
+            ZStack {
+                ColorfulStripesBackground(baseColor: theme.color(for: .themePrimary, scheme: colorScheme))
+                    .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .fill(.clear)
+                    .gentleSurface(role)
+            }
+            .frame(height: 40)
             Text(label)
                 .font(.caption2)
                 .foregroundStyle(.secondary)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(
+                    theme.color(for: .surfaceBase, scheme: colorScheme)
+                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                )
         }
         .frame(maxWidth: .infinity)
     }
 
     private var surfaceChips: some View {
         HStack(spacing: 4) {
-            ForEach([GentleSurfaceRole.card, .cardElevated, .overlayPopover], id: \.self) { role in
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(.clear)
-                    .frame(width: 28, height: 20)
-                    .gentleSurface(role)
+            ForEach(Array(GentleSurfaceRole.allCases.prefix(6)), id: \.self) { role in
+                let cornerRadius = theme.surfaces.roleSpec(for: role).cornerRadius
+                ZStack {
+                    ColorfulStripesBackground(baseColor: theme.color(for: .themePrimary, scheme: colorScheme), stripeWidth: 4)
+                        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .fill(.clear)
+                        .gentleSurface(role)
+                }
+                .overlay(
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .stroke(theme.color(for: .borderSubtle, scheme: colorScheme), lineWidth: 1)
+                )
+                .frame(width: 28, height: 16)
             }
         }
-        .padding(4)
-        .background(
-            DiagonalStripesBackground()
-                .clipShape(RoundedRectangle(cornerRadius: 6))
-        )
     }
 
     // MARK: - Divider
@@ -401,6 +413,67 @@ struct DiagonalStripesBackground: View {
 
                 context.fill(path, with: .color(.black.opacity(0.08)))
                 x += spacing + stripeWidth
+            }
+        }
+    }
+}
+
+// MARK: - Colorful Stripes Background
+
+struct ColorfulStripesBackground: View {
+    let baseColor: Color
+    var stripeWidth: CGFloat = 10
+
+    // Generate shades from the base color
+    private var shades: [Color] {
+        [
+            baseColor.opacity(1.0),
+            baseColor.opacity(0.85),
+            baseColor.opacity(0.7),
+            baseColor.opacity(0.9),
+            baseColor.opacity(0.75)
+        ]
+    }
+
+    var body: some View {
+        Canvas { context, size in
+            let stripeWidth = self.stripeWidth
+            let totalWidth = size.width + size.height
+
+            var x: CGFloat = -size.height
+            var colorIndex = 0
+            var isColoredStripe = true
+
+            while x < totalWidth {
+                var path = Path()
+                path.move(to: CGPoint(x: x, y: 0))
+                path.addLine(to: CGPoint(x: x + size.height, y: size.height))
+                path.addLine(to: CGPoint(x: x + size.height + stripeWidth, y: size.height))
+                path.addLine(to: CGPoint(x: x + stripeWidth, y: 0))
+                path.closeSubpath()
+
+                if isColoredStripe {
+                    // Gradient from one shade to the next at full opacity
+                    let color1 = shades[colorIndex % shades.count]
+                    let color2 = shades[(colorIndex + 1) % shades.count]
+                    let gradient = Gradient(colors: [color1, color2])
+
+                    context.fill(
+                        path,
+                        with: .linearGradient(
+                            gradient,
+                            startPoint: CGPoint(x: x, y: 0),
+                            endPoint: CGPoint(x: x + stripeWidth + size.height, y: size.height)
+                        )
+                    )
+                    colorIndex += 1
+                } else {
+                    // Gap stripe - base color at 20% opacity
+                    context.fill(path, with: .color(baseColor.opacity(0.2)))
+                }
+
+                isColoredStripe.toggle()
+                x += stripeWidth
             }
         }
     }
