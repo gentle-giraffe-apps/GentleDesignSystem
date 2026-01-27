@@ -678,17 +678,65 @@ public struct GentleDesignSurfacesSection: View {
         Button {
             editingRole = role
         } label: {
-            VStack(alignment: .leading, spacing: design.layout.stack.tight) {
-                Text(role.displayName)
-                    .gentleText(.caption_s)
-                    .fontWeight(.semibold)
+            ZStack {
+                // Miniature mock UI content (visible through blur/glass effects)
+                HStack(spacing: 0) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        HStack(spacing: 4) {
+                            Circle().fill(design.color(.themePrimary)).frame(width: 10, height: 10)
+                            Text("Primary")
+                                .font(.system(size: 8))
+                        }
+                        HStack(spacing: 4) {
+                            Circle().fill(design.color(.themeSecondary)).frame(width: 10, height: 10)
+                            Text("Secondary")
+                                .font(.system(size: 8))
+                        }
+                        HStack(spacing: 4) {
+                            Circle().fill(design.color(.primaryCTA)).frame(width: 10, height: 10)
+                            Text("CTA")
+                                .font(.system(size: 8))
+                        }
+                    }
+                    .padding(.leading, 8)
 
-                Text(role.subtitle)
-                    .gentleText(.caption2_s)
-                    .opacity(0.7)
+                    Spacer()
+
+                    // Mini mesh gradient
+                    MeshGradient(
+                        width: 3,
+                        height: 3,
+                        points: [
+                            [0.0, 0.0], [0.5, 0.0], [1.0, 0.0],
+                            [0.0, 0.5], [0.5, 0.5], [1.0, 0.5],
+                            [0.0, 1.0], [0.5, 1.0], [1.0, 1.0]
+                        ],
+                        colors: [
+                            .red, .purple, .indigo,
+                            .orange, .pink, .blue,
+                            .yellow, .green, .cyan
+                        ]
+                    )
+                    .frame(width: 40, height: 40)
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .padding(.trailing, 8)
+                }
+                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity)
+
+                // Surface content on top
+                VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+                    Text(role.displayName)
+                        .gentleText(.caption_s)
+                        .fontWeight(.semibold)
+
+                    Text(role.subtitle)
+                        .gentleText(.caption2_s)
+                        .opacity(0.7)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .gentleSurface(role, inset: .card, showTappableHint: true)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .gentleSurface(role, inset: .card, showTappableHint: true)
         }
         .buttonStyle(.plain)
     }
@@ -1242,6 +1290,32 @@ extension Color {
                 Int(g * 255),
                 Int(b * 255)
             )
+        }
+    }
+}
+
+// MARK: - Diagonal Stripes Background
+
+struct DiagonalStripesBackground: View {
+    var body: some View {
+        Canvas { context, size in
+            // Draw diagonal stripes that darken the background
+            let stripeWidth: CGFloat = 12
+            let spacing: CGFloat = 8
+            let totalWidth = size.width + size.height
+
+            var x: CGFloat = -size.height
+            while x < totalWidth {
+                var path = Path()
+                path.move(to: CGPoint(x: x, y: 0))
+                path.addLine(to: CGPoint(x: x + size.height, y: size.height))
+                path.addLine(to: CGPoint(x: x + size.height + stripeWidth, y: size.height))
+                path.addLine(to: CGPoint(x: x + stripeWidth, y: 0))
+                path.closeSubpath()
+
+                context.fill(path, with: .color(.black.opacity(0.08)))
+                x += spacing + stripeWidth
+            }
         }
     }
 }

@@ -76,6 +76,7 @@ struct ThemePresetCard: View {
     @State private var isColorsExpanded = false
     @State private var isTypographyExpanded = false
     @State private var isButtonsExpanded = false
+    @State private var isSurfacesExpanded = false
 
     // Row 1: Brand/Action colors
     private static let brandColors: [(GentleColorRole, String)] = [
@@ -112,6 +113,11 @@ struct ThemePresetCard: View {
 
             // MARK: Buttons (Expandable)
             buttonsSection
+
+            divider
+
+            // MARK: Surfaces (Expandable)
+            surfacesSection
         }
         .gentleSurface(.card, inset: .card, insetVariant: .roomy)
         .shadow(color: .black.opacity(0.25), radius: 12, x: 8, y: 8)
@@ -297,6 +303,73 @@ struct ThemePresetCard: View {
         }
     }
 
+    // MARK: - Surfaces Section
+
+    private var surfacesSection: some View {
+        DisclosureGroup(isExpanded: $isSurfacesExpanded) {
+            VStack(spacing: design.layout.gap.regular) {
+                // Structure surfaces
+                HStack(spacing: design.layout.gap.tight) {
+                    surfacePreview(role: .card, label: "Card")
+                    surfacePreview(role: .cardElevated, label: "Elevated")
+                    surfacePreview(role: .cardSecondary, label: "Secondary")
+                }
+
+                // Overlay/Floating surfaces
+                HStack(spacing: design.layout.gap.tight) {
+                    surfacePreview(role: .overlaySheet, label: "Sheet")
+                    surfacePreview(role: .overlayPopover, label: "Popover")
+                    surfacePreview(role: .floatingPanel, label: "Panel")
+                }
+            }
+            .padding(design.layout.gap.regular)
+            .background(
+                DiagonalStripesBackground()
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            )
+            .padding(.leading, 12)
+            .padding(.top, design.layout.gap.tight)
+        } label: {
+            HStack(spacing: 0) {
+                Text("Surfaces")
+                    .gentleText(.headline_m)
+                Spacer()
+                surfaceChips
+                    .opacity(0.7)
+            }
+        }
+        .disclosureGroupStyle(GentleDisclosureStyle())
+    }
+
+    private func surfacePreview(role: GentleSurfaceRole, label: String) -> some View {
+        VStack(spacing: 4) {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(.clear)
+                .frame(height: 40)
+                .gentleSurface(role)
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var surfaceChips: some View {
+        HStack(spacing: 4) {
+            ForEach([GentleSurfaceRole.card, .cardElevated, .overlayPopover], id: \.self) { role in
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(.clear)
+                    .frame(width: 28, height: 20)
+                    .gentleSurface(role)
+            }
+        }
+        .padding(4)
+        .background(
+            DiagonalStripesBackground()
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+        )
+    }
+
     // MARK: - Divider
 
     private var divider: some View {
@@ -304,6 +377,32 @@ struct ThemePresetCard: View {
             .fill(theme.color(for: .borderSubtle, scheme: colorScheme))
             .frame(height: 1)
             .padding(.horizontal, design.layout.stack.regular)
+    }
+}
+
+// MARK: - Diagonal Stripes Background
+
+struct DiagonalStripesBackground: View {
+    var body: some View {
+        Canvas { context, size in
+            // Draw diagonal stripes that darken the background
+            let stripeWidth: CGFloat = 12
+            let spacing: CGFloat = 8
+            let totalWidth = size.width + size.height
+
+            var x: CGFloat = -size.height
+            while x < totalWidth {
+                var path = Path()
+                path.move(to: CGPoint(x: x, y: 0))
+                path.addLine(to: CGPoint(x: x + size.height, y: size.height))
+                path.addLine(to: CGPoint(x: x + size.height + stripeWidth, y: size.height))
+                path.addLine(to: CGPoint(x: x + stripeWidth, y: 0))
+                path.closeSubpath()
+
+                context.fill(path, with: .color(.black.opacity(0.08)))
+                x += spacing + stripeWidth
+            }
+        }
     }
 }
 
