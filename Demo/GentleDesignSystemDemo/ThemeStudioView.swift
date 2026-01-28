@@ -3,8 +3,9 @@ import SwiftUI
 import UIKit
 
 struct ThemeStudioView: View {
-    
+    var isTitleEditable: Bool = false
+
     var body: some View {
-        GentleDesignStudioView()
+        GentleDesignStudioView(isTitleEditable: isTitleEditable, embedInNavigationStack: false)
     }
 }

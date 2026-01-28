@@ -5,12 +5,50 @@ import UIKit
 
 public struct GentleThemeEditor: View {
     @GentleDesignRuntime private var design
+    @GentleThemeManagerRuntime private var themeManager
+    @Environment(\.gentleTheme) private var theme
+    @Environment(\.colorScheme) private var colorScheme
 
-    public init() {}
+    private let isTitleEditable: Bool
+    @State private var editableTitle: String = ""
+
+    public init(isTitleEditable: Bool = false) {
+        self.isTitleEditable = isTitleEditable
+    }
 
     public var body: some View {
         ScrollView {
             VStack(spacing: design.layout.stack.loose) {
+                // Theme name - editable or read-only
+                if isTitleEditable {
+                    VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+                        Text("Theme Name")
+                            .gentleText(.subheadline_ms, colorRole: .textSecondary)
+                        TextField("Theme Name", text: $editableTitle)
+                            .gentleText(.title_xl)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(theme.color(for: .surfaceBase, scheme: colorScheme))
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(theme.color(for: .borderSubtle, scheme: colorScheme), lineWidth: 1)
+                            )
+                            .onAppear {
+                                editableTitle = themeManager.currentPresetName ?? "New Theme"
+                            }
+                            .onChange(of: editableTitle) { _, newValue in
+                                themeManager.renamePreset(to: newValue)
+                            }
+                    }
+                } else {
+                    Text(themeManager.currentPresetName ?? "Design System")
+                        .gentleText(.title_xl)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+
                 GentleDesignColorsSection()
                 GentleDesignTypographySection()
                 GentleDesignButtonsSection()

@@ -1521,6 +1521,12 @@ public final class GentleThemeManager {
         (try? store.hasEditableSpec(forPreset: name)) ?? false
     }
 
+    /// Renames the current preset.
+    public func renamePreset(to newName: String) {
+        currentPresetName = newName
+        hasUnsavedChanges = true
+    }
+
     public func bindingForTypographyRole(_ role: GentleTextRole) -> Binding<GentleTypographyRoleSpec> {
         Binding(
             get: { self.theme.editableSpec.typography.roleSpec(for: role) },

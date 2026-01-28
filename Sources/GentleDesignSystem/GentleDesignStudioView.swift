@@ -19,21 +19,55 @@ public struct GentleDesignStudioView: View {
         }
     }
 
+    private let isTitleEditable: Bool
+    private let embedInNavigationStack: Bool
+
     @State private var activeSheet: ActiveSheet?
     @State private var exportURL: URL?
     @State private var showRevertAlert = false
     @GentleDesignRuntime private var design
     @GentleThemeManagerRuntime private var themeManager
 
-    public init() {
+    public init(isTitleEditable: Bool = false, embedInNavigationStack: Bool = true) {
+        self.isTitleEditable = isTitleEditable
+        self.embedInNavigationStack = embedInNavigationStack
     }
 
     public var body: some View {
-        NavigationStack {
-            GentleThemeEditor()
-            .navigationTitle(themeManager.currentPresetName ?? "Design System")
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
+        if embedInNavigationStack {
+            NavigationStack {
+                studioContent
+            }
+            .task { await refreshExportURL() }
+            .alert("Revert Changes?", isPresented: $showRevertAlert) {
+                Button("Cancel", role: .cancel) { }
+                Button("Revert", role: .destructive) {
+                    try? themeManager.load()
+                }
+            } message: {
+                Text("This will discard all unsaved changes and restore the last saved version.")
+            }
+        } else {
+            studioContent
+                .task { await refreshExportURL() }
+                .alert("Revert Changes?", isPresented: $showRevertAlert) {
+                    Button("Cancel", role: .cancel) { }
+                    Button("Revert", role: .destructive) {
+                        try? themeManager.load()
+                    }
+                } message: {
+                    Text("This will discard all unsaved changes and restore the last saved version.")
+                }
+        }
+    }
+
+    @ViewBuilder
+    private var studioContent: some View {
+        GentleThemeEditor(isTitleEditable: isTitleEditable)
+            .navigationTitle(isTitleEditable ? "New Theme" : (themeManager.currentPresetName ?? "Design System"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
                         HStack(spacing: 16) {
                             Button {
                                 showRevertAlert = true
@@ -116,16 +150,6 @@ public struct GentleDesignStudioView: View {
                         }
                     }
                 }
-        }
-        .task { await refreshExportURL() }
-        .alert("Revert Changes?", isPresented: $showRevertAlert) {
-            Button("Cancel", role: .cancel) { }
-            Button("Revert", role: .destructive) {
-                try? themeManager.load()
-            }
-        } message: {
-            Text("This will discard all unsaved changes and restore the last saved version.")
-        }
     }
 
     @MainActor
