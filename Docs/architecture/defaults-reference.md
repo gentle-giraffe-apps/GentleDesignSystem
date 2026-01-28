@@ -115,11 +115,12 @@ All `.gentleDefault` values in one place.
 | `textTertiary` | #6B7280 | #9AA0A6 | Tertiary/hint text |
 | `background` | #FFFFFF | #0B0F19 | App background |
 | `surfaceBase` | #FAFAFE | #111827 | Card/container background |
+| `surfaceCardSecondary` | #F4F6FE | #151D30 | Nested/secondary card background (tinted surfaceBase) |
 | `surfaceTint` | #111827CC | #020617CC | Surface tint overlay |
 | `surfaceSpecular` | #FFFFFF66 | #FFFFFF33 | Specular highlight |
 | `surfaceOverlay` | #111827CC | #020617CC | Modal overlay |
-| `textOnOverlay` | #F9FAFB | #F9FAFB | Primary text on overlay |
-| `textOnOverlaySecondary` | #D1D5DB | #D1D5DB | Secondary text on overlay |
+| `textOnOverlay` | #1F2933 | #F5F7FA | Primary text on overlay (adaptive) |
+| `textOnOverlaySecondary` | #4B5563 | #C7CDD4 | Secondary text on overlay (adaptive) |
 | `borderSubtle` | #E5E7EB | #374151 | Subtle borders |
 | `primaryCTA` | #4A6EF5 | #3B82F6 | Primary action color |
 | `textOnPrimaryCTA` | #FFFFFF | #FFFFFF | Text on primary CTA |

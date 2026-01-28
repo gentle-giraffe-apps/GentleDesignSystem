@@ -92,7 +92,7 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
 
     case textPrimary, textSecondary, textTertiary
     case textOnPrimaryCTA, textOnDestructive
-    case background, surfaceBase
+    case background, surfaceBase, surfaceCardSecondary
     case surfaceTint, surfaceSpecular
     case surfaceOverlay, textOnOverlay, textOnOverlaySecondary
     case borderSubtle
@@ -109,6 +109,7 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
         case .textOnDestructive: return "Text On Destructive"
         case .background: return "Background"
         case .surfaceBase: return "Surface Base"
+        case .surfaceCardSecondary: return "Surface Card Secondary"
         case .surfaceTint: return "Surface Tint"
         case .surfaceSpecular: return "Surface Specular"
         case .surfaceOverlay: return "Surface Overlay"
@@ -133,7 +134,7 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
 
     /// Container/background colors
     public static let surfaceRoles: [GentleColorRole] = [
-        .background, .surfaceBase, .surfaceOverlay,
+        .background, .surfaceBase, .surfaceCardSecondary, .surfaceOverlay,
         .surfaceTint, .surfaceSpecular,
         .borderSubtle
     ]
@@ -150,7 +151,7 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
 
     /// Subset of surface roles valid for surface backgrounds (excludes effect colors)
     public static let surfaceBackgroundRoles: [GentleColorRole] = [
-        .background, .surfaceBase, .surfaceOverlay
+        .background, .surfaceBase, .surfaceCardSecondary, .surfaceOverlay
     ]
 
     // MARK: - Membership Checks
@@ -444,11 +445,12 @@ public extension GentleColorTokens {
             // Surfaces
             GentleColorRole.background.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#0B0F19"),
             GentleColorRole.surfaceBase.rawValue: .init(lightHex: "#FAFAFE", darkHex: "#111827"),
+            GentleColorRole.surfaceCardSecondary.rawValue: .init(lightHex: "#F4F6FE", darkHex: "#151D30"),
             GentleColorRole.surfaceTint.rawValue: .init(lightHex: "#111827CC", darkHex: "#020617CC"),
             GentleColorRole.surfaceSpecular.rawValue: .init(lightHex: "#FFFFFF66", darkHex: "#FFFFFF33"),
             GentleColorRole.surfaceOverlay.rawValue: .init(lightHex: "#111827CC", darkHex: "#020617CC"),
-            GentleColorRole.textOnOverlay.rawValue: .init(lightHex: "#F9FAFB", darkHex: "#F9FAFB"),
-            GentleColorRole.textOnOverlaySecondary.rawValue: .init(lightHex: "#D1D5DB", darkHex:  "#D1D5DB"),
+            GentleColorRole.textOnOverlay.rawValue: .init(lightHex: "#1F2933", darkHex: "#F5F7FA"),
+            GentleColorRole.textOnOverlaySecondary.rawValue: .init(lightHex: "#4B5563", darkHex: "#C7CDD4"),
             GentleColorRole.borderSubtle.rawValue: .init(lightHex: "#E5E7EB", darkHex: "#374151"),
 
             // Actions / status
