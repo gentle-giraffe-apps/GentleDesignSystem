@@ -27,29 +27,43 @@ struct ThemePickerView: View {
             editableSpec: savedSpec ?? preset.spec
         )
     }
-    
+
     var body: some View {
         NavigationStack {
             ScrollView {
-                LazyVGrid(columns: columns, spacing: design.layout.grid.regular) {
-                    ForEach(Array(ThemePreset.allPresets.enumerated()), id: \.element.id) { index, preset in
-                        let previewTheme = previewThemeForPreset(preset)
+                VStack(alignment: .leading, spacing: design.layout.grid.regular) {
+                    // MARK: - Create Theme Card
+                    CreateThemeCard()
+                        .padding(.horizontal)
 
-                        Button {
-                            try? themeManager.selectPreset(name: preset.name, defaultSpec: preset.spec)
-                            showingThemeStudio = true
-                        } label: {
-                            GentleThemeRoot(theme: previewTheme) {
-                                ThemePresetCard(preset: preset, index: index + 1, refreshID: refreshID)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
+                    // MARK: - Preset Themes Section Header
+                    Text("Preset Themes")
+                        .gentleText(.title3_ml)
+                        .padding(.horizontal)
+                        .padding(.top, design.layout.gap.regular)
+
+                    // MARK: - Preset Theme Cards
+                    LazyVGrid(columns: columns, spacing: design.layout.grid.regular) {
+                        ForEach(Array(ThemePreset.allPresets.enumerated()), id: \.element.id) { index, preset in
+                            let previewTheme = previewThemeForPreset(preset)
+
+                            Button {
+                                try? themeManager.selectPreset(name: preset.name, defaultSpec: preset.spec)
+                                showingThemeStudio = true
+                            } label: {
+                                GentleThemeRoot(theme: previewTheme) {
+                                    ThemePresetCard(preset: preset, index: index + 1, refreshID: refreshID)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
                             }
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
                     }
+                    .padding(.horizontal)
                 }
-                .padding()
+                .padding(.vertical)
             }
-            .navigationTitle("Choose Theme")
+            .navigationTitle("Theme")
             .navigationDestination(isPresented: $showingThemeStudio) {
                 ThemeStudioView()
             }
@@ -59,6 +73,216 @@ struct ThemePickerView: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - Create Theme Card
+
+struct CreateThemeCard: View {
+    @GentleDesignRuntime private var design
+    @Environment(\.gentleTheme) private var theme
+    @Environment(\.colorScheme) private var colorScheme
+
+    @State private var selectedPresetName: String = ThemePreset.allPresets.first?.name ?? "Gentle Default"
+    @State private var showingBaseThemePicker = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: design.layout.gap.regular) {
+            // Title and Subtitle (matching preset card spacing)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Create Your Theme")
+                    .gentleText(.title_xl)
+
+                Text("Choose a base theme to start from")
+                    .gentleText(.subheadline_ms, colorRole: .textSecondary)
+            }
+
+            // Dropdown picker and Create button row
+            HStack(spacing: design.layout.gap.regular) {
+                // Dropdown picker button
+                Button {
+                    showingBaseThemePicker = true
+                } label: {
+                    HStack(spacing: 6) {
+                        Text(selectedPresetName)
+                            .gentleText(.body_m)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .truncationMode(.tail)
+                        Spacer()
+                        Image(systemName: "chevron.up.chevron.down")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(theme.color(for: .surfaceBase, scheme: colorScheme))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(theme.color(for: .borderSubtle, scheme: colorScheme), lineWidth: 1)
+                    )
+                }
+                .buttonStyle(.plain)
+                .popover(isPresented: $showingBaseThemePicker) {
+                    BaseThemePickerPopover(
+                        selectedPresetName: $selectedPresetName,
+                        onDismiss: { showingBaseThemePicker = false }
+                    )
+                }
+
+                // Create button
+                Button {
+                    // TODO: Implement theme creation
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "plus")
+                        Text("Create")
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .truncationMode(.tail)
+                    }
+                }
+                .gentleButton(.primary)
+            }
+        }
+        .gentleSurface(.card, inset: .card, insetVariant: .roomy)
+        .overlay(
+            RoundedRectangle(cornerRadius: max(8, theme.radii.large - 10))
+                .strokeBorder(
+                    theme.color(for: .borderSubtle, scheme: colorScheme),
+                    style: StrokeStyle(lineWidth: 2, dash: [8, 4])
+                )
+                .padding(10)
+        )
+    }
+}
+
+// MARK: - Base Theme Picker Popover
+
+private struct BaseThemePickerPopover: View {
+    @Binding var selectedPresetName: String
+    let onDismiss: () -> Void
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(ThemePreset.allPresets) { preset in
+                    BaseThemeOptionRow(
+                        preset: preset,
+                        isSelected: selectedPresetName == preset.name,
+                        colorScheme: colorScheme,
+                        onSelect: {
+                            selectedPresetName = preset.name
+                            onDismiss()
+                        }
+                    )
+                    if preset.id != ThemePreset.allPresets.last?.id {
+                        Divider()
+                    }
+                }
+            }
+            .padding(.vertical, 8)
+        }
+        .frame(minWidth: 260, maxHeight: 400)
+        .presentationCompactAdaptation(.popover)
+    }
+}
+
+private struct BaseThemeOptionRow: View {
+    let preset: ThemePreset
+    let isSelected: Bool
+    let colorScheme: ColorScheme
+    let onSelect: () -> Void
+
+    // Simplified color roles for swatches (4 colors)
+    private static let previewColors: [GentleColorRole] = [
+        .themePrimary,
+        .primaryCTA,
+        .destructive,
+        .surfaceBase
+    ]
+
+    /// Get the preset's background color for the current color scheme
+    private var presetBackgroundColor: Color {
+        let pair = preset.spec.colors.pairByRole[GentleColorRole.background.rawValue]
+        let hex = colorScheme == .dark ? pair?.darkHex : pair?.lightHex
+        return colorFromHex(hex)
+    }
+
+    /// Get the preset's text color for the current color scheme
+    private var presetTextColor: Color {
+        let pair = preset.spec.colors.pairByRole[GentleColorRole.textPrimary.rawValue]
+        let hex = colorScheme == .dark ? pair?.darkHex : pair?.lightHex
+        return colorFromHex(hex)
+    }
+
+    /// Get the preset's theme primary color for the checkmark
+    private var presetAccentColor: Color {
+        let pair = preset.spec.colors.pairByRole[GentleColorRole.themePrimary.rawValue]
+        let hex = colorScheme == .dark ? pair?.darkHex : pair?.lightHex
+        return colorFromHex(hex)
+    }
+
+    var body: some View {
+        Button(action: onSelect) {
+            HStack(spacing: 12) {
+                // Checkmark
+                Image(systemName: "checkmark")
+                    .foregroundStyle(presetAccentColor)
+                    .opacity(isSelected ? 1 : 0)
+
+                // Preset name
+                Text(preset.name)
+                    .foregroundStyle(presetTextColor)
+
+                Spacer()
+
+                // Color swatches
+                presetColorSwatches
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(presetBackgroundColor)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var presetColorSwatches: some View {
+        HStack(spacing: 0) {
+            ForEach(Self.previewColors, id: \.self) { role in
+                let pair = preset.spec.colors.pairByRole[role.rawValue]
+                let hex = colorScheme == .dark ? pair?.darkHex : pair?.lightHex
+                colorFromHex(hex)
+                    .frame(width: 20, height: 20)
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 4))
+        .overlay(
+            RoundedRectangle(cornerRadius: 4)
+                .stroke(Color.gray.opacity(0.3), lineWidth: 0.5)
+        )
+    }
+
+    private func colorFromHex(_ hex: String?) -> Color {
+        guard let hex = hex else { return .gray }
+        var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+        hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
+
+        var rgb: UInt64 = 0
+        Scanner(string: hexSanitized).scanHexInt64(&rgb)
+
+        let r = Double((rgb & 0xFF0000) >> 16) / 255.0
+        let g = Double((rgb & 0x00FF00) >> 8) / 255.0
+        let b = Double(rgb & 0x0000FF) / 255.0
+
+        return Color(red: r, green: g, blue: b)
     }
 }
 
