@@ -56,21 +56,21 @@ footnote_s, caption_s, caption2_s
 
 Naming: `{semantic}_{ramp}` where ramp = xxl > xl > l > ml > m > ms > s
 
-### GentleColorRole (17 roles)
+### GentleColorRole (18 roles)
 ```
 Text:     textPrimary, textSecondary, textTertiary,
           textOnPrimaryCTA, textOnDestructive, textOnOverlay, textOnOverlaySecondary
-Surface:  background, surfaceBase, surfaceOverlay, surfaceTint, surfaceSpecular, borderSubtle
+Surface:  background, surfaceBase, surfaceCardSecondary, surfaceOverlay, surfaceTint, surfaceSpecular, borderSubtle
 Action:   primaryCTA, destructive
 Theme:    themePrimary, themeSecondary
 ```
 
 **Semantic Groupings**:
 - `GentleColorRole.textRoles` - all text/foreground colors (7)
-- `GentleColorRole.surfaceRoles` - container/background/border colors (6)
+- `GentleColorRole.surfaceRoles` - container/background/border colors (7)
 - `GentleColorRole.actionRoles` - interactive element colors (2)
 - `GentleColorRole.themeRoles` - brand/accent colors (2)
-- `GentleColorRole.surfaceBackgroundRoles` - subset valid for surface backgrounds (3): `background`, `surface`, `surfaceOverlay`
+- `GentleColorRole.surfaceBackgroundRoles` - subset valid for surface backgrounds (4): `background`, `surfaceBase`, `surfaceCardSecondary`, `surfaceOverlay`
 
 Use `role.isTextRole`, `role.isSurfaceRole`, `role.isActionRole`, `role.isThemeRole`, or `role.isSurfaceBackgroundRole` for membership checks.
 

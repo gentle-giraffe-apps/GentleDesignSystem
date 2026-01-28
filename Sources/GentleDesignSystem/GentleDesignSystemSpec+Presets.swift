@@ -35,12 +35,12 @@ public extension GentleSurfaceTokens {
                 shadowOffsetY: 6
             ),
             GentleSurfaceRole.cardSecondary.rawValue: .init(
-                backgroundStyle: .solid(colorRole: .surfaceOverlay),
-                specularEffect: .indent,
-                specularStrength: 0.04,
-                border: GentleColorPair(lightHex: "#D4C8B430", darkHex: "#4A403030"),
-                cornerRadius: 12,
-                borderWidth: 0.5
+                backgroundStyle: .solid(colorRole: .surfaceCardSecondary),
+                specularEffect: .highlight,
+                specularStrength: 0.03,
+                border: GentleColorPair(lightHex: "#D4C8B4", darkHex: "#4A4030"),
+                cornerRadius: 14,
+                borderWidth: 1
             ),
             GentleSurfaceRole.chrome.rawValue: .init(
                 backgroundStyle: .material(material: .thin, tintColorRole: .surfaceBase, tintOpacity: 0.05),
@@ -112,10 +112,10 @@ public extension GentleSurfaceTokens {
                 shadowOffsetY: 4
             ),
             GentleSurfaceRole.cardSecondary.rawValue: .init(
-                backgroundStyle: .solid(colorRole: .surfaceOverlay),
-                border: GentleColorPair(lightHex: "#E0E0E830", darkHex: "#3A3A4E30"),
-                cornerRadius: 8,
-                borderWidth: 0.5
+                backgroundStyle: .solid(colorRole: .surfaceCardSecondary),
+                border: GentleColorPair(lightHex: "#E0E0E8", darkHex: "#3A3A4E"),
+                cornerRadius: 10,
+                borderWidth: 1
             ),
             GentleSurfaceRole.chrome.rawValue: .init(
                 backgroundStyle: .material(material: .ultraThin, tintColorRole: nil, tintOpacity: 0),
@@ -189,12 +189,12 @@ public extension GentleSurfaceTokens {
                 shadowOffsetY: 8
             ),
             GentleSurfaceRole.cardSecondary.rawValue: .init(
-                backgroundStyle: .solid(colorRole: .surfaceOverlay),
-                specularEffect: .indent,
+                backgroundStyle: .solid(colorRole: .surfaceCardSecondary),
+                specularEffect: .highlight,
                 specularStrength: 0.03,
-                border: GentleColorPair(lightHex: "#C5E0D430", darkHex: "#2A4D3D30"),
-                cornerRadius: 16,
-                borderWidth: 0.5
+                border: GentleColorPair(lightHex: "#C5E0D4", darkHex: "#2A4D3D"),
+                cornerRadius: 20,
+                borderWidth: 1
             ),
             GentleSurfaceRole.chrome.rawValue: .init(
                 backgroundStyle: .material(material: .thin, tintColorRole: .surfaceBase, tintOpacity: 0.03),
@@ -265,8 +265,8 @@ public extension GentleSurfaceTokens {
                 shadowOffsetY: 4
             ),
             GentleSurfaceRole.cardSecondary.rawValue: .init(
-                backgroundStyle: .solid(colorRole: .surfaceOverlay),
-                border: GentleColorPair(lightHex: "#00000020", darkHex: "#40404020"),
+                backgroundStyle: .solid(colorRole: .surfaceCardSecondary),
+                border: GentleColorPair(lightHex: "#000000", darkHex: "#404040"),
                 cornerRadius: 0,
                 borderWidth: 1
             ),
@@ -343,11 +343,11 @@ public extension GentleSurfaceTokens {
                 shadowOffsetY: 2
             ),
             GentleSurfaceRole.cardSecondary.rawValue: .init(
-                backgroundStyle: .solid(colorRole: .surfaceOverlay),
-                specularEffect: .indent,
-                specularStrength: 0.03,
-                border: GentleColorPair(lightHex: "#C4DCF050", darkHex: "#1E406050"),
-                cornerRadius: 4,
+                backgroundStyle: .solid(colorRole: .surfaceCardSecondary),
+                specularEffect: .highlight,
+                specularStrength: 0.02,
+                border: GentleColorPair(lightHex: "#C4DCF0", darkHex: "#1E4060"),
+                cornerRadius: 5,
                 borderWidth: 1
             ),
             GentleSurfaceRole.chrome.rawValue: .init(
@@ -422,12 +422,12 @@ public extension GentleSurfaceTokens {
                 shadowOffsetY: 8
             ),
             GentleSurfaceRole.cardSecondary.rawValue: .init(
-                backgroundStyle: .solid(colorRole: .surfaceOverlay),
-                specularEffect: .indent,
-                specularStrength: 0.08,
-                border: GentleColorPair(lightHex: "#F0D4C060", darkHex: "#4D302060"),
-                cornerRadius: 12,
-                borderWidth: 1.5
+                backgroundStyle: .solid(colorRole: .surfaceCardSecondary),
+                specularEffect: .highlight,
+                specularStrength: 0.05,
+                border: GentleColorPair(lightHex: "#F0D4C0", darkHex: "#4D3020"),
+                cornerRadius: 14,
+                borderWidth: 2
             ),
             GentleSurfaceRole.chrome.rawValue: .init(
                 backgroundStyle: .material(material: .thin, tintColorRole: .surfaceBase, tintOpacity: 0.1),
@@ -501,11 +501,11 @@ public extension GentleSurfaceTokens {
                 shadowOffsetY: 10
             ),
             GentleSurfaceRole.cardSecondary.rawValue: .init(
-                backgroundStyle: .solid(colorRole: .surfaceOverlay),
-                specularEffect: .indent,
+                backgroundStyle: .solid(colorRole: .surfaceCardSecondary),
+                specularEffect: .highlight,
                 specularStrength: 0.02,
-                border: GentleColorPair(lightHex: "#E0D0F025", darkHex: "#3D2D6025"),
-                cornerRadius: 14,
+                border: GentleColorPair(lightHex: "#E0D0F0", darkHex: "#3D2D60"),
+                cornerRadius: 16,
                 borderWidth: 0.5
             ),
             GentleSurfaceRole.chrome.rawValue: .init(
@@ -578,12 +578,12 @@ public extension GentleSurfaceTokens {
                 shadowOffsetY: 2
             ),
             GentleSurfaceRole.cardSecondary.rawValue: .init(
-                backgroundStyle: .solid(colorRole: .surfaceOverlay),
-                specularEffect: .indent,
+                backgroundStyle: .solid(colorRole: .surfaceCardSecondary),
+                specularEffect: .highlight,
                 specularStrength: 0.03,
-                border: GentleColorPair(lightHex: "#C4DCD040", darkHex: "#2D4D3D40"),
-                cornerRadius: 6,
-                borderWidth: 0.5
+                border: GentleColorPair(lightHex: "#C4DCD0", darkHex: "#2D4D3D"),
+                cornerRadius: 7,
+                borderWidth: 1
             ),
             GentleSurfaceRole.chrome.rawValue: .init(
                 backgroundStyle: .material(material: .ultraThin, tintColorRole: nil, tintOpacity: 0),
@@ -642,11 +642,12 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.textTertiary.rawValue:  .init(lightHex: "#7A6E5A", darkHex: "#B0A48E"),
             GentleColorRole.background.rawValue:    .init(lightHex: "#FAF8F3", darkHex: "#1A1610"),
             GentleColorRole.surfaceBase.rawValue:       .init(lightHex: "#F5F0E6", darkHex: "#2C2416"),
+            GentleColorRole.surfaceCardSecondary.rawValue: .init(lightHex: "#F1E9D7", darkHex: "#3D3117"),
             GentleColorRole.surfaceTint.rawValue:   .init(lightHex: "#2C2416CC", darkHex: "#0D0B08CC"),
             GentleColorRole.surfaceSpecular.rawValue: .init(lightHex: "#FFFFFF66", darkHex: "#FFFFFF33"),
             GentleColorRole.surfaceOverlay.rawValue:.init(lightHex: "#2C2416CC", darkHex: "#0D0B08CC"),
-            GentleColorRole.textOnOverlay.rawValue:   .init(lightHex: "#FAF8F3", darkHex: "#FAF8F3"),
-            GentleColorRole.textOnOverlaySecondary.rawValue: .init(lightHex: "#D4C8B4", darkHex: "#D4C8B4"),
+            GentleColorRole.textOnOverlay.rawValue:   .init(lightHex: "#2C2416", darkHex: "#F5F0E6"),
+            GentleColorRole.textOnOverlaySecondary.rawValue: .init(lightHex: "#5A4D3A", darkHex: "#D4C8B4"),
             GentleColorRole.borderSubtle.rawValue:   .init(lightHex: "#E0D8C8", darkHex: "#4A4030"),
             GentleColorRole.primaryCTA.rawValue:     .init(lightHex: "#8B4513", darkHex: "#CD853F"),
             GentleColorRole.textOnPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#1A1610"),
@@ -714,11 +715,12 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.textTertiary.rawValue:  .init(lightHex: "#6A6A7E", darkHex: "#8A8A9E"),
             GentleColorRole.background.rawValue:    .init(lightHex: "#FAFAFC", darkHex: "#0D0D14"),
             GentleColorRole.surfaceBase.rawValue:       .init(lightHex: "#F0F0F4", darkHex: "#1A1A28"),
+            GentleColorRole.surfaceCardSecondary.rawValue: .init(lightHex: "#E9EBF5", darkHex: "#24263E"),
             GentleColorRole.surfaceTint.rawValue:   .init(lightHex: "#1A1A2ECC", darkHex: "#08080CCC"),
             GentleColorRole.surfaceSpecular.rawValue: .init(lightHex: "#FFFFFF66", darkHex: "#FFFFFF33"),
             GentleColorRole.surfaceOverlay.rawValue:.init(lightHex: "#1A1A2ECC", darkHex: "#08080CCC"),
-            GentleColorRole.textOnOverlay.rawValue:   .init(lightHex: "#FAFAFC", darkHex: "#FAFAFC"),
-            GentleColorRole.textOnOverlaySecondary.rawValue: .init(lightHex: "#B0B0C4", darkHex: "#B0B0C4"),
+            GentleColorRole.textOnOverlay.rawValue:   .init(lightHex: "#1A1A2E", darkHex: "#EAEAF4"),
+            GentleColorRole.textOnOverlaySecondary.rawValue: .init(lightHex: "#4A4A5E", darkHex: "#B0B0C4"),
             GentleColorRole.borderSubtle.rawValue:   .init(lightHex: "#E0E0E8", darkHex: "#3A3A4E"),
             GentleColorRole.primaryCTA.rawValue:     .init(lightHex: "#3B5BDB", darkHex: "#5C7CFA"),
             GentleColorRole.textOnPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#0D0D14"),
@@ -786,11 +788,12 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.textTertiary.rawValue:  .init(lightHex: "#5A7A6A", darkHex: "#8AB09E"),
             GentleColorRole.background.rawValue:    .init(lightHex: "#F5FAF8", darkHex: "#0D1F18"),
             GentleColorRole.surfaceBase.rawValue:       .init(lightHex: "#E8F5F0", darkHex: "#142E24"),
+            GentleColorRole.surfaceCardSecondary.rawValue: .init(lightHex: "#E0F2EA", darkHex: "#1F4133"),
             GentleColorRole.surfaceTint.rawValue:   .init(lightHex: "#1A3A2FCC", darkHex: "#0A1A14CC"),
             GentleColorRole.surfaceSpecular.rawValue: .init(lightHex: "#FFFFFF66", darkHex: "#FFFFFF33"),
             GentleColorRole.surfaceOverlay.rawValue:.init(lightHex: "#1A3A2FCC", darkHex: "#0A1A14CC"),
-            GentleColorRole.textOnOverlay.rawValue:   .init(lightHex: "#F5FAF8", darkHex: "#F5FAF8"),
-            GentleColorRole.textOnOverlaySecondary.rawValue: .init(lightHex: "#B8D4C8", darkHex: "#B8D4C8"),
+            GentleColorRole.textOnOverlay.rawValue:   .init(lightHex: "#1A3A2F", darkHex: "#E8F5F0"),
+            GentleColorRole.textOnOverlaySecondary.rawValue: .init(lightHex: "#3D5A4F", darkHex: "#B8D4C8"),
             GentleColorRole.borderSubtle.rawValue:   .init(lightHex: "#C5E0D4", darkHex: "#2A4D3D"),
             GentleColorRole.primaryCTA.rawValue:     .init(lightHex: "#2E8B6E", darkHex: "#4ADE9F"),
             GentleColorRole.textOnPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#0D1F18"),
@@ -870,11 +873,12 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.textTertiary.rawValue:  .init(lightHex: "#666666", darkHex: "#999999"),
             GentleColorRole.background.rawValue:    .init(lightHex: "#FFFFFF", darkHex: "#000000"),
             GentleColorRole.surfaceBase.rawValue:       .init(lightHex: "#F5F5F5", darkHex: "#1A1A1A"),
+            GentleColorRole.surfaceCardSecondary.rawValue: .init(lightHex: "#ECECEC", darkHex: "#242424"),
             GentleColorRole.surfaceTint.rawValue:   .init(lightHex: "#000000CC", darkHex: "#000000CC"),
             GentleColorRole.surfaceSpecular.rawValue: .init(lightHex: "#FFFFFF66", darkHex: "#FFFFFF33"),
             GentleColorRole.surfaceOverlay.rawValue:.init(lightHex: "#000000CC", darkHex: "#000000CC"),
-            GentleColorRole.textOnOverlay.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
-            GentleColorRole.textOnOverlaySecondary.rawValue: .init(lightHex: "#CCCCCC", darkHex: "#CCCCCC"),
+            GentleColorRole.textOnOverlay.rawValue:   .init(lightHex: "#000000", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnOverlaySecondary.rawValue: .init(lightHex: "#333333", darkHex: "#CCCCCC"),
             GentleColorRole.borderSubtle.rawValue:   .init(lightHex: "#E0E0E0", darkHex: "#404040"),
             GentleColorRole.primaryCTA.rawValue:     .init(lightHex: "#000000", darkHex: "#FFFFFF"),
             GentleColorRole.textOnPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#000000"),
@@ -950,11 +954,12 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.textTertiary.rawValue:  .init(lightHex: "#5A7A94", darkHex: "#7BA3C4"),
             GentleColorRole.background.rawValue:    .init(lightHex: "#F0F7FC", darkHex: "#061623"),
             GentleColorRole.surfaceBase.rawValue:       .init(lightHex: "#E1EFF9", darkHex: "#0C2236"),
+            GentleColorRole.surfaceCardSecondary.rawValue: .init(lightHex: "#D7E9F7", darkHex: "#18324A"),
             GentleColorRole.surfaceTint.rawValue:   .init(lightHex: "#0A2540CC", darkHex: "#041020CC"),
             GentleColorRole.surfaceSpecular.rawValue: .init(lightHex: "#FFFFFF66", darkHex: "#FFFFFF33"),
             GentleColorRole.surfaceOverlay.rawValue:.init(lightHex: "#0A2540CC", darkHex: "#041020CC"),
-            GentleColorRole.textOnOverlay.rawValue:   .init(lightHex: "#F0F7FC", darkHex: "#F0F7FC"),
-            GentleColorRole.textOnOverlaySecondary.rawValue: .init(lightHex: "#A3C4E0", darkHex: "#A3C4E0"),
+            GentleColorRole.textOnOverlay.rawValue:   .init(lightHex: "#0A2540", darkHex: "#E6F0FA"),
+            GentleColorRole.textOnOverlaySecondary.rawValue: .init(lightHex: "#334E68", darkHex: "#A3C4E0"),
             GentleColorRole.borderSubtle.rawValue:   .init(lightHex: "#C4DCF0", darkHex: "#1E4060"),
             GentleColorRole.primaryCTA.rawValue:     .init(lightHex: "#0066CC", darkHex: "#4DA6FF"),
             GentleColorRole.textOnPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#061623"),
@@ -1026,11 +1031,12 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.textTertiary.rawValue:  .init(lightHex: "#8B6B55", darkHex: "#C4A088"),
             GentleColorRole.background.rawValue:    .init(lightHex: "#FFF8F3", darkHex: "#1A0D06"),
             GentleColorRole.surfaceBase.rawValue:       .init(lightHex: "#FFEFE5", darkHex: "#2D1A0F"),
+            GentleColorRole.surfaceCardSecondary.rawValue: .init(lightHex: "#FEEADC", darkHex: "#422A1A"),
             GentleColorRole.surfaceTint.rawValue:   .init(lightHex: "#3D1E0ACC", darkHex: "#140A05CC"),
             GentleColorRole.surfaceSpecular.rawValue: .init(lightHex: "#FFFFFF66", darkHex: "#FFFFFF33"),
             GentleColorRole.surfaceOverlay.rawValue:.init(lightHex: "#3D1E0ACC", darkHex: "#140A05CC"),
-            GentleColorRole.textOnOverlay.rawValue:   .init(lightHex: "#FFF8F3", darkHex: "#FFF8F3"),
-            GentleColorRole.textOnOverlaySecondary.rawValue: .init(lightHex: "#E0C4B0", darkHex: "#E0C4B0"),
+            GentleColorRole.textOnOverlay.rawValue:   .init(lightHex: "#3D1E0A", darkHex: "#FFF0E6"),
+            GentleColorRole.textOnOverlaySecondary.rawValue: .init(lightHex: "#664433", darkHex: "#E0C4B0"),
             GentleColorRole.borderSubtle.rawValue:   .init(lightHex: "#F0D4C0", darkHex: "#4D3020"),
             GentleColorRole.primaryCTA.rawValue:     .init(lightHex: "#E85D04", darkHex: "#FF8C42"),
             GentleColorRole.textOnPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#1A0D06"),
@@ -1102,11 +1108,12 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.textTertiary.rawValue:  .init(lightHex: "#6E5A8A", darkHex: "#B0A0C8"),
             GentleColorRole.background.rawValue:    .init(lightHex: "#F8F5FF", darkHex: "#120D1F"),
             GentleColorRole.surfaceBase.rawValue:       .init(lightHex: "#F0E8FF", darkHex: "#1E1630"),
+            GentleColorRole.surfaceCardSecondary.rawValue: .init(lightHex: "#ECE1FF", darkHex: "#2F2445"),
             GentleColorRole.surfaceTint.rawValue:   .init(lightHex: "#2D1B4ECC", darkHex: "#0D0818CC"),
             GentleColorRole.surfaceSpecular.rawValue: .init(lightHex: "#FFFFFF66", darkHex: "#FFFFFF33"),
             GentleColorRole.surfaceOverlay.rawValue:.init(lightHex: "#2D1B4ECC", darkHex: "#0D0818CC"),
-            GentleColorRole.textOnOverlay.rawValue:   .init(lightHex: "#F8F5FF", darkHex: "#F8F5FF"),
-            GentleColorRole.textOnOverlaySecondary.rawValue: .init(lightHex: "#D0C0E8", darkHex: "#D0C0E8"),
+            GentleColorRole.textOnOverlay.rawValue:   .init(lightHex: "#2D1B4E", darkHex: "#F0E6FF"),
+            GentleColorRole.textOnOverlaySecondary.rawValue: .init(lightHex: "#4D3A6B", darkHex: "#D0C0E8"),
             GentleColorRole.borderSubtle.rawValue:   .init(lightHex: "#E0D0F0", darkHex: "#3D2D60"),
             GentleColorRole.primaryCTA.rawValue:     .init(lightHex: "#7C4DFF", darkHex: "#A580FF"),
             GentleColorRole.textOnPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#120D1F"),
@@ -1178,11 +1185,12 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.textTertiary.rawValue:  .init(lightHex: "#5A7A6A", darkHex: "#94B8A4"),
             GentleColorRole.background.rawValue:    .init(lightHex: "#F2F8F5", darkHex: "#0D1A14"),
             GentleColorRole.surfaceBase.rawValue:       .init(lightHex: "#E4F0EA", darkHex: "#1A2D24"),
+            GentleColorRole.surfaceCardSecondary.rawValue: .init(lightHex: "#D6EDE0", darkHex: "#254032"),
             GentleColorRole.surfaceTint.rawValue:   .init(lightHex: "#1B3D2FCC", darkHex: "#0A1810CC"),
             GentleColorRole.surfaceSpecular.rawValue: .init(lightHex: "#FFFFFF66", darkHex: "#FFFFFF33"),
             GentleColorRole.surfaceOverlay.rawValue:.init(lightHex: "#1B3D2FCC", darkHex: "#0A1810CC"),
-            GentleColorRole.textOnOverlay.rawValue:   .init(lightHex: "#F2F8F5", darkHex: "#F2F8F5"),
-            GentleColorRole.textOnOverlaySecondary.rawValue: .init(lightHex: "#B8D4C4", darkHex: "#B8D4C4"),
+            GentleColorRole.textOnOverlay.rawValue:   .init(lightHex: "#1B3D2F", darkHex: "#E6F2EC"),
+            GentleColorRole.textOnOverlaySecondary.rawValue: .init(lightHex: "#3A5A4A", darkHex: "#B8D4C4"),
             GentleColorRole.borderSubtle.rawValue:   .init(lightHex: "#C4DCD0", darkHex: "#2D4D3D"),
             GentleColorRole.primaryCTA.rawValue:     .init(lightHex: "#166534", darkHex: "#4ADE80"),
             GentleColorRole.textOnPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#0D1A14"),

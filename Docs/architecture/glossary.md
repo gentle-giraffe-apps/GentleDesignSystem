@@ -25,7 +25,7 @@
 | Type | What it defines |
 |------|-----------------|
 | `GentleTextRole` | Typography intent (17 roles) |
-| `GentleColorRole` | Color intent (17 roles in 4 groups: text, surface, action, theme) |
+| `GentleColorRole` | Color intent (18 roles in 4 groups: text, surface, action, theme) |
 | `GentleButtonRole` | Button style intent (5 roles) |
 | `GentleButtonFillRole` | Button fill strategy (solidFillPrimaryCTA, solidFillDestructive, hollow) |
 | `GentleButtonAnimationRole` | Button animation feel (6 roles) |

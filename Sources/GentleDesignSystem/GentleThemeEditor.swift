@@ -1049,6 +1049,8 @@ struct SurfaceRoleEditorSheet: View {
         case solid, material, glass
     }
 
+    /// Returns true for surfaces that use overlay styling (surfaceOverlay color role).
+    /// These surfaces use textOnOverlay/textOnOverlaySecondary for text colors.
     private func isOverlayStyle(_ style: GentleSurfaceBackgroundStyle) -> Bool {
         switch style {
         case .solid(let colorRole):

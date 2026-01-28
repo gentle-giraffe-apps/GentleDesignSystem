@@ -420,12 +420,12 @@ public extension GentleSurfaceTokens {
                 shadowOffsetY: 6
             ),
             GentleSurfaceRole.cardSecondary.rawValue: .init(
-                backgroundStyle: .solid(colorRole: .surfaceOverlay),
-                specularEffect: .indent,
-                specularStrength: 0.05,
-                border: GentleColorPair(lightHex: "#E5E7EB40", darkHex: "#37415140"),
-                cornerRadius: 12,
-                borderWidth: 0.5
+                backgroundStyle: .solid(colorRole: .surfaceCardSecondary),
+                specularEffect: .highlight,
+                specularStrength: 0.03,
+                border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
+                cornerRadius: 16,
+                borderWidth: 1
             ),
 
             // Chrome

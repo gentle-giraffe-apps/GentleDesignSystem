@@ -16,7 +16,7 @@ Complete mapping of every public type to its file location, kind, and purpose.
 |------|------|-------|---------|
 | `GentleTextRole` | enum | 17 | Typography semantic roles (largeTitle_xxl → caption2_s + 4 button titles) |
 | `GentleTextRamp` | enum | 7 | Size progression: xxl, xl, l, ml, m, ms, s |
-| `GentleColorRole` | enum | 17 | Color semantic roles (text, surface, action, theme, border) |
+| `GentleColorRole` | enum | 18 | Color semantic roles (text, surface, action, theme, border) |
 | `GentleButtonRole` | enum | 5 | Button style intent: primary, secondary, tertiary, quaternary, destructive |
 | `GentleButtonMaterialRole` | enum | 3 | Button fill: solidFillPrimaryCTA, solidFillDestructive, hollow |
 | `GentleButtonBorderRole` | enum | 3 | Button border: hidden, accent, subtle |
