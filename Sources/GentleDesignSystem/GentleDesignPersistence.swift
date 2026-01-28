@@ -49,6 +49,9 @@ public protocol GentleThemeSpecStore: Sendable {
     func saveEditableSpec(_ spec: GentleDesignSystemSpec, forPreset name: String) throws
     func clearEditableSpec(forPreset name: String) throws
     func hasEditableSpec(forPreset name: String) throws -> Bool
+
+    // Discovery
+    func listSavedPresetNames() throws -> [String]
 }
 
 /// File-backed JSON store (Application Support).
@@ -109,6 +112,27 @@ public struct GentleFileThemeSpecStore: GentleThemeSpecStore, Sendable {
     public func hasEditableSpec(forPreset name: String) throws -> Bool {
         let url = try presetFileURL(for: name)
         return FileManager.default.fileExists(atPath: url.path)
+    }
+
+    public func listSavedPresetNames() throws -> [String] {
+        let fm = FileManager.default
+        let presetsDir = try presetsDirectory()
+
+        guard fm.fileExists(atPath: presetsDir.path) else { return [] }
+
+        let contents = try fm.contentsOfDirectory(at: presetsDir, includingPropertiesForKeys: nil)
+        let jsonFiles = contents.filter { $0.pathExtension == "json" }
+
+        // Convert filenames back to display names
+        // The filename format is: preset_name.json (lowercased, spaces replaced with underscores)
+        return jsonFiles.compactMap { url -> String? in
+            let filename = url.deletingPathExtension().lastPathComponent
+            // We store the original name when saving, so we need to read the file to get the actual name
+            // For now, just convert the filename back to a readable format
+            return filename
+                .replacingOccurrences(of: "_", with: " ")
+                .capitalized
+        }
     }
 
     // MARK: - Paths

@@ -7,7 +7,21 @@ struct ThemePickerView: View {
     @State private var showingThemeStudio = false
     @State private var isCreatingNewTheme = false
     @State private var refreshID = UUID()
+    @State private var savedThemeNames: [String] = []
     @Environment(\.horizontalSizeClass) private var sizeClass
+
+    /// Built-in preset names (to filter out from saved themes)
+    private var builtInPresetNames: Set<String> {
+        Set(ThemePreset.allPresets.map { $0.name.lowercased().replacingOccurrences(of: " ", with: "_") })
+    }
+
+    /// User-created themes (saved but not built-in presets)
+    private var userSavedThemes: [String] {
+        savedThemeNames.filter { name in
+            let normalizedName = name.lowercased().replacingOccurrences(of: " ", with: "_")
+            return !builtInPresetNames.contains(normalizedName)
+        }
+    }
 
     private var columns: [GridItem] {
         if sizeClass == .compact {
@@ -16,6 +30,16 @@ struct ThemePickerView: View {
         } else {
             // iPad: adaptive grid
             [GridItem(.adaptive(minimum: 300, maximum: 400), spacing: 8, alignment: .leading)]
+        }
+    }
+
+    /// Loads saved theme names from the filesystem
+    private func loadSavedThemes() {
+        do {
+            savedThemeNames = try themeManager.store.listSavedPresetNames()
+        } catch {
+            print("Failed to load saved themes: \(error)")
+            savedThemeNames = []
         }
     }
 
@@ -41,6 +65,29 @@ struct ThemePickerView: View {
                         )
                         GentleThemeRoot(theme: defaultTheme) {
                             CreateThemeCard(showingThemeStudio: $showingThemeStudio, isCreatingNewTheme: $isCreatingNewTheme)
+                        }
+                        .padding(.horizontal)
+                    }
+
+                    // MARK: - Saved Themes Section (if any user-created themes exist)
+                    if !userSavedThemes.isEmpty {
+                        Text("Saved Themes")
+                            .gentleText(.title3_ml)
+                            .padding(.horizontal)
+                            .padding(.top, design.layout.gap.regular)
+
+                        LazyVGrid(columns: columns, spacing: design.layout.grid.regular) {
+                            ForEach(userSavedThemes, id: \.self) { themeName in
+                                SavedThemeCard(themeName: themeName, refreshID: refreshID)
+                                    .onTapGesture {
+                                        // Load the saved theme and navigate to studio
+                                        if let savedSpec = try? themeManager.store.loadEditableSpec(forPreset: themeName) {
+                                            try? themeManager.selectPreset(name: themeName, defaultSpec: savedSpec)
+                                            isCreatingNewTheme = true // Allow editing the name
+                                            showingThemeStudio = true
+                                        }
+                                    }
+                            }
                         }
                         .padding(.horizontal)
                     }
@@ -80,9 +127,87 @@ struct ThemePickerView: View {
                 if !isShowing {
                     refreshID = UUID()
                     isCreatingNewTheme = false
+                    loadSavedThemes()
                 }
             }
+            .onAppear {
+                loadSavedThemes()
+            }
         }
+    }
+}
+
+// MARK: - Saved Theme Card
+
+struct SavedThemeCard: View {
+    let themeName: String
+    var refreshID: UUID = UUID()
+
+    @GentleThemeManagerRuntime private var themeManager
+    @GentleDesignRuntime private var design
+    @Environment(\.colorScheme) private var colorScheme
+
+    // Color roles to preview
+    private static let previewColors: [GentleColorRole] = [
+        .themePrimary,
+        .themeSecondary,
+        .primaryCTA,
+        .destructive,
+        .background,
+        .surfaceBase,
+        .textPrimary,
+        .borderSubtle
+    ]
+
+    /// Load the saved spec and create a preview theme
+    private var previewTheme: GentleTheme? {
+        let _ = refreshID // Force dependency on refreshID
+        guard let savedSpec = try? themeManager.store.loadEditableSpec(forPreset: themeName) else {
+            return nil
+        }
+        return GentleTheme(defaultSpec: savedSpec, editableSpec: savedSpec)
+    }
+
+    var body: some View {
+        if let previewTheme {
+            GentleThemeRoot(theme: previewTheme) {
+                cardContent(theme: previewTheme)
+            }
+        } else {
+            // Fallback if theme can't be loaded
+            Text(themeName)
+                .gentleText(.headline_m)
+                .padding()
+                .gentleSurface(.card)
+        }
+    }
+
+    private func cardContent(theme: GentleTheme) -> some View {
+        VStack(alignment: .leading, spacing: design.layout.gap.regular) {
+            // Header
+            HStack {
+                Text(themeName)
+                    .gentleText(.title_xl)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .gentleText(.title2_l)
+            }
+
+            // Color bar preview
+            HStack(spacing: 0) {
+                ForEach(Self.previewColors, id: \.self) { role in
+                    theme.color(for: role, scheme: colorScheme)
+                        .frame(height: 24)
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .overlay(
+                RoundedRectangle(cornerRadius: 4)
+                    .stroke(theme.color(for: .borderSubtle, scheme: colorScheme), lineWidth: 0.5)
+            )
+        }
+        .gentleSurface(.card, inset: .card, insetVariant: .roomy)
+        .shadow(color: .black.opacity(0.15), radius: 8, x: 4, y: 4)
     }
 }
 
