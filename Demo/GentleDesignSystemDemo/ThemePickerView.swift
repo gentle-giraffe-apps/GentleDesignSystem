@@ -5,6 +5,7 @@ struct ThemePickerView: View {
     @GentleThemeManagerRuntime private var themeManager
     @GentleDesignRuntime private var design
     @State private var showingThemeStudio = false
+    @State private var isCreatingNewTheme = false
     @State private var refreshID = UUID()
     @Environment(\.horizontalSizeClass) private var sizeClass
 
@@ -32,9 +33,17 @@ struct ThemePickerView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: design.layout.grid.regular) {
-                    // MARK: - Create Theme Card
-                    CreateThemeCard()
+                    // MARK: - Create Theme Card (always rendered with Gentle Default theme)
+                    if let defaultPreset = ThemePreset.allPresets.first {
+                        let defaultTheme = GentleTheme(
+                            defaultSpec: defaultPreset.spec,
+                            editableSpec: defaultPreset.spec
+                        )
+                        GentleThemeRoot(theme: defaultTheme) {
+                            CreateThemeCard(showingThemeStudio: $showingThemeStudio, isCreatingNewTheme: $isCreatingNewTheme)
+                        }
                         .padding(.horizontal)
+                    }
 
                     // MARK: - Preset Themes Section Header
                     Text("Preset Themes")
@@ -65,11 +74,12 @@ struct ThemePickerView: View {
             }
             .navigationTitle("Theme")
             .navigationDestination(isPresented: $showingThemeStudio) {
-                ThemeStudioView()
+                ThemeStudioView(isTitleEditable: isCreatingNewTheme)
             }
             .onChange(of: showingThemeStudio) { _, isShowing in
                 if !isShowing {
                     refreshID = UUID()
+                    isCreatingNewTheme = false
                 }
             }
         }
@@ -80,9 +90,12 @@ struct ThemePickerView: View {
 
 struct CreateThemeCard: View {
     @GentleDesignRuntime private var design
+    @GentleThemeManagerRuntime private var themeManager
     @Environment(\.gentleTheme) private var theme
     @Environment(\.colorScheme) private var colorScheme
 
+    @Binding var showingThemeStudio: Bool
+    @Binding var isCreatingNewTheme: Bool
     @State private var selectedPresetName: String = ThemePreset.allPresets.first?.name ?? "Gentle Default"
     @State private var showingBaseThemePicker = false
 
@@ -136,7 +149,12 @@ struct CreateThemeCard: View {
 
                 // Create button
                 Button {
-                    // TODO: Implement theme creation
+                    // Find the selected preset and create a new theme based on it
+                    if let basePreset = ThemePreset.allPresets.first(where: { $0.name == selectedPresetName }) {
+                        try? themeManager.selectPreset(name: "New Theme", defaultSpec: basePreset.spec)
+                        isCreatingNewTheme = true
+                        showingThemeStudio = true
+                    }
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "plus")
