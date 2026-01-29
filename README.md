@@ -2,18 +2,18 @@
 
 A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to feel *native*, *predictable*, and *composable*, while giving you a centralized way to evolve typography, color, spacing, and surface behavior over time.
 
+**Who is this for?** Apps that want a strong SwiftUI foundation and theme evolution without rewriting view code.
+
 [![CI](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml)
 [![Swift](https://img.shields.io/badge/Swift-6.0–6.2-orange.svg)](https://swift.org)
 ![iOS](https://img.shields.io/badge/iOS-18.0+-blue?logo=apple)
 ![Platform](https://img.shields.io/badge/Platform-iPhone%20%7C%20iPad-lightgrey)
 ![SPM](https://img.shields.io/badge/SPM-Compatible-success)
-![Commit activity](https://img.shields.io/github/commit-activity/y/gentle-giraffe-apps/GentleDesignSystem)
-![Last commit](https://img.shields.io/github/last-commit/gentle-giraffe-apps/GentleDesignSystem)
-
 [![Coverage](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/branch/main/graph/badge.svg)](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem) 
 [![DeepSource Static Analysis](https://img.shields.io/badge/DeepSource-Static%20Analysis-0A2540?logo=deepsource&logoColor=white)](https://deepsource.io/) 
 [![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=active+issues&show_trend=true)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/) 
-
+![Commit activity](https://img.shields.io/github/commit-activity/y/gentle-giraffe-apps/GentleDesignSystem)
+![Last commit](https://img.shields.io/github/last-commit/gentle-giraffe-apps/GentleDesignSystem)
 
 <sub><strong>Codecov Snapshot</strong></sub><br/>
 <a href="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem">
@@ -24,8 +24,6 @@ A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to fe
     alt="Codecov coverage history icicle chart"
   />
 </a>
-
-**Who is this for?** Apps that want a strong SwiftUI foundation and theme evolution without rewriting view code.
 
 ### TLDR
 
@@ -46,11 +44,18 @@ VStack {
 
 💬 **[Join the discussion. Feedback and questions welcome](https://github.com/gentle-giraffe-apps/GentleDesignSystem/discussions)**
 
-![Demo animation](Docs/README_assets/Typography.gif)
+<table>
+  <tr>
+    <td align="center">
+      <img src="Docs/README_assets/Typography.gif" alt="Typography animation" width="340" />
+    </td>
+    <td align="center">
+      <img src="Docs/README_assets/Typography1.png" alt="GentleDesignSystem demo" width="430" />
+    </td>
+  </tr>
+</table>
 
 **See it in action:** Open `Demo/GentleDesignSystemDemo.xcodeproj` to explore the components. The demo app also supports editing and sharing JSON specs via the system Share Sheet.
-
-<img src="Docs/README_assets/Typography1.png" alt="GentleDesignSystem demo" width="700" />
 
 ---
 
