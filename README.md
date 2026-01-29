@@ -27,13 +27,30 @@ A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to fe
 
 **Who is this for?** Apps that want a strong SwiftUI foundation and theme evolution without rewriting view code.
 
+### TLDR
+
+Quickly standardize text, buttons, and surfaces with a unified design system.
+
+```swift
+Text("Simple modifiers")
+    .gentleText(.title_xl)
+
+Button("Across your app") { }
+    .gentleButton(.primary)
+
+VStack {
+    Text("Save so much time")
+}
+.gentleSurface(.card)
+```
+
 💬 **[Join the discussion. Feedback and questions welcome](https://github.com/gentle-giraffe-apps/GentleDesignSystem/discussions)**
 
 ![Demo animation](Docs/README_assets/Typography.gif)
 
 **See it in action:** Open `Demo/GentleDesignSystemDemo.xcodeproj` to explore the components. The demo app also supports editing and sharing JSON specs via the system Share Sheet.
 
-<img src="Docs/README_assets/Typography1.png" alt="GentleDesignSystem demo" width="1000" />
+<img src="Docs/README_assets/Typography1.png" alt="GentleDesignSystem demo" width="700" />
 
 ---
 
