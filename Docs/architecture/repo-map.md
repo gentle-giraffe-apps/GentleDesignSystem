@@ -32,6 +32,7 @@ GentleDesignSystem/
 | `GentleUIKitTheming.swift` | UIKit integration (nav bar) |
 | `GentleDesignCustomizeView.swift` | Section-based customization view |
 | `GentleDesignShareSheet.swift` | Theme export/share sheet |
+| `GentlePDFExporter.swift` | PDF generation for theme specs |
 | `String+camelCaseBreakable.swift` | String utility extension |
 
 ## What Lives Where
@@ -48,6 +49,7 @@ GentleDesignSystem/
 | Add role editors | `ColorRoleEditor.swift`, `TypographyRoleEditor.swift` |
 | Modify persistence | `GentleDesignPersistence.swift` |
 | UIKit navigation styling | `GentleUIKitTheming.swift` |
+| Export theme as PDF | `GentlePDFExporter.swift` |
 
 ## Files That Should Not Be Edited Casually
 

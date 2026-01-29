@@ -15,6 +15,7 @@
 |------|------------|
 | Find a type/file | [Docs/architecture/type-inventory.md](architecture/type-inventory.md) |
 | Use the API | [Docs/architecture/api-quick-ref.md](architecture/api-quick-ref.md) |
+| Full API surface | [Docs/architecture/api-map.md](architecture/api-map.md) |
 | Check default values | [Docs/architecture/defaults-reference.md](architecture/defaults-reference.md) |
 | Add/modify tokens | [Docs/architecture/common-tasks.md](architecture/common-tasks.md) |
 | Structural changes | [Docs/architecture/repo-map.md](architecture/repo-map.md) |

@@ -224,6 +224,15 @@ Complete mapping of every public type to its file location, kind, and purpose.
 
 ---
 
+## GentlePDFExporter.swift
+
+| Type | Kind | Purpose |
+|------|------|---------|
+| `GentlePDFExportError` | enum | Error cases for PDF generation failures |
+| `GentlePDFExporter` | enum | Static PDF generation for theme specs (colors, typography, buttons, surfaces) |
+
+---
+
 ## String+camelCaseBreakable.swift
 
 | Type | Kind | Purpose |
