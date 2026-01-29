@@ -239,7 +239,7 @@ GentleDesignSystemSpec
 │       │       ├── key = GentleButtonRole.rawValue
 │       │       └── value = GentleButtonRoleSpec
 │       │               ├── shape: GentleButtonShape
-│       │               ├── materialRole: GentleButtonMaterialRole
+│       │               ├── fillRole: GentleButtonFillRole
 │       │               ├── borderRole: GentleButtonBorderRole
 │       │               ├── animationRole: GentleButtonAnimationRole
 │       │               ├── pressedScale: Double

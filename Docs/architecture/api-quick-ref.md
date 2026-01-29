@@ -42,10 +42,21 @@ TextField("Search", text: $query).gentleTextField(.body_m, chrome: .standalone(s
 // Apply surface styling (background, border, shadow, corner radius)
 .gentleSurface(_ role: GentleSurfaceRole)
 
-// Roles: .appBackground, .card, .cardElevated, .surfaceOverlay
+// Roles (9):
+// .appBackground      - Full-screen app background
+// .card               - Standard card container
+// .cardElevated       - Card with shadow elevation
+// .cardSecondary      - Nested/secondary card (tinted)
+// .chrome             - Navigation/toolbar chrome
+// .overlaySheet       - Modal sheet background
+// .overlayPopover     - Popover background
+// .floatingPanel      - Floating panel container
+// .floatingWidget     - Floating widget container
 
-// Example:
+// Examples:
 VStack { content }.gentleSurface(.card)
+VStack { nested }.gentleSurface(.cardSecondary)
+VStack { modal }.gentleSurface(.overlaySheet)
 ```
 
 ### Buttons

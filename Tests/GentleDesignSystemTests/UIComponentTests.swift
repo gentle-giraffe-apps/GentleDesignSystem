@@ -298,10 +298,12 @@ struct GentleDesignStudioViewTests {
     @Test("GentleDesignStudioView ActiveSheet enum is identifiable")
     func testActiveSheetIdentifiable() {
         let settings = GentleDesignStudioView.ActiveSheet.settings
-        let share = GentleDesignStudioView.ActiveSheet.share
+        let shareJSON = GentleDesignStudioView.ActiveSheet.shareJSON
+        let sharePDF = GentleDesignStudioView.ActiveSheet.sharePDF
 
         #expect(settings.id == "settings")
-        #expect(share.id == "share")
+        #expect(shareJSON.id == "shareJSON")
+        #expect(sharePDF.id == "sharePDF")
     }
 }
 

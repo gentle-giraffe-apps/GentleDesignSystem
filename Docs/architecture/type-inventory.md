@@ -2,13 +2,13 @@
 
 Complete mapping of every public type to its file location, kind, and purpose.
 
-## GentleDesignSystem.swift (~1575 lines)
+## GentleDesignSystem.swift
 
 ### Constants
 
 | Type | Kind | Purpose |
 |------|------|---------|
-| `GentleDesignSystemSpecVersion` | enum | Contains `current` version string ("0.4.0") |
+| `GentleDesignSystemSpecVersion` | enum | Contains `current` version string ("0.6.0") |
 
 ### Role Enums
 
@@ -18,7 +18,7 @@ Complete mapping of every public type to its file location, kind, and purpose.
 | `GentleTextRamp` | enum | 7 | Size progression: xxl, xl, l, ml, m, ms, s |
 | `GentleColorRole` | enum | 18 | Color semantic roles (text, surface, action, theme, border) |
 | `GentleButtonRole` | enum | 5 | Button style intent: primary, secondary, tertiary, quaternary, destructive |
-| `GentleButtonMaterialRole` | enum | 3 | Button fill: solidFillPrimaryCTA, solidFillDestructive, hollow |
+| `GentleButtonFillRole` | enum | 3 | Button fill: solidFillPrimaryCTA, solidFillDestructive, hollow |
 | `GentleButtonBorderRole` | enum | 3 | Button border: hidden, accent, subtle |
 | `GentleButtonShape` | enum | 2 | Button geometry: rounded, pill |
 | `GentleButtonAnimationRole` | enum | 6 | Animation intent: unknown, subtlePress, squish, pop, bouncy, springBack |
@@ -43,7 +43,7 @@ Complete mapping of every public type to its file location, kind, and purpose.
 | `GentleTypographyRoleSpec` | struct | pointSize, weight, design, width, relativeTo, lineSpacing, letterSpacing, isUppercased, colorRole | Single typography definition |
 | `GentleTypographyTokens` | struct | roles: [String: GentleTypographyRoleSpec] | Typography role mapping |
 | `GentleButtonAnimationSpec` | struct | pressedScale, pressedOpacity, duration, springResponse, springDamping, springBlend | Animation tuning |
-| `GentleButtonRoleSpec` | struct | shape, materialRole, borderRole, animationRole, pressedScale, pressedOpacity, usesNativeStyle | Button style definition |
+| `GentleButtonRoleSpec` | struct | shape, fillRole, borderRole, animationRole, pressedScale, pressedOpacity, usesNativeStyle | Button style definition |
 | `GentleButtonTokens` | struct | roles, animations | Button roles + animation specs |
 | `GentleSpacingScaleTokens` | struct | xs, s, m, l, xl, xxl (all Double) | 6-step spacing scale |
 | `GentleAxisInsetTokens` | struct | horizontal, vertical (GentleSpacingToken) | H/V inset pair |
@@ -81,7 +81,7 @@ Complete mapping of every public type to its file location, kind, and purpose.
 
 ---
 
-## GentleSurfaceRole.swift (~317 lines)
+## GentleSurfaceRole.swift
 
 | Type | Kind | Cases/Properties | Purpose |
 |------|------|------------------|---------|
@@ -94,13 +94,13 @@ Complete mapping of every public type to its file location, kind, and purpose.
 
 ---
 
-## GentleDesignMaterial.swift (~255 lines)
+## GentleVisualEffect.swift
 
 | Type | Kind | Cases/Properties | Purpose |
 |------|------|------------------|---------|
-| `GentleDesignMaterialRole` | enum | 3: appBackground, surface, surfaceOverlay | Material semantic roles |
-| `GentleMaterialBaseSpec` | enum | 4: solid(GentleColorPair), appleMaterial(GentleAppleMaterialSpec), blur(GentleBlurSpec), glass(GentleGlassSpec) | Material base type |
-| `GentleDesignMaterial` | struct | id, base, tint, specular, innerEdges | Complete material recipe |
+| `GentleVisualEffect` | enum | 3: appBackground, surface, surfaceOverlay | Visual effect semantic roles |
+| `GentleVisualEffectRecipe` | struct | id, base, tint, specular, innerEdges | Complete visual effect recipe |
+| `GentleVisualEffectBase` | enum | 4: solid(GentleColorPair), appleMaterial(GentleAppleMaterialSpec), blur(GentleBlurSpec), glass(GentleGlassSpec) | Visual effect base type |
 | `GentleAppleMaterialSpec` | struct | material (String), opacity | SwiftUI Material config |
 | `GentleBlurSpec` | struct | radius, backgroundOnly, opacity | Custom blur parameters |
 | `GentleGlassSpec` | struct | tintColor, tintOpacity | iOS 26 liquid glass config |
@@ -109,7 +109,7 @@ Complete mapping of every public type to its file location, kind, and purpose.
 
 ---
 
-## GentleDesignModifiers.swift (~370 lines)
+## GentleDesignModifiers.swift
 
 | Type | Kind | Parameters | Purpose |
 |------|------|------------|---------|
@@ -137,7 +137,7 @@ Complete mapping of every public type to its file location, kind, and purpose.
 
 ---
 
-## GentleDesignPersistence.swift (~155 lines)
+## GentleDesignPersistence.swift
 
 | Type | Kind | Key Methods | Purpose |
 |------|------|-------------|---------|
@@ -148,7 +148,7 @@ Complete mapping of every public type to its file location, kind, and purpose.
 
 ---
 
-## GentleDesignSystemSpec+Presets.swift (~665 lines)
+## GentleDesignSystemSpec+Presets.swift
 
 | Type | Kind | Purpose |
 |------|------|---------|
@@ -168,7 +168,7 @@ Complete mapping of every public type to its file location, kind, and purpose.
 
 ---
 
-## GentleUIKitTheming.swift (~155 lines)
+## GentleUIKitTheming.swift
 
 | Type | Kind | Purpose |
 |------|------|---------|
@@ -176,7 +176,7 @@ Complete mapping of every public type to its file location, kind, and purpose.
 
 ---
 
-## GentleThemeEditor.swift (~1120 lines)
+## GentleThemeEditor.swift
 
 | Type | Kind | Purpose |
 |------|------|---------|
@@ -184,7 +184,7 @@ Complete mapping of every public type to its file location, kind, and purpose.
 
 ---
 
-## ColorRoleEditor.swift (~460 lines)
+## ColorRoleEditor.swift
 
 | Type | Kind | Purpose |
 |------|------|---------|
@@ -192,7 +192,7 @@ Complete mapping of every public type to its file location, kind, and purpose.
 
 ---
 
-## TypographyRoleEditor.swift (~450 lines)
+## TypographyRoleEditor.swift
 
 | Type | Kind | Purpose |
 |------|------|---------|
@@ -200,7 +200,7 @@ Complete mapping of every public type to its file location, kind, and purpose.
 
 ---
 
-## GentleDesignStudioView.swift (~140 lines)
+## GentleDesignStudioView.swift
 
 | Type | Kind | Purpose |
 |------|------|---------|
@@ -208,7 +208,7 @@ Complete mapping of every public type to its file location, kind, and purpose.
 
 ---
 
-## GentleDesignCustomizeView.swift (~150 lines)
+## GentleDesignCustomizeView.swift
 
 | Type | Kind | Purpose |
 |------|------|---------|
@@ -216,7 +216,7 @@ Complete mapping of every public type to its file location, kind, and purpose.
 
 ---
 
-## GentleDesignShareSheet.swift (~25 lines)
+## GentleDesignShareSheet.swift
 
 | Type | Kind | Purpose |
 |------|------|---------|
@@ -224,7 +224,7 @@ Complete mapping of every public type to its file location, kind, and purpose.
 
 ---
 
-## String+camelCaseBreakable.swift (~15 lines)
+## String+camelCaseBreakable.swift
 
 | Type | Kind | Purpose |
 |------|------|---------|
