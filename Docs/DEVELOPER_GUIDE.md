@@ -13,16 +13,16 @@
 
 | Task | Read First |
 |------|------------|
-| Find a type/file | [docs/architecture/type-inventory.md](architecture/type-inventory.md) |
-| Use the API | [docs/architecture/api-quick-ref.md](architecture/api-quick-ref.md) |
-| Check default values | [docs/architecture/defaults-reference.md](architecture/defaults-reference.md) |
-| Add/modify tokens | [docs/architecture/common-tasks.md](architecture/common-tasks.md) |
-| Structural changes | [docs/architecture/repo-map.md](architecture/repo-map.md) |
-| Token/theming work | [docs/architecture/design-tokens.md](architecture/design-tokens.md) |
-| Boundary questions | [docs/architecture/architecture.md](architecture/architecture.md) |
-| Code style | [docs/architecture/conventions.md](architecture/conventions.md) |
-| Build/test commands | [docs/architecture/workflows.md](architecture/workflows.md) |
-| Terminology | [docs/architecture/glossary.md](architecture/glossary.md) |
+| Find a type/file | [Docs/architecture/type-inventory.md](architecture/type-inventory.md) |
+| Use the API | [Docs/architecture/api-quick-ref.md](architecture/api-quick-ref.md) |
+| Check default values | [Docs/architecture/defaults-reference.md](architecture/defaults-reference.md) |
+| Add/modify tokens | [Docs/architecture/common-tasks.md](architecture/common-tasks.md) |
+| Structural changes | [Docs/architecture/repo-map.md](architecture/repo-map.md) |
+| Token/theming work | [Docs/architecture/design-tokens.md](architecture/design-tokens.md) |
+| Boundary questions | [Docs/architecture/architecture.md](architecture/architecture.md) |
+| Code style | [Docs/architecture/conventions.md](architecture/conventions.md) |
+| Build/test commands | [Docs/architecture/workflows.md](architecture/workflows.md) |
+| Terminology | [Docs/architecture/glossary.md](architecture/glossary.md) |
 
 ## Invariants (Never Violate)
 

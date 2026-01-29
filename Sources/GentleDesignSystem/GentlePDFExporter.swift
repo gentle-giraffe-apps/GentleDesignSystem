@@ -37,7 +37,6 @@ public enum GentlePDFExporter {
 
     private static let sectionTitleFontSize: CGFloat = 18
     private static let labelFontSize: CGFloat = 10
-    private static let buttonLabelFontSize: CGFloat = 11
 
     // MARK: - Label Color
 
@@ -99,13 +98,13 @@ public enum GentlePDFExporter {
     private static func calculateTotalHeight(for spec: GentleDesignSystemSpec) -> CGFloat {
         var height: CGFloat = margin
 
-        // Typography: 4 columns, tight rows
+        // Typography: 4 columns, rows sized for large fonts
         let typographyRows = ceil(Double(GentleTextRole.allCases.count) / 4.0)
-        height += sectionTitleFontSize + 12 + (CGFloat(typographyRows) * 46) + 14
+        height += sectionTitleFontSize + 12 + (CGFloat(typographyRows) * 62) + 14  // 58 cell + 4 gap
         height += sectionSpacing
 
-        // Buttons: 3 rows of buttons
-        height += sectionTitleFontSize + 12 + 36 + gridGap + 36 + gridGap + 36 + 20
+        // Buttons: 3 rows of buttons sized for 17pt text
+        height += sectionTitleFontSize + 12 + 40 + gridGap + 40 + gridGap + 40 + 20
         height += sectionSpacing
 
         // Surfaces: 3 columns
@@ -136,8 +135,8 @@ public enum GentlePDFExporter {
         let columns = 4
         let rows = Int(ceil(Double(roles.count) / Double(columns)))
         let cellWidth = (contentWidth - CGFloat(columns - 1) * gridGap - 20) / CGFloat(columns)
-        let cellHeight: CGFloat = 44
-        let rowGap: CGFloat = 2
+        let cellHeight: CGFloat = 58  // Accommodate large fonts like largeTitle_xxl (34pt)
+        let rowGap: CGFloat = 4
 
         let containerHeight = CGFloat(rows) * cellHeight + CGFloat(rows - 1) * rowGap + 14
         let containerRect = CGRect(x: margin, y: y, width: contentWidth, height: containerHeight)
@@ -185,10 +184,8 @@ public enum GentlePDFExporter {
 
         labelString.draw(at: point)
 
-        // Sample "Aa Bb" in actual font style
-        // Use smaller of actual point size or 18pt cap
-        let cappedSize = min(CGFloat(roleSpec.pointSize), 18)
-        let sampleFont = UIFont.systemFont(ofSize: cappedSize, weight: roleSpec.weight.swiftUIWeight.uiKitWeight)
+        // Sample "Aa Bb" in actual font style using the theme's point size, design, and width
+        let sampleFont = buildUIFont(from: roleSpec)
         let sampleColor = colorFromSpec(spec, role: .textPrimary)
         let sampleAttrs: [NSAttributedString.Key: Any] = [
             .font: sampleFont,
@@ -207,8 +204,8 @@ public enum GentlePDFExporter {
         y = drawSectionTitle("Buttons", in: cgContext, at: y)
         y += 12
 
-        // Container card
-        let containerHeight: CGFloat = 32 + gridGap + 32 + gridGap + 32 + 20
+        // Container card - sized for 17pt button text
+        let containerHeight: CGFloat = 40 + gridGap + 40 + gridGap + 40 + 20
         let containerRect = CGRect(x: margin, y: y, width: contentWidth, height: containerHeight)
         drawContainerCard(in: cgContext, rect: containerRect, spec: spec)
 
@@ -216,7 +213,7 @@ public enum GentlePDFExporter {
         let buttonGap: CGFloat = 10
         let containerPadding: CGFloat = 10
         let buttonWidth = (contentWidth - containerPadding * 2 - CGFloat(columns - 1) * buttonGap) / CGFloat(columns)
-        let buttonHeight: CGFloat = 28
+        let buttonHeight: CGFloat = 36
         let startX = margin + containerPadding
 
         // Row 1: Primary, Secondary (light/dark variants)
@@ -306,8 +303,10 @@ public enum GentlePDFExporter {
             cgContext.strokePath()
         }
 
-        // Button label
-        let labelFont = UIFont.systemFont(ofSize: buttonLabelFontSize, weight: .semibold)
+        // Button label - use the typography spec for this button role's text role
+        let textRole = role.defaultTextRole
+        let typographySpec = spec.typography.roleSpec(for: textRole)
+        let labelFont = buildUIFont(from: typographySpec)
         let labelColor: UIColor
         switch roleSpec.fillRole {
         case .solidFillPrimaryCTA, .solidFillDestructive:
