@@ -135,7 +135,7 @@ All `.gentleDefault` values in one place.
 
 ### Button Role Specs
 
-| Role | Shape | Material | Border | Animation | Pressed Scale | Pressed Opacity | Native Style |
+| Role | Shape | Fill | Border | Animation | Pressed Scale | Pressed Opacity | Native Style |
 |------|-------|----------|--------|-----------|---------------|-----------------|--------------|
 | `primary` | pill | solidFillPrimaryCTA | hidden | springBack | 0.9 | 0.86 | false |
 | `secondary` | pill | hollow | accent | subtlePress | 0.85 | 0.9 | false |
@@ -158,19 +158,24 @@ All `.gentleDefault` values in one place.
 
 ## Surfaces (GentleSurfaceTokens.gentleDefault)
 
-| Role | Material Role | Border (Light/Dark) | Corner Radius | Border Width | Shadow Radius | Shadow Opacity | Shadow Offset Y |
-|------|---------------|---------------------|---------------|--------------|---------------|----------------|-----------------|
-| `appBackground` | appBackground | #00000000 / #00000000 | 0 | 0 | 0 | 0 | 0 |
-| `card` | surface | #E5E7EB / #374151 | 20 | 1 | 0 | 0 | 0 |
-| `cardElevated` | surface | #E5E7EB59 / #37415159 | 20 | 0.5 | 8 | 0.08 | 6 |
-| `surfaceOverlay` | surfaceOverlay | #00000000 / #00000000 | 0 | 0 | 0 | 0 | 0 |
+| Role | Background Style | Border (Light/Dark) | Corner Radius | Border Width | Shadow Radius | Shadow Opacity | Shadow Offset Y |
+|------|------------------|---------------------|---------------|--------------|---------------|----------------|-----------------|
+| `appBackground` | solid(background) | transparent | 0 | 0 | 0 | 0 | 0 |
+| `card` | solid(surfaceBase) | #E5E7EB / #374151 | 20 | 1 | 0 | 0 | 0 |
+| `cardElevated` | solid(surfaceBase) | #E5E7EB59 / #37415159 | 20 | 0.5 | 8 | 0.08 | 6 |
+| `cardSecondary` | solid(surfaceCardSecondary) | #E5E7EB / #374151 | 16 | 1 | 0 | 0 | 0 |
+| `chrome` | material(ultraThin) | transparent | 0 | 0 | 0 | 0 | 0 |
+| `overlaySheet` | material(regular, tint: surfaceOverlay) | transparent | 32 | 0 | 0 | 0 | 0 |
+| `overlayPopover` | material(regular, tint: surfaceBase) | #E5E7EB30 / #37415130 | 14 | 0.5 | 16 | 0.15 | 8 |
+| `floatingPanel` | glass(fallback: regular) | #FFFFFF20 / #FFFFFF10 | 20 | 0.5 | 24 | 0.2 | 12 |
+| `floatingWidget` | glass(fallback: thick) | transparent | 24 | 0 | 8 | 0.1 | 4 |
 
 ---
 
-## Material Roles → Colors
+## Background Style Types
 
-| Material Role | Color Role Used |
-|---------------|-----------------|
-| `appBackground` | background |
-| `surface` | surfaceBase |
-| `surfaceOverlay` | surfaceOverlay |
+| Style | Description |
+|-------|-------------|
+| `solid(colorRole)` | Solid color from the specified color role |
+| `material(material, tint?, opacity?)` | Apple blur material with optional tint |
+| `glass(fallbackMaterial, fallbackColorRole)` | iOS 26+ liquid glass, with fallback for older iOS |

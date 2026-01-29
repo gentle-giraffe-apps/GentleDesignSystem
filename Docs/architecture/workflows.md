@@ -55,7 +55,11 @@ xcodebuild -project GentleDesignSystemDemo.xcodeproj \
 **Steps:**
 1. Checkout
 2. Setup Ruby 3.3 with Bundler
-3. Run `bundle exec fastlane ios build` in Demo/
+3. Install xcresultparser (for coverage conversion)
+4. Build demo app (`bundle exec fastlane ios build`)
+5. Run package tests (`bundle exec fastlane ios package_tests`)
+6. Convert coverage to XML (`bundle exec fastlane coverage_xml`)
+7. Upload coverage to Codecov
 
 ## Local Development
 
@@ -69,7 +73,7 @@ open Demo/GentleDesignSystemDemo.xcodeproj
 ```
 
 ### Previews
-Demo app has previews in `ContentView.swift`:
+Demo app has previews in `ThemeStudioView.swift`:
 - Light mode preview
 - Dark mode preview
 

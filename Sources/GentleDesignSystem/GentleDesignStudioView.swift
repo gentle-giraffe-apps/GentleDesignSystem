@@ -4,14 +4,18 @@ import UIKit
 public struct GentleDesignStudioView: View {
     enum ActiveSheet: Identifiable {
         case settings
-        case share
+        case shareJSON
+        case sharePDF
+        case exportMenu
         case editTypography
         case editButtons
         case editSurfaces
         var id: String {
             switch self {
             case .settings: "settings"
-            case .share: "share"
+            case .shareJSON: "shareJSON"
+            case .sharePDF: "sharePDF"
+            case .exportMenu: "exportMenu"
             case .editTypography: "editTypography"
             case .editButtons: "editButtons"
             case .editSurfaces: "editSurfaces"
@@ -23,7 +27,8 @@ public struct GentleDesignStudioView: View {
     private let embedInNavigationStack: Bool
 
     @State private var activeSheet: ActiveSheet?
-    @State private var exportURL: URL?
+    @State private var exportJSONURL: URL?
+    @State private var exportPDFURL: URL?
     @State private var showRevertAlert = false
     @GentleDesignRuntime private var design
     @GentleThemeManagerRuntime private var themeManager
@@ -38,7 +43,7 @@ public struct GentleDesignStudioView: View {
             NavigationStack {
                 studioContent
             }
-            .task { await refreshExportURL() }
+            .task { await refreshExportURLs() }
             .alert("Revert Changes?", isPresented: $showRevertAlert) {
                 Button("Cancel", role: .cancel) { }
                 Button("Revert", role: .destructive) {
@@ -49,7 +54,7 @@ public struct GentleDesignStudioView: View {
             }
         } else {
             studioContent
-                .task { await refreshExportURL() }
+                .task { await refreshExportURLs() }
                 .alert("Revert Changes?", isPresented: $showRevertAlert) {
                     Button("Cancel", role: .cancel) { }
                     Button("Revert", role: .destructive) {
@@ -91,14 +96,25 @@ public struct GentleDesignStudioView: View {
                             }
                             .disabled(!themeManager.hasUnsavedChanges)
 
-                            Button {
-                                activeSheet = .share
+                            Menu {
+                                Button {
+                                    activeSheet = .shareJSON
+                                } label: {
+                                    Label("Export JSON", systemImage: "doc.text")
+                                }
+                                .disabled(exportJSONURL == nil)
+
+                                Button {
+                                    activeSheet = .sharePDF
+                                } label: {
+                                    Label("Export PDF", systemImage: "doc.richtext")
+                                }
+                                .disabled(exportPDFURL == nil)
                             } label: {
                                 Image(systemName: "square.and.arrow.up")
                                     .gentleText(.title3_ml)
                                     .padding()
                             }
-                            .disabled(exportURL == nil)
                         }
                     }
                 }
@@ -136,30 +152,52 @@ public struct GentleDesignStudioView: View {
                         .presentationDragIndicator(.visible)
                         .presentationBackgroundInteraction(.enabled)
 
-                    case .share:
-                        if let exportURL {
-                            GentleDesignShareSheet(items: [exportURL])
+                    case .shareJSON:
+                        if let exportJSONURL {
+                            GentleDesignShareSheet(items: [exportJSONURL])
                                 .presentationDetents([.height(360), .medium, .large])
                                 .presentationDragIndicator(.visible)
                                 .presentationBackgroundInteraction(.enabled)
                         } else {
-                            ProgressView("Preparing export…")
+                            ProgressView("Preparing JSON export…")
                                 .presentationDetents([.height(260)])
                                 .presentationDragIndicator(.visible)
-                                .task { await refreshExportURL() }
+                                .task { await refreshExportURLs() }
                         }
+
+                    case .sharePDF:
+                        if let exportPDFURL {
+                            GentleDesignShareSheet(items: [exportPDFURL])
+                                .presentationDetents([.height(360), .medium, .large])
+                                .presentationDragIndicator(.visible)
+                                .presentationBackgroundInteraction(.enabled)
+                        } else {
+                            ProgressView("Preparing PDF export…")
+                                .presentationDetents([.height(260)])
+                                .presentationDragIndicator(.visible)
+                                .task { await refreshExportURLs() }
+                        }
+
+                    case .exportMenu:
+                        EmptyView()
                     }
                 }
     }
 
     @MainActor
-    private func refreshExportURL() async {
+    private func refreshExportURLs() async {
         do {
-            exportURL = try themeManager.exportURL()
+            exportJSONURL = try themeManager.exportURL()
         } catch {
             print("themeManager.exportURL error: \(error)")
-            exportURL = nil
+            exportJSONURL = nil
+        }
+
+        do {
+            exportPDFURL = try themeManager.exportPDFURL()
+        } catch {
+            print("themeManager.exportPDFURL error: \(error)")
+            exportPDFURL = nil
         }
     }
 }
-

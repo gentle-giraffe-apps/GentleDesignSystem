@@ -107,7 +107,7 @@ Step-by-step guides for common modifications.
    ```swift
    GentleButtonRole.myNewButton.rawValue: .init(
        shape: .rounded,
-       materialRole: .hollow,
+       fillRole: .hollow,
        borderRole: .subtle,
        animationRole: .squish,
        pressedScale: 0.97,
@@ -314,7 +314,7 @@ When loading old JSON that may have different structure:
 In `GentleDesignSystem.swift`:
 ```swift
 public enum GentleDesignSystemSpecVersion {
-    public static let current = "0.5.0"  // ← increment
+    public static let current = "0.6.0"  // ← increment
 }
 ```
 

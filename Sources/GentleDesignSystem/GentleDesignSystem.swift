@@ -1591,6 +1591,12 @@ public final class GentleThemeManager {
         return url
     }
 
+    /// Exports the current editable spec to a PDF file and returns its URL.
+    /// The PDF contains a professional design system specification document.
+    public func exportPDFURL() throws -> URL {
+        try GentlePDFExporter.exportPDFURL(for: theme.editableSpec, themeName: currentPresetName)
+    }
+
     private func formattedTimestamp() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd_HHmmss"

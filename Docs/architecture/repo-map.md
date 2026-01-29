@@ -17,22 +17,22 @@ GentleDesignSystem/
 
 ## Source Files
 
-| File | Purpose | Lines |
-|------|---------|-------|
-| `GentleDesignSystem.swift` | Core types, tokens, theme, modifiers | ~1560 |
-| `GentleThemeEditor.swift` | Theme editor UI (colors, typography, buttons, surfaces) | ~1120 |
-| `GentleDesignSystemSpec+Presets.swift` | Built-in theme presets | ~665 |
-| `ColorRoleEditor.swift` | Collapsible color editor component | ~460 |
-| `TypographyRoleEditor.swift` | Collapsible typography editor | ~450 |
-| `GentleDesignModifiers.swift` | SwiftUI view modifiers | ~370 |
-| `GentleVisualEffect.swift` | Visual effect/blur/glass background specs | ~255 |
-| `GentleDesignPersistence.swift` | JSON file persistence | ~155 |
-| `GentleUIKitTheming.swift` | UIKit integration (nav bar) | ~155 |
-| `GentleDesignCustomizeView.swift` | Section-based customization view | ~150 |
-| `GentleDesignStudioView.swift` | Full design studio wrapper | ~140 |
-| `GentleSurfaceRole.swift` | Surface role specs | ~130 |
-| `GentleDesignShareSheet.swift` | Theme export/share sheet | ~25 |
-| `String+camelCaseBreakable.swift` | String utility extension | ~15 |
+| File | Purpose |
+|------|---------|
+| `GentleDesignSystem.swift` | Core types, tokens, theme, modifiers |
+| `GentleThemeEditor.swift` | Theme editor UI (colors, typography, buttons, surfaces) |
+| `GentleDesignSystemSpec+Presets.swift` | Built-in theme presets |
+| `GentleSurfaceRole.swift` | Surface roles, background styles, materials |
+| `GentleDesignModifiers.swift` | SwiftUI view modifiers |
+| `ColorRoleEditor.swift` | Collapsible color editor component |
+| `TypographyRoleEditor.swift` | Collapsible typography editor |
+| `GentleVisualEffect.swift` | Visual effect/blur/glass background specs |
+| `GentleDesignPersistence.swift` | JSON file persistence |
+| `GentleDesignStudioView.swift` | Full design studio wrapper |
+| `GentleUIKitTheming.swift` | UIKit integration (nav bar) |
+| `GentleDesignCustomizeView.swift` | Section-based customization view |
+| `GentleDesignShareSheet.swift` | Theme export/share sheet |
+| `String+camelCaseBreakable.swift` | String utility extension |
 
 ## What Lives Where
 
