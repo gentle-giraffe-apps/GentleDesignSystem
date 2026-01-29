@@ -23,76 +23,50 @@ public enum GentlePDFExportError: Error, LocalizedError {
 
 public enum GentlePDFExporter {
 
-    // MARK: - Page Constants
+    // MARK: - Layout Constants
 
-    private static let pageWidth: CGFloat = 612   // Letter width in points
-    private static let pageHeight: CGFloat = 792  // Letter height in points
-    private static let margin: CGFloat = 54       // 0.75 inch margins
-
+    private static let pageWidth: CGFloat = 620
+    private static let margin: CGFloat = 24
     private static var contentWidth: CGFloat { pageWidth - (margin * 2) }
-    private static var contentHeight: CGFloat { pageHeight - (margin * 2) }
+
+    private static let sectionSpacing: CGFloat = 24
+    private static let itemSpacing: CGFloat = 10
+    private static let gridGap: CGFloat = 10
 
     // MARK: - Typography Constants
 
-    private static let titleFontSize: CGFloat = 24
     private static let sectionTitleFontSize: CGFloat = 18
-    private static let subsectionTitleFontSize: CGFloat = 14
-    private static let bodyFontSize: CGFloat = 11
-    private static let captionFontSize: CGFloat = 9
-
-    private static let sectionSpacing: CGFloat = 32
-    private static let itemSpacing: CGFloat = 16
-    private static let lineSpacing: CGFloat = 6
+    private static let labelFontSize: CGFloat = 10
+    private static let buttonLabelFontSize: CGFloat = 11
 
     // MARK: - Public API
 
-    /// Generates PDF data for the given design system spec.
+    /// Generates PDF data for the given design system spec on a single sheet.
     public static func generatePDFData(for spec: GentleDesignSystemSpec, themeName: String? = nil) throws -> Data {
-        let pageRect = CGRect(x: 0, y: 0, width: pageWidth, height: pageHeight)
+        // Calculate required height
+        let totalHeight = calculateTotalHeight(for: spec)
+        let pageRect = CGRect(x: 0, y: 0, width: pageWidth, height: totalHeight)
         let renderer = UIGraphicsPDFRenderer(bounds: pageRect)
 
         let data = renderer.pdfData { context in
-            var currentY: CGFloat = margin
-
-            // Start first page
             context.beginPage()
 
-            // Draw header
-            currentY = drawHeader(in: context.cgContext, spec: spec, themeName: themeName, startY: currentY)
+            var currentY: CGFloat = margin
+
+            // Draw Typography section
+            currentY = drawTypographySection(in: context.cgContext, spec: spec, startY: currentY)
+            currentY += sectionSpacing
+
+            // Draw Buttons section
+            currentY = drawButtonsSection(in: context.cgContext, spec: spec, startY: currentY)
+            currentY += sectionSpacing
+
+            // Draw Surfaces section
+            currentY = drawSurfacesSection(in: context.cgContext, spec: spec, startY: currentY)
             currentY += sectionSpacing
 
             // Draw Colors section
-            currentY = drawColorsSection(in: context.cgContext, spec: spec, startY: currentY, context: context)
-            currentY += sectionSpacing
-
-            // Check if we need a new page for Typography
-            if currentY > pageHeight - margin - 200 {
-                context.beginPage()
-                currentY = margin
-            }
-
-            // Draw Typography section
-            currentY = drawTypographySection(in: context.cgContext, spec: spec, startY: currentY, context: context)
-            currentY += sectionSpacing
-
-            // Check if we need a new page for Buttons
-            if currentY > pageHeight - margin - 200 {
-                context.beginPage()
-                currentY = margin
-            }
-
-            // Draw Buttons section
-            currentY = drawButtonsSection(in: context.cgContext, spec: spec, startY: currentY, context: context)
-            currentY += sectionSpacing
-
-            // Check if we need a new page for Surfaces
-            if currentY > pageHeight - margin - 200 {
-                context.beginPage()
-                currentY = margin
-            }
-
-            // Draw Surfaces section
-            _ = drawSurfacesSection(in: context.cgContext, spec: spec, startY: currentY, context: context)
+            _ = drawColorsSection(in: context.cgContext, spec: spec, startY: currentY)
         }
 
         return data
@@ -115,323 +89,173 @@ public enum GentlePDFExporter {
         }
     }
 
-    // MARK: - Header
+    // MARK: - Height Calculation
 
-    private static func drawHeader(in cgContext: CGContext, spec: GentleDesignSystemSpec, themeName: String?, startY: CGFloat) -> CGFloat {
-        var y = startY
+    private static func calculateTotalHeight(for spec: GentleDesignSystemSpec) -> CGFloat {
+        var height: CGFloat = margin
 
-        // Theme name or "Design System Specification"
-        let title = themeName ?? "Design System Specification"
-        let titleFont = UIFont.systemFont(ofSize: titleFontSize, weight: .bold)
-        let titleAttrs: [NSAttributedString.Key: Any] = [
-            .font: titleFont,
-            .foregroundColor: UIColor.black
-        ]
-        let titleString = NSAttributedString(string: title, attributes: titleAttrs)
-        titleString.draw(at: CGPoint(x: margin, y: y))
-        y += titleFont.lineHeight + lineSpacing
+        // Typography: 4 columns, tight rows
+        let typographyRows = ceil(Double(GentleTextRole.allCases.count) / 4.0)
+        height += sectionTitleFontSize + 12 + (CGFloat(typographyRows) * 46) + 14
+        height += sectionSpacing
 
-        // Date and version
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .long
-        let dateString = dateFormatter.string(from: Date())
+        // Buttons: 3 rows of buttons
+        height += sectionTitleFontSize + 12 + 36 + gridGap + 36 + gridGap + 36 + 20
+        height += sectionSpacing
 
-        let subtitleFont = UIFont.systemFont(ofSize: bodyFontSize, weight: .regular)
-        let subtitleAttrs: [NSAttributedString.Key: Any] = [
-            .font: subtitleFont,
-            .foregroundColor: UIColor.darkGray
-        ]
-        let subtitleString = NSAttributedString(
-            string: "Generated: \(dateString)  •  Spec Version: \(spec.specVersion)",
-            attributes: subtitleAttrs
-        )
-        subtitleString.draw(at: CGPoint(x: margin, y: y))
-        y += subtitleFont.lineHeight + lineSpacing
+        // Surfaces: 3 columns
+        let surfaceCount = GentleSurfaceRole.allCases.filter { $0 != .appBackground }.count
+        let surfaceRows = ceil(Double(surfaceCount) / 3.0)
+        height += sectionTitleFontSize + 12 + (CGFloat(surfaceRows) * 75)
+        height += sectionSpacing
 
-        // Horizontal rule
-        y += 8
-        cgContext.setStrokeColor(UIColor.lightGray.cgColor)
-        cgContext.setLineWidth(0.5)
-        cgContext.move(to: CGPoint(x: margin, y: y))
-        cgContext.addLine(to: CGPoint(x: pageWidth - margin, y: y))
-        cgContext.strokePath()
-        y += 8
+        // Colors: 4 columns
+        let colorRows = ceil(Double(GentleColorRole.allCases.count) / 4.0)
+        height += sectionTitleFontSize + 12 + (CGFloat(colorRows) * 32)
+        height += margin
 
-        return y
-    }
-
-    // MARK: - Colors Section
-
-    private static func drawColorsSection(in cgContext: CGContext, spec: GentleDesignSystemSpec, startY: CGFloat, context: UIGraphicsPDFRendererContext) -> CGFloat {
-        var y = startY
-
-        // Section title
-        y = drawSectionTitle("Colors", in: cgContext, at: y)
-        y += itemSpacing
-
-        // Group colors by category
-        let colorGroups: [(title: String, roles: [GentleColorRole])] = [
-            ("Text", GentleColorRole.textRoles),
-            ("Surface", GentleColorRole.surfaceRoles),
-            ("Action", GentleColorRole.actionRoles),
-            ("Theme", GentleColorRole.themeRoles)
-        ]
-
-        let swatchSize: CGFloat = 24
-        let columnWidth: CGFloat = contentWidth / 2
-        var columnIndex = 0
-        var rowY = y
-        var maxRowY = y
-
-        for group in colorGroups {
-            // Check if we need a new page
-            if rowY > pageHeight - margin - 100 {
-                context.beginPage()
-                rowY = margin
-                maxRowY = margin
-                columnIndex = 0
-            }
-
-            // Draw group title
-            let groupX = margin + CGFloat(columnIndex) * columnWidth
-            let groupTitleFont = UIFont.systemFont(ofSize: subsectionTitleFontSize, weight: .semibold)
-            let groupTitleAttrs: [NSAttributedString.Key: Any] = [
-                .font: groupTitleFont,
-                .foregroundColor: UIColor.black
-            ]
-            let groupTitleString = NSAttributedString(string: group.title, attributes: groupTitleAttrs)
-            groupTitleString.draw(at: CGPoint(x: groupX, y: rowY))
-            var groupY = rowY + groupTitleFont.lineHeight + 8
-
-            // Draw each color role
-            for role in group.roles {
-                guard let pair = spec.colors.pair(for: role) else { continue }
-
-                // Check if we need a new page
-                if groupY > pageHeight - margin - 40 {
-                    context.beginPage()
-                    groupY = margin
-                }
-
-                let itemX = groupX
-
-                // Color swatch (light mode)
-                let swatchRect = CGRect(x: itemX, y: groupY, width: swatchSize, height: swatchSize)
-                let (r, g, b, a) = parseHexToRGBA(pair.lightHex)
-                let swatchColor = UIColor(red: r, green: g, blue: b, alpha: a)
-                cgContext.setFillColor(swatchColor.cgColor)
-                cgContext.fill(swatchRect)
-
-                // Border for swatch
-                cgContext.setStrokeColor(UIColor.lightGray.cgColor)
-                cgContext.setLineWidth(0.5)
-                cgContext.stroke(swatchRect)
-
-                // Role name
-                let labelFont = UIFont.systemFont(ofSize: bodyFontSize, weight: .medium)
-                let labelAttrs: [NSAttributedString.Key: Any] = [
-                    .font: labelFont,
-                    .foregroundColor: UIColor.black
-                ]
-                let labelString = NSAttributedString(string: role.displayName, attributes: labelAttrs)
-                labelString.draw(at: CGPoint(x: itemX + swatchSize + 8, y: groupY))
-
-                // RGB and Hex values
-                let valueFont = UIFont.monospacedSystemFont(ofSize: captionFontSize, weight: .regular)
-                let valueAttrs: [NSAttributedString.Key: Any] = [
-                    .font: valueFont,
-                    .foregroundColor: UIColor.gray
-                ]
-                let rgbString = String(format: "R: %.2f  G: %.2f  B: %.2f", r, g, b)
-                let valueString = NSAttributedString(string: "\(rgbString)  \(pair.lightHex)", attributes: valueAttrs)
-                valueString.draw(at: CGPoint(x: itemX + swatchSize + 8, y: groupY + labelFont.lineHeight + 2))
-
-                groupY += swatchSize + itemSpacing
-            }
-
-            maxRowY = max(maxRowY, groupY)
-
-            // Move to next column or next row
-            columnIndex += 1
-            if columnIndex >= 2 {
-                columnIndex = 0
-                rowY = maxRowY + itemSpacing
-            }
-        }
-
-        return maxRowY
+        return height
     }
 
     // MARK: - Typography Section
 
-    private static func drawTypographySection(in cgContext: CGContext, spec: GentleDesignSystemSpec, startY: CGFloat, context: UIGraphicsPDFRendererContext) -> CGFloat {
+    private static func drawTypographySection(in cgContext: CGContext, spec: GentleDesignSystemSpec, startY: CGFloat) -> CGFloat {
         var y = startY
 
         // Section title
         y = drawSectionTitle("Typography", in: cgContext, at: y)
-        y += itemSpacing
+        y += 12
 
-        let columnWidth: CGFloat = contentWidth / 2
-        var columnIndex = 0
-        var rowStartY = y
-        var maxRowY = y
+        // Draw container card
+        let roles = GentleTextRole.allCases
+        let columns = 4
+        let rows = Int(ceil(Double(roles.count) / Double(columns)))
+        let cellWidth = (contentWidth - CGFloat(columns - 1) * gridGap - 20) / CGFloat(columns)
+        let cellHeight: CGFloat = 44
+        let rowGap: CGFloat = 2
 
-        for role in GentleTextRole.allCases {
-            let roleSpec = spec.typography.roleSpec(for: role)
+        let containerHeight = CGFloat(rows) * cellHeight + CGFloat(rows - 1) * rowGap + 14
+        let containerRect = CGRect(x: margin, y: y, width: contentWidth, height: containerHeight)
+        drawContainerCard(in: cgContext, rect: containerRect, spec: spec)
 
-            // Check if we need a new page
-            if y > pageHeight - margin - 80 {
-                context.beginPage()
-                y = margin
-                rowStartY = y
-                maxRowY = y
-                columnIndex = 0
-            }
+        // Draw typography items in grid
+        for (index, role) in roles.enumerated() {
+            let col = index % columns
+            let row = index / columns
 
-            let itemX = margin + CGFloat(columnIndex) * columnWidth
-            var itemY = (columnIndex == 0) ? y : rowStartY
+            let cellX = margin + 10 + CGFloat(col) * (cellWidth + gridGap)
+            let cellY = y + 8 + CGFloat(row) * (cellHeight + rowGap)
 
-            // Sample "Aa" in actual font
-            let sampleFont = buildUIFont(from: roleSpec, maxSize: 28)
-            let sampleAttrs: [NSAttributedString.Key: Any] = [
-                .font: sampleFont,
-                .foregroundColor: UIColor.black
-            ]
-            let sampleString = NSAttributedString(string: "Aa", attributes: sampleAttrs)
-            sampleString.draw(at: CGPoint(x: itemX, y: itemY))
-
-            // Role name
-            let labelFont = UIFont.systemFont(ofSize: bodyFontSize, weight: .semibold)
-            let labelAttrs: [NSAttributedString.Key: Any] = [
-                .font: labelFont,
-                .foregroundColor: UIColor.black
-            ]
-            let labelString = NSAttributedString(string: role.displayName, attributes: labelAttrs)
-            labelString.draw(at: CGPoint(x: itemX + 48, y: itemY))
-            itemY += labelFont.lineHeight + 2
-
-            // Properties
-            let propsFont = UIFont.monospacedSystemFont(ofSize: captionFontSize, weight: .regular)
-            let propsAttrs: [NSAttributedString.Key: Any] = [
-                .font: propsFont,
-                .foregroundColor: UIColor.gray
-            ]
-
-            let widthStr = roleSpec.width?.rawValue ?? "standard"
-            let propsString = String(format: "%.0fpt • %@ • %@ • %@",
-                                    roleSpec.pointSize,
-                                    roleSpec.weight.rawValue,
-                                    roleSpec.design.rawValue,
-                                    widthStr)
-            let propsAttrString = NSAttributedString(string: propsString, attributes: propsAttrs)
-            propsAttrString.draw(at: CGPoint(x: itemX + 48, y: itemY))
-            itemY += propsFont.lineHeight + 2
-
-            // Line/letter spacing
-            let spacingString = String(format: "lineSpacing: %.1f  letterSpacing: %.2f  color: %@",
-                                       roleSpec.lineSpacing,
-                                       roleSpec.letterSpacing,
-                                       roleSpec.colorRole.rawValue)
-            let spacingAttrString = NSAttributedString(string: spacingString, attributes: propsAttrs)
-            spacingAttrString.draw(at: CGPoint(x: itemX + 48, y: itemY))
-            itemY += propsFont.lineHeight + itemSpacing
-
-            maxRowY = max(maxRowY, itemY)
-
-            // Move to next column or next row
-            columnIndex += 1
-            if columnIndex >= 2 {
-                columnIndex = 0
-                y = maxRowY
-                rowStartY = y
-            }
+            drawTypographyItem(in: cgContext, spec: spec, role: role, at: CGPoint(x: cellX, y: cellY), width: cellWidth)
         }
 
-        return maxRowY
+        return y + containerHeight
+    }
+
+    private static func drawTypographyItem(in cgContext: CGContext, spec: GentleDesignSystemSpec, role: GentleTextRole, at point: CGPoint, width: CGFloat) {
+        let roleSpec = spec.typography.roleSpec(for: role)
+
+        // Role name (small label)
+        let labelFont = UIFont.systemFont(ofSize: 8, weight: .regular)
+        let labelColor = colorFromSpec(spec, role: .textSecondary)
+        let labelAttrs: [NSAttributedString.Key: Any] = [
+            .font: labelFont,
+            .foregroundColor: labelColor
+        ]
+        let labelString = NSAttributedString(string: role.rawValue, attributes: labelAttrs)
+        labelString.draw(at: point)
+
+        // Sample "Aa Bb" in actual font style
+        let sampleFont = buildUIFont(from: roleSpec, maxSize: 24)
+        let sampleColor = colorFromSpec(spec, role: .textPrimary)
+        let sampleAttrs: [NSAttributedString.Key: Any] = [
+            .font: sampleFont,
+            .foregroundColor: sampleColor
+        ]
+        let sampleString = NSAttributedString(string: "Aa Bb", attributes: sampleAttrs)
+        sampleString.draw(at: CGPoint(x: point.x, y: point.y + labelFont.lineHeight))
     }
 
     // MARK: - Buttons Section
 
-    private static func drawButtonsSection(in cgContext: CGContext, spec: GentleDesignSystemSpec, startY: CGFloat, context: UIGraphicsPDFRendererContext) -> CGFloat {
+    private static func drawButtonsSection(in cgContext: CGContext, spec: GentleDesignSystemSpec, startY: CGFloat) -> CGFloat {
         var y = startY
 
         // Section title
         y = drawSectionTitle("Buttons", in: cgContext, at: y)
-        y += itemSpacing
+        y += 12
 
-        let buttonWidth: CGFloat = 100
-        let buttonHeight: CGFloat = 36
+        // Container card
+        let containerHeight: CGFloat = 32 + gridGap + 32 + gridGap + 32 + 20
+        let containerRect = CGRect(x: margin, y: y, width: contentWidth, height: containerHeight)
+        drawContainerCard(in: cgContext, rect: containerRect, spec: spec)
 
-        for role in [GentleButtonRole.primary, .secondary, .tertiary, .quaternary, .destructive] {
-            let roleSpec = spec.buttons.roleSpec(for: role)
+        let columns = 4
+        let buttonGap: CGFloat = 10
+        let containerPadding: CGFloat = 10
+        let buttonWidth = (contentWidth - containerPadding * 2 - CGFloat(columns - 1) * buttonGap) / CGFloat(columns)
+        let buttonHeight: CGFloat = 28
+        let startX = margin + containerPadding
 
-            // Check if we need a new page
-            if y > pageHeight - margin - 80 {
-                context.beginPage()
-                y = margin
-            }
+        // Row 1: Primary, Secondary (light/dark variants)
+        var rowY = y + 12
+        let row1Buttons: [(GentleButtonRole, Bool)] = [
+            (.primary, false),
+            (.primary, true),
+            (.secondary, false),
+            (.secondary, true)
+        ]
 
-            // Draw button preview
-            let buttonRect = CGRect(x: margin, y: y, width: buttonWidth, height: buttonHeight)
-            drawButtonPreview(in: cgContext, rect: buttonRect, role: role, spec: roleSpec, colors: spec.colors)
-
-            // Role name
-            let labelFont = UIFont.systemFont(ofSize: bodyFontSize, weight: .semibold)
-            let labelAttrs: [NSAttributedString.Key: Any] = [
-                .font: labelFont,
-                .foregroundColor: UIColor.black
-            ]
-            let labelString = NSAttributedString(string: role.rawValue.capitalized, attributes: labelAttrs)
-            labelString.draw(at: CGPoint(x: margin + buttonWidth + 16, y: y))
-
-            // Properties
-            let propsFont = UIFont.monospacedSystemFont(ofSize: captionFontSize, weight: .regular)
-            let propsAttrs: [NSAttributedString.Key: Any] = [
-                .font: propsFont,
-                .foregroundColor: UIColor.gray
-            ]
-
-            let propsString = String(format: "shape: %@  fill: %@  border: %@",
-                                    roleSpec.shape.rawValue,
-                                    roleSpec.fillRole.rawValue,
-                                    roleSpec.borderRole.rawValue)
-            let propsAttrString = NSAttributedString(string: propsString, attributes: propsAttrs)
-            propsAttrString.draw(at: CGPoint(x: margin + buttonWidth + 16, y: y + labelFont.lineHeight + 2))
-
-            let animString = String(format: "animation: %@  pressedScale: %.2f  pressedOpacity: %.2f",
-                                   roleSpec.animationRole.rawValue,
-                                   roleSpec.pressedScale,
-                                   roleSpec.pressedOpacity)
-            let animAttrString = NSAttributedString(string: animString, attributes: propsAttrs)
-            animAttrString.draw(at: CGPoint(x: margin + buttonWidth + 16, y: y + labelFont.lineHeight + propsFont.lineHeight + 4))
-
-            y += buttonHeight + itemSpacing
+        for (index, (role, isDark)) in row1Buttons.enumerated() {
+            let buttonX = startX + CGFloat(index) * (buttonWidth + buttonGap)
+            let buttonRect = CGRect(x: buttonX, y: rowY, width: buttonWidth, height: buttonHeight)
+            drawButtonPreview(in: cgContext, rect: buttonRect, role: role, spec: spec, isDarkMode: isDark)
         }
 
-        return y
+        // Row 2: Tertiary, Quaternary (light/dark variants)
+        rowY += buttonHeight + gridGap
+        let row2Buttons: [(GentleButtonRole, Bool)] = [
+            (.tertiary, false),
+            (.tertiary, true),
+            (.quaternary, false),
+            (.quaternary, true)
+        ]
+
+        for (index, (role, isDark)) in row2Buttons.enumerated() {
+            let buttonX = startX + CGFloat(index) * (buttonWidth + buttonGap)
+            let buttonRect = CGRect(x: buttonX, y: rowY, width: buttonWidth, height: buttonHeight)
+            drawButtonPreview(in: cgContext, rect: buttonRect, role: role, spec: spec, isDarkMode: isDark)
+        }
+
+        // Row 3: Destructive (light/dark)
+        rowY += buttonHeight + gridGap
+        let destructiveLightRect = CGRect(x: startX, y: rowY, width: buttonWidth, height: buttonHeight)
+        drawButtonPreview(in: cgContext, rect: destructiveLightRect, role: .destructive, spec: spec, isDarkMode: false)
+        let destructiveDarkRect = CGRect(x: startX + buttonWidth + buttonGap, y: rowY, width: buttonWidth, height: buttonHeight)
+        drawButtonPreview(in: cgContext, rect: destructiveDarkRect, role: .destructive, spec: spec, isDarkMode: true)
+
+        return y + containerHeight
     }
 
-    private static func drawButtonPreview(in cgContext: CGContext, rect: CGRect, role: GentleButtonRole, spec: GentleButtonRoleSpec, colors: GentleColorTokens) {
-        let cornerRadius: CGFloat = spec.shape == .pill ? rect.height / 2 : 8
+    private static func drawButtonPreview(in cgContext: CGContext, rect: CGRect, role: GentleButtonRole, spec: GentleDesignSystemSpec, isDarkMode: Bool) {
+        let roleSpec = spec.buttons.roleSpec(for: role)
+        let cornerRadius: CGFloat = roleSpec.shape == .pill ? rect.height / 2 : 8
         let path = UIBezierPath(roundedRect: rect, cornerRadius: cornerRadius)
+
+        // Get colors
+        let primaryCTA = spec.colors.pair(for: .primaryCTA)
+        let destructive = spec.colors.pair(for: .destructive)
+        let borderSubtle = spec.colors.pair(for: .borderSubtle)
 
         // Fill
         let fillColor: UIColor
-        switch spec.fillRole {
+        switch roleSpec.fillRole {
         case .solidFillPrimaryCTA:
-            if let pair = colors.pair(for: .primaryCTA) {
-                let (r, g, b, a) = parseHexToRGBA(pair.lightHex)
-                fillColor = UIColor(red: r, green: g, blue: b, alpha: a)
-            } else {
-                fillColor = UIColor.systemBlue
-            }
+            let hex = isDarkMode ? (primaryCTA?.darkHex ?? "#3B82F6") : (primaryCTA?.lightHex ?? "#4A6EF5")
+            fillColor = uiColorFromHex(hex)
         case .solidFillDestructive:
-            if let pair = colors.pair(for: .destructive) {
-                let (r, g, b, a) = parseHexToRGBA(pair.lightHex)
-                fillColor = UIColor(red: r, green: g, blue: b, alpha: a)
-            } else {
-                fillColor = UIColor.systemRed
-            }
+            let hex = isDarkMode ? (destructive?.darkHex ?? "#F87171") : (destructive?.lightHex ?? "#E35D5B")
+            fillColor = uiColorFromHex(hex)
         case .hollow:
             fillColor = UIColor.clear
         }
@@ -441,23 +265,15 @@ public enum GentlePDFExporter {
         cgContext.fillPath()
 
         // Border
-        if spec.borderRole != .hidden {
+        if roleSpec.borderRole != .hidden {
             let borderColor: UIColor
-            switch spec.borderRole {
+            switch roleSpec.borderRole {
             case .accent:
-                if let pair = colors.pair(for: .primaryCTA) {
-                    let (r, g, b, a) = parseHexToRGBA(pair.lightHex)
-                    borderColor = UIColor(red: r, green: g, blue: b, alpha: a)
-                } else {
-                    borderColor = UIColor.systemBlue
-                }
+                let hex = isDarkMode ? (primaryCTA?.darkHex ?? "#3B82F6") : (primaryCTA?.lightHex ?? "#4A6EF5")
+                borderColor = uiColorFromHex(hex)
             case .subtle:
-                if let pair = colors.pair(for: .borderSubtle) {
-                    let (r, g, b, a) = parseHexToRGBA(pair.lightHex)
-                    borderColor = UIColor(red: r, green: g, blue: b, alpha: a)
-                } else {
-                    borderColor = UIColor.lightGray
-                }
+                let hex = isDarkMode ? (borderSubtle?.darkHex ?? "#374151") : (borderSubtle?.lightHex ?? "#E5E7EB")
+                borderColor = uiColorFromHex(hex)
             case .hidden:
                 borderColor = UIColor.clear
             }
@@ -469,25 +285,22 @@ public enum GentlePDFExporter {
         }
 
         // Button label
-        let labelFont = UIFont.systemFont(ofSize: 12, weight: .semibold)
+        let labelFont = UIFont.systemFont(ofSize: buttonLabelFontSize, weight: .semibold)
         let labelColor: UIColor
-        switch spec.fillRole {
+        switch roleSpec.fillRole {
         case .solidFillPrimaryCTA, .solidFillDestructive:
             labelColor = UIColor.white
         case .hollow:
-            if let pair = colors.pair(for: .primaryCTA) {
-                let (r, g, b, a) = parseHexToRGBA(pair.lightHex)
-                labelColor = UIColor(red: r, green: g, blue: b, alpha: a)
-            } else {
-                labelColor = UIColor.systemBlue
-            }
+            let hex = isDarkMode ? (primaryCTA?.darkHex ?? "#3B82F6") : (primaryCTA?.lightHex ?? "#4A6EF5")
+            labelColor = uiColorFromHex(hex)
         }
 
         let labelAttrs: [NSAttributedString.Key: Any] = [
             .font: labelFont,
             .foregroundColor: labelColor
         ]
-        let labelString = NSAttributedString(string: role.rawValue.capitalized, attributes: labelAttrs)
+        let labelText = role.rawValue.capitalized
+        let labelString = NSAttributedString(string: labelText, attributes: labelAttrs)
         let labelSize = labelString.size()
         let labelX = rect.midX - labelSize.width / 2
         let labelY = rect.midY - labelSize.height / 2
@@ -496,186 +309,195 @@ public enum GentlePDFExporter {
 
     // MARK: - Surfaces Section
 
-    private static func drawSurfacesSection(in cgContext: CGContext, spec: GentleDesignSystemSpec, startY: CGFloat, context: UIGraphicsPDFRendererContext) -> CGFloat {
+    private static func drawSurfacesSection(in cgContext: CGContext, spec: GentleDesignSystemSpec, startY: CGFloat) -> CGFloat {
         var y = startY
 
         // Section title
         y = drawSectionTitle("Surfaces", in: cgContext, at: y)
-        y += itemSpacing
+        y += 12
 
-        let previewWidth: CGFloat = 80
-        let previewHeight: CGFloat = 50
+        // Filter out appBackground since it's not really a card-style surface
+        let surfaceRoles = GentleSurfaceRole.allCases.filter { $0 != .appBackground }
 
-        // Group surfaces by category
-        for (category, roles) in GentleSurfaceRole.groupedByCategory {
-            // Check if we need a new page
-            if y > pageHeight - margin - 100 {
-                context.beginPage()
-                y = margin
-            }
+        let columns = 3
+        let rows = Int(ceil(Double(surfaceRoles.count) / Double(columns)))
+        let cellWidth = (contentWidth - CGFloat(columns - 1) * gridGap - 20) / CGFloat(columns)
+        let cellHeight: CGFloat = 55
 
-            // Category title
-            let categoryFont = UIFont.systemFont(ofSize: subsectionTitleFontSize, weight: .semibold)
-            let categoryAttrs: [NSAttributedString.Key: Any] = [
-                .font: categoryFont,
-                .foregroundColor: UIColor.black
-            ]
-            let categoryString = NSAttributedString(string: category.rawValue, attributes: categoryAttrs)
-            categoryString.draw(at: CGPoint(x: margin, y: y))
-            y += categoryFont.lineHeight + 8
+        let containerHeight = CGFloat(rows) * (cellHeight + gridGap) - gridGap + 20
+        let containerRect = CGRect(x: margin, y: y, width: contentWidth, height: containerHeight)
+        drawContainerCard(in: cgContext, rect: containerRect, spec: spec)
 
-            for role in roles {
-                let roleSpec = spec.surfaces.roleSpec(for: role)
+        for (index, role) in surfaceRoles.enumerated() {
+            let col = index % columns
+            let row = index / columns
 
-                // Check if we need a new page
-                if y > pageHeight - margin - 80 {
-                    context.beginPage()
-                    y = margin
-                }
+            let cellX = margin + 10 + CGFloat(col) * (cellWidth + gridGap)
+            let cellY = y + 10 + CGFloat(row) * (cellHeight + gridGap)
 
-                // Draw surface preview
-                let previewRect = CGRect(x: margin, y: y, width: previewWidth, height: previewHeight)
-                drawSurfacePreview(in: cgContext, rect: previewRect, spec: roleSpec, colors: spec.colors)
-
-                // Role name
-                let labelFont = UIFont.systemFont(ofSize: bodyFontSize, weight: .semibold)
-                let labelAttrs: [NSAttributedString.Key: Any] = [
-                    .font: labelFont,
-                    .foregroundColor: UIColor.black
-                ]
-                let labelString = NSAttributedString(string: role.displayName, attributes: labelAttrs)
-                labelString.draw(at: CGPoint(x: margin + previewWidth + 12, y: y))
-
-                // Properties
-                let propsFont = UIFont.monospacedSystemFont(ofSize: captionFontSize, weight: .regular)
-                let propsAttrs: [NSAttributedString.Key: Any] = [
-                    .font: propsFont,
-                    .foregroundColor: UIColor.gray
-                ]
-
-                let backgroundDesc = backgroundStyleDescription(roleSpec.backgroundStyle)
-                let propsString = String(format: "background: %@  cornerRadius: %.0f  borderWidth: %.1f",
-                                        backgroundDesc,
-                                        roleSpec.cornerRadius,
-                                        roleSpec.borderWidth)
-                let propsAttrString = NSAttributedString(string: propsString, attributes: propsAttrs)
-                propsAttrString.draw(at: CGPoint(x: margin + previewWidth + 12, y: y + labelFont.lineHeight + 2))
-
-                // Shadow properties
-                let shadowString = String(format: "shadow: radius=%.0f opacity=%.2f offset=(%.0f, %.0f)",
-                                         roleSpec.shadowRadius,
-                                         roleSpec.shadowOpacity,
-                                         roleSpec.shadowOffsetX,
-                                         roleSpec.shadowOffsetY)
-                let shadowAttrString = NSAttributedString(string: shadowString, attributes: propsAttrs)
-                shadowAttrString.draw(at: CGPoint(x: margin + previewWidth + 12, y: y + labelFont.lineHeight + propsFont.lineHeight + 4))
-
-                y += previewHeight + itemSpacing
-            }
-
-            y += 8 // Extra space between categories
+            drawSurfaceItem(in: cgContext, spec: spec, role: role, rect: CGRect(x: cellX, y: cellY, width: cellWidth, height: cellHeight))
         }
 
-        return y
+        return y + containerHeight
     }
 
-    private static func drawSurfacePreview(in cgContext: CGContext, rect: CGRect, spec: GentleSurfaceRoleSpec, colors: GentleColorTokens) {
-        let cornerRadius = min(CGFloat(spec.cornerRadius), rect.height / 2)
+    private static func drawSurfaceItem(in cgContext: CGContext, spec: GentleDesignSystemSpec, role: GentleSurfaceRole, rect: CGRect) {
+        let roleSpec = spec.surfaces.roleSpec(for: role)
+
+        // Draw the surface preview
+        let cornerRadius = min(CGFloat(roleSpec.cornerRadius), 12)
         let path = UIBezierPath(roundedRect: rect, cornerRadius: cornerRadius)
 
-        // Background fill - use solid fallback for materials/glass
+        // Background
         let fillColor: UIColor
-        switch spec.backgroundStyle {
+        switch roleSpec.backgroundStyle {
         case .solid(let colorRole):
-            if let pair = colors.pair(for: colorRole) {
-                let (r, g, b, a) = parseHexToRGBA(pair.lightHex)
-                fillColor = UIColor(red: r, green: g, blue: b, alpha: a)
-            } else {
-                fillColor = UIColor.systemBackground
-            }
+            fillColor = colorFromSpec(spec, role: colorRole)
         case .material(_, let tintColorRole, _):
-            // Show a light gray to indicate material with optional tint
-            if let tintRole = tintColorRole, let pair = colors.pair(for: tintRole) {
-                let (r, g, b, _) = parseHexToRGBA(pair.lightHex)
-                fillColor = UIColor(red: r, green: g, blue: b, alpha: 0.15)
+            if let tintRole = tintColorRole {
+                fillColor = colorFromSpec(spec, role: tintRole).withAlphaComponent(0.15)
             } else {
-                fillColor = UIColor(white: 0.95, alpha: 1.0)
+                fillColor = UIColor(white: 0.96, alpha: 1.0)
             }
         case .glass(_, let fallbackColorRole):
-            // Show semi-transparent to indicate glass
-            if let pair = colors.pair(for: fallbackColorRole) {
-                let (r, g, b, _) = parseHexToRGBA(pair.lightHex)
-                fillColor = UIColor(red: r, green: g, blue: b, alpha: 0.3)
-            } else {
-                fillColor = UIColor(white: 0.9, alpha: 0.5)
-            }
+            fillColor = colorFromSpec(spec, role: fallbackColorRole).withAlphaComponent(0.3)
         }
 
-        cgContext.setFillColor(fillColor.cgColor)
-        cgContext.addPath(path.cgPath)
-        cgContext.fillPath()
+        // Draw shadow if specified
+        if roleSpec.shadowRadius > 0 && roleSpec.shadowOpacity > 0 {
+            cgContext.saveGState()
+            let shadowColor = UIColor.black.withAlphaComponent(CGFloat(roleSpec.shadowOpacity))
+            cgContext.setShadow(
+                offset: CGSize(width: CGFloat(roleSpec.shadowOffsetX), height: CGFloat(roleSpec.shadowOffsetY)),
+                blur: CGFloat(roleSpec.shadowRadius),
+                color: shadowColor.cgColor
+            )
+            cgContext.setFillColor(fillColor.cgColor)
+            cgContext.addPath(path.cgPath)
+            cgContext.fillPath()
+            cgContext.restoreGState()
+        } else {
+            cgContext.setFillColor(fillColor.cgColor)
+            cgContext.addPath(path.cgPath)
+            cgContext.fillPath()
+        }
 
         // Border
-        if spec.borderWidth > 0 {
-            let (r, g, b, a) = parseHexToRGBA(spec.border.lightHex)
-            let borderColor = UIColor(red: r, green: g, blue: b, alpha: a)
+        if roleSpec.borderWidth > 0 {
+            let borderColor = uiColorFromHex(roleSpec.border.lightHex)
             cgContext.setStrokeColor(borderColor.cgColor)
-            cgContext.setLineWidth(CGFloat(spec.borderWidth))
+            cgContext.setLineWidth(CGFloat(roleSpec.borderWidth))
             cgContext.addPath(path.cgPath)
             cgContext.strokePath()
         }
 
-        // Draw pattern to indicate material/glass
-        if case .material = spec.backgroundStyle {
-            drawMaterialPattern(in: cgContext, rect: rect.insetBy(dx: 4, dy: 4))
-        } else if case .glass = spec.backgroundStyle {
-            drawGlassPattern(in: cgContext, rect: rect.insetBy(dx: 4, dy: 4))
+        // Role name
+        let labelFont = UIFont.systemFont(ofSize: 9, weight: .medium)
+        let labelAttrs: [NSAttributedString.Key: Any] = [
+            .font: labelFont,
+            .foregroundColor: colorFromSpec(spec, role: .textPrimary)
+        ]
+        let labelString = NSAttributedString(string: role.rawValue, attributes: labelAttrs)
+        labelString.draw(at: CGPoint(x: rect.minX + 8, y: rect.minY + 8))
+
+        // Subtitle based on type
+        let subtitle: String
+        switch roleSpec.backgroundStyle {
+        case .solid:
+            subtitle = roleSpec.borderWidth > 0 ? "Subtle border" : "Solid"
+        case .material:
+            subtitle = "Material blur"
+        case .glass:
+            subtitle = "Glass effect"
         }
+
+        let subtitleFont = UIFont.systemFont(ofSize: 8, weight: .regular)
+        let subtitleAttrs: [NSAttributedString.Key: Any] = [
+            .font: subtitleFont,
+            .foregroundColor: colorFromSpec(spec, role: .textSecondary)
+        ]
+        let subtitleString = NSAttributedString(string: subtitle, attributes: subtitleAttrs)
+        subtitleString.draw(at: CGPoint(x: rect.minX + 8, y: rect.minY + 8 + labelFont.lineHeight + 1))
     }
 
-    private static func drawMaterialPattern(in cgContext: CGContext, rect: CGRect) {
-        // Draw subtle lines to indicate blur material
-        cgContext.setStrokeColor(UIColor.lightGray.withAlphaComponent(0.3).cgColor)
-        cgContext.setLineWidth(0.5)
-        for i in stride(from: 0, to: rect.width, by: 6) {
-            cgContext.move(to: CGPoint(x: rect.minX + CGFloat(i), y: rect.minY))
-            cgContext.addLine(to: CGPoint(x: rect.minX + CGFloat(i), y: rect.maxY))
-        }
-        cgContext.strokePath()
-    }
+    // MARK: - Colors Section
 
-    private static func drawGlassPattern(in cgContext: CGContext, rect: CGRect) {
-        // Draw diagonal lines to indicate glass effect
-        cgContext.setStrokeColor(UIColor.white.withAlphaComponent(0.4).cgColor)
-        cgContext.setLineWidth(1)
-        for i in stride(from: 0, to: rect.width + rect.height, by: 8) {
-            let startX = rect.minX + CGFloat(i)
-            let startY = rect.minY
-            let endX = rect.minX
-            let endY = rect.minY + CGFloat(i)
-            cgContext.move(to: CGPoint(x: min(startX, rect.maxX), y: max(startY, rect.minY)))
-            cgContext.addLine(to: CGPoint(x: max(endX, rect.minX), y: min(endY, rect.maxY)))
-        }
-        cgContext.strokePath()
-    }
+    private static func drawColorsSection(in cgContext: CGContext, spec: GentleDesignSystemSpec, startY: CGFloat) -> CGFloat {
+        var y = startY
 
-    private static func backgroundStyleDescription(_ style: GentleSurfaceBackgroundStyle) -> String {
-        switch style {
-        case .solid(let colorRole):
-            return "solid(\(colorRole.rawValue))"
-        case .material(let material, let tintRole, _):
-            if let tintRole = tintRole {
-                return "material(\(material.rawValue), tint: \(tintRole.rawValue))"
-            } else {
-                return "material(\(material.rawValue))"
-            }
-        case .glass(let fallback, _):
-            if let fallback = fallback {
-                return "glass(fallback: \(fallback.rawValue))"
-            } else {
-                return "glass"
-            }
+        // Section title
+        y = drawSectionTitle("Colors", in: cgContext, at: y)
+        y += 12
+
+        let roles = GentleColorRole.allCases
+        let columns = 4
+        let rows = Int(ceil(Double(roles.count) / Double(columns)))
+        let cellWidth = (contentWidth - CGFloat(columns - 1) * gridGap - 20) / CGFloat(columns)
+        let cellHeight: CGFloat = 24
+
+        let containerHeight = CGFloat(rows) * (cellHeight + 6) + 14
+        let containerRect = CGRect(x: margin, y: y, width: contentWidth, height: containerHeight)
+        drawContainerCard(in: cgContext, rect: containerRect, spec: spec)
+
+        let swatchSize: CGFloat = 18
+        let swatchGap: CGFloat = 2
+
+        for (index, role) in roles.enumerated() {
+            let col = index % columns
+            let row = index / columns
+
+            let cellX = margin + 10 + CGFloat(col) * (cellWidth + gridGap)
+            let cellY = y + 10 + CGFloat(row) * (cellHeight + 6)
+
+            guard let pair = spec.colors.pair(for: role) else { continue }
+
+            // Light mode swatch (left, with top-left and bottom-left corners rounded)
+            let lightSwatchRect = CGRect(x: cellX, y: cellY, width: swatchSize, height: swatchSize)
+            let lightColor = uiColorFromHex(pair.lightHex)
+            let lightPath = UIBezierPath(
+                roundedRect: lightSwatchRect,
+                byRoundingCorners: [.topLeft, .bottomLeft],
+                cornerRadii: CGSize(width: 3, height: 3)
+            )
+            cgContext.setFillColor(lightColor.cgColor)
+            cgContext.addPath(lightPath.cgPath)
+            cgContext.fillPath()
+
+            // Border for light swatch
+            cgContext.setStrokeColor(UIColor.lightGray.withAlphaComponent(0.3).cgColor)
+            cgContext.setLineWidth(0.5)
+            cgContext.addPath(lightPath.cgPath)
+            cgContext.strokePath()
+
+            // Dark mode swatch (right, with top-right and bottom-right corners rounded)
+            let darkSwatchRect = CGRect(x: cellX + swatchSize + swatchGap, y: cellY, width: swatchSize, height: swatchSize)
+            let darkColor = uiColorFromHex(pair.darkHex)
+            let darkPath = UIBezierPath(
+                roundedRect: darkSwatchRect,
+                byRoundingCorners: [.topRight, .bottomRight],
+                cornerRadii: CGSize(width: 3, height: 3)
+            )
+            cgContext.setFillColor(darkColor.cgColor)
+            cgContext.addPath(darkPath.cgPath)
+            cgContext.fillPath()
+
+            // Border for dark swatch
+            cgContext.setStrokeColor(UIColor.lightGray.withAlphaComponent(0.3).cgColor)
+            cgContext.setLineWidth(0.5)
+            cgContext.addPath(darkPath.cgPath)
+            cgContext.strokePath()
+
+            // Role name (after both swatches)
+            let labelFont = UIFont.systemFont(ofSize: 9, weight: .regular)
+            let labelAttrs: [NSAttributedString.Key: Any] = [
+                .font: labelFont,
+                .foregroundColor: colorFromSpec(spec, role: .textPrimary)
+            ]
+            let labelString = NSAttributedString(string: role.rawValue, attributes: labelAttrs)
+            labelString.draw(at: CGPoint(x: cellX + swatchSize * 2 + swatchGap + 6, y: cellY + 2))
         }
+
+        return y + containerHeight
     }
 
     // MARK: - Helpers
@@ -689,15 +511,37 @@ public enum GentlePDFExporter {
         let attrString = NSAttributedString(string: title, attributes: attrs)
         attrString.draw(at: CGPoint(x: margin, y: y))
 
-        // Underline
-        let lineY = y + font.lineHeight + 4
-        cgContext.setStrokeColor(UIColor.black.cgColor)
-        cgContext.setLineWidth(1)
-        cgContext.move(to: CGPoint(x: margin, y: lineY))
-        cgContext.addLine(to: CGPoint(x: margin + attrString.size().width, y: lineY))
-        cgContext.strokePath()
+        return y + font.lineHeight
+    }
 
-        return lineY + 4
+    private static func drawContainerCard(in cgContext: CGContext, rect: CGRect, spec: GentleDesignSystemSpec) {
+        let cornerRadius: CGFloat = 12
+        let path = UIBezierPath(roundedRect: rect, cornerRadius: cornerRadius)
+
+        // Fill with surface color
+        let fillColor = colorFromSpec(spec, role: .surfaceBase)
+        cgContext.setFillColor(fillColor.cgColor)
+        cgContext.addPath(path.cgPath)
+        cgContext.fillPath()
+
+        // Border
+        let borderColor = colorFromSpec(spec, role: .borderSubtle)
+        cgContext.setStrokeColor(borderColor.cgColor)
+        cgContext.setLineWidth(1)
+        cgContext.addPath(path.cgPath)
+        cgContext.strokePath()
+    }
+
+    private static func colorFromSpec(_ spec: GentleDesignSystemSpec, role: GentleColorRole) -> UIColor {
+        guard let pair = spec.colors.pair(for: role) else {
+            return UIColor.black
+        }
+        return uiColorFromHex(pair.lightHex)
+    }
+
+    private static func uiColorFromHex(_ hex: String) -> UIColor {
+        let (r, g, b, a) = parseHexToRGBA(hex)
+        return UIColor(red: r, green: g, blue: b, alpha: a)
     }
 
     private static func parseHexToRGBA(_ hex: String) -> (r: CGFloat, g: CGFloat, b: CGFloat, a: CGFloat) {
