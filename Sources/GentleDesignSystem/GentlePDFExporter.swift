@@ -21,7 +21,7 @@ public enum GentlePDFExportError: Error, LocalizedError {
 
 // MARK: - PDF Exporter
 
-public struct GentlePDFExporter {
+public enum GentlePDFExporter {
 
     // MARK: - Page Constants
 
