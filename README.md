@@ -33,6 +33,8 @@ A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to fe
 
 **See it in action:** Open `Demo/GentleDesignSystemDemo.xcodeproj` to explore the components. The demo app also supports editing and sharing JSON specs via the system Share Sheet.
 
+<img src="Docs/README_assets/Typography1.png" alt="GentleDesignSystem demo" width="1000" />
+
 ---
 
 ## Quick Start

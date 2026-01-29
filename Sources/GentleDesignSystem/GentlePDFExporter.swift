@@ -37,7 +37,11 @@ public enum GentlePDFExporter {
 
     private static let sectionTitleFontSize: CGFloat = 18
     private static let labelFontSize: CGFloat = 10
-    private static let buttonLabelFontSize: CGFloat = 11
+
+    // MARK: - Label Color
+
+    /// Gentle dark blue at 70% opacity for all role/token labels
+    private static let labelColor = UIColor(red: 0.2, green: 0.3, blue: 0.5, alpha: 0.7)
 
     // MARK: - Public API
 
@@ -94,13 +98,13 @@ public enum GentlePDFExporter {
     private static func calculateTotalHeight(for spec: GentleDesignSystemSpec) -> CGFloat {
         var height: CGFloat = margin
 
-        // Typography: 4 columns, tight rows
+        // Typography: 4 columns, rows sized for large fonts
         let typographyRows = ceil(Double(GentleTextRole.allCases.count) / 4.0)
-        height += sectionTitleFontSize + 12 + (CGFloat(typographyRows) * 46) + 14
+        height += sectionTitleFontSize + 12 + (CGFloat(typographyRows) * 62) + 14  // 58 cell + 4 gap
         height += sectionSpacing
 
-        // Buttons: 3 rows of buttons
-        height += sectionTitleFontSize + 12 + 36 + gridGap + 36 + gridGap + 36 + 20
+        // Buttons: 3 rows of buttons sized for 17pt text
+        height += sectionTitleFontSize + 12 + 40 + gridGap + 40 + gridGap + 40 + 20
         height += sectionSpacing
 
         // Surfaces: 3 columns
@@ -131,8 +135,8 @@ public enum GentlePDFExporter {
         let columns = 4
         let rows = Int(ceil(Double(roles.count) / Double(columns)))
         let cellWidth = (contentWidth - CGFloat(columns - 1) * gridGap - 20) / CGFloat(columns)
-        let cellHeight: CGFloat = 44
-        let rowGap: CGFloat = 2
+        let cellHeight: CGFloat = 58  // Accommodate large fonts like largeTitle_xxl (34pt)
+        let rowGap: CGFloat = 4
 
         let containerHeight = CGFloat(rows) * cellHeight + CGFloat(rows - 1) * rowGap + 14
         let containerRect = CGRect(x: margin, y: y, width: contentWidth, height: containerHeight)
@@ -155,18 +159,33 @@ public enum GentlePDFExporter {
     private static func drawTypographyItem(in cgContext: CGContext, spec: GentleDesignSystemSpec, role: GentleTextRole, at point: CGPoint, width: CGFloat) {
         let roleSpec = spec.typography.roleSpec(for: role)
 
-        // Role name (small label)
-        let labelFont = UIFont.systemFont(ofSize: 8, weight: .regular)
-        let labelColor = colorFromSpec(spec, role: .textSecondary)
-        let labelAttrs: [NSAttributedString.Key: Any] = [
+        // Role name label - with minimum scale factor
+        let baseLabelFontSize: CGFloat = 12
+        let minScaleFactor: CGFloat = 0.5
+
+        // Try full size first, then scale down if needed
+        var labelFontSize = baseLabelFontSize
+        var labelFont = UIFont.systemFont(ofSize: labelFontSize, weight: .regular)
+        var labelAttrs: [NSAttributedString.Key: Any] = [
             .font: labelFont,
-            .foregroundColor: labelColor
+            .foregroundColor: Self.labelColor
         ]
-        let labelString = NSAttributedString(string: role.rawValue, attributes: labelAttrs)
+        var labelString = NSAttributedString(string: role.rawValue, attributes: labelAttrs)
+        var labelSize = labelString.size()
+
+        // Scale down if needed, respecting minimum scale factor
+        if labelSize.width > width {
+            let scaleFactor = max(width / labelSize.width, minScaleFactor)
+            labelFontSize = baseLabelFontSize * scaleFactor
+            labelFont = UIFont.systemFont(ofSize: labelFontSize, weight: .regular)
+            labelAttrs[.font] = labelFont
+            labelString = NSAttributedString(string: role.rawValue, attributes: labelAttrs)
+        }
+
         labelString.draw(at: point)
 
-        // Sample "Aa Bb" in actual font style
-        let sampleFont = buildUIFont(from: roleSpec, maxSize: 24)
+        // Sample "Aa Bb" in actual font style using the theme's point size, design, and width
+        let sampleFont = buildUIFont(from: roleSpec)
         let sampleColor = colorFromSpec(spec, role: .textPrimary)
         let sampleAttrs: [NSAttributedString.Key: Any] = [
             .font: sampleFont,
@@ -185,8 +204,8 @@ public enum GentlePDFExporter {
         y = drawSectionTitle("Buttons", in: cgContext, at: y)
         y += 12
 
-        // Container card
-        let containerHeight: CGFloat = 32 + gridGap + 32 + gridGap + 32 + 20
+        // Container card - sized for 17pt button text
+        let containerHeight: CGFloat = 40 + gridGap + 40 + gridGap + 40 + 20
         let containerRect = CGRect(x: margin, y: y, width: contentWidth, height: containerHeight)
         drawContainerCard(in: cgContext, rect: containerRect, spec: spec)
 
@@ -194,7 +213,7 @@ public enum GentlePDFExporter {
         let buttonGap: CGFloat = 10
         let containerPadding: CGFloat = 10
         let buttonWidth = (contentWidth - containerPadding * 2 - CGFloat(columns - 1) * buttonGap) / CGFloat(columns)
-        let buttonHeight: CGFloat = 28
+        let buttonHeight: CGFloat = 36
         let startX = margin + containerPadding
 
         // Row 1: Primary, Secondary (light/dark variants)
@@ -284,8 +303,10 @@ public enum GentlePDFExporter {
             cgContext.strokePath()
         }
 
-        // Button label
-        let labelFont = UIFont.systemFont(ofSize: buttonLabelFontSize, weight: .semibold)
+        // Button label - use the typography spec for this button role's text role
+        let textRole = role.defaultTextRole
+        let typographySpec = spec.typography.roleSpec(for: textRole)
+        let labelFont = buildUIFont(from: typographySpec)
         let labelColor: UIColor
         switch roleSpec.fillRole {
         case .solidFillPrimaryCTA, .solidFillDestructive:
@@ -343,9 +364,98 @@ public enum GentlePDFExporter {
 
     private static func drawSurfaceItem(in cgContext: CGContext, spec: GentleDesignSystemSpec, role: GentleSurfaceRole, rect: CGRect) {
         let roleSpec = spec.surfaces.roleSpec(for: role)
+        // Use actual corner radius, capped to half the smallest dimension
+        let maxRadius = min(rect.width, rect.height) / 2
+        let cornerRadius = min(CGFloat(roleSpec.cornerRadius), maxRadius)
 
-        // Draw the surface preview
-        let cornerRadius = min(CGFloat(roleSpec.cornerRadius), 12)
+        // Check if this is a material or glass surface that needs SwiftUI rendering
+        let needsSwiftUIRendering: Bool
+        switch roleSpec.backgroundStyle {
+        case .solid:
+            needsSwiftUIRendering = false
+        case .material, .glass:
+            needsSwiftUIRendering = true
+        }
+
+        if needsSwiftUIRendering {
+            // Render using SwiftUI with actual materials
+            if let surfaceImage = renderSurfaceWithSwiftUI(spec: spec, role: role, size: rect.size) {
+                // Draw shadow first if needed
+                if roleSpec.shadowRadius > 0 && roleSpec.shadowOpacity > 0 {
+                    cgContext.saveGState()
+                    let shadowColor = UIColor.black.withAlphaComponent(CGFloat(roleSpec.shadowOpacity))
+                    cgContext.setShadow(
+                        offset: CGSize(width: CGFloat(roleSpec.shadowOffsetX), height: CGFloat(roleSpec.shadowOffsetY)),
+                        blur: CGFloat(roleSpec.shadowRadius),
+                        color: shadowColor.cgColor
+                    )
+                    // Draw a filled shape to cast the shadow
+                    let path = UIBezierPath(roundedRect: rect, cornerRadius: cornerRadius)
+                    cgContext.setFillColor(UIColor.white.cgColor)
+                    cgContext.addPath(path.cgPath)
+                    cgContext.fillPath()
+                    cgContext.restoreGState()
+                }
+
+                // Draw the rendered SwiftUI image
+                surfaceImage.draw(in: rect)
+            } else {
+                // Fallback to simple rendering if SwiftUI rendering fails
+                drawSolidSurface(in: cgContext, spec: spec, role: role, roleSpec: roleSpec, rect: rect, cornerRadius: cornerRadius)
+            }
+        } else {
+            // Use simple Core Graphics rendering for solid surfaces
+            drawSolidSurface(in: cgContext, spec: spec, role: role, roleSpec: roleSpec, rect: rect, cornerRadius: cornerRadius)
+        }
+
+        // Role name - with minimum scale factor
+        let labelInset: CGFloat = 16
+        let availableWidth = rect.width - labelInset * 2
+        let baseLabelFontSize: CGFloat = 12
+        let minScaleFactor: CGFloat = 0.5
+
+        var labelFontSize = baseLabelFontSize
+        var labelFont = UIFont.systemFont(ofSize: labelFontSize, weight: .medium)
+        var labelAttrs: [NSAttributedString.Key: Any] = [
+            .font: labelFont,
+            .foregroundColor: Self.labelColor
+        ]
+        var labelString = NSAttributedString(string: role.rawValue, attributes: labelAttrs)
+        var labelSize = labelString.size()
+
+        // Scale down if needed
+        if labelSize.width > availableWidth {
+            let scaleFactor = max(availableWidth / labelSize.width, minScaleFactor)
+            labelFontSize = baseLabelFontSize * scaleFactor
+            labelFont = UIFont.systemFont(ofSize: labelFontSize, weight: .medium)
+            labelAttrs[.font] = labelFont
+            labelString = NSAttributedString(string: role.rawValue, attributes: labelAttrs)
+        }
+
+        labelString.draw(at: CGPoint(x: rect.minX + labelInset, y: rect.minY + 10))
+
+        // Subtitle based on type
+        let subtitle: String
+        switch roleSpec.backgroundStyle {
+        case .solid:
+            subtitle = roleSpec.borderWidth > 0 ? "Subtle border" : "Solid"
+        case .material:
+            subtitle = "Material blur"
+        case .glass:
+            subtitle = "Glass effect"
+        }
+
+        let subtitleFont = UIFont.systemFont(ofSize: 10, weight: .regular)
+        let subtitleAttrs: [NSAttributedString.Key: Any] = [
+            .font: subtitleFont,
+            .foregroundColor: Self.labelColor
+        ]
+        let subtitleString = NSAttributedString(string: subtitle, attributes: subtitleAttrs)
+        subtitleString.draw(at: CGPoint(x: rect.minX + labelInset, y: rect.minY + 10 + labelFont.lineHeight + 1))
+    }
+
+    /// Draws a solid surface using Core Graphics (for non-material/glass surfaces)
+    private static func drawSolidSurface(in cgContext: CGContext, spec: GentleDesignSystemSpec, role: GentleSurfaceRole, roleSpec: GentleSurfaceRoleSpec, rect: CGRect, cornerRadius: CGFloat) {
         let path = UIBezierPath(roundedRect: rect, cornerRadius: cornerRadius)
 
         // Background
@@ -390,34 +500,30 @@ public enum GentlePDFExporter {
             cgContext.addPath(path.cgPath)
             cgContext.strokePath()
         }
+    }
 
-        // Role name
-        let labelFont = UIFont.systemFont(ofSize: 9, weight: .medium)
-        let labelAttrs: [NSAttributedString.Key: Any] = [
-            .font: labelFont,
-            .foregroundColor: colorFromSpec(spec, role: .textPrimary)
-        ]
-        let labelString = NSAttributedString(string: role.rawValue, attributes: labelAttrs)
-        labelString.draw(at: CGPoint(x: rect.minX + 8, y: rect.minY + 8))
+    /// Renders a surface using SwiftUI and captures it as a UIImage
+    /// Note: This must be called from the main thread since ImageRenderer requires it
+    private static func renderSurfaceWithSwiftUI(spec: GentleDesignSystemSpec, role: GentleSurfaceRole, size: CGSize) -> UIImage? {
+        // Use assumeIsolated since PDF rendering happens on main thread via UIGraphicsPDFRenderer
+        return MainActor.assumeIsolated {
+            let theme = GentleTheme(defaultSpec: spec, editableSpec: spec)
 
-        // Subtitle based on type
-        let subtitle: String
-        switch roleSpec.backgroundStyle {
-        case .solid:
-            subtitle = roleSpec.borderWidth > 0 ? "Subtle border" : "Solid"
-        case .material:
-            subtitle = "Material blur"
-        case .glass:
-            subtitle = "Glass effect"
+            // Create a SwiftUI view that renders the surface with a gradient background to show the blur
+            let surfaceView = SurfacePreviewView(role: role, size: size)
+
+            // Use ImageRenderer to capture the view
+            let renderer = ImageRenderer(content:
+                GentleThemeRoot(theme: theme) {
+                    surfaceView
+                }
+                .environment(\.colorScheme, .light)
+            )
+
+            renderer.scale = 8.0 // 8x scale for crisp PDF output
+
+            return renderer.uiImage
         }
-
-        let subtitleFont = UIFont.systemFont(ofSize: 8, weight: .regular)
-        let subtitleAttrs: [NSAttributedString.Key: Any] = [
-            .font: subtitleFont,
-            .foregroundColor: colorFromSpec(spec, role: .textSecondary)
-        ]
-        let subtitleString = NSAttributedString(string: subtitle, attributes: subtitleAttrs)
-        subtitleString.draw(at: CGPoint(x: rect.minX + 8, y: rect.minY + 8 + labelFont.lineHeight + 1))
     }
 
     // MARK: - Colors Section
@@ -487,14 +593,32 @@ public enum GentlePDFExporter {
             cgContext.addPath(darkPath.cgPath)
             cgContext.strokePath()
 
-            // Role name (after both swatches)
-            let labelFont = UIFont.systemFont(ofSize: 9, weight: .regular)
-            let labelAttrs: [NSAttributedString.Key: Any] = [
+            // Role name (after both swatches) - with minimum scale factor
+            let labelX = cellX + swatchSize * 2 + swatchGap + 6
+            let availableWidth = cellWidth - (swatchSize * 2 + swatchGap + 6)
+            let baseFontSize: CGFloat = 10
+            let minScaleFactor: CGFloat = 0.7
+
+            // Try full size first, then scale down if needed
+            var fontSize = baseFontSize
+            var labelFont = UIFont.systemFont(ofSize: fontSize, weight: .regular)
+            var labelAttrs: [NSAttributedString.Key: Any] = [
                 .font: labelFont,
-                .foregroundColor: colorFromSpec(spec, role: .textPrimary)
+                .foregroundColor: Self.labelColor
             ]
-            let labelString = NSAttributedString(string: role.rawValue, attributes: labelAttrs)
-            labelString.draw(at: CGPoint(x: cellX + swatchSize * 2 + swatchGap + 6, y: cellY + 2))
+            var labelString = NSAttributedString(string: role.rawValue, attributes: labelAttrs)
+            var labelSize = labelString.size()
+
+            // Scale down if needed, respecting minimum scale factor
+            if labelSize.width > availableWidth {
+                let scaleFactor = max(availableWidth / labelSize.width, minScaleFactor)
+                fontSize = baseFontSize * scaleFactor
+                labelFont = UIFont.systemFont(ofSize: fontSize, weight: .regular)
+                labelAttrs[.font] = labelFont
+                labelString = NSAttributedString(string: role.rawValue, attributes: labelAttrs)
+            }
+
+            labelString.draw(at: CGPoint(x: labelX, y: cellY + 2))
         }
 
         return y + containerHeight
@@ -596,6 +720,182 @@ public enum GentlePDFExporter {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd_HHmmss"
         return formatter.string(from: Date())
+    }
+}
+
+// MARK: - SwiftUI Surface Preview View
+
+/// A SwiftUI view that renders a surface preview with colorful stripes background
+/// to make material/glass effects visible.
+/// Matches the pattern used in ThemePickerView's surfacePreview method.
+private struct SurfacePreviewView: View {
+    @Environment(\.gentleTheme) private var theme
+    @Environment(\.colorScheme) private var colorScheme
+
+    let role: GentleSurfaceRole
+    let size: CGSize
+
+    private var isGlass: Bool {
+        switch theme.surfaces.roleSpec(for: role).backgroundStyle {
+        case .glass:
+            return true
+        case .material, .solid:
+            return false
+        }
+    }
+
+    var body: some View {
+        let roleSpec = theme.surfaces.roleSpec(for: role)
+        let cornerRadius = roleSpec.cornerRadius
+
+        ZStack {
+            // Background - orbs for materials, stripes for glass
+            if isGlass {
+                PDFColorfulStripesBackground(
+                    baseColor: theme.color(for: .themePrimary, scheme: colorScheme),
+                    stripeWidth: 8
+                )
+            } else {
+                PDFGradientOrbsBackground(
+                    primaryColor: theme.color(for: .themePrimary, scheme: colorScheme),
+                    secondaryColor: theme.color(for: .themeSecondary, scheme: colorScheme)
+                )
+            }
+
+            // The surface on top
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .fill(.clear)
+                .gentleSurface(role)
+        }
+        .frame(width: size.width, height: size.height)
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+    }
+}
+
+/// Colorful diagonal stripes background for glass surfaces
+private struct PDFColorfulStripesBackground: View {
+    let baseColor: Color
+    var stripeWidth: CGFloat = 10
+
+    private var shades: [Color] {
+        [
+            baseColor.opacity(1.0),
+            baseColor.opacity(0.85),
+            baseColor.opacity(0.7),
+            baseColor.opacity(0.9),
+            baseColor.opacity(0.75)
+        ]
+    }
+
+    var body: some View {
+        Canvas { context, size in
+            let stripeWidth = self.stripeWidth
+            let totalWidth = size.width + size.height
+
+            var x: CGFloat = -size.height
+            var colorIndex = 0
+            var isColoredStripe = true
+
+            while x < totalWidth {
+                var path = Path()
+                path.move(to: CGPoint(x: x, y: 0))
+                path.addLine(to: CGPoint(x: x + size.height, y: size.height))
+                path.addLine(to: CGPoint(x: x + size.height + stripeWidth, y: size.height))
+                path.addLine(to: CGPoint(x: x + stripeWidth, y: 0))
+                path.closeSubpath()
+
+                if isColoredStripe {
+                    let color1 = shades[colorIndex % shades.count]
+                    let color2 = shades[(colorIndex + 1) % shades.count]
+                    let gradient = Gradient(colors: [color1, color2])
+
+                    context.fill(
+                        path,
+                        with: .linearGradient(
+                            gradient,
+                            startPoint: CGPoint(x: x, y: 0),
+                            endPoint: CGPoint(x: x + stripeWidth + size.height, y: size.height)
+                        )
+                    )
+                    colorIndex += 1
+                } else {
+                    context.fill(path, with: .color(baseColor.opacity(0.2)))
+                }
+
+                isColoredStripe.toggle()
+                x += stripeWidth
+            }
+        }
+    }
+}
+
+/// High-contrast gradient orbs background for PDF surface previews
+/// Creates overlapping soft circles to demonstrate material blur effects
+private struct PDFGradientOrbsBackground: View {
+    let primaryColor: Color
+    let secondaryColor: Color
+
+    // Dark, high-contrast orb colors derived from theme
+    private var orbColors: [Color] {
+        [
+            primaryColor,
+            secondaryColor,
+            Color(red: 0.8, green: 0.3, blue: 0.1),   // Deep orange
+            Color(red: 0.7, green: 0.1, blue: 0.4),   // Deep magenta
+            Color(red: 0.1, green: 0.5, blue: 0.6),   // Dark teal
+            Color(red: 0.4, green: 0.2, blue: 0.7)    // Deep purple
+        ]
+    }
+
+    var body: some View {
+        Canvas { context, size in
+            // Define orb positions and sizes for an interesting composition
+            let orbs: [(x: CGFloat, y: CGFloat, radius: CGFloat, colorIndex: Int)] = [
+                // Large background orbs
+                (0.1, 0.2, 0.7, 0),      // Primary - top left
+                (0.9, 0.8, 0.6, 1),      // Secondary - bottom right
+                (0.8, 0.1, 0.5, 2),      // Orange - top right
+                // Medium orbs
+                (0.3, 0.9, 0.45, 3),     // Pink - bottom left
+                (0.6, 0.4, 0.4, 4),      // Cyan - center
+                // Smaller accent orbs
+                (0.15, 0.7, 0.3, 5),     // Yellow - left
+                (0.75, 0.5, 0.35, 0),    // Primary - right
+                (0.5, 0.15, 0.25, 1),    // Secondary - top center
+            ]
+
+            for orb in orbs {
+                let centerX = orb.x * size.width
+                let centerY = orb.y * size.height
+                let radius = orb.radius * max(size.width, size.height)
+                let color = orbColors[orb.colorIndex % orbColors.count]
+
+                // Create radial gradient for soft orb effect
+                let gradient = Gradient(colors: [
+                    color.opacity(0.9),
+                    color.opacity(0.6),
+                    color.opacity(0.0)
+                ])
+
+                let center = CGPoint(x: centerX, y: centerY)
+                let orbRect = CGRect(
+                    x: centerX - radius,
+                    y: centerY - radius,
+                    width: radius * 2,
+                    height: radius * 2
+                )
+
+                context.fill(
+                    Path(ellipseIn: orbRect),
+                    with: .radialGradient(
+                        gradient,
+                        center: center,
+                        startRadius: 0,
+                        endRadius: radius
+                    )
+                )
+            }
+        }
     }
 }
 

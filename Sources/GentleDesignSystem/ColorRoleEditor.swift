@@ -1,5 +1,6 @@
 //  Jonathan Ritchey
 import SwiftUI
+import UIKit
 
 /// Compact grid cell for displaying a color role.
 /// Tapping opens a sheet for editing.
@@ -421,8 +422,6 @@ public struct ColorRoleEditor: View {
 }
 
 // MARK: - Color to Hex conversion
-
-import UIKit
 
 private extension Color {
     func toHexString() -> String {
