@@ -1,3 +1,5 @@
+<img align="right" src="Docs/README_assets/Typography.gif" width="360" />
+
 ![Gentle Design System](Docs/README_assets/gentle_design.png)
 
 [![CI](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml)
@@ -44,16 +46,7 @@ VStack {
 
 💬 **[Join the discussion. Feedback and questions welcome](https://github.com/gentle-giraffe-apps/GentleDesignSystem/discussions)**
 
-<table>
-  <tr>
-    <td align="center">
-      <img src="Docs/README_assets/Typography.gif" alt="Typography animation" width="340" />
-    </td>
-    <td align="center">
-      <img src="Docs/README_assets/Typography1.png" alt="GentleDesignSystem demo" width="430" />
-    </td>
-  </tr>
-</table>
+<img src="Docs/README_assets/Typography1.png" width="400" />
 
 **See it in action:** Open `Demo/GentleDesignSystemDemo.xcodeproj` to explore the components. The demo app also supports editing and sharing JSON specs via the system Share Sheet.
 
