@@ -232,16 +232,16 @@ public struct GentleSurfaceModifier: ViewModifier {
             let hasShadow = spec.shadowRadius > 0
             let shadowOpacity = colorScheme == .dark ? spec.shadowOpacity * 3.5 : spec.shadowOpacity
 
-            // Only apply specular to solid backgrounds
-            let applySpecular = spec.backgroundStyle.isSolid && spec.specularEffect.hasEffect
+            // Only apply surface depth effect to solid backgrounds
+            let applyDepthEffect = spec.backgroundStyle.isSolid && spec.surfaceDepthEffect.hasEffect
 
             return AnyView(
                 applyGlassIfNeeded(
                     insetContent
                         .background(surfaceBackground(spec: spec))
                         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-                        .modifier(GentleSpecularModifier(
-                            effect: applySpecular ? spec.specularEffect : .noEffect,
+                        .modifier(GentleSurfaceDepthModifier(
+                            effect: applyDepthEffect ? spec.surfaceDepthEffect : .noEffect,
                             cornerRadius: cornerRadius
                         ))
                         .overlay(
@@ -462,11 +462,11 @@ public extension Color {
     }
 }
 
-// MARK: - Specular Effect Modifier
+// MARK: - Surface Depth Effect Modifier
 
-/// Applies specular effects (highlight and/or indent) to a view
-public struct GentleSpecularModifier: ViewModifier {
-    let effect: GentleSpecularEffect
+/// Applies surface depth effects (highlight and/or indent) to a view
+public struct GentleSurfaceDepthModifier: ViewModifier {
+    let effect: GentleSurfaceDepthEffect
     let cornerRadius: CGFloat
 
     public func body(content: Content) -> some View {
@@ -476,7 +476,7 @@ public struct GentleSpecularModifier: ViewModifier {
 
         case .highlightAndIndent(let strength):
             content
-                .gentleSpecularHighlight(strength: strength, cornerRadius: cornerRadius)
+                .gentleSurfaceDepthHighlight(strength: strength, cornerRadius: cornerRadius)
                 .gentleIndentRim(strength: strength, cornerRadius: cornerRadius)
                 .gentleTopLeftOcclusion(strength: strength, cornerRadius: cornerRadius)
                 .gentleEdgeKeyline(strength: strength, cornerRadius: cornerRadius)
@@ -485,13 +485,13 @@ public struct GentleSpecularModifier: ViewModifier {
     }
 }
 
-// MARK: - Specular Helper Extensions
+// MARK: - Surface Depth Helper Extensions
 
 private extension View {
 
-    // MARK: Phase 1 — Top-Edge Specular Highlight (planar, not convex)
+    // MARK: Phase 1 — Top-Edge Surface Depth Highlight (planar, not convex)
 
-    func gentleSpecularHighlight(strength: CGFloat, cornerRadius: CGFloat) -> some View {
+    func gentleSurfaceDepthHighlight(strength: CGFloat, cornerRadius: CGFloat) -> some View {
         let s = strength.clamped01()
         let k = pow(s, 0.75)
 

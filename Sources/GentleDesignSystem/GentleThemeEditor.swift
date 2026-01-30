@@ -964,36 +964,36 @@ struct SurfaceRoleEditorSheet: View {
                         }
                     }
 
-                    // Specular section - hidden when glass is selected
+                    // Surface Depth section - hidden when glass is selected
                     if !binding.wrappedValue.backgroundStyle.isGlass {
-                        Section("Specular") {
+                        Section("Surface Depth") {
                             Toggle("Enabled", isOn: Binding(
-                                get: { binding.wrappedValue.specularEffect.hasEffect },
+                                get: { binding.wrappedValue.surfaceDepthEffect.hasEffect },
                                 set: { enabled in
                                     if enabled {
-                                        let currentStrength = binding.wrappedValue.specularEffect.strength
+                                        let currentStrength = binding.wrappedValue.surfaceDepthEffect.strength
                                         let strength = currentStrength > 0 ? currentStrength : 0.1
-                                        binding.wrappedValue.specularEffect = .highlightAndIndent(strength: strength)
+                                        binding.wrappedValue.surfaceDepthEffect = .highlightAndIndent(strength: strength)
                                     } else {
-                                        binding.wrappedValue.specularEffect = .noEffect
+                                        binding.wrappedValue.surfaceDepthEffect = .noEffect
                                     }
                                 }
                             ))
 
-                            if binding.wrappedValue.specularEffect.hasEffect {
+                            if binding.wrappedValue.surfaceDepthEffect.hasEffect {
                                 VStack(alignment: .leading, spacing: 6) {
                                     HStack {
                                         Text("Strength")
                                         Spacer()
-                                        Text(String(format: "%.0f%%", binding.wrappedValue.specularEffect.strength * 100))
+                                        Text(String(format: "%.0f%%", binding.wrappedValue.surfaceDepthEffect.strength * 100))
                                             .monospacedDigit()
                                             .foregroundStyle(.secondary)
                                     }
                                     Slider(
                                         value: Binding(
-                                            get: { binding.wrappedValue.specularEffect.strength },
+                                            get: { binding.wrappedValue.surfaceDepthEffect.strength },
                                             set: { newStrength in
-                                                binding.wrappedValue.specularEffect = .highlightAndIndent(strength: newStrength)
+                                                binding.wrappedValue.surfaceDepthEffect = .highlightAndIndent(strength: newStrength)
                                             }
                                         ),
                                         in: 0...0.2,

@@ -17,14 +17,14 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.card.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceBase),
-                specularEffect: .highlightAndIndent(strength: 0.05),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.05),
                 border: GentleColorPair(lightHex: "#D4C8B4", darkHex: "#4A4030"),
                 cornerRadius: 16,
                 borderWidth: 1
             ),
             GentleSurfaceRole.cardElevated.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceBase),
-                specularEffect: .highlightAndIndent(strength: 0.12),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.12),
                 border: GentleColorPair(lightHex: "#D4C8B450", darkHex: "#4A403050"),
                 cornerRadius: 16,
                 borderWidth: 0.5,
@@ -34,7 +34,7 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.cardSecondary.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceCardSecondary),
-                specularEffect: .highlightAndIndent(strength: 0.03),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.03),
                 border: GentleColorPair(lightHex: "#D4C8B4", darkHex: "#4A4030"),
                 cornerRadius: 14,
                 borderWidth: 1
@@ -105,7 +105,7 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.cardElevated.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceBase),
-                specularEffect: .highlightAndIndent(strength: 0.06),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.06),
                 border: GentleColorPair(lightHex: "#E0E0E840", darkHex: "#3A3A4E40"),
                 cornerRadius: 12,
                 borderWidth: 0.5,
@@ -179,14 +179,14 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.card.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceBase),
-                specularEffect: .highlightAndIndent(strength: 0.04),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.04),
                 border: GentleColorPair(lightHex: "#C5E0D4", darkHex: "#2A4D3D"),
                 cornerRadius: 24,
                 borderWidth: 1
             ),
             GentleSurfaceRole.cardElevated.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceBase),
-                specularEffect: .highlightAndIndent(strength: 0.08),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.08),
                 border: GentleColorPair(lightHex: "#C5E0D450", darkHex: "#2A4D3D50"),
                 cornerRadius: 24,
                 borderWidth: 0.5,
@@ -196,7 +196,7 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.cardSecondary.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceCardSecondary),
-                specularEffect: .highlightAndIndent(strength: 0.03),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.03),
                 border: GentleColorPair(lightHex: "#C5E0D4", darkHex: "#2A4D3D"),
                 cornerRadius: 20,
                 borderWidth: 1
@@ -350,7 +350,7 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.cardElevated.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceBase),
-                specularEffect: .highlightAndIndent(strength: 0.04),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.04),
                 border: GentleColorPair(lightHex: "#C4DCF0", darkHex: "#1E4060"),
                 cornerRadius: 6,
                 borderWidth: 1,
@@ -360,7 +360,7 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.cardSecondary.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceCardSecondary),
-                specularEffect: .highlightAndIndent(strength: 0.02),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.02),
                 border: GentleColorPair(lightHex: "#C4DCF0", darkHex: "#1E4060"),
                 cornerRadius: 5,
                 borderWidth: 1
@@ -425,14 +425,14 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.card.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceBase),
-                specularEffect: .highlightAndIndent(strength: 0.08),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.08),
                 border: GentleColorPair(lightHex: "#F0D4C0", darkHex: "#4D3020"),
                 cornerRadius: 16,
                 borderWidth: 2
             ),
             GentleSurfaceRole.cardElevated.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceBase),
-                specularEffect: .highlightAndIndent(strength: 0.15),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.15),
                 border: GentleColorPair(lightHex: "#F0D4C080", darkHex: "#4D302080"),
                 cornerRadius: 16,
                 borderWidth: 2,
@@ -442,7 +442,7 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.cardSecondary.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceCardSecondary),
-                specularEffect: .highlightAndIndent(strength: 0.05),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.05),
                 border: GentleColorPair(lightHex: "#F0D4C0", darkHex: "#4D3020"),
                 cornerRadius: 14,
                 borderWidth: 2
@@ -507,14 +507,14 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.card.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceBase),
-                specularEffect: .highlightAndIndent(strength: 0.03),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.03),
                 border: GentleColorPair(lightHex: "#E0D0F0", darkHex: "#3D2D60"),
                 cornerRadius: 20,
                 borderWidth: 0.5
             ),
             GentleSurfaceRole.cardElevated.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceBase),
-                specularEffect: .highlightAndIndent(strength: 0.06),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.06),
                 border: GentleColorPair(lightHex: "#E0D0F040", darkHex: "#3D2D6040"),
                 cornerRadius: 20,
                 borderWidth: 0.5,
@@ -524,7 +524,7 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.cardSecondary.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceCardSecondary),
-                specularEffect: .highlightAndIndent(strength: 0.02),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.02),
                 border: GentleColorPair(lightHex: "#E0D0F0", darkHex: "#3D2D60"),
                 cornerRadius: 16,
                 borderWidth: 0.5
@@ -595,7 +595,7 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.cardElevated.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceBase),
-                specularEffect: .highlightAndIndent(strength: 0.05),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.05),
                 border: GentleColorPair(lightHex: "#C4DCD060", darkHex: "#2D4D3D60"),
                 cornerRadius: 8,
                 borderWidth: 0.5,
@@ -605,7 +605,7 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.cardSecondary.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceCardSecondary),
-                specularEffect: .highlightAndIndent(strength: 0.03),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.03),
                 border: GentleColorPair(lightHex: "#C4DCD0", darkHex: "#2D4D3D"),
                 cornerRadius: 7,
                 borderWidth: 1

@@ -122,10 +122,10 @@ public enum GentleAppleMaterial: String, Codable, Sendable, CaseIterable, Identi
     }
 }
 
-// MARK: - Specular Effect
+// MARK: - Surface Depth Effect
 
-/// Specular highlight effect for surface depth cues.
-public enum GentleSpecularEffect: Codable, Sendable, Equatable {
+/// Surface depth effect for visual depth cues (highlights, indents, edge darkening).
+public enum GentleSurfaceDepthEffect: Codable, Sendable, Equatable {
     case noEffect
     case highlightAndIndent(strength: CGFloat)   // Light sweep + indent rim + edge darkening, strength 0.0...1.0
 
@@ -144,7 +144,7 @@ public enum GentleSpecularEffect: Codable, Sendable, Equatable {
         }
     }
 
-    /// Returns true if this has a specular effect (regardless of strength)
+    /// Returns true if this has a depth effect (regardless of strength)
     public var hasEffect: Bool {
         switch self {
         case .noEffect: return false
@@ -299,8 +299,8 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
     /// Background rendering style (solid, material, or glass)
     public var backgroundStyle: GentleSurfaceBackgroundStyle
 
-    /// Specular highlights for depth cues (includes strength)
-    public var specularEffect: GentleSpecularEffect
+    /// Surface depth effect for visual depth cues (includes strength)
+    public var surfaceDepthEffect: GentleSurfaceDepthEffect
 
     /// Border color
     public var border: GentleColorPair
@@ -325,7 +325,7 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
 
     public init(
         backgroundStyle: GentleSurfaceBackgroundStyle,
-        specularEffect: GentleSpecularEffect = .noEffect,
+        surfaceDepthEffect: GentleSurfaceDepthEffect = .noEffect,
         border: GentleColorPair,
         cornerRadius: Double = 20,
         borderWidth: Double = 1,
@@ -335,7 +335,7 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
         shadowOffsetY: Double = 0
     ) {
         self.backgroundStyle = backgroundStyle
-        self.specularEffect = specularEffect
+        self.surfaceDepthEffect = surfaceDepthEffect
         self.border = border
         self.cornerRadius = cornerRadius
         self.borderWidth = borderWidth
@@ -347,7 +347,7 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
 
     enum CodingKeys: String, CodingKey {
         case backgroundStyle
-        case specularEffect
+        case surfaceDepthEffect
         case border
         case cornerRadius
         case borderWidth
@@ -360,7 +360,8 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
         case colorRole
         case appleMaterial
         case useGlass
-        case specularStrength  // Legacy - now embedded in specularEffect
+        case specularEffect    // Legacy - now surfaceDepthEffect
+        case specularStrength  // Legacy - now embedded in surfaceDepthEffect
     }
 
     public init(from decoder: Decoder) throws {
@@ -401,15 +402,18 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
             self.backgroundStyle = .solid(colorRole: .surfaceBase)
         }
 
-        // Try to decode new specularEffect format first, with migration from legacy format
-        if let specularEffect = try? container.decode(GentleSpecularEffect.self, forKey: .specularEffect) {
-            self.specularEffect = specularEffect
+        // Try to decode new surfaceDepthEffect format first, with migration from legacy formats
+        if let depthEffect = try? container.decode(GentleSurfaceDepthEffect.self, forKey: .surfaceDepthEffect) {
+            self.surfaceDepthEffect = depthEffect
+        } else if let legacyEffect = try? container.decode(GentleSurfaceDepthEffect.self, forKey: .specularEffect) {
+            // Legacy migration: old key name was specularEffect
+            self.surfaceDepthEffect = legacyEffect
         } else if let legacyStrength = try? container.decodeIfPresent(Double.self, forKey: .specularStrength),
                   legacyStrength > 0 {
             // Legacy migration: had separate specularStrength, assume highlightAndIndent effect
-            self.specularEffect = .highlightAndIndent(strength: CGFloat(legacyStrength))
+            self.surfaceDepthEffect = .highlightAndIndent(strength: CGFloat(legacyStrength))
         } else {
-            self.specularEffect = .noEffect
+            self.surfaceDepthEffect = .noEffect
         }
         self.border = try container.decode(GentleColorPair.self, forKey: .border)
         self.cornerRadius = try container.decodeIfPresent(Double.self, forKey: .cornerRadius) ?? 20
@@ -423,7 +427,7 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(backgroundStyle, forKey: .backgroundStyle)
-        try container.encode(specularEffect, forKey: .specularEffect)
+        try container.encode(surfaceDepthEffect, forKey: .surfaceDepthEffect)
         try container.encode(border, forKey: .border)
         try container.encode(cornerRadius, forKey: .cornerRadius)
         try container.encode(borderWidth, forKey: .borderWidth)
@@ -471,7 +475,7 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.cardElevated.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceBase),
-                specularEffect: .highlightAndIndent(strength: 0.1),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.1),
                 border: GentleColorPair(lightHex: "#E5E7EB59", darkHex: "#37415159"),
                 cornerRadius: 20,
                 borderWidth: 0.5,
@@ -481,7 +485,7 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.cardSecondary.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceCardSecondary),
-                specularEffect: .highlightAndIndent(strength: 0.03),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.03),
                 border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
                 cornerRadius: 16,
                 borderWidth: 1

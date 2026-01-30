@@ -32,7 +32,7 @@
 | `GentleSurfaceRole` | Container/background intent (10 roles: appBackground, card, cardElevated, cardSecondary, chrome, overlaySheet, overlayPopover, overlayScrim, floatingPanel, floatingWidget) |
 | `GentleSurfaceBackgroundStyle` | Surface background type: .solid(colorRole:), .material(material:tintColorRole:tintOpacity:), .glass(fallbackMaterial:fallbackColorRole:) |
 | `GentleAppleMaterial` | Apple's blur materials: noMaterial, ultraThin, thin, regular, thick, ultraThick, bar |
-| `GentleSpecularEffect` | Specular highlight types: noEffect, indent, highlight |
+| `GentleSurfaceDepthEffect` | Surface depth effects: noEffect, highlightAndIndent(strength:) |
 | `GentleVisualEffect` | Legacy visual effect type (appBackground, surface, surfaceOverlay) |
 | `GentleInsetRole` | Padding intent (4 roles) |
 | `GentleGapIntent` | Spacing intent (7 levels) |
@@ -44,7 +44,7 @@
 | `GentleColorTokens` | Map of role → `GentleColorPair` (light/dark hex) |
 | `GentleTypographyTokens` | Map of role → `GentleTypographyRoleSpec` |
 | `GentleButtonTokens` | Map of role → `GentleButtonRoleSpec` + animations |
-| `GentleSurfaceTokens` | Map of role → `GentleSurfaceRoleSpec` (backgroundStyle, specular, border, shadow) |
+| `GentleSurfaceTokens` | Map of role → `GentleSurfaceRoleSpec` (backgroundStyle, surfaceDepthEffect, border, shadow) |
 | `GentleLayoutTokens` | Spacing scales, gaps, insets |
 | `GentleVisualTokens` | Radii, shadows |
 
