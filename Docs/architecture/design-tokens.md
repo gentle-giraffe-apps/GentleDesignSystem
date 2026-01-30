@@ -56,17 +56,18 @@ footnote_s, caption_s, caption2_s
 
 Naming: `{semantic}_{ramp}` where ramp = xxl > xl > l > ml > m > ms > s
 
-### GentleColorRole (18 roles)
+### GentleColorRole (20 roles)
 ```
 Text:     textPrimary, textSecondary, textTertiary,
-          textOnPrimaryCTA, textOnDestructive, textOnOverlay, textOnOverlaySecondary
+          textOnPrimaryCTA, textOnDestructive, textOnOverlay, textOnOverlaySecondary,
+          textOnScrim, textOnScrimSecondary
 Surface:  background, surfaceBase, surfaceCardSecondary, surfaceOverlay, surfaceTint, surfaceSpecular, borderSubtle
 Action:   primaryCTA, destructive
 Theme:    themePrimary, themeSecondary
 ```
 
 **Semantic Groupings**:
-- `GentleColorRole.textRoles` - all text/foreground colors (7)
+- `GentleColorRole.textRoles` - all text/foreground colors (9)
 - `GentleColorRole.surfaceRoles` - container/background/border colors (7)
 - `GentleColorRole.actionRoles` - interactive element colors (2)
 - `GentleColorRole.themeRoles` - brand/accent colors (2)
@@ -91,10 +92,10 @@ solidFillPrimaryCTA, solidFillDestructive, hollow
 
 Determines button background fill and label color strategy.
 
-### GentleSurfaceRole (9 roles)
+### GentleSurfaceRole (10 roles)
 ```
 appBackground, card, cardElevated, cardSecondary,
-chrome, overlaySheet, overlayPopover,
+chrome, overlaySheet, overlayPopover, overlayScrim,
 floatingPanel, floatingWidget
 ```
 

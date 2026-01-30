@@ -42,7 +42,7 @@ TextField("Search", text: $query).gentleTextField(.body_m, chrome: .standalone(s
 // Apply surface styling (background, border, shadow, corner radius)
 .gentleSurface(_ role: GentleSurfaceRole)
 
-// Roles (9):
+// Roles (10):
 // .appBackground      - Full-screen app background
 // .card               - Standard card container
 // .cardElevated       - Card with shadow elevation
@@ -50,6 +50,7 @@ TextField("Search", text: $query).gentleTextField(.body_m, chrome: .standalone(s
 // .chrome             - Navigation/toolbar chrome
 // .overlaySheet       - Modal sheet background
 // .overlayPopover     - Popover background
+// .overlayScrim       - Dark scrim for contrast/labels
 // .floatingPanel      - Floating panel container
 // .floatingWidget     - Floating widget container
 
@@ -302,17 +303,18 @@ callout_ms, subheadline_ms,
 footnote_s, caption_s, caption2_s
 ```
 
-### GentleColorRole (18)
+### GentleColorRole (20)
 ```
 textPrimary, textSecondary, textTertiary,
 textOnPrimaryCTA, textOnDestructive, textOnOverlay, textOnOverlaySecondary,
+textOnScrim, textOnScrimSecondary,
 background, surfaceBase, surfaceCardSecondary, surfaceOverlay, surfaceTint, surfaceSpecular, borderSubtle,
 primaryCTA, destructive,
 themePrimary, themeSecondary
 ```
 
 **Semantic Groupings:**
-- `.textRoles` (7) - text/foreground colors
+- `.textRoles` (9) - text/foreground colors
 - `.surfaceRoles` (7) - container/background/border colors
 - `.actionRoles` (2) - interactive element colors
 - `.themeRoles` (2) - brand/accent colors
@@ -324,10 +326,10 @@ themePrimary, themeSecondary
 primary, secondary, tertiary, quaternary, destructive
 ```
 
-### GentleSurfaceRole (9)
+### GentleSurfaceRole (10)
 ```
 appBackground, card, cardElevated, cardSecondary,
-chrome, overlaySheet, overlayPopover,
+chrome, overlaySheet, overlayPopover, overlayScrim,
 floatingPanel, floatingWidget
 ```
 

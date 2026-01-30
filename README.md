@@ -618,13 +618,13 @@ Each role resolves to a `GentleTypographyRoleSpec` containing: `pointSize`, `wei
 
 ### Surface Roles
 
-`appBackground` · `card` · `cardElevated` · `surfaceOverlay`
+`appBackground` · `card` · `cardElevated` · `cardSecondary` · `chrome` · `overlaySheet` · `overlayPopover` · `overlayScrim` · `floatingPanel` · `floatingWidget`
 
 ### Color Roles
 
 | Category | Roles |
 |----------|-------|
-| Text (7) | `textPrimary`, `textSecondary`, `textTertiary`, `textOnPrimaryCTA`, `textOnDestructive`, `textOnOverlay`, `textOnOverlaySecondary` |
+| Text (9) | `textPrimary`, `textSecondary`, `textTertiary`, `textOnPrimaryCTA`, `textOnDestructive`, `textOnOverlay`, `textOnOverlaySecondary`, `textOnScrim`, `textOnScrimSecondary` |
 | Surfaces (7) | `background`, `surfaceBase`, `surfaceCardSecondary`, `surfaceOverlay`, `surfaceTint`, `surfaceSpecular`, `borderSubtle` |
 | Actions (2) | `primaryCTA`, `destructive` |
 | Theme (2) | `themePrimary`, `themeSecondary` |

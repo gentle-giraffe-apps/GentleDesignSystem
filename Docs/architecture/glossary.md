@@ -25,11 +25,11 @@
 | Type | What it defines |
 |------|-----------------|
 | `GentleTextRole` | Typography intent (17 roles) |
-| `GentleColorRole` | Color intent (18 roles in 4 groups: text, surface, action, theme) |
+| `GentleColorRole` | Color intent (20 roles in 4 groups: text, surface, action, theme) |
 | `GentleButtonRole` | Button style intent (5 roles) |
 | `GentleButtonFillRole` | Button fill strategy (solidFillPrimaryCTA, solidFillDestructive, hollow) |
 | `GentleButtonAnimationRole` | Button animation feel (6 roles) |
-| `GentleSurfaceRole` | Container/background intent (9 roles: appBackground, card, cardElevated, cardSecondary, chrome, overlaySheet, overlayPopover, floatingPanel, floatingWidget) |
+| `GentleSurfaceRole` | Container/background intent (10 roles: appBackground, card, cardElevated, cardSecondary, chrome, overlaySheet, overlayPopover, overlayScrim, floatingPanel, floatingWidget) |
 | `GentleSurfaceBackgroundStyle` | Surface background type: .solid(colorRole:), .material(material:tintColorRole:tintOpacity:), .glass(fallbackMaterial:fallbackColorRole:) |
 | `GentleAppleMaterial` | Apple's blur materials: noMaterial, ultraThin, thin, regular, thick, ultraThick, bar |
 | `GentleSpecularEffect` | Specular highlight types: noEffect, indent, highlight |
