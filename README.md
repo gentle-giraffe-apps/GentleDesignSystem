@@ -38,7 +38,7 @@ VStack {
 
 💬 **[Join the discussion. Feedback and questions welcome](https://github.com/gentle-giraffe-apps/GentleDesignSystem/discussions)**
 
-<img src="Docs/README_assets/Typography1.png" width="400" />
+<img src="Docs/README_assets/Typography1.png" width="700" />
 
 **See it in action:** Open `Demo/GentleDesignSystemDemo.xcodeproj` to explore the components. The demo app also supports editing and sharing JSON specs via the system Share Sheet.
 
