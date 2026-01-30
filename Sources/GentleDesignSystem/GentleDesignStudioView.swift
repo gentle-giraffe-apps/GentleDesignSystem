@@ -69,8 +69,6 @@ public struct GentleDesignStudioView: View {
     @ViewBuilder
     private var studioContent: some View {
         GentleThemeEditor(isTitleEditable: isTitleEditable)
-            .navigationTitle(isTitleEditable ? "New Theme" : (themeManager.currentPresetName ?? "Design System"))
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                         HStack(spacing: 16) {

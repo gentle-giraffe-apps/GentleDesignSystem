@@ -232,11 +232,18 @@ public struct GentleSurfaceModifier: ViewModifier {
             let hasShadow = spec.shadowRadius > 0
             let shadowOpacity = colorScheme == .dark ? spec.shadowOpacity * 3.5 : spec.shadowOpacity
 
+            // Only apply specular to solid backgrounds
+            let applySpecular = spec.backgroundStyle.isSolid && spec.specularEffect.hasEffect
+
             return AnyView(
                 applyGlassIfNeeded(
                     insetContent
                         .background(surfaceBackground(spec: spec))
                         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                        .modifier(GentleSpecularModifier(
+                            effect: applySpecular ? spec.specularEffect : .noEffect,
+                            cornerRadius: cornerRadius
+                        ))
                         .overlay(
                             Group {
                                 if hasBorder {
@@ -453,4 +460,174 @@ public extension Color {
 
         self.init(red: r, green: g, blue: b, opacity: a)
     }
+}
+
+// MARK: - Specular Effect Modifier
+
+/// Applies specular effects (highlight and/or indent) to a view
+public struct GentleSpecularModifier: ViewModifier {
+    let effect: GentleSpecularEffect
+    let cornerRadius: CGFloat
+
+    public func body(content: Content) -> some View {
+        switch effect {
+        case .noEffect:
+            content
+
+        case .highlightAndIndent(let strength):
+            content
+                .gentleSpecularHighlight(strength: strength, cornerRadius: cornerRadius)
+                .gentleIndentRim(strength: strength, cornerRadius: cornerRadius)
+                .gentleTopLeftOcclusion(strength: strength, cornerRadius: cornerRadius)
+                .gentleEdgeKeyline(strength: strength, cornerRadius: cornerRadius)
+                .gentleInnerEdgeDarkening(strength: strength, cornerRadius: cornerRadius)
+        }
+    }
+}
+
+// MARK: - Specular Helper Extensions
+
+private extension View {
+
+    // MARK: Phase 1 — Specular Highlight (optical polish, no geometry)
+
+    func gentleSpecularHighlight(strength: CGFloat, cornerRadius: CGFloat) -> some View {
+        let s = strength.clamped01()
+        let k = pow(s, 0.75)
+
+        // Small, stable inset (do NOT scale with strength)
+        let inset: CGFloat = min(3.0, max(2.0, cornerRadius * 0.08))
+
+        let highlight = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+            .fill(
+                LinearGradient(
+                    colors: [
+                        Color.white.opacity(0.08 + 0.20 * k),
+                        Color.white.opacity(0.02 + 0.06 * k),
+                        Color.clear
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .center
+                )
+            )
+            .blendMode(.screen)
+            .opacity(0.95)
+
+        return overlay(
+            highlight
+                .mask(
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .inset(by: inset)
+                )
+                .allowsHitTesting(false)
+        )
+    }
+
+    // MARK: Phase 2 — Indent Rim (inner bevel)
+
+    func gentleIndentRim(strength: CGFloat, cornerRadius: CGFloat) -> some View {
+        let s = strength.clamped01()
+        let k = pow(s, 0.85)
+
+        let lineWidth: CGFloat = 2.0 // geometry is constant
+
+        return overlay(
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .strokeBorder(
+                    LinearGradient(
+                        colors: [
+                            // keep TL light subtle — do NOT blow out on light cards
+                            Color.white.opacity(0.06 + 0.10 * k),
+                            Color.clear,
+                            Color.black.opacity(0.14 + 0.18 * k)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: lineWidth
+                )
+                .blendMode(.overlay)
+                .opacity(0.85)
+                .allowsHitTesting(false)
+        )
+    }
+
+    // MARK: Phase 2.5 — Top-left Occlusion Wedge (corner readability fix)
+
+    func gentleTopLeftOcclusion(strength: CGFloat, cornerRadius: CGFloat) -> some View {
+        let s = strength.clamped01()
+        let k = pow(s, 0.65)
+
+        let band: CGFloat = 3 // fixed bezel band
+        let dark = 0.04 + 0.14 * k
+
+        return overlay(
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            Color.black.opacity(dark),
+                            Color.clear
+                        ],
+                        center: .topLeading,
+                        startRadius: 0,
+                        endRadius: 180
+                    )
+                )
+                .blendMode(.multiply)
+                .mask(
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .strokeBorder(Color.white, lineWidth: band)
+                )
+                .allowsHitTesting(false)
+        )
+    }
+
+    // MARK: Phase 2.8 — Edge Keyline (guaranteed separation)
+
+    func gentleEdgeKeyline(strength: CGFloat, cornerRadius: CGFloat) -> some View {
+        let s = strength.clamped01()
+        let k = pow(s, 0.8)
+
+        return overlay(
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .strokeBorder(
+                    Color.black.opacity(0.04 + 0.08 * k),
+                    lineWidth: 1
+                )
+                .blendMode(.multiply)
+                .allowsHitTesting(false)
+        )
+    }
+
+    // MARK: Phase 3 — Inner Edge Darkening (global recess cue)
+
+    func gentleInnerEdgeDarkening(strength: CGFloat, cornerRadius: CGFloat) -> some View {
+        let s = strength.clamped01()
+        let k = pow(s, 0.80)
+
+        return overlay(
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            Color.clear,
+                            Color.black.opacity(0.10 + 0.22 * k)
+                        ],
+                        center: .center,
+                        startRadius: 40,
+                        endRadius: 260
+                    )
+                )
+                .blendMode(.multiply)
+                .opacity(0.55)
+                .allowsHitTesting(false)
+        )
+    }
+}
+
+// MARK: - CGFloat Clamping Helper
+
+private extension CGFloat {
+    func clamped01() -> CGFloat { Swift.min(1, Swift.max(0, self)) }
 }

@@ -967,22 +967,38 @@ struct SurfaceRoleEditorSheet: View {
                     // Specular section - hidden when glass is selected
                     if !binding.wrappedValue.backgroundStyle.isGlass {
                         Section("Specular") {
-                            Picker("Effect", selection: binding.specularEffect) {
-                                ForEach(GentleSpecularEffect.allCases, id: \.self) { effect in
-                                    Text(effect.displayName).tag(effect)
+                            Toggle("Enabled", isOn: Binding(
+                                get: { binding.wrappedValue.specularEffect.hasEffect },
+                                set: { enabled in
+                                    if enabled {
+                                        let currentStrength = binding.wrappedValue.specularEffect.strength
+                                        let strength = currentStrength > 0 ? currentStrength : 0.1
+                                        binding.wrappedValue.specularEffect = .highlightAndIndent(strength: strength)
+                                    } else {
+                                        binding.wrappedValue.specularEffect = .noEffect
+                                    }
                                 }
-                            }
+                            ))
 
-                            if binding.specularEffect.wrappedValue != .noEffect {
+                            if binding.wrappedValue.specularEffect.hasEffect {
                                 VStack(alignment: .leading, spacing: 6) {
                                     HStack {
                                         Text("Strength")
                                         Spacer()
-                                        Text(String(format: "%.0f%%", binding.specularStrength.wrappedValue * 100))
+                                        Text(String(format: "%.0f%%", binding.wrappedValue.specularEffect.strength * 100))
                                             .monospacedDigit()
                                             .foregroundStyle(.secondary)
                                     }
-                                    Slider(value: binding.specularStrength, in: 0...1, step: 0.05)
+                                    Slider(
+                                        value: Binding(
+                                            get: { binding.wrappedValue.specularEffect.strength },
+                                            set: { newStrength in
+                                                binding.wrappedValue.specularEffect = .highlightAndIndent(strength: newStrength)
+                                            }
+                                        ),
+                                        in: 0...1,
+                                        step: 0.05
+                                    )
                                 }
                             }
                         }
@@ -1280,6 +1296,7 @@ struct SurfaceRoleEditorSheet: View {
             }
         )
     }
+
 }
 
 // MARK: - Surface Color Pair Row
