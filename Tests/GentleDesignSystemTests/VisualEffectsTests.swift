@@ -580,16 +580,15 @@ struct GentleSurfaceRoleSpecTests {
         #expect(spec.shadowOpacity == 0)
         #expect(spec.shadowOffsetX == 0)
         #expect(spec.shadowOffsetY == 0)
-        #expect(spec.specularEffect == .noEffect)
-        #expect(spec.specularStrength == 0)
+        #expect(spec.surfaceDepthEffect == .noEffect)
+        #expect(spec.surfaceDepthEffect.strength == 0)
     }
 
     @Test("Surface role spec with all properties")
     func testSurfaceRoleSpecAllProperties() {
         let spec = GentleSurfaceRoleSpec(
             backgroundStyle: .material(material: .thin, tintColorRole: .surfaceBase, tintOpacity: 0.15),
-            specularEffect: .highlight,
-            specularStrength: 0.5,
+            surfaceDepthEffect: .highlightAndIndent(strength: 0.5),
             border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
             cornerRadius: 24,
             borderWidth: 0.5,
@@ -611,8 +610,8 @@ struct GentleSurfaceRoleSpecTests {
         } else {
             Issue.record("Expected material background style")
         }
-        #expect(spec.specularEffect == .highlight)
-        #expect(spec.specularStrength == 0.5)
+        #expect(spec.surfaceDepthEffect.hasEffect)
+        #expect(spec.surfaceDepthEffect.strength == 0.5)
     }
 
     @Test("Surface role spec is codable")
@@ -644,7 +643,7 @@ struct GentleSurfaceRoleSpecTests {
     @Test("Surface role spec with material is codable")
     func testSurfaceRoleSpecWithMaterialCodable() throws {
         let original = GentleSurfaceRoleSpec(
-            backgroundStyle: .material(material: .thick, tintColorRole: .surfaceOverlay, tintOpacity: 0.1),
+            backgroundStyle: .material(material: .thick, tintColorRole: .surfaceTint, tintOpacity: 0.1),
             border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000")
         )
 
@@ -656,7 +655,7 @@ struct GentleSurfaceRoleSpecTests {
 
         if case .material(let material, let tintColorRole, let tintOpacity) = decoded.backgroundStyle {
             #expect(material == .thick)
-            #expect(tintColorRole == .surfaceOverlay)
+            #expect(tintColorRole == .surfaceTint)
             #expect(tintOpacity == 0.1)
         } else {
             Issue.record("Expected material background style")
@@ -802,7 +801,7 @@ struct MaterialJSONRoundTripTests {
 
         // Replace card with a material background style
         spec.surfaces.roles[GentleSurfaceRole.card.rawValue] = GentleSurfaceRoleSpec(
-            backgroundStyle: .material(material: .regular, tintColorRole: .surfaceOverlay, tintOpacity: 0.15),
+            backgroundStyle: .material(material: .regular, tintColorRole: .surfaceTint, tintOpacity: 0.15),
             border: GentleColorPair(lightHex: "#FFFFFF20", darkHex: "#00000020"),
             cornerRadius: 16
         )
@@ -813,7 +812,7 @@ struct MaterialJSONRoundTripTests {
         let decodedCardSpec = decoded.surfaces.roleSpec(for: .card)
         if case .material(let material, let tintColorRole, let tintOpacity) = decodedCardSpec.backgroundStyle {
             #expect(material == .regular)
-            #expect(tintColorRole == .surfaceOverlay)
+            #expect(tintColorRole == .surfaceTint)
             #expect(tintOpacity == 0.15)
         } else {
             Issue.record("Expected material background style")

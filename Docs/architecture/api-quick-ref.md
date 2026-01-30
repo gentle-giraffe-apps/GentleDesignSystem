@@ -303,19 +303,19 @@ callout_ms, subheadline_ms,
 footnote_s, caption_s, caption2_s
 ```
 
-### GentleColorRole (20)
+### GentleColorRole (19)
 ```
 textPrimary, textSecondary, textTertiary,
 textOnPrimaryCTA, textOnDestructive, textOnOverlay, textOnOverlaySecondary,
 textOnScrim, textOnScrimSecondary,
-background, surfaceBase, surfaceCardSecondary, surfaceOverlay, surfaceTint, surfaceSpecular, borderSubtle,
+background, surfaceBase, surfaceCardSecondary, surfaceTint, surfaceScrim, borderSubtle,
 primaryCTA, destructive,
 themePrimary, themeSecondary
 ```
 
 **Semantic Groupings:**
 - `.textRoles` (9) - text/foreground colors
-- `.surfaceRoles` (7) - container/background/border colors
+- `.surfaceRoles` (6) - container/background/border colors
 - `.actionRoles` (2) - interactive element colors
 - `.themeRoles` (2) - brand/accent colors
 

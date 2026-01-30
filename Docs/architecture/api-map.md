@@ -31,8 +31,8 @@ Cases: xxl, xl, l, ml, m, ms, s
 ### GentleColorRole (enum: String, Codable, Sendable, CaseIterable, Identifiable)
 ```
 Cases: textPrimary, textSecondary, textTertiary, textOnPrimaryCTA, textOnDestructive,
-       background, surfaceBase, surfaceCardSecondary, surfaceTint, surfaceSpecular,
-       surfaceOverlay, textOnOverlay, textOnOverlaySecondary, borderSubtle,
+       textOnScrim, textOnScrimSecondary, textOnOverlay, textOnOverlaySecondary,
+       background, surfaceBase, surfaceCardSecondary, surfaceTint, surfaceScrim, borderSubtle,
        destructive, primaryCTA, themePrimary, themeSecondary
 
 var id: String
@@ -499,12 +499,13 @@ var displayName: String
 var swiftUIMaterial: Material?  // iOS 15+
 ```
 
-### GentleSpecularEffect (enum: String, Codable, Sendable, CaseIterable, Identifiable)
+### GentleSurfaceDepthEffect (enum: Codable, Sendable, Equatable)
 ```
-Cases: noEffect, indent, highlight
+Cases: noEffect, highlightAndIndent(strength: CGFloat)
 
-var id: String
 var displayName: String
+var strength: CGFloat
+var hasEffect: Bool
 ```
 
 ### GentleSurfaceBackgroundStyle (enum: Codable, Sendable, Equatable)
@@ -515,13 +516,13 @@ Cases: solid(colorRole: GentleColorRole)
 
 var displayName: String
 var isGlass: Bool
+var isSolid: Bool
 ```
 
 ### GentleSurfaceRoleSpec (struct: Codable, Sendable, Equatable)
 ```
 var backgroundStyle: GentleSurfaceBackgroundStyle
-var specularEffect: GentleSpecularEffect
-var specularStrength: Double
+var surfaceDepthEffect: GentleSurfaceDepthEffect
 var border: GentleColorPair
 var cornerRadius: Double
 var borderWidth: Double
@@ -530,7 +531,7 @@ var shadowOpacity: Double
 var shadowOffsetX: Double
 var shadowOffsetY: Double
 
-init(backgroundStyle:specularEffect:specularStrength:border:cornerRadius:borderWidth:shadowRadius:shadowOpacity:shadowOffsetX:shadowOffsetY:)
+init(backgroundStyle:surfaceDepthEffect:border:cornerRadius:borderWidth:shadowRadius:shadowOpacity:shadowOffsetX:shadowOffsetY:)
 ```
 
 ### GentleSurfaceTokens (struct: Codable, Sendable)

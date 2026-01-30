@@ -292,8 +292,7 @@ GentleDesignSystemSpec
                         │       ├── .solid(colorRole: GentleColorRole)
                         │       ├── .material(material:, tintColorRole:, tintOpacity:)
                         │       └── .glass(fallbackMaterial:, fallbackColorRole:)
-                        ├── specularEffect: GentleSpecularEffect
-                        ├── specularStrength: Double
+                        ├── surfaceDepthEffect: GentleSurfaceDepthEffect
                         ├── border: GentleColorPair
                         ├── cornerRadius: Double
                         ├── borderWidth: Double
@@ -625,7 +624,7 @@ Each role resolves to a `GentleTypographyRoleSpec` containing: `pointSize`, `wei
 | Category | Roles |
 |----------|-------|
 | Text (9) | `textPrimary`, `textSecondary`, `textTertiary`, `textOnPrimaryCTA`, `textOnDestructive`, `textOnOverlay`, `textOnOverlaySecondary`, `textOnScrim`, `textOnScrimSecondary` |
-| Surfaces (7) | `background`, `surfaceBase`, `surfaceCardSecondary`, `surfaceOverlay`, `surfaceTint`, `surfaceSpecular`, `borderSubtle` |
+| Surfaces (6) | `background`, `surfaceBase`, `surfaceCardSecondary`, `surfaceTint`, `surfaceScrim`, `borderSubtle` |
 | Actions (2) | `primaryCTA`, `destructive` |
 | Theme (2) | `themePrimary`, `themeSecondary` |
 

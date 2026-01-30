@@ -16,7 +16,7 @@ Complete mapping of every public type to its file location, kind, and purpose.
 |------|------|-------|---------|
 | `GentleTextRole` | enum | 17 | Typography semantic roles (largeTitle_xxl → caption2_s + 4 button titles) |
 | `GentleTextRamp` | enum | 7 | Size progression: xxl, xl, l, ml, m, ms, s |
-| `GentleColorRole` | enum | 20 | Color semantic roles (text, surface, action, theme, border) |
+| `GentleColorRole` | enum | 19 | Color semantic roles (text, surface, action, theme, border) |
 | `GentleButtonRole` | enum | 5 | Button style intent: primary, secondary, tertiary, quaternary, destructive |
 | `GentleButtonFillRole` | enum | 3 | Button fill: solidFillPrimaryCTA, solidFillDestructive, hollow |
 | `GentleButtonBorderRole` | enum | 3 | Button border: hidden, accent, subtle |
@@ -87,9 +87,9 @@ Complete mapping of every public type to its file location, kind, and purpose.
 |------|------|------------------|---------|
 | `GentleSurfaceRole` | enum | 10: appBackground, card, cardElevated, cardSecondary, chrome, overlaySheet, overlayPopover, overlayScrim, floatingPanel, floatingWidget | Surface semantic roles |
 | `GentleAppleMaterial` | enum | 7: noMaterial, ultraThin, thin, regular, thick, ultraThick, bar | Apple's built-in blur materials |
-| `GentleSpecularEffect` | enum | 3: noEffect, indent, highlight | Specular highlight effects for depth cues |
+| `GentleSurfaceDepthEffect` | enum | 2: noEffect, highlightAndIndent(strength:) | Surface depth effects for visual depth cues |
 | `GentleSurfaceBackgroundStyle` | enum | 3: solid(colorRole: GentleColorRole), material(material:tintColorRole:tintOpacity:), glass(fallbackMaterial:fallbackColorRole:) | Mutually exclusive background rendering styles |
-| `GentleSurfaceRoleSpec` | struct | backgroundStyle, specularEffect, specularStrength, border, cornerRadius, borderWidth, shadow* | Surface style definition |
+| `GentleSurfaceRoleSpec` | struct | backgroundStyle, surfaceDepthEffect, border, cornerRadius, borderWidth, shadow* | Surface style definition |
 | `GentleSurfaceTokens` | struct | roles: [String: GentleSurfaceRoleSpec] | Surface role mapping |
 
 ---

@@ -964,25 +964,41 @@ struct SurfaceRoleEditorSheet: View {
                         }
                     }
 
-                    // Specular section - hidden when glass is selected
+                    // Surface Depth section - hidden when glass is selected
                     if !binding.wrappedValue.backgroundStyle.isGlass {
-                        Section("Specular") {
-                            Picker("Effect", selection: binding.specularEffect) {
-                                ForEach(GentleSpecularEffect.allCases, id: \.self) { effect in
-                                    Text(effect.displayName).tag(effect)
+                        Section("Surface Depth") {
+                            Toggle("Enabled", isOn: Binding(
+                                get: { binding.wrappedValue.surfaceDepthEffect.hasEffect },
+                                set: { enabled in
+                                    if enabled {
+                                        let currentStrength = binding.wrappedValue.surfaceDepthEffect.strength
+                                        let strength = currentStrength > 0 ? currentStrength : 0.1
+                                        binding.wrappedValue.surfaceDepthEffect = .highlightAndIndent(strength: strength)
+                                    } else {
+                                        binding.wrappedValue.surfaceDepthEffect = .noEffect
+                                    }
                                 }
-                            }
+                            ))
 
-                            if binding.specularEffect.wrappedValue != .noEffect {
+                            if binding.wrappedValue.surfaceDepthEffect.hasEffect {
                                 VStack(alignment: .leading, spacing: 6) {
                                     HStack {
                                         Text("Strength")
                                         Spacer()
-                                        Text(String(format: "%.0f%%", binding.specularStrength.wrappedValue * 100))
+                                        Text(String(format: "%.0f%%", binding.wrappedValue.surfaceDepthEffect.strength * 100))
                                             .monospacedDigit()
                                             .foregroundStyle(.secondary)
                                     }
-                                    Slider(value: binding.specularStrength, in: 0...1, step: 0.05)
+                                    Slider(
+                                        value: Binding(
+                                            get: { binding.wrappedValue.surfaceDepthEffect.strength },
+                                            set: { newStrength in
+                                                binding.wrappedValue.surfaceDepthEffect = .highlightAndIndent(strength: newStrength)
+                                            }
+                                        ),
+                                        in: 0...0.2,
+                                        step: 0.01
+                                    )
                                 }
                             }
                         }
@@ -1115,11 +1131,11 @@ struct SurfaceRoleEditorSheet: View {
     private func isOverlayStyle(_ style: GentleSurfaceBackgroundStyle) -> Bool {
         switch style {
         case .solid(let colorRole):
-            return colorRole == .surfaceOverlay
+            return colorRole == .surfaceTint
         case .material(_, let tintColorRole, _):
-            return tintColorRole == .surfaceOverlay
+            return tintColorRole == .surfaceTint
         case .glass(_, let fallbackColorRole):
-            return fallbackColorRole == .surfaceOverlay
+            return fallbackColorRole == .surfaceTint
         }
     }
 
@@ -1280,6 +1296,7 @@ struct SurfaceRoleEditorSheet: View {
             }
         )
     }
+
 }
 
 // MARK: - Surface Color Pair Row

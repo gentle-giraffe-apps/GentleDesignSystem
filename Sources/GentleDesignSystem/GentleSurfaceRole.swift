@@ -122,21 +122,71 @@ public enum GentleAppleMaterial: String, Codable, Sendable, CaseIterable, Identi
     }
 }
 
-// MARK: - Specular Effect
+// MARK: - Surface Depth Effect
 
-/// Specular highlight effect for surface depth cues.
-public enum GentleSpecularEffect: String, Codable, Sendable, CaseIterable, Identifiable {
+/// Surface depth effect for visual depth cues (highlights, indents, edge darkening).
+public enum GentleSurfaceDepthEffect: Codable, Sendable, Equatable {
     case noEffect
-    case indent      // Inset/pressed appearance
-    case highlight   // Raised/lit appearance
-
-    public var id: String { rawValue }
+    case highlightAndIndent(strength: CGFloat)   // Light sweep + indent rim + edge darkening, strength 0.0...1.0
 
     public var displayName: String {
         switch self {
         case .noEffect: return "None"
-        case .indent: return "Indent"
-        case .highlight: return "Highlight"
+        case .highlightAndIndent: return "Highlight & Indent"
+        }
+    }
+
+    /// Returns the strength value, or 0 if noEffect
+    public var strength: CGFloat {
+        switch self {
+        case .noEffect: return 0
+        case .highlightAndIndent(let strength): return strength
+        }
+    }
+
+    /// Returns true if this has a depth effect (regardless of strength)
+    public var hasEffect: Bool {
+        switch self {
+        case .noEffect: return false
+        case .highlightAndIndent: return true
+        }
+    }
+
+    // MARK: - Codable
+
+    private enum CodingKeys: String, CodingKey {
+        case type
+        case strength
+    }
+
+    private enum EffectType: String, Codable {
+        case noEffect
+        case highlightAndIndent
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decode(EffectType.self, forKey: .type)
+
+        switch type {
+        case .noEffect:
+            self = .noEffect
+        case .highlightAndIndent:
+            // Legacy "highlight" type maps to highlightAndIndent
+            let strength = try container.decodeIfPresent(CGFloat.self, forKey: .strength) ?? 0.1
+            self = .highlightAndIndent(strength: strength)
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case .noEffect:
+            try container.encode(EffectType.noEffect, forKey: .type)
+        case .highlightAndIndent(let strength):
+            try container.encode(EffectType.highlightAndIndent, forKey: .type)
+            try container.encode(strength, forKey: .strength)
         }
     }
 }
@@ -234,6 +284,12 @@ public enum GentleSurfaceBackgroundStyle: Codable, Sendable, Equatable {
         if case .glass = self { return true }
         return false
     }
+
+    /// Returns true if this style uses a solid color background
+    public var isSolid: Bool {
+        if case .solid = self { return true }
+        return false
+    }
 }
 
 // MARK: - Surface specs
@@ -243,11 +299,8 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
     /// Background rendering style (solid, material, or glass)
     public var backgroundStyle: GentleSurfaceBackgroundStyle
 
-    /// Specular highlights for depth cues
-    public var specularEffect: GentleSpecularEffect
-
-    /// Specular strength (0.0...1.0)
-    public var specularStrength: Double
+    /// Surface depth effect for visual depth cues (includes strength)
+    public var surfaceDepthEffect: GentleSurfaceDepthEffect
 
     /// Border color
     public var border: GentleColorPair
@@ -272,8 +325,7 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
 
     public init(
         backgroundStyle: GentleSurfaceBackgroundStyle,
-        specularEffect: GentleSpecularEffect = .noEffect,
-        specularStrength: Double = 0,
+        surfaceDepthEffect: GentleSurfaceDepthEffect = .noEffect,
         border: GentleColorPair,
         cornerRadius: Double = 20,
         borderWidth: Double = 1,
@@ -283,8 +335,7 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
         shadowOffsetY: Double = 0
     ) {
         self.backgroundStyle = backgroundStyle
-        self.specularEffect = specularEffect
-        self.specularStrength = specularStrength
+        self.surfaceDepthEffect = surfaceDepthEffect
         self.border = border
         self.cornerRadius = cornerRadius
         self.borderWidth = borderWidth
@@ -296,8 +347,7 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
 
     enum CodingKeys: String, CodingKey {
         case backgroundStyle
-        case specularEffect
-        case specularStrength
+        case surfaceDepthEffect
         case border
         case cornerRadius
         case borderWidth
@@ -310,6 +360,8 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
         case colorRole
         case appleMaterial
         case useGlass
+        case specularEffect    // Legacy - now surfaceDepthEffect
+        case specularStrength  // Legacy - now embedded in surfaceDepthEffect
     }
 
     public init(from decoder: Decoder) throws {
@@ -327,7 +379,7 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
             case .surface:
                 self.backgroundStyle = .solid(colorRole: .surfaceBase)
             case .surfaceOverlay:
-                self.backgroundStyle = .material(material: .regular, tintColorRole: .surfaceOverlay, tintOpacity: 0.1)
+                self.backgroundStyle = .material(material: .regular, tintColorRole: .surfaceTint, tintOpacity: 0.1)
             }
         }
         // Migration: if old flat properties exist (colorRole, appleMaterial, useGlass)
@@ -350,8 +402,19 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
             self.backgroundStyle = .solid(colorRole: .surfaceBase)
         }
 
-        self.specularEffect = try container.decodeIfPresent(GentleSpecularEffect.self, forKey: .specularEffect) ?? .noEffect
-        self.specularStrength = try container.decodeIfPresent(Double.self, forKey: .specularStrength) ?? 0
+        // Try to decode new surfaceDepthEffect format first, with migration from legacy formats
+        if let depthEffect = try? container.decode(GentleSurfaceDepthEffect.self, forKey: .surfaceDepthEffect) {
+            self.surfaceDepthEffect = depthEffect
+        } else if let legacyEffect = try? container.decode(GentleSurfaceDepthEffect.self, forKey: .specularEffect) {
+            // Legacy migration: old key name was specularEffect
+            self.surfaceDepthEffect = legacyEffect
+        } else if let legacyStrength = try? container.decodeIfPresent(Double.self, forKey: .specularStrength),
+                  legacyStrength > 0 {
+            // Legacy migration: had separate specularStrength, assume highlightAndIndent effect
+            self.surfaceDepthEffect = .highlightAndIndent(strength: CGFloat(legacyStrength))
+        } else {
+            self.surfaceDepthEffect = .noEffect
+        }
         self.border = try container.decode(GentleColorPair.self, forKey: .border)
         self.cornerRadius = try container.decodeIfPresent(Double.self, forKey: .cornerRadius) ?? 20
         self.borderWidth = try container.decodeIfPresent(Double.self, forKey: .borderWidth) ?? 1
@@ -364,8 +427,7 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(backgroundStyle, forKey: .backgroundStyle)
-        try container.encode(specularEffect, forKey: .specularEffect)
-        try container.encode(specularStrength, forKey: .specularStrength)
+        try container.encode(surfaceDepthEffect, forKey: .surfaceDepthEffect)
         try container.encode(border, forKey: .border)
         try container.encode(cornerRadius, forKey: .cornerRadius)
         try container.encode(borderWidth, forKey: .borderWidth)
@@ -407,14 +469,14 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.card.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceBase),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.05),
                 border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
                 cornerRadius: 20,
                 borderWidth: 1
             ),
             GentleSurfaceRole.cardElevated.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceBase),
-                specularEffect: .highlight,
-                specularStrength: 0.1,
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.1),
                 border: GentleColorPair(lightHex: "#E5E7EB59", darkHex: "#37415159"),
                 cornerRadius: 20,
                 borderWidth: 0.5,
@@ -424,8 +486,7 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.cardSecondary.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceCardSecondary),
-                specularEffect: .highlight,
-                specularStrength: 0.03,
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.03),
                 border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
                 cornerRadius: 16,
                 borderWidth: 1
@@ -441,9 +502,9 @@ public extension GentleSurfaceTokens {
 
             // Overlays
             GentleSurfaceRole.overlaySheet.rawValue: .init(
-                backgroundStyle: .material(material: .regular, tintColorRole: .surfaceOverlay, tintOpacity: 0.1),
+                backgroundStyle: .material(material: .regular, tintColorRole: .surfaceTint, tintOpacity: 0.1),
                 border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
-                cornerRadius: 32,
+                cornerRadius: 0,
                 borderWidth: 0
             ),
             GentleSurfaceRole.overlayPopover.rawValue: .init(
@@ -456,7 +517,7 @@ public extension GentleSurfaceTokens {
                 shadowOffsetY: 8
             ),
             GentleSurfaceRole.overlayScrim.rawValue: .init(
-                backgroundStyle: .solid(colorRole: .surfaceTint),
+                backgroundStyle: .solid(colorRole: .surfaceScrim),
                 border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
                 cornerRadius: 0,
                 borderWidth: 0
