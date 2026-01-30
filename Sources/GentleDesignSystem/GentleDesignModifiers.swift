@@ -489,77 +489,84 @@ public struct GentleSpecularModifier: ViewModifier {
 
 private extension View {
 
-    // MARK: Phase 1 — Specular Highlight (optical polish, no geometry)
+    // MARK: Phase 1 — Top-Edge Specular Highlight (planar, not convex)
 
     func gentleSpecularHighlight(strength: CGFloat, cornerRadius: CGFloat) -> some View {
         let s = strength.clamped01()
         let k = pow(s, 0.75)
 
-        // Small, stable inset (do NOT scale with strength)
         let inset: CGFloat = min(3.0, max(2.0, cornerRadius * 0.08))
+        let bandHeight: CGFloat = 10 // fixed optical band
 
         let highlight = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
             .fill(
                 LinearGradient(
                     colors: [
-                        Color.white.opacity(0.08 + 0.20 * k),
-                        Color.white.opacity(0.02 + 0.06 * k),
+                        Color.white.opacity(0.05 + 0.12 * k),
+                        Color.white.opacity(0.01 + 0.03 * k),
                         Color.clear
                     ],
-                    startPoint: .topLeading,
-                    endPoint: .center
+                    startPoint: .top,
+                    endPoint: .bottom
                 )
             )
             .blendMode(.screen)
-            .opacity(0.95)
+            .opacity(0.90)
 
         return overlay(
             highlight
                 .mask(
-                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                        .inset(by: inset)
+                    ZStack(alignment: .top) {
+                        // Shape mask
+                        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                            .inset(by: inset)
+
+                        // Top band limiter
+                        Rectangle()
+                            .frame(height: bandHeight)
+                    }
                 )
                 .allowsHitTesting(false)
         )
     }
 
-    // MARK: Phase 2 — Indent Rim (inner bevel)
+
+    // MARK: Phase 2 — Neutral Inner Rim (no diagonal press cue)
 
     func gentleIndentRim(strength: CGFloat, cornerRadius: CGFloat) -> some View {
         let s = strength.clamped01()
         let k = pow(s, 0.85)
 
-        let lineWidth: CGFloat = 2.0 // geometry is constant
+        let lineWidth: CGFloat = 2.0
 
         return overlay(
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .strokeBorder(
                     LinearGradient(
                         colors: [
-                            // keep TL light subtle — do NOT blow out on light cards
-                            Color.white.opacity(0.06 + 0.10 * k),
-                            Color.clear,
-                            Color.black.opacity(0.14 + 0.18 * k)
+                            Color.white.opacity(0.03 + 0.06 * k),
+                            Color.white.opacity(0.01 + 0.02 * k),
+                            Color.black.opacity(0.06 + 0.08 * k)
                         ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+                        startPoint: .top,
+                        endPoint: .bottom
                     ),
                     lineWidth: lineWidth
                 )
-                .blendMode(.overlay)
-                .opacity(0.85)
+                .blendMode(.softLight)
+                .opacity(0.80)
                 .allowsHitTesting(false)
         )
     }
 
-    // MARK: Phase 2.5 — Top-left Occlusion Wedge (corner readability fix)
+    // MARK: Phase 2.5 — Top-Left Ambient Occlusion (micro depth)
 
     func gentleTopLeftOcclusion(strength: CGFloat, cornerRadius: CGFloat) -> some View {
         let s = strength.clamped01()
         let k = pow(s, 0.65)
 
-        let band: CGFloat = 3 // fixed bezel band
-        let dark = 0.04 + 0.14 * k
+        let band: CGFloat = 3
+        let dark = 0.03 + 0.10 * k
 
         return overlay(
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
@@ -583,7 +590,7 @@ private extension View {
         )
     }
 
-    // MARK: Phase 2.8 — Edge Keyline (guaranteed separation)
+    // MARK: Phase 2.8 — Edge Keyline (separation, non-interactive)
 
     func gentleEdgeKeyline(strength: CGFloat, cornerRadius: CGFloat) -> some View {
         let s = strength.clamped01()
@@ -592,7 +599,7 @@ private extension View {
         return overlay(
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .strokeBorder(
-                    Color.black.opacity(0.04 + 0.08 * k),
+                    Color.black.opacity(0.05 + 0.10 * k),
                     lineWidth: 1
                 )
                 .blendMode(.multiply)
@@ -600,11 +607,10 @@ private extension View {
         )
     }
 
-    // MARK: Phase 3 — Inner Edge Darkening (global recess cue)
-
+    // MARK: Phase 3 — Subtle Inner Edge Darkening (planar depth)
     func gentleInnerEdgeDarkening(strength: CGFloat, cornerRadius: CGFloat) -> some View {
         let s = strength.clamped01()
-        let k = pow(s, 0.80)
+        let k = pow(s, 0.85)
 
         return overlay(
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
@@ -612,19 +618,21 @@ private extension View {
                     RadialGradient(
                         colors: [
                             Color.clear,
-                            Color.black.opacity(0.10 + 0.22 * k)
+                            Color.black.opacity(0.03 + 0.05 * k) // MUCH lower
                         ],
                         center: .center,
-                        startRadius: 40,
-                        endRadius: 260
+                        startRadius: 140,  // push outward
+                        endRadius: 520
                     )
                 )
                 .blendMode(.multiply)
-                .opacity(0.55)
+                .opacity(0.18) // was 0.30
                 .allowsHitTesting(false)
         )
     }
+
 }
+
 
 // MARK: - CGFloat Clamping Helper
 

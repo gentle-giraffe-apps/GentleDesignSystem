@@ -996,8 +996,8 @@ struct SurfaceRoleEditorSheet: View {
                                                 binding.wrappedValue.specularEffect = .highlightAndIndent(strength: newStrength)
                                             }
                                         ),
-                                        in: 0...1,
-                                        step: 0.05
+                                        in: 0...0.2,
+                                        step: 0.01
                                     )
                                 }
                             }
