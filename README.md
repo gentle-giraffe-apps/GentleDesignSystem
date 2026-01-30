@@ -1,4 +1,4 @@
-<img src="Docs/README_assets/gentle_design_system.png" alt="Gentle Design System" width="600" />
+![Gentle Design System](Docs/README_assets/gentle_design.png)
 
 [![CI](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml)
 [![Swift](https://img.shields.io/badge/Swift-6.0–6.2-orange.svg)](https://swift.org)
