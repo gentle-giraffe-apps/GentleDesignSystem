@@ -105,7 +105,6 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.cardElevated.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceBase),
-                surfaceDepthEffect: .highlightAndIndent(strength: 0.06),
                 border: GentleColorPair(lightHex: "#E0E0E840", darkHex: "#3A3A4E40"),
                 cornerRadius: 12,
                 borderWidth: 0.5,
@@ -344,6 +343,7 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.card.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceBase),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.02),
                 border: GentleColorPair(lightHex: "#C4DCF0", darkHex: "#1E4060"),
                 cornerRadius: 6,
                 borderWidth: 1
@@ -589,6 +589,7 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.card.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceBase),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.03),
                 border: GentleColorPair(lightHex: "#C4DCD0", darkHex: "#2D4D3D"),
                 cornerRadius: 8,
                 borderWidth: 1

@@ -469,6 +469,7 @@ public extension GentleSurfaceTokens {
             ),
             GentleSurfaceRole.card.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceBase),
+                surfaceDepthEffect: .highlightAndIndent(strength: 0.05),
                 border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
                 cornerRadius: 20,
                 borderWidth: 1
