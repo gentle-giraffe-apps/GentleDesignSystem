@@ -1,8 +1,4 @@
-# GentleDesignSystem
-
-A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to feel *native*, *predictable*, and *composable*, while giving you a centralized way to evolve typography, color, spacing, and surface behavior over time.
-
-**Who is this for?** Apps that want a strong SwiftUI foundation and theme evolution without rewriting view code.
+<img src="Docs/README_assets/gentle_design_system.png" alt="Gentle Design System" width="600" />
 
 [![CI](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml)
 [![Swift](https://img.shields.io/badge/Swift-6.0–6.2-orange.svg)](https://swift.org)
@@ -24,6 +20,10 @@ A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to fe
     alt="Codecov coverage history icicle chart"
   />
 </a>
+
+A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to feel *native*, *predictable*, and *composable*, while giving you a centralized way to evolve typography, color, spacing, and surface behavior over time.
+
+**Who is this for?** Apps that want a strong SwiftUI foundation and theme evolution without rewriting view code.
 
 ### TLDR
 
