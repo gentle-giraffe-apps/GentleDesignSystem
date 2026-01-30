@@ -379,7 +379,7 @@ public struct GentleSurfaceRoleSpec: Codable, Sendable, Equatable {
             case .surface:
                 self.backgroundStyle = .solid(colorRole: .surfaceBase)
             case .surfaceOverlay:
-                self.backgroundStyle = .material(material: .regular, tintColorRole: .surfaceOverlay, tintOpacity: 0.1)
+                self.backgroundStyle = .material(material: .regular, tintColorRole: .surfaceTint, tintOpacity: 0.1)
             }
         }
         // Migration: if old flat properties exist (colorRole, appleMaterial, useGlass)
@@ -501,9 +501,9 @@ public extension GentleSurfaceTokens {
 
             // Overlays
             GentleSurfaceRole.overlaySheet.rawValue: .init(
-                backgroundStyle: .material(material: .regular, tintColorRole: .surfaceOverlay, tintOpacity: 0.1),
+                backgroundStyle: .material(material: .regular, tintColorRole: .surfaceTint, tintOpacity: 0.1),
                 border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
-                cornerRadius: 32,
+                cornerRadius: 0,
                 borderWidth: 0
             ),
             GentleSurfaceRole.overlayPopover.rawValue: .init(
@@ -516,7 +516,7 @@ public extension GentleSurfaceTokens {
                 shadowOffsetY: 8
             ),
             GentleSurfaceRole.overlayScrim.rawValue: .init(
-                backgroundStyle: .solid(colorRole: .surfaceTint),
+                backgroundStyle: .solid(colorRole: .surfaceScrim),
                 border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
                 cornerRadius: 0,
                 borderWidth: 0

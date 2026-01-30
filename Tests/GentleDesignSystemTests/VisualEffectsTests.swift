@@ -643,7 +643,7 @@ struct GentleSurfaceRoleSpecTests {
     @Test("Surface role spec with material is codable")
     func testSurfaceRoleSpecWithMaterialCodable() throws {
         let original = GentleSurfaceRoleSpec(
-            backgroundStyle: .material(material: .thick, tintColorRole: .surfaceOverlay, tintOpacity: 0.1),
+            backgroundStyle: .material(material: .thick, tintColorRole: .surfaceTint, tintOpacity: 0.1),
             border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000")
         )
 
@@ -655,7 +655,7 @@ struct GentleSurfaceRoleSpecTests {
 
         if case .material(let material, let tintColorRole, let tintOpacity) = decoded.backgroundStyle {
             #expect(material == .thick)
-            #expect(tintColorRole == .surfaceOverlay)
+            #expect(tintColorRole == .surfaceTint)
             #expect(tintOpacity == 0.1)
         } else {
             Issue.record("Expected material background style")
@@ -801,7 +801,7 @@ struct MaterialJSONRoundTripTests {
 
         // Replace card with a material background style
         spec.surfaces.roles[GentleSurfaceRole.card.rawValue] = GentleSurfaceRoleSpec(
-            backgroundStyle: .material(material: .regular, tintColorRole: .surfaceOverlay, tintOpacity: 0.15),
+            backgroundStyle: .material(material: .regular, tintColorRole: .surfaceTint, tintOpacity: 0.15),
             border: GentleColorPair(lightHex: "#FFFFFF20", darkHex: "#00000020"),
             cornerRadius: 16
         )
@@ -812,7 +812,7 @@ struct MaterialJSONRoundTripTests {
         let decodedCardSpec = decoded.surfaces.roleSpec(for: .card)
         if case .material(let material, let tintColorRole, let tintOpacity) = decodedCardSpec.backgroundStyle {
             #expect(material == .regular)
-            #expect(tintColorRole == .surfaceOverlay)
+            #expect(tintColorRole == .surfaceTint)
             #expect(tintOpacity == 0.15)
         } else {
             Issue.record("Expected material background style")

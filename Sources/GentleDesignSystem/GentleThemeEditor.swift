@@ -1131,11 +1131,11 @@ struct SurfaceRoleEditorSheet: View {
     private func isOverlayStyle(_ style: GentleSurfaceBackgroundStyle) -> Bool {
         switch style {
         case .solid(let colorRole):
-            return colorRole == .surfaceOverlay
+            return colorRole == .surfaceTint
         case .material(_, let tintColorRole, _):
-            return tintColorRole == .surfaceOverlay
+            return tintColorRole == .surfaceTint
         case .glass(_, let fallbackColorRole):
-            return fallbackColorRole == .surfaceOverlay
+            return fallbackColorRole == .surfaceTint
         }
     }
 

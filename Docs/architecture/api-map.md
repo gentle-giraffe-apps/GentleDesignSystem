@@ -31,8 +31,8 @@ Cases: xxl, xl, l, ml, m, ms, s
 ### GentleColorRole (enum: String, Codable, Sendable, CaseIterable, Identifiable)
 ```
 Cases: textPrimary, textSecondary, textTertiary, textOnPrimaryCTA, textOnDestructive,
-       background, surfaceBase, surfaceCardSecondary, surfaceTint, surfaceSpecular,
-       surfaceOverlay, textOnOverlay, textOnOverlaySecondary, borderSubtle,
+       textOnScrim, textOnScrimSecondary, textOnOverlay, textOnOverlaySecondary,
+       background, surfaceBase, surfaceCardSecondary, surfaceTint, surfaceScrim, borderSubtle,
        destructive, primaryCTA, themePrimary, themeSecondary
 
 var id: String

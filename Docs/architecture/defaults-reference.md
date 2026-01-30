@@ -117,8 +117,7 @@ All `.gentleDefault` values in one place.
 | `surfaceBase` | #FAFAFE | #111827 | Card/container background |
 | `surfaceCardSecondary` | #F4F6FE | #151D30 | Nested/secondary card background (tinted surfaceBase) |
 | `surfaceTint` | #111827CC | #020617CC | Surface tint overlay |
-| `surfaceSpecular` | #FFFFFF66 | #FFFFFF33 | Specular highlight |
-| `surfaceOverlay` | #111827CC | #020617CC | Modal overlay |
+| `surfaceScrim` | #000000B3 | #000000B3 | Dark scrim background |
 | `textOnOverlay` | #1F2933 | #F5F7FA | Primary text on overlay (adaptive) |
 | `textOnOverlaySecondary` | #4B5563 | #C7CDD4 | Secondary text on overlay (adaptive) |
 | `textOnScrim` | #FFFFFF | #FFFFFF | Primary text on dark scrim |
