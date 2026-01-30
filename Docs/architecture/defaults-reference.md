@@ -121,6 +121,8 @@ All `.gentleDefault` values in one place.
 | `surfaceOverlay` | #111827CC | #020617CC | Modal overlay |
 | `textOnOverlay` | #1F2933 | #F5F7FA | Primary text on overlay (adaptive) |
 | `textOnOverlaySecondary` | #4B5563 | #C7CDD4 | Secondary text on overlay (adaptive) |
+| `textOnScrim` | #FFFFFF | #FFFFFF | Primary text on dark scrim |
+| `textOnScrimSecondary` | #C7CDD4 | #C7CDD4 | Secondary text on dark scrim |
 | `borderSubtle` | #E5E7EB | #374151 | Subtle borders |
 | `primaryCTA` | #4A6EF5 | #3B82F6 | Primary action color |
 | `textOnPrimaryCTA` | #FFFFFF | #FFFFFF | Text on primary CTA |
@@ -167,6 +169,7 @@ All `.gentleDefault` values in one place.
 | `chrome` | material(ultraThin) | transparent | 0 | 0 | 0 | 0 | 0 |
 | `overlaySheet` | material(regular, tint: surfaceOverlay) | transparent | 32 | 0 | 0 | 0 | 0 |
 | `overlayPopover` | material(regular, tint: surfaceBase) | #E5E7EB30 / #37415130 | 14 | 0.5 | 16 | 0.15 | 8 |
+| `overlayScrim` | solid(surfaceTint) | transparent | 0 | 0 | 0 | 0 | 0 |
 | `floatingPanel` | glass(fallback: regular) | #FFFFFF20 / #FFFFFF10 | 20 | 0.5 | 24 | 0.2 | 12 |
 | `floatingWidget` | glass(fallback: thick) | transparent | 24 | 0 | 8 | 0.1 | 4 |
 

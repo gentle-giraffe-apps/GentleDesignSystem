@@ -43,6 +43,40 @@ public enum GentlePDFExporter {
     /// Gentle dark blue at 70% opacity for all role/token labels
     private static let labelColor = UIColor(red: 0.2, green: 0.3, blue: 0.5, alpha: 0.7)
 
+    /// Returns the appropriate primary text color for displaying text on a given surface
+    private static func textColor(for surfaceRole: GentleSurfaceRole, spec: GentleDesignSystemSpec, scheme: ColorScheme) -> UIColor {
+        let colorRole: GentleColorRole
+        switch surfaceRole {
+        case .overlayScrim:
+            colorRole = .textOnScrim
+        case .overlaySheet, .overlayPopover:
+            colorRole = .textOnOverlay
+        default:
+            return labelColor
+        }
+        let hex = scheme == .dark
+            ? spec.colors.pairByRole[colorRole.rawValue]?.darkHex
+            : spec.colors.pairByRole[colorRole.rawValue]?.lightHex
+        return hex.map { uiColorFromHex($0) } ?? labelColor
+    }
+
+    /// Returns the appropriate secondary text color for displaying text on a given surface
+    private static func secondaryTextColor(for surfaceRole: GentleSurfaceRole, spec: GentleDesignSystemSpec, scheme: ColorScheme) -> UIColor {
+        let colorRole: GentleColorRole
+        switch surfaceRole {
+        case .overlayScrim:
+            colorRole = .textOnScrimSecondary
+        case .overlaySheet, .overlayPopover:
+            colorRole = .textOnOverlaySecondary
+        default:
+            return labelColor
+        }
+        let hex = scheme == .dark
+            ? spec.colors.pairByRole[colorRole.rawValue]?.darkHex
+            : spec.colors.pairByRole[colorRole.rawValue]?.lightHex
+        return hex.map { uiColorFromHex($0) } ?? labelColor
+    }
+
     // MARK: - Public API
 
     /// Generates PDF data for the given design system spec on a single sheet.
@@ -409,6 +443,10 @@ public enum GentlePDFExporter {
         }
 
         // Role name - with minimum scale factor
+        // Use appropriate text color based on surface type (overlay surfaces need special colors)
+        let primaryTextColor = textColor(for: role, spec: spec, scheme: .light)
+        let secondaryTextColor = secondaryTextColor(for: role, spec: spec, scheme: .light)
+
         let labelInset: CGFloat = 16
         let availableWidth = rect.width - labelInset * 2
         let baseLabelFontSize: CGFloat = 12
@@ -418,7 +456,7 @@ public enum GentlePDFExporter {
         var labelFont = UIFont.systemFont(ofSize: labelFontSize, weight: .medium)
         var labelAttrs: [NSAttributedString.Key: Any] = [
             .font: labelFont,
-            .foregroundColor: Self.labelColor
+            .foregroundColor: primaryTextColor
         ]
         var labelString = NSAttributedString(string: role.rawValue, attributes: labelAttrs)
         var labelSize = labelString.size()
@@ -448,7 +486,7 @@ public enum GentlePDFExporter {
         let subtitleFont = UIFont.systemFont(ofSize: 10, weight: .regular)
         let subtitleAttrs: [NSAttributedString.Key: Any] = [
             .font: subtitleFont,
-            .foregroundColor: Self.labelColor
+            .foregroundColor: secondaryTextColor
         ]
         let subtitleString = NSAttributedString(string: subtitle, attributes: subtitleAttrs)
         subtitleString.draw(at: CGPoint(x: rect.minX + labelInset, y: rect.minY + 10 + labelFont.lineHeight + 1))
