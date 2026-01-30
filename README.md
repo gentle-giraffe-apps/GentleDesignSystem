@@ -13,17 +13,9 @@
 ![Commit activity](https://img.shields.io/github/commit-activity/y/gentle-giraffe-apps/GentleDesignSystem)
 ![Last commit](https://img.shields.io/github/last-commit/gentle-giraffe-apps/GentleDesignSystem)
 
-<sub><strong>Codecov Snapshot</strong></sub><br/>
-<a href="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem">
-  <img
-    src="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/graphs/icicle.svg"
-    height="72"
-    style="max-width: 420px;"
-    alt="Codecov coverage history icicle chart"
-  />
-</a>
-
-A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to feel *native*, *predictable*, and *composable*, while giving you a centralized way to evolve typography, color, spacing, and surface behavior over time.
+<p>
+  A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to feel native, predictable, and composable, while giving you a centralized way to evolve typography, color, spacing, and surface behavior over time.
+</p>
 
 **Who is this for?** Apps that want a strong SwiftUI foundation and theme evolution without rewriting view code.
 
@@ -51,6 +43,16 @@ VStack {
 **See it in action:** Open `Demo/GentleDesignSystemDemo.xcodeproj` to explore the components. The demo app also supports editing and sharing JSON specs via the system Share Sheet.
 
 ---
+
+<sub><strong>Codecov Snapshot</strong></sub><br/>
+<a href="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem">
+  <img
+    src="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/graphs/icicle.svg"
+    height="72"
+    style="max-width: 420px;"
+    alt="Codecov coverage history icicle chart"
+  />
+</a>
 
 ## Quick Start
 
