@@ -13,14 +13,6 @@
 ![Commit activity](https://img.shields.io/github/commit-activity/y/gentle-giraffe-apps/GentleDesignSystem)
 ![Last commit](https://img.shields.io/github/last-commit/gentle-giraffe-apps/GentleDesignSystem)
 
-**A token-driven SwiftUI design system**  
-Built for Dark Mode + Dynamic Type — native, predictable, and composable.
-
-Centralize typography, color, spacing, and surface behavior, and evolve your app’s look over time—without rewriting view code.
-
-**Built for**  
-Apps that want a strong SwiftUI foundation with long-term theme evolution.
-
 ### TLDR
 
 Quickly standardize text, buttons, and surfaces with a unified design system.
@@ -37,6 +29,10 @@ VStack {
 }
 .gentleSurface(.card)
 ```
+
+### Built for
+
+Apps that want a strong SwiftUI foundation with long-term theme evolution.
 
 💬 **[Join the discussion. Feedback and questions welcome](https://github.com/gentle-giraffe-apps/GentleDesignSystem/discussions)**
 
