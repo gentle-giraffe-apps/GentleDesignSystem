@@ -1,6 +1,6 @@
 <img align="right" src="Docs/README_assets/Typography.gif" width="360" />
 
-![Gentle Design System](Docs/README_assets/gentle_design.png)
+<img src="Docs/README_assets/gentle_design.png" width="400" />
 
 [![CI](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml)
 [![Swift](https://img.shields.io/badge/Swift-6.0–6.2-orange.svg)](https://swift.org)
