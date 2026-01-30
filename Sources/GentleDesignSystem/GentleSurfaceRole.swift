@@ -15,6 +15,7 @@ public enum GentleSurfaceRole: String, Codable, Sendable, CaseIterable {
     // Overlays
     case overlaySheet       // Modal sheets - regular material or glass
     case overlayPopover     // Menus, popovers, dropdowns - regular material
+    case overlayScrim       // Dark scrim for contrast/labels - solid dark, no border
 
     // Floating
     case floatingPanel      // Picture-in-picture, floating panels - glass
@@ -30,6 +31,7 @@ public enum GentleSurfaceRole: String, Codable, Sendable, CaseIterable {
         case .chrome: return "Chrome"
         case .overlaySheet: return "Overlay Sheet"
         case .overlayPopover: return "Overlay Popover"
+        case .overlayScrim: return "Overlay Scrim"
         case .floatingPanel: return "Floating Panel"
         case .floatingWidget: return "Floating Widget"
         }
@@ -45,6 +47,7 @@ public enum GentleSurfaceRole: String, Codable, Sendable, CaseIterable {
         case .chrome: return "Nav bars, toolbars"
         case .overlaySheet: return "Modal sheets"
         case .overlayPopover: return "Menus, popovers"
+        case .overlayScrim: return "Dark contrast band"
         case .floatingPanel: return "Floating panels"
         case .floatingWidget: return "Widget style"
         }
@@ -57,7 +60,7 @@ public enum GentleSurfaceRole: String, Codable, Sendable, CaseIterable {
             return .structure
         case .chrome:
             return .chrome
-        case .overlaySheet, .overlayPopover:
+        case .overlaySheet, .overlayPopover, .overlayScrim:
             return .overlay
         case .floatingPanel, .floatingWidget:
             return .floating
@@ -451,6 +454,12 @@ public extension GentleSurfaceTokens {
                 shadowRadius: 16,
                 shadowOpacity: 0.15,
                 shadowOffsetY: 8
+            ),
+            GentleSurfaceRole.overlayScrim.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceTint),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
             ),
 
             // Floating

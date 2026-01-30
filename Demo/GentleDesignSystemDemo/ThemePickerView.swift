@@ -705,6 +705,7 @@ struct ThemePresetCard: View {
 
     private func surfacePreview(role: GentleSurfaceRole, label: String) -> some View {
         let cornerRadius = theme.surfaces.roleSpec(for: role).cornerRadius
+        let textColorRole = textColorRole(for: role)
         return VStack(spacing: 4) {
             ZStack {
                 ColorfulStripesBackground(baseColor: theme.color(for: .themePrimary, scheme: colorScheme))
@@ -713,6 +714,12 @@ struct ThemePresetCard: View {
                 RoundedRectangle(cornerRadius: cornerRadius)
                     .fill(.clear)
                     .gentleSurface(role)
+
+                // Text sample on the surface using appropriate color
+                Text("Aa")
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundStyle(theme.color(for: textColorRole, scheme: colorScheme))
             }
             .frame(height: 40)
             Text(label)
@@ -726,6 +733,18 @@ struct ThemePresetCard: View {
                 )
         }
         .frame(maxWidth: .infinity)
+    }
+
+    /// Returns the appropriate text color role for displaying text on a given surface
+    private func textColorRole(for surfaceRole: GentleSurfaceRole) -> GentleColorRole {
+        switch surfaceRole {
+        case .overlayScrim:
+            return .textOnScrim
+        case .overlaySheet, .overlayPopover:
+            return .textOnOverlay
+        default:
+            return .textPrimary
+        }
     }
 
     private var surfaceChips: some View {

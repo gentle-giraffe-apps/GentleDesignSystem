@@ -63,6 +63,12 @@ public extension GentleSurfaceTokens {
                 shadowOpacity: 0.15,
                 shadowOffsetY: 8
             ),
+            GentleSurfaceRole.overlayScrim.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceTint),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
+            ),
             GentleSurfaceRole.floatingPanel.rawValue: .init(
                 backgroundStyle: .glass(fallbackMaterial: .thick, fallbackColorRole: .surfaceBase),
                 border: GentleColorPair(lightHex: "#FFFFFF30", darkHex: "#FFFFFF15"),
@@ -137,6 +143,12 @@ public extension GentleSurfaceTokens {
                 shadowRadius: 12,
                 shadowOpacity: 0.1,
                 shadowOffsetY: 6
+            ),
+            GentleSurfaceRole.overlayScrim.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceTint),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
             ),
             GentleSurfaceRole.floatingPanel.rawValue: .init(
                 backgroundStyle: .glass(fallbackMaterial: .regular, fallbackColorRole: .surfaceBase),
@@ -217,6 +229,12 @@ public extension GentleSurfaceTokens {
                 shadowOpacity: 0.1,
                 shadowOffsetY: 10
             ),
+            GentleSurfaceRole.overlayScrim.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceTint),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
+            ),
             GentleSurfaceRole.floatingPanel.rawValue: .init(
                 backgroundStyle: .glass(fallbackMaterial: .regular, fallbackColorRole: .surfaceBase),
                 border: GentleColorPair(lightHex: "#FFFFFF25", darkHex: "#FFFFFF12"),
@@ -291,6 +309,12 @@ public extension GentleSurfaceTokens {
                 shadowOpacity: 0.2,
                 shadowOffsetX: 4,
                 shadowOffsetY: 4
+            ),
+            GentleSurfaceRole.overlayScrim.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceTint),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
             ),
             GentleSurfaceRole.floatingPanel.rawValue: .init(
                 backgroundStyle: .solid(colorRole: .surfaceBase),
@@ -371,6 +395,12 @@ public extension GentleSurfaceTokens {
                 shadowOpacity: 0.12,
                 shadowOffsetY: 4
             ),
+            GentleSurfaceRole.overlayScrim.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceTint),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
+            ),
             GentleSurfaceRole.floatingPanel.rawValue: .init(
                 backgroundStyle: .glass(fallbackMaterial: .regular, fallbackColorRole: .surfaceBase),
                 border: GentleColorPair(lightHex: "#C4DCF0", darkHex: "#1E4060"),
@@ -449,6 +479,12 @@ public extension GentleSurfaceTokens {
                 shadowRadius: 20,
                 shadowOpacity: 0.25,
                 shadowOffsetY: 10
+            ),
+            GentleSurfaceRole.overlayScrim.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceTint),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
             ),
             GentleSurfaceRole.floatingPanel.rawValue: .init(
                 backgroundStyle: .glass(fallbackMaterial: .thick, fallbackColorRole: .surfaceBase),
@@ -529,6 +565,12 @@ public extension GentleSurfaceTokens {
                 shadowOpacity: 0.08,
                 shadowOffsetY: 12
             ),
+            GentleSurfaceRole.overlayScrim.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceTint),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
+            ),
             GentleSurfaceRole.floatingPanel.rawValue: .init(
                 backgroundStyle: .glass(fallbackMaterial: .thin, fallbackColorRole: .surfaceBase),
                 border: GentleColorPair(lightHex: "#FFFFFF15", darkHex: "#FFFFFF08"),
@@ -606,6 +648,12 @@ public extension GentleSurfaceTokens {
                 shadowOpacity: 0.1,
                 shadowOffsetY: 4
             ),
+            GentleSurfaceRole.overlayScrim.rawValue: .init(
+                backgroundStyle: .solid(colorRole: .surfaceTint),
+                border: GentleColorPair(lightHex: "#00000000", darkHex: "#00000000"),
+                cornerRadius: 0,
+                borderWidth: 0
+            ),
             GentleSurfaceRole.floatingPanel.rawValue: .init(
                 backgroundStyle: .glass(fallbackMaterial: .regular, fallbackColorRole: .surfaceBase),
                 border: GentleColorPair(lightHex: "#FFFFFF18", darkHex: "#FFFFFF0C"),
@@ -653,6 +701,8 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.textOnPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#1A1610"),
             GentleColorRole.destructive.rawValue:    .init(lightHex: "#A0522D", darkHex: "#E07850"),
             GentleColorRole.textOnDestructive.rawValue:  .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnScrim.rawValue:    .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnScrimSecondary.rawValue: .init(lightHex: "#C7CDD4", darkHex: "#C7CDD4"),
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#8B4513", darkHex: "#CD853F"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#B8860B", darkHex: "#DAA520"),
         ])
@@ -726,6 +776,8 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.textOnPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#0D0D14"),
             GentleColorRole.destructive.rawValue:    .init(lightHex: "#E03131", darkHex: "#FF6B6B"),
             GentleColorRole.textOnDestructive.rawValue:  .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnScrim.rawValue:    .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnScrimSecondary.rawValue: .init(lightHex: "#C7CDD4", darkHex: "#C7CDD4"),
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#3B5BDB", darkHex: "#5C7CFA"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#748FFC", darkHex: "#91A7FF"),
         ])
@@ -799,6 +851,8 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.textOnPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#0D1F18"),
             GentleColorRole.destructive.rawValue:    .init(lightHex: "#D9534F", darkHex: "#FF6B6B"),
             GentleColorRole.textOnDestructive.rawValue:  .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnScrim.rawValue:    .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnScrimSecondary.rawValue: .init(lightHex: "#C7CDD4", darkHex: "#C7CDD4"),
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#2E8B6E", darkHex: "#4ADE9F"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#6FCF97", darkHex: "#7EEAB8"),
         ])
@@ -884,6 +938,8 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.textOnPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#000000"),
             GentleColorRole.destructive.rawValue:    .init(lightHex: "#B91C1C", darkHex: "#F87171"),
             GentleColorRole.textOnDestructive.rawValue:  .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnScrim.rawValue:    .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnScrimSecondary.rawValue: .init(lightHex: "#C7CDD4", darkHex: "#C7CDD4"),
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#000000", darkHex: "#FFFFFF"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#666666", darkHex: "#999999"),
         ])
@@ -965,6 +1021,8 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.textOnPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#061623"),
             GentleColorRole.destructive.rawValue:    .init(lightHex: "#D64545", darkHex: "#FF7070"),
             GentleColorRole.textOnDestructive.rawValue:  .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnScrim.rawValue:    .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnScrimSecondary.rawValue: .init(lightHex: "#C7CDD4", darkHex: "#C7CDD4"),
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#0066CC", darkHex: "#4DA6FF"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#4D94DB", darkHex: "#80C0FF"),
         ])
@@ -1042,6 +1100,8 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.textOnPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#1A0D06"),
             GentleColorRole.destructive.rawValue:    .init(lightHex: "#CC3300", darkHex: "#FF6644"),
             GentleColorRole.textOnDestructive.rawValue:  .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnScrim.rawValue:    .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnScrimSecondary.rawValue: .init(lightHex: "#C7CDD4", darkHex: "#C7CDD4"),
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#E85D04", darkHex: "#FF8C42"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#F5A060", darkHex: "#FFB87A"),
         ])
@@ -1119,6 +1179,8 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.textOnPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#120D1F"),
             GentleColorRole.destructive.rawValue:    .init(lightHex: "#D946EF", darkHex: "#F472B6"),
             GentleColorRole.textOnDestructive.rawValue:  .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnScrim.rawValue:    .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnScrimSecondary.rawValue: .init(lightHex: "#C7CDD4", darkHex: "#C7CDD4"),
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#7C4DFF", darkHex: "#A580FF"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#B388FF", darkHex: "#C9A0FF"),
         ])
@@ -1196,6 +1258,8 @@ public extension GentleDesignSystemSpec {
             GentleColorRole.textOnPrimaryCTA.rawValue:   .init(lightHex: "#FFFFFF", darkHex: "#0D1A14"),
             GentleColorRole.destructive.rawValue:    .init(lightHex: "#B91C1C", darkHex: "#F87171"),
             GentleColorRole.textOnDestructive.rawValue:  .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnScrim.rawValue:    .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnScrimSecondary.rawValue: .init(lightHex: "#C7CDD4", darkHex: "#C7CDD4"),
             GentleColorRole.themePrimary.rawValue:   .init(lightHex: "#166534", darkHex: "#4ADE80"),
             GentleColorRole.themeSecondary.rawValue: .init(lightHex: "#22C55E", darkHex: "#86EFAC"),
         ])

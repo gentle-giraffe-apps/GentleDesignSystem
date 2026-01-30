@@ -92,6 +92,7 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
 
     case textPrimary, textSecondary, textTertiary
     case textOnPrimaryCTA, textOnDestructive
+    case textOnScrim, textOnScrimSecondary
     case background, surfaceBase, surfaceCardSecondary
     case surfaceTint, surfaceSpecular
     case surfaceOverlay, textOnOverlay, textOnOverlaySecondary
@@ -107,6 +108,8 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
         case .textTertiary: return "Text Tertiary"
         case .textOnPrimaryCTA: return "Text On Primary CTA"
         case .textOnDestructive: return "Text On Destructive"
+        case .textOnScrim: return "Text On Scrim"
+        case .textOnScrimSecondary: return "Text On Scrim Secondary"
         case .background: return "Background"
         case .surfaceBase: return "Surface Base"
         case .surfaceCardSecondary: return "Surface Card Secondary"
@@ -129,6 +132,7 @@ public enum GentleColorRole: String, Codable, Sendable, CaseIterable, Identifiab
     public static let textRoles: [GentleColorRole] = [
         .textPrimary, .textSecondary, .textTertiary,
         .textOnPrimaryCTA, .textOnDestructive,
+        .textOnScrim, .textOnScrimSecondary,
         .textOnOverlay, .textOnOverlaySecondary
     ]
 
@@ -456,6 +460,8 @@ public extension GentleColorTokens {
             // Actions / status
             GentleColorRole.primaryCTA.rawValue: .init(lightHex: "#4A6EF5", darkHex: "#3B82F6"),
             GentleColorRole.textOnPrimaryCTA.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnScrim.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
+            GentleColorRole.textOnScrimSecondary.rawValue: .init(lightHex: "#C7CDD4", darkHex: "#C7CDD4"),
             GentleColorRole.destructive.rawValue: .init(lightHex: "#E35D5B", darkHex: "#F87171"),
             GentleColorRole.textOnDestructive.rawValue: .init(lightHex: "#FFFFFF", darkHex: "#FFFFFF"),
 

@@ -202,7 +202,7 @@ public struct GentleSurfaceModifier: ViewModifier {
                 )
             )
 
-        case .chrome:
+        case .chrome, .overlayScrim:
             // Edge-to-edge surfaces without shadows
             return AnyView(
                 applyGlassIfNeeded(

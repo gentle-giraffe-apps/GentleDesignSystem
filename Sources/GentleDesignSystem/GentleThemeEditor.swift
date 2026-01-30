@@ -765,18 +765,41 @@ public struct GentleDesignSurfacesSection: View {
                 // Surface content on top
                 VStack(alignment: .leading, spacing: design.layout.stack.tight) {
                     Text(role.displayName)
-                        .gentleText(.caption_s)
+                        .gentleText(.caption_s, colorRole: textColorRole(for: role))
                         .fontWeight(.semibold)
 
                     Text(role.subtitle)
-                        .gentleText(.caption2_s)
-                        .opacity(0.7)
+                        .gentleText(.caption2_s, colorRole: secondaryTextColorRole(for: role))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .gentleSurface(role, inset: .card, showTappableHint: true)
             }
         }
         .buttonStyle(.plain)
+    }
+
+    /// Returns the appropriate primary text color role for displaying text on a given surface
+    private func textColorRole(for surfaceRole: GentleSurfaceRole) -> GentleColorRole {
+        switch surfaceRole {
+        case .overlayScrim:
+            return .textOnScrim
+        case .overlaySheet, .overlayPopover:
+            return .textOnOverlay
+        default:
+            return .textPrimary
+        }
+    }
+
+    /// Returns the appropriate secondary text color role for displaying text on a given surface
+    private func secondaryTextColorRole(for surfaceRole: GentleSurfaceRole) -> GentleColorRole {
+        switch surfaceRole {
+        case .overlayScrim:
+            return .textOnScrimSecondary
+        case .overlaySheet, .overlayPopover:
+            return .textOnOverlaySecondary
+        default:
+            return .textSecondary
+        }
     }
 }
 
