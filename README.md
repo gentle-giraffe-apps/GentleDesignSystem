@@ -13,11 +13,13 @@
 ![Commit activity](https://img.shields.io/github/commit-activity/y/gentle-giraffe-apps/GentleDesignSystem)
 ![Last commit](https://img.shields.io/github/last-commit/gentle-giraffe-apps/GentleDesignSystem)
 
-<p>
-  A token-driven SwiftUI design system with Dark Mode + Dynamic Type—built to feel native, predictable, and composable, while giving you a centralized way to evolve typography, color, spacing, and surface behavior over time.
-</p>
+**A token-driven SwiftUI design system**  
+Built for Dark Mode + Dynamic Type — native, predictable, and composable.
 
-**Who is this for?** Apps that want a strong SwiftUI foundation and theme evolution without rewriting view code.
+Centralize typography, color, spacing, and surface behavior, and evolve your app’s look over time—without rewriting view code.
+
+**Built for**  
+Apps that want a strong SwiftUI foundation with long-term theme evolution.
 
 ### TLDR
 
@@ -43,16 +45,6 @@ VStack {
 **See it in action:** Open `Demo/GentleDesignSystemDemo.xcodeproj` to explore the components. The demo app also supports editing and sharing JSON specs via the system Share Sheet.
 
 ---
-
-<sub><strong>Codecov Snapshot</strong></sub><br/>
-<a href="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem">
-  <img
-    src="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/graphs/icicle.svg"
-    height="72"
-    style="max-width: 420px;"
-    alt="Codecov coverage history icicle chart"
-  />
-</a>
 
 ## Quick Start
 
@@ -117,6 +109,16 @@ This project enforces quality gates via CI and static analysis:
 - **Static analysis:** DeepSource runs on every commit to `main`.  
   The badge indicates the current number of outstanding static analysis issues.
 - **Test coverage:** Codecov reports line coverage for the `main` branch
+
+<sub><strong>Codecov Snapshot</strong></sub><br/>
+<a href="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem">
+  <img
+    src="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/graphs/icicle.svg"
+    height="72"
+    style="max-width: 420px;"
+    alt="Codecov coverage history icicle chart"
+  />
+</a>
 
 These checks are intended to keep the design system safe to evolve over time.
 
