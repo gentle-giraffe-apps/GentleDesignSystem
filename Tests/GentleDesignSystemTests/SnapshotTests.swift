@@ -1,6 +1,7 @@
 //  Jonathan Ritchey
 import Testing
 import SnapshotTesting
+import SnapshotTestingHEIC
 import SwiftUI
 @testable import GentleDesignSystem
 
@@ -227,7 +228,7 @@ struct ButtonImageSnapshotTests {
         .environment(\.colorScheme, .light)
         .frame(width: 300)
 
-        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
     }
 
     @Test("All button roles dark mode")
@@ -255,7 +256,7 @@ struct ButtonImageSnapshotTests {
         .environment(\.colorScheme, .dark)
         .frame(width: 300)
 
-        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
     }
 }
 
@@ -297,7 +298,7 @@ struct TypographyImageSnapshotTests {
         .environment(\.colorScheme, .light)
         .frame(width: 350)
 
-        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
     }
 
     @Test("Typography roles dark mode")
@@ -334,7 +335,7 @@ struct TypographyImageSnapshotTests {
         .environment(\.colorScheme, .dark)
         .frame(width: 350)
 
-        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
     }
 }
 
@@ -362,7 +363,7 @@ struct ColorSwatchImageSnapshotTests {
         .environment(\.colorScheme, .light)
         .frame(width: 400)
 
-        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
     }
 
     @Test("Color swatches dark mode")
@@ -385,7 +386,7 @@ struct ColorSwatchImageSnapshotTests {
         .environment(\.colorScheme, .dark)
         .frame(width: 400)
 
-        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
     }
 }
 
@@ -441,7 +442,7 @@ struct SurfaceImageSnapshotTests {
         .environment(\.colorScheme, .light)
         .frame(width: 300, height: 300)
 
-        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
     }
 
     @Test("Surface cards dark mode")
@@ -466,7 +467,7 @@ struct SurfaceImageSnapshotTests {
         .environment(\.colorScheme, .dark)
         .frame(width: 300, height: 300)
 
-        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
     }
 }
 
@@ -477,31 +478,31 @@ struct PresetComparisonImageSnapshotTests {
     @Test("GentleDefault preset UI")
     func testGentleDefaultPresetUI() {
         let view = makePresetPreview(spec: .gentleDefault, name: "Gentle Default")
-        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
     }
 
     @Test("Classic preset UI")
     func testClassicPresetUI() {
         let view = makePresetPreview(spec: .classic, name: "Classic")
-        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
     }
 
     @Test("Modern preset UI")
     func testModernPresetUI() {
         let view = makePresetPreview(spec: .modern, name: "Modern")
-        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
     }
 
     @Test("Soft preset UI")
     func testSoftPresetUI() {
         let view = makePresetPreview(spec: .soft, name: "Soft")
-        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
     }
 
     @Test("Compact preset UI")
     func testCompactPresetUI() {
         let view = makePresetPreview(spec: .compact, name: "Compact")
-        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
     }
 
     private func makePresetPreview(spec: GentleDesignSystemSpec, name: String) -> some View {
