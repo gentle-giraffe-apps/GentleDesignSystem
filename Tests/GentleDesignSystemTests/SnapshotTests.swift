@@ -195,3 +195,340 @@ struct ButtonTokensSnapshotTests {
         assertSnapshot(of: buttonOutput, as: .lines)
     }
 }
+
+// MARK: - Image Snapshot Tests
+
+@Suite("Button Image Snapshot Tests", .snapshots(record: .missing))
+@MainActor
+struct ButtonImageSnapshotTests {
+
+    @Test("All button roles light mode")
+    func testButtonRolesLightMode() {
+        let view = GentleThemeRoot {
+            VStack(spacing: 12) {
+                Button("Primary") {}
+                    .gentleButton(.primary)
+
+                Button("Secondary") {}
+                    .gentleButton(.secondary)
+
+                Button("Tertiary") {}
+                    .gentleButton(.tertiary)
+
+                Button("Quaternary") {}
+                    .gentleButton(.quaternary)
+
+                Button("Destructive") {}
+                    .gentleButton(.destructive)
+            }
+            .padding(20)
+            .background(Color.white)
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 300)
+
+        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+    }
+
+    @Test("All button roles dark mode")
+    func testButtonRolesDarkMode() {
+        let view = GentleThemeRoot {
+            VStack(spacing: 12) {
+                Button("Primary") {}
+                    .gentleButton(.primary)
+
+                Button("Secondary") {}
+                    .gentleButton(.secondary)
+
+                Button("Tertiary") {}
+                    .gentleButton(.tertiary)
+
+                Button("Quaternary") {}
+                    .gentleButton(.quaternary)
+
+                Button("Destructive") {}
+                    .gentleButton(.destructive)
+            }
+            .padding(20)
+            .background(Color.black)
+        }
+        .environment(\.colorScheme, .dark)
+        .frame(width: 300)
+
+        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+    }
+}
+
+@Suite("Typography Image Snapshot Tests", .snapshots(record: .missing))
+@MainActor
+struct TypographyImageSnapshotTests {
+
+    @Test("Typography roles light mode")
+    func testTypographyLightMode() {
+        let view = GentleThemeRoot {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Large Title XXL")
+                    .gentleText(.largeTitle_xxl)
+
+                Text("Title XL")
+                    .gentleText(.title_xl)
+
+                Text("Title L")
+                    .gentleText(.title2_l)
+
+                Text("Headline M")
+                    .gentleText(.headline_m)
+
+                Text("Body M")
+                    .gentleText(.body_m)
+
+                Text("Body S")
+                    .gentleText(.callout_ms)
+
+                Text("Caption S")
+                    .gentleText(.caption_s)
+
+                Text("Caption XS")
+                    .gentleText(.caption2_s)
+            }
+            .padding(20)
+            .background(Color.white)
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 350)
+
+        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+    }
+
+    @Test("Typography roles dark mode")
+    func testTypographyDarkMode() {
+        let view = GentleThemeRoot {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Large Title XXL")
+                    .gentleText(.largeTitle_xxl)
+
+                Text("Title XL")
+                    .gentleText(.title_xl)
+
+                Text("Title L")
+                    .gentleText(.title2_l)
+
+                Text("Headline M")
+                    .gentleText(.headline_m)
+
+                Text("Body M")
+                    .gentleText(.body_m)
+
+                Text("Body S")
+                    .gentleText(.callout_ms)
+
+                Text("Caption S")
+                    .gentleText(.caption_s)
+
+                Text("Caption XS")
+                    .gentleText(.caption2_s)
+            }
+            .padding(20)
+            .background(Color.black)
+        }
+        .environment(\.colorScheme, .dark)
+        .frame(width: 350)
+
+        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+    }
+}
+
+@Suite("Color Swatch Image Snapshot Tests", .snapshots(record: .missing))
+@MainActor
+struct ColorSwatchImageSnapshotTests {
+
+    @Test("Color swatches light mode")
+    func testColorSwatchesLightMode() {
+        let roles: [GentleColorRole] = [
+            .primaryCTA, .destructive, .themePrimary, .themeSecondary,
+            .textPrimary, .textSecondary, .textTertiary,
+            .background, .surfaceBase
+        ]
+
+        let view = GentleThemeRoot {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                ForEach(roles, id: \.rawValue) { role in
+                    ColorSwatchView(role: role)
+                }
+            }
+            .padding(20)
+            .background(Color.white)
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 400)
+
+        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+    }
+
+    @Test("Color swatches dark mode")
+    func testColorSwatchesDarkMode() {
+        let roles: [GentleColorRole] = [
+            .primaryCTA, .destructive, .themePrimary, .themeSecondary,
+            .textPrimary, .textSecondary, .textTertiary,
+            .background, .surfaceBase
+        ]
+
+        let view = GentleThemeRoot {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                ForEach(roles, id: \.rawValue) { role in
+                    ColorSwatchView(role: role)
+                }
+            }
+            .padding(20)
+            .background(Color.black)
+        }
+        .environment(\.colorScheme, .dark)
+        .frame(width: 400)
+
+        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+    }
+}
+
+// Helper view for color swatches
+private struct ColorSwatchView: View {
+    @Environment(\.gentleTheme) private var theme
+    @Environment(\.colorScheme) private var colorScheme
+
+    let role: GentleColorRole
+
+    var body: some View {
+        VStack(spacing: 4) {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(theme.color(for: role, scheme: colorScheme))
+                .frame(width: 60, height: 40)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .strokeBorder(Color.gray.opacity(0.3), lineWidth: 1)
+                )
+
+            Text(role.rawValue)
+                .font(.system(size: 8))
+                .foregroundColor(colorScheme == .dark ? .white : .black)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+        }
+    }
+}
+
+@Suite("Surface Image Snapshot Tests", .snapshots(record: .missing))
+@MainActor
+struct SurfaceImageSnapshotTests {
+
+    @Test("Surface cards light mode")
+    func testSurfaceCardsLightMode() {
+        let view = GentleThemeRoot {
+            VStack(spacing: 16) {
+                Text("Card Surface")
+                    .gentleText(.body_m)
+                    .gentleSurface(.card, inset: .card)
+
+                Text("Card Elevated")
+                    .gentleText(.body_m)
+                    .gentleSurface(.cardElevated, inset: .card)
+
+                Text("Card Secondary")
+                    .gentleText(.body_m)
+                    .gentleSurface(.cardSecondary, inset: .card)
+            }
+            .padding(24)
+            .gentleSurface(.appBackground)
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 300, height: 300)
+
+        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+    }
+
+    @Test("Surface cards dark mode")
+    func testSurfaceCardsDarkMode() {
+        let view = GentleThemeRoot {
+            VStack(spacing: 16) {
+                Text("Card Surface")
+                    .gentleText(.body_m)
+                    .gentleSurface(.card, inset: .card)
+
+                Text("Card Elevated")
+                    .gentleText(.body_m)
+                    .gentleSurface(.cardElevated, inset: .card)
+
+                Text("Card Secondary")
+                    .gentleText(.body_m)
+                    .gentleSurface(.cardSecondary, inset: .card)
+            }
+            .padding(24)
+            .gentleSurface(.appBackground)
+        }
+        .environment(\.colorScheme, .dark)
+        .frame(width: 300, height: 300)
+
+        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+    }
+}
+
+@Suite("Preset Comparison Image Snapshot Tests", .snapshots(record: .missing))
+@MainActor
+struct PresetComparisonImageSnapshotTests {
+
+    @Test("GentleDefault preset UI")
+    func testGentleDefaultPresetUI() {
+        let view = makePresetPreview(spec: .gentleDefault, name: "Gentle Default")
+        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+    }
+
+    @Test("Classic preset UI")
+    func testClassicPresetUI() {
+        let view = makePresetPreview(spec: .classic, name: "Classic")
+        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+    }
+
+    @Test("Modern preset UI")
+    func testModernPresetUI() {
+        let view = makePresetPreview(spec: .modern, name: "Modern")
+        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+    }
+
+    @Test("Soft preset UI")
+    func testSoftPresetUI() {
+        let view = makePresetPreview(spec: .soft, name: "Soft")
+        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+    }
+
+    @Test("Compact preset UI")
+    func testCompactPresetUI() {
+        let view = makePresetPreview(spec: .compact, name: "Compact")
+        assertSnapshot(of: view, as: .image(layout: .sizeThatFits))
+    }
+
+    private func makePresetPreview(spec: GentleDesignSystemSpec, name: String) -> some View {
+        let theme = GentleTheme(defaultSpec: spec)
+
+        return GentleThemeRoot(theme: theme) {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(name)
+                    .gentleText(.title_xl)
+
+                Text("Body text sample for this preset theme.")
+                    .gentleText(.body_m)
+
+                HStack(spacing: 8) {
+                    Button("Primary") {}
+                        .gentleButton(.primary)
+
+                    Button("Secondary") {}
+                        .gentleButton(.secondary)
+                }
+            }
+            .padding(20)
+            .gentleSurface(.card, inset: .card)
+            .padding(16)
+            .background(Color.white)
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 350)
+    }
+}
