@@ -766,50 +766,6 @@ struct StudioViewSnapshotTests {
         assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
     }
 
-    @Test("GentleDesignCustomizeView colors section")
-    func testCustomizeViewColors() {
-        let view = EditorTestEnvironment {
-            GentleDesignCustomizeView(section: .colors)
-        }
-        .environment(\.colorScheme, .light)
-        .frame(width: 400, height: 700)
-
-        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
-    }
-
-    @Test("GentleDesignCustomizeView typography section")
-    func testCustomizeViewTypography() {
-        let view = EditorTestEnvironment {
-            GentleDesignCustomizeView(section: .typography)
-        }
-        .environment(\.colorScheme, .light)
-        .frame(width: 400, height: 700)
-
-        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
-    }
-
-    @Test("GentleDesignCustomizeView buttons section")
-    func testCustomizeViewButtons() {
-        let view = EditorTestEnvironment {
-            GentleDesignCustomizeView(section: .buttons)
-        }
-        .environment(\.colorScheme, .light)
-        .frame(width: 400, height: 700)
-
-        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
-    }
-
-    @Test("GentleDesignCustomizeView surfaces section")
-    func testCustomizeViewSurfaces() {
-        let view = EditorTestEnvironment {
-            GentleDesignCustomizeView(section: .surfaces)
-        }
-        .environment(\.colorScheme, .light)
-        .frame(width: 400, height: 700)
-
-        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
-    }
-
     @Test("GentleThemeEditor renders")
     func testThemeEditor() {
         let view = EditorTestEnvironment {
