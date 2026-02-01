@@ -1,0 +1,4 @@
+small: 8.0
+medium: 12.0
+large: 20.0
+pill: 999.0

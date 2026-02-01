@@ -1,0 +1,5 @@
+primary: shape=pill, fill=solidFillPrimaryCTA, pressedScale=0.9, pressedOpacity=0.86
+secondary: shape=pill, fill=hollow, pressedScale=0.85, pressedOpacity=0.9
+tertiary: shape=pill, fill=hollow, pressedScale=0.85, pressedOpacity=0.9
+quaternary: shape=pill, fill=hollow, pressedScale=0.95, pressedOpacity=0.93
+destructive: shape=pill, fill=solidFillDestructive, pressedScale=0.9, pressedOpacity=0.86
