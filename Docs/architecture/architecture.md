@@ -81,3 +81,13 @@ manager.save() → GentleFileThemeSpecStore → JSON file
 - All token types are `Sendable`
 - Theme struct is `Sendable` (value type)
 - No async token resolution (sync by design)
+
+## Testing Strategy
+
+| Test Type | Purpose |
+|-----------|---------|
+| **Unit tests** | Verify token resolution, encoding/decoding, facades |
+| **JSON snapshots** | Guard against unintended changes to preset specs |
+| **Image snapshots** | Guard against unintended UI rendering changes |
+
+Snapshot tests use `swift-snapshot-testing` with HEIC support for smaller image files. Baselines are stored in `Tests/GentleDesignSystemTests/__Snapshots__/`.

@@ -471,6 +471,368 @@ struct SurfaceImageSnapshotTests {
     }
 }
 
+// MARK: - Helper for Editor Component Tests
+
+/// A helper view that sets up both the theme and manager environment needed for editor components.
+private struct EditorTestEnvironment<Content: View>: View {
+    let content: Content
+    let manager: GentleThemeManager
+
+    init(@ViewBuilder content: () -> Content) {
+        self.manager = GentleThemeManager()
+        self.content = content()
+    }
+
+    var body: some View {
+        content
+            .environment(\.gentleTheme, manager.theme)
+            .environment(\.gentleThemeManager, manager)
+    }
+}
+
+// MARK: - Editor Component Snapshot Tests
+
+@Suite("Typography Editor Snapshot Tests", .snapshots(record: .missing))
+@MainActor
+struct TypographyEditorSnapshotTests {
+
+    @Test("TypographyRoleCell renders correctly")
+    func testTypographyRoleCell() {
+        let view = EditorTestEnvironment {
+            TypographyRoleCell(role: .headline_m, isEditing: .constant(false))
+                .frame(width: 120)
+                .padding(8)
+                .background(Color.white)
+        }
+        .environment(\.colorScheme, .light)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+
+    @Test("TypographyRoleEditor collapsed state")
+    func testTypographyRoleEditorCollapsed() {
+        let view = EditorTestEnvironment {
+            VStack(spacing: 0) {
+                TypographyRoleEditor(role: .title_xl)
+                TypographyRoleEditor(role: .body_m)
+                TypographyRoleEditor(role: .caption_s)
+            }
+            .padding(16)
+            .background(Color.white)
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 350)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+
+    @Test("Typography roles grid")
+    func testTypographyRolesGrid() {
+        let roles: [GentleTextRole] = [.largeTitle_xxl, .title_xl, .headline_m, .body_m, .caption_s]
+
+        let view = EditorTestEnvironment {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                ForEach(roles, id: \.rawValue) { role in
+                    TypographyRoleCell(role: role, isEditing: .constant(false))
+                }
+            }
+            .padding(16)
+            .background(Color.white)
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 300)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+}
+
+@Suite("Color Editor Snapshot Tests", .snapshots(record: .missing))
+@MainActor
+struct ColorEditorSnapshotTests {
+
+    @Test("ColorRoleCell renders correctly")
+    func testColorRoleCell() {
+        let view = EditorTestEnvironment {
+            HStack(spacing: 8) {
+                ColorRoleCell(role: .primaryCTA, isEditing: .constant(false))
+                ColorRoleCell(role: .textPrimary, isEditing: .constant(false))
+                ColorRoleCell(role: .surfaceBase, isEditing: .constant(false))
+            }
+            .padding(16)
+            .background(Color.white)
+        }
+        .environment(\.colorScheme, .light)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+
+    @Test("ColorRoleEditor collapsed state")
+    func testColorRoleEditorCollapsed() {
+        let view = EditorTestEnvironment {
+            VStack(spacing: 0) {
+                ColorRoleEditor(role: .primaryCTA)
+                ColorRoleEditor(role: .textPrimary)
+                ColorRoleEditor(role: .surfaceBase)
+            }
+            .padding(16)
+            .background(Color.white)
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 350)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+
+    @Test("Color roles grid light mode")
+    func testColorRolesGridLightMode() {
+        let roles: [GentleColorRole] = [.primaryCTA, .destructive, .textPrimary, .textSecondary, .surfaceBase, .background]
+
+        let view = EditorTestEnvironment {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                ForEach(roles, id: \.rawValue) { role in
+                    ColorRoleCell(role: role, isEditing: .constant(false))
+                }
+            }
+            .padding(16)
+            .background(Color.white)
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 320)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+
+    @Test("Color roles grid dark mode")
+    func testColorRolesGridDarkMode() {
+        let roles: [GentleColorRole] = [.primaryCTA, .destructive, .textPrimary, .textSecondary, .surfaceBase, .background]
+
+        let view = EditorTestEnvironment {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                ForEach(roles, id: \.rawValue) { role in
+                    ColorRoleCell(role: role, isEditing: .constant(false))
+                }
+            }
+            .padding(16)
+            .background(Color.black)
+        }
+        .environment(\.colorScheme, .dark)
+        .frame(width: 320)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+}
+
+@Suite("Button Preview Snapshot Tests", .snapshots(record: .missing))
+@MainActor
+struct ButtonPreviewSnapshotTests {
+
+    @Test("GentleButtonPreview all roles")
+    func testGentleButtonPreviewAllRoles() {
+        let view = GentleThemeRoot {
+            VStack(spacing: 12) {
+                GentleButtonPreview(role: .primary)
+                GentleButtonPreview(role: .secondary)
+                GentleButtonPreview(role: .tertiary)
+                GentleButtonPreview(role: .quaternary)
+                GentleButtonPreview(role: .destructive)
+            }
+            .padding(20)
+            .background(Color.white)
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 200)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+
+    @Test("GentleButtonPreview pressed state")
+    func testGentleButtonPreviewPressed() {
+        let view = GentleThemeRoot {
+            HStack(spacing: 20) {
+                VStack(spacing: 8) {
+                    Text("Default")
+                        .font(.caption)
+                    GentleButtonPreview(role: .primary, isPressed: false)
+                }
+                VStack(spacing: 8) {
+                    Text("Pressed")
+                        .font(.caption)
+                    GentleButtonPreview(role: .primary, isPressed: true)
+                }
+            }
+            .padding(20)
+            .background(Color.white)
+        }
+        .environment(\.colorScheme, .light)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+
+    @Test("GentleButtonPreview miniature mode")
+    func testGentleButtonPreviewMiniature() {
+        let view = GentleThemeRoot {
+            HStack(spacing: 12) {
+                GentleButtonPreview(role: .primary, isMiniature: true)
+                GentleButtonPreview(role: .secondary, isMiniature: true)
+                GentleButtonPreview(role: .tertiary, isMiniature: true)
+                GentleButtonPreview(role: .destructive, isMiniature: true)
+            }
+            .padding(20)
+            .background(Color.white)
+        }
+        .environment(\.colorScheme, .light)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+}
+
+@Suite("Theme Editor Section Snapshot Tests", .snapshots(record: .missing))
+@MainActor
+struct ThemeEditorSectionSnapshotTests {
+
+    @Test("GentleDesignColorsSection renders")
+    func testColorsSection() {
+        let view = EditorTestEnvironment {
+            ScrollView {
+                GentleDesignColorsSection()
+                    .padding(16)
+            }
+            .background(Color.white)
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 380, height: 400)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+
+    @Test("GentleDesignTypographySection renders")
+    func testTypographySection() {
+        let view = EditorTestEnvironment {
+            ScrollView {
+                GentleDesignTypographySection()
+                    .padding(16)
+            }
+            .background(Color.white)
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 380, height: 500)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+
+    @Test("GentleDesignButtonsSection renders")
+    func testButtonsSection() {
+        let view = EditorTestEnvironment {
+            ScrollView {
+                GentleDesignButtonsSection()
+                    .padding(16)
+            }
+            .background(Color.white)
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 380, height: 300)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+
+    @Test("GentleDesignSurfacesSection renders")
+    func testSurfacesSection() {
+        let view = EditorTestEnvironment {
+            ScrollView {
+                GentleDesignSurfacesSection()
+                    .padding(16)
+            }
+            .background(Color.white)
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 380, height: 600)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+}
+
+@Suite("Studio and Customize View Snapshot Tests", .snapshots(record: .missing))
+@MainActor
+struct StudioViewSnapshotTests {
+
+    @Test("GentleDesignStudioView renders")
+    func testStudioView() {
+        let view = EditorTestEnvironment {
+            GentleDesignStudioView()
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 400, height: 700)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+
+    @Test("GentleDesignCustomizeView colors section")
+    func testCustomizeViewColors() {
+        let view = EditorTestEnvironment {
+            GentleDesignCustomizeView(section: .colors)
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 400, height: 700)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+
+    @Test("GentleDesignCustomizeView typography section")
+    func testCustomizeViewTypography() {
+        let view = EditorTestEnvironment {
+            GentleDesignCustomizeView(section: .typography)
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 400, height: 700)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+
+    @Test("GentleDesignCustomizeView buttons section")
+    func testCustomizeViewButtons() {
+        let view = EditorTestEnvironment {
+            GentleDesignCustomizeView(section: .buttons)
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 400, height: 700)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+
+    @Test("GentleDesignCustomizeView surfaces section")
+    func testCustomizeViewSurfaces() {
+        let view = EditorTestEnvironment {
+            GentleDesignCustomizeView(section: .surfaces)
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 400, height: 700)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+
+    @Test("GentleThemeEditor renders")
+    func testThemeEditor() {
+        let view = EditorTestEnvironment {
+            GentleThemeEditor()
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 400, height: 800)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+
+    @Test("GentleThemeEditor with editable title")
+    func testThemeEditorEditableTitle() {
+        let view = EditorTestEnvironment {
+            GentleThemeEditor(isTitleEditable: true)
+        }
+        .environment(\.colorScheme, .light)
+        .frame(width: 400, height: 800)
+
+        assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+    }
+}
+
 @Suite("Preset Comparison Image Snapshot Tests", .snapshots(record: .missing))
 @MainActor
 struct PresetComparisonImageSnapshotTests {

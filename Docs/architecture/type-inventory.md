@@ -238,3 +238,30 @@ Complete mapping of every public type to its file location, kind, and purpose.
 | Type | Kind | Purpose |
 |------|------|---------|
 | `String.camelCaseBreakable` | computed property | Inserts zero-width breaks for text wrapping at camelCase boundaries |
+
+---
+
+## SnapshotTests.swift (Tests)
+
+Test suites for JSON and image snapshot verification using swift-snapshot-testing.
+
+| Suite | Purpose |
+|-------|---------|
+| `SpecJSONSnapshotTests` | Verifies JSON serialization of all 9 preset specs |
+| `ColorTokensSnapshotTests` | Verifies color role hex values |
+| `TypographyTokensSnapshotTests` | Verifies typography role specs |
+| `LayoutTokensSnapshotTests` | Verifies spacing scale values |
+| `VisualTokensSnapshotTests` | Verifies radii and shadow values |
+| `ButtonTokensSnapshotTests` | Verifies button role specs |
+| `ButtonImageSnapshotTests` | Image snapshots of buttons (light/dark mode) |
+| `TypographyImageSnapshotTests` | Image snapshots of typography (light/dark mode) |
+| `ColorSwatchImageSnapshotTests` | Image snapshots of color swatches (light/dark mode) |
+| `SurfaceImageSnapshotTests` | Image snapshots of surface cards (light/dark mode) |
+| `PresetComparisonImageSnapshotTests` | Image snapshots of preset UI previews |
+
+### Dependencies
+
+| Package | Purpose |
+|---------|---------|
+| `swift-snapshot-testing` | Core snapshot testing framework by Point-Free |
+| `SnapshotTestingHEIC` | HEIC image format support for smaller snapshot files |

@@ -57,8 +57,7 @@ public struct TypographyRoleEditorSheet: View {
     @Environment(\.dismiss) private var dismiss
     @GentleThemeManagerRuntime private var manager
 
-    @State private var initialSpec: GentleTypographyRoleSpec?
-    @State private var didSave = false
+    @State private var editSession = EditSession<GentleTypographyRoleSpec>()
     @State private var showingWeightPicker = false
 
     public init(
@@ -197,7 +196,7 @@ public struct TypographyRoleEditorSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
-                        revertChanges()
+                        editSession.cancelAndRevert()
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
@@ -205,7 +204,7 @@ public struct TypographyRoleEditorSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button {
-                        didSave = true
+                        editSession.markSaved()
                         dismiss()
                     } label: {
                         Image(systemName: "checkmark")
@@ -215,18 +214,14 @@ public struct TypographyRoleEditorSheet: View {
         }
         .presentationDetents([.large])
         .onAppear {
-            initialSpec = manager.bindingForTypographyRole(role).wrappedValue
-        }
-        .onDisappear {
-            if !didSave {
-                revertChanges()
+            let binding = manager.bindingForTypographyRole(role)
+            editSession.begin(with: binding.wrappedValue) { spec in
+                binding.wrappedValue = spec
             }
         }
-    }
-
-    private func revertChanges() {
-        guard let initialSpec else { return }
-        manager.bindingForTypographyRole(role).wrappedValue = initialSpec
+        .onDisappear {
+            editSession.handleDismissal()
+        }
     }
 
     private func widthBinding(_ roleSpec: Binding<GentleTypographyRoleSpec>) -> Binding<GentleFontWidthToken?> {

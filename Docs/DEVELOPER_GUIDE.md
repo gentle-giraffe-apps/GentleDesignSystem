@@ -41,6 +41,7 @@
 ```bash
 swift build                           # Build package
 swift test                            # Run tests
+swift test --filter SnapshotTests     # Run snapshot tests only
 cd Demo && bundle exec fastlane ios build  # Build demo app
 ```
 
