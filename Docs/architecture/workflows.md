@@ -21,7 +21,34 @@ swift test
 
 # Run specific test
 swift test --filter GentleDesignSystemTests
+
+# Run snapshot tests only
+swift test --filter SnapshotTests
 ```
+
+### Snapshot Tests
+
+Snapshot tests verify that token values and UI rendering remain consistent. They use [swift-snapshot-testing](https://github.com/pointfreeco/swift-snapshot-testing) with HEIC image support.
+
+**Snapshot types:**
+- **JSON snapshots** - Verify preset spec serialization (`.txt` files)
+- **Image snapshots** - Verify UI rendering in light/dark mode (`.heic` files)
+
+**Recording new snapshots:**
+Snapshots are configured with `.snapshots(record: .missing)`, so new tests automatically record baselines on first run. To re-record all snapshots:
+
+```bash
+# Delete existing snapshots and re-run tests
+rm -rf Tests/GentleDesignSystemTests/__Snapshots__
+swift test --filter SnapshotTests
+```
+
+**When to update snapshots:**
+- After intentionally changing default token values
+- After adding new presets
+- After modifying view modifiers that affect rendering
+
+**Snapshot location:** `Tests/GentleDesignSystemTests/__Snapshots__/SnapshotTests/`
 
 ### Demo App (Fastlane)
 ```bash

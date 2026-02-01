@@ -93,3 +93,13 @@
 | `TypographyRoleEditor` | Edits one typography role |
 | `ColorRoleEditor` | Edits one color role |
 | `GentleNavigationBarStyler` | Applies theme to UINavigationBar |
+
+## Testing
+
+| Term | Definition |
+|------|------------|
+| **Snapshot test** | Test that compares output against a recorded baseline |
+| **JSON snapshot** | Text-based snapshot of serialized spec (`.txt` file) |
+| **Image snapshot** | Visual snapshot of rendered UI (`.heic` file) |
+| **Baseline** | Recorded reference output stored in `__Snapshots__/` |
+| **swift-snapshot-testing** | Point-Free's snapshot testing library |

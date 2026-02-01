@@ -35,6 +35,11 @@ Step-by-step guides for common modifications.
 
 4. Bump `GentleDesignSystemSpecVersion.current` if this is a breaking change.
 
+5. Run snapshot tests and update baselines if needed:
+   ```bash
+   swift test --filter SnapshotTests
+   ```
+
 ---
 
 ### Add a New Typography Role
@@ -78,6 +83,11 @@ Step-by-step guides for common modifications.
    ```
 
 5. Bump spec version if breaking.
+
+6. Run snapshot tests and update baselines if needed:
+   ```bash
+   swift test --filter SnapshotTests
+   ```
 
 ---
 
@@ -264,10 +274,71 @@ swift test
 swift test --filter GentleDesignSystemTests
 ```
 
+### Run Snapshot Tests
+```bash
+swift test --filter SnapshotTests
+```
+
 ### Build Demo App
 ```bash
 cd Demo && bundle exec fastlane ios build
 ```
+
+---
+
+## Snapshot Testing
+
+Snapshot tests guard against unintended changes to token values and UI rendering.
+
+### When Snapshots Fail
+
+If snapshot tests fail after making changes:
+
+1. **Intentional changes** - Re-record the snapshots:
+   ```bash
+   # Delete the specific snapshot file(s) that need updating
+   rm Tests/GentleDesignSystemTests/__Snapshots__/SnapshotTests/testGentleDefaultSnapshot.1.txt
+
+   # Re-run the test to record new baseline
+   swift test --filter testGentleDefaultSnapshot
+   ```
+
+2. **Unintentional changes** - Review your changes and fix the regression.
+
+### Adding Snapshot Tests for New Presets
+
+When adding a new preset, add corresponding snapshot tests:
+
+```swift
+@Test("myNewPreset spec JSON snapshot")
+func testMyNewPresetSnapshot() throws {
+    let spec = GentleDesignSystemSpec.myNewPreset
+    let jsonString = try spec.encodedJSONString()
+    assertSnapshot(of: jsonString, as: .lines)
+}
+
+@Test("MyNewPreset preset UI")
+func testMyNewPresetUI() {
+    let view = makePresetPreview(spec: .myNewPreset, name: "My New Preset")
+    assertSnapshot(of: view, as: .imageHEIC(layout: .sizeThatFits, compressionQuality: .maximum))
+}
+```
+
+### Snapshot Test Categories
+
+| Suite | What it tests |
+|-------|---------------|
+| `SpecJSONSnapshotTests` | JSON serialization of all 9 presets |
+| `ColorTokensSnapshotTests` | Color role hex values |
+| `TypographyTokensSnapshotTests` | Typography role specs |
+| `LayoutTokensSnapshotTests` | Spacing scale values |
+| `VisualTokensSnapshotTests` | Radii and shadow values |
+| `ButtonTokensSnapshotTests` | Button role specs |
+| `ButtonImageSnapshotTests` | Button rendering (light/dark) |
+| `TypographyImageSnapshotTests` | Typography rendering (light/dark) |
+| `ColorSwatchImageSnapshotTests` | Color swatch rendering (light/dark) |
+| `SurfaceImageSnapshotTests` | Surface card rendering (light/dark) |
+| `PresetComparisonImageSnapshotTests` | Full preset UI previews |
 
 ---
 

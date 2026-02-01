@@ -505,10 +505,7 @@ struct ButtonRoleEditorSheet: View {
     @GentleDesignRuntime private var design
     @GentleThemeManagerRuntime private var manager
 
-    /// The initial spec captured when the sheet appears, used to revert on cancel/drag-dismiss.
-    @State private var initialSpec: GentleButtonRoleSpec?
-    /// Tracks whether the user explicitly saved changes.
-    @State private var didSave = false
+    @State private var editSession = EditSession<GentleButtonRoleSpec>()
 
     private let shapes: [GentleButtonShape] = [.rounded, .pill]
     private let fillRoles: [GentleButtonFillRole] = GentleButtonFillRole.allCases
@@ -623,7 +620,7 @@ struct ButtonRoleEditorSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
-                        revertChanges()
+                        editSession.cancelAndRevert()
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
@@ -631,7 +628,7 @@ struct ButtonRoleEditorSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button {
-                        didSave = true
+                        editSession.markSaved()
                         dismiss()
                     } label: {
                         Image(systemName: "checkmark")
@@ -641,20 +638,14 @@ struct ButtonRoleEditorSheet: View {
         }
         .presentationDetents([.large])
         .onAppear {
-            // Capture initial state for potential revert
-            initialSpec = manager.bindingForButtonRole(role).wrappedValue
-        }
-        .onDisappear {
-            // If user dragged to dismiss without saving, revert changes
-            if !didSave {
-                revertChanges()
+            let binding = manager.bindingForButtonRole(role)
+            editSession.begin(with: binding.wrappedValue) { spec in
+                binding.wrappedValue = spec
             }
         }
-    }
-
-    private func revertChanges() {
-        guard let initialSpec else { return }
-        manager.bindingForButtonRole(role).wrappedValue = initialSpec
+        .onDisappear {
+            editSession.handleDismissal()
+        }
     }
 }
 
@@ -815,10 +806,7 @@ struct SurfaceRoleEditorSheet: View {
     @GentleDesignRuntime private var design
     @GentleThemeManagerRuntime private var manager
 
-    /// The initial spec captured when the sheet appears, used to revert on cancel/drag-dismiss.
-    @State private var initialSpec: GentleSurfaceRoleSpec?
-    /// Tracks whether the user explicitly saved changes.
-    @State private var didSave = false
+    @State private var editSession = EditSession<GentleSurfaceRoleSpec>()
 
     var body: some View {
         let binding = manager.bindingForSurfaceRole(role)
@@ -1086,7 +1074,7 @@ struct SurfaceRoleEditorSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
-                        revertChanges()
+                        editSession.cancelAndRevert()
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
@@ -1094,7 +1082,7 @@ struct SurfaceRoleEditorSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button {
-                        didSave = true
+                        editSession.markSaved()
                         dismiss()
                     } label: {
                         Image(systemName: "checkmark")
@@ -1104,101 +1092,34 @@ struct SurfaceRoleEditorSheet: View {
         }
         .presentationDetents([.large])
         .onAppear {
-            // Capture initial state for potential revert
-            initialSpec = manager.bindingForSurfaceRole(role).wrappedValue
-        }
-        .onDisappear {
-            // If user dragged to dismiss without saving, revert changes
-            if !didSave {
-                revertChanges()
+            let binding = manager.bindingForSurfaceRole(role)
+            editSession.begin(with: binding.wrappedValue) { spec in
+                binding.wrappedValue = spec
             }
         }
-    }
-
-    private func revertChanges() {
-        guard let initialSpec else { return }
-        manager.bindingForSurfaceRole(role).wrappedValue = initialSpec
+        .onDisappear {
+            editSession.handleDismissal()
+        }
     }
 
     // MARK: - Background Style Helpers
 
-    private enum BackgroundStyleType: String, CaseIterable {
-        case solid, material, glass
-    }
-
     /// Returns true for surfaces that use overlay styling (surfaceOverlay color role).
     /// These surfaces use textOnOverlay/textOnOverlaySecondary for text colors.
     private func isOverlayStyle(_ style: GentleSurfaceBackgroundStyle) -> Bool {
-        switch style {
-        case .solid(let colorRole):
-            return colorRole == .surfaceTint
-        case .material(_, let tintColorRole, _):
-            return tintColorRole == .surfaceTint
-        case .glass(_, let fallbackColorRole):
-            return fallbackColorRole == .surfaceTint
-        }
+        BackgroundStyleConverter.extractColorRole(from: style) == .surfaceTint
     }
 
     private func backgroundStyleTypeBinding(_ binding: Binding<GentleSurfaceRoleSpec>) -> Binding<BackgroundStyleType> {
         Binding(
             get: {
-                switch binding.wrappedValue.backgroundStyle {
-                case .solid: return .solid
-                case .material: return .material
-                case .glass: return .glass
-                }
+                BackgroundStyleConverter.styleType(of: binding.wrappedValue.backgroundStyle)
             },
             set: { newType in
-                let currentStyle = binding.wrappedValue.backgroundStyle
-                switch newType {
-                case .solid:
-                    // Extract color role from current style for continuity
-                    let colorRole: GentleColorRole
-                    switch currentStyle {
-                    case .solid(let cr): colorRole = cr
-                    case .material(_, let tcr, _): colorRole = tcr ?? .surfaceBase
-                    case .glass(_, let fcr): colorRole = fcr
-                    }
-                    binding.wrappedValue.backgroundStyle = .solid(colorRole: colorRole)
-
-                case .material:
-                    // Extract values from current style
-                    let material: GentleAppleMaterial
-                    let tintColor: GentleColorRole?
-                    let tintOpacity: Double
-                    switch currentStyle {
-                    case .solid(let cr):
-                        material = .regular
-                        tintColor = cr
-                        tintOpacity = 0.1
-                    case .material(let m, let tcr, let to):
-                        material = m
-                        tintColor = tcr
-                        tintOpacity = to
-                    case .glass(let fm, let fcr):
-                        material = fm ?? .regular
-                        tintColor = fcr
-                        tintOpacity = 0.1
-                    }
-                    binding.wrappedValue.backgroundStyle = .material(material: material, tintColorRole: tintColor, tintOpacity: tintOpacity)
-
-                case .glass:
-                    // Extract values from current style for fallback
-                    let fallbackMaterial: GentleAppleMaterial?
-                    let fallbackColor: GentleColorRole
-                    switch currentStyle {
-                    case .solid(let cr):
-                        fallbackMaterial = nil
-                        fallbackColor = cr
-                    case .material(let m, let tcr, _):
-                        fallbackMaterial = m
-                        fallbackColor = tcr ?? .surfaceBase
-                    case .glass(let fm, let fcr):
-                        fallbackMaterial = fm
-                        fallbackColor = fcr
-                    }
-                    binding.wrappedValue.backgroundStyle = .glass(fallbackMaterial: fallbackMaterial, fallbackColorRole: fallbackColor)
-                }
+                binding.wrappedValue.backgroundStyle = BackgroundStyleConverter.convert(
+                    binding.wrappedValue.backgroundStyle,
+                    to: newType
+                )
             }
         )
     }
@@ -1206,10 +1127,7 @@ struct SurfaceRoleEditorSheet: View {
     private func solidColorRoleBinding(_ binding: Binding<GentleSurfaceRoleSpec>) -> Binding<GentleColorRole> {
         Binding(
             get: {
-                if case .solid(let colorRole) = binding.wrappedValue.backgroundStyle {
-                    return colorRole
-                }
-                return .surfaceBase
+                BackgroundStyleConverter.extractColorRole(from: binding.wrappedValue.backgroundStyle)
             },
             set: { newValue in
                 binding.wrappedValue.backgroundStyle = .solid(colorRole: newValue)
@@ -1220,15 +1138,13 @@ struct SurfaceRoleEditorSheet: View {
     private func materialBinding(_ binding: Binding<GentleSurfaceRoleSpec>) -> Binding<GentleAppleMaterial> {
         Binding(
             get: {
-                if case .material(let material, _, _) = binding.wrappedValue.backgroundStyle {
-                    return material
-                }
-                return .regular
+                BackgroundStyleConverter.extractMaterial(from: binding.wrappedValue.backgroundStyle)
             },
             set: { newValue in
-                if case .material(_, let tintColorRole, let tintOpacity) = binding.wrappedValue.backgroundStyle {
-                    binding.wrappedValue.backgroundStyle = .material(material: newValue, tintColorRole: tintColorRole, tintOpacity: tintOpacity)
-                }
+                binding.wrappedValue.backgroundStyle = BackgroundStyleConverter.updateMaterial(
+                    newValue,
+                    in: binding.wrappedValue.backgroundStyle
+                )
             }
         )
     }
@@ -1242,9 +1158,10 @@ struct SurfaceRoleEditorSheet: View {
                 return nil
             },
             set: { newValue in
-                if case .material(let material, _, let tintOpacity) = binding.wrappedValue.backgroundStyle {
-                    binding.wrappedValue.backgroundStyle = .material(material: material, tintColorRole: newValue, tintOpacity: tintOpacity)
-                }
+                binding.wrappedValue.backgroundStyle = BackgroundStyleConverter.updateMaterialTint(
+                    newValue,
+                    in: binding.wrappedValue.backgroundStyle
+                )
             }
         )
     }
@@ -1258,9 +1175,10 @@ struct SurfaceRoleEditorSheet: View {
                 return 0.1
             },
             set: { newValue in
-                if case .material(let material, let tintColorRole, _) = binding.wrappedValue.backgroundStyle {
-                    binding.wrappedValue.backgroundStyle = .material(material: material, tintColorRole: tintColorRole, tintOpacity: newValue)
-                }
+                binding.wrappedValue.backgroundStyle = BackgroundStyleConverter.updateMaterialTintOpacity(
+                    newValue,
+                    in: binding.wrappedValue.backgroundStyle
+                )
             }
         )
     }
@@ -1274,9 +1192,10 @@ struct SurfaceRoleEditorSheet: View {
                 return nil
             },
             set: { newValue in
-                if case .glass(_, let fallbackColorRole) = binding.wrappedValue.backgroundStyle {
-                    binding.wrappedValue.backgroundStyle = .glass(fallbackMaterial: newValue, fallbackColorRole: fallbackColorRole)
-                }
+                binding.wrappedValue.backgroundStyle = BackgroundStyleConverter.updateGlassFallbackMaterial(
+                    newValue,
+                    in: binding.wrappedValue.backgroundStyle
+                )
             }
         )
     }
@@ -1290,9 +1209,10 @@ struct SurfaceRoleEditorSheet: View {
                 return .surfaceBase
             },
             set: { newValue in
-                if case .glass(let fallbackMaterial, _) = binding.wrappedValue.backgroundStyle {
-                    binding.wrappedValue.backgroundStyle = .glass(fallbackMaterial: fallbackMaterial, fallbackColorRole: newValue)
-                }
+                binding.wrappedValue.backgroundStyle = BackgroundStyleConverter.updateGlassFallbackColorRole(
+                    newValue,
+                    in: binding.wrappedValue.backgroundStyle
+                )
             }
         )
     }

@@ -7,6 +7,8 @@ GentleDesignSystem/
 ├── Package.swift                 # SPM manifest (iOS 18+, Swift 6.1)
 ├── Sources/GentleDesignSystem/   # Package source (THE source of truth)
 ├── Tests/GentleDesignSystemTests/# Swift Testing tests
+│   ├── *.swift                   # Unit and snapshot test files
+│   └── __Snapshots__/            # Recorded snapshot baselines
 ├── Demo/                         # Demo iOS app (consumes package)
 │   ├── GentleDesignSystemDemo.xcodeproj
 │   ├── GentleDesignSystemDemo/   # App source
@@ -35,6 +37,25 @@ GentleDesignSystem/
 | `GentlePDFExporter.swift` | PDF generation for theme specs |
 | `String+camelCaseBreakable.swift` | String utility extension |
 
+## Test Files
+
+| File | Purpose |
+|------|---------|
+| `SnapshotTests.swift` | JSON and image snapshot tests for all presets and UI components |
+| `TokenTests.swift` | Token value and encoding tests |
+| `ThemeTests.swift` | Theme resolution tests |
+| `ThemeManagerTests.swift` | Persistence and manager tests |
+| `ButtonTokenTests.swift` | Button role and animation tests |
+| `FontTokenTests.swift` | Typography token tests |
+| `LayoutFacadeTests.swift` | Layout facade access tests |
+| `RoleEnumTests.swift` | Role enum coverage tests |
+| `SpecTests.swift` | Spec structure tests |
+| `ViewModifierTests.swift` | View modifier application tests |
+| `ViewBodyEvaluationTests.swift` | View body evaluation tests |
+| `VisualEffectsTests.swift` | Visual effect recipe tests |
+| `UIComponentTests.swift` | UI component tests |
+| `JSONEncodingTests.swift` | JSON encoding/decoding tests |
+
 ## What Lives Where
 
 | Need to... | Look in... |
@@ -50,6 +71,8 @@ GentleDesignSystem/
 | Modify persistence | `GentleDesignPersistence.swift` |
 | UIKit navigation styling | `GentleUIKitTheming.swift` |
 | Export theme as PDF | `GentlePDFExporter.swift` |
+| Add/update snapshot tests | `Tests/GentleDesignSystemTests/SnapshotTests.swift` |
+| View recorded snapshots | `Tests/GentleDesignSystemTests/__Snapshots__/` |
 
 ## Files That Should Not Be Edited Casually
 
