@@ -1,0 +1,659 @@
+{
+  "_specVersion" : "0.6.0",
+  "buttons" : {
+    "animations" : {
+      "bouncy" : {
+        "duration" : 0.1,
+        "pressedOpacity" : 0.94,
+        "pressedScale" : 0.97,
+        "springBlend" : 0,
+        "springDamping" : 0.7,
+        "springResponse" : 0.28
+      },
+      "pop" : {
+        "duration" : 0.1,
+        "pressedOpacity" : 0.93,
+        "pressedScale" : 0.975,
+        "springBlend" : 0,
+        "springDamping" : 0.78,
+        "springResponse" : 0.18
+      },
+      "springBack" : {
+        "duration" : 0.1,
+        "pressedOpacity" : 0.9,
+        "pressedScale" : 0.72,
+        "springBlend" : 0,
+        "springDamping" : 0.45,
+        "springResponse" : 0.45
+      },
+      "squish" : {
+        "duration" : 0.1,
+        "pressedOpacity" : 0.92,
+        "pressedScale" : 0.97,
+        "springBlend" : 0,
+        "springDamping" : 0.85,
+        "springResponse" : 0.22
+      },
+      "subtlePress" : {
+        "duration" : 0.12,
+        "pressedOpacity" : 0.95,
+        "pressedScale" : 0.98,
+        "springBlend" : 0,
+        "springDamping" : 1,
+        "springResponse" : 0
+      },
+      "unknown" : {
+        "duration" : 0,
+        "pressedOpacity" : 1,
+        "pressedScale" : 1,
+        "springBlend" : 0,
+        "springDamping" : 1,
+        "springResponse" : 0
+      }
+    },
+    "roles" : {
+      "destructive" : {
+        "animationRole" : "squish",
+        "borderRole" : "hidden",
+        "fillRole" : "solidFillDestructive",
+        "pressedOpacity" : 0.86,
+        "pressedScale" : 0.9,
+        "shape" : "pill",
+        "usesNativeStyle" : false
+      },
+      "primary" : {
+        "animationRole" : "springBack",
+        "borderRole" : "hidden",
+        "fillRole" : "solidFillPrimaryCTA",
+        "pressedOpacity" : 0.86,
+        "pressedScale" : 0.9,
+        "shape" : "pill",
+        "usesNativeStyle" : false
+      },
+      "quaternary" : {
+        "animationRole" : "subtlePress",
+        "borderRole" : "hidden",
+        "fillRole" : "hollow",
+        "pressedOpacity" : 0.93,
+        "pressedScale" : 0.95,
+        "shape" : "pill",
+        "usesNativeStyle" : true
+      },
+      "secondary" : {
+        "animationRole" : "subtlePress",
+        "borderRole" : "accent",
+        "fillRole" : "hollow",
+        "pressedOpacity" : 0.9,
+        "pressedScale" : 0.85,
+        "shape" : "pill",
+        "usesNativeStyle" : false
+      },
+      "tertiary" : {
+        "animationRole" : "subtlePress",
+        "borderRole" : "hidden",
+        "fillRole" : "hollow",
+        "pressedOpacity" : 0.9,
+        "pressedScale" : 0.85,
+        "shape" : "pill",
+        "usesNativeStyle" : true
+      }
+    }
+  },
+  "colors" : {
+    "pairByRole" : {
+      "background" : {
+        "darkHex" : "#1A0D06",
+        "lightHex" : "#FFF8F3"
+      },
+      "borderSubtle" : {
+        "darkHex" : "#4D3020",
+        "lightHex" : "#F0D4C0"
+      },
+      "destructive" : {
+        "darkHex" : "#FF6644",
+        "lightHex" : "#CC3300"
+      },
+      "primaryCTA" : {
+        "darkHex" : "#FF8C42",
+        "lightHex" : "#E85D04"
+      },
+      "surfaceBase" : {
+        "darkHex" : "#2D1A0F",
+        "lightHex" : "#FFEFE5"
+      },
+      "surfaceCardSecondary" : {
+        "darkHex" : "#422A1A",
+        "lightHex" : "#FEEADC"
+      },
+      "surfaceScrim" : {
+        "darkHex" : "#000000B3",
+        "lightHex" : "#000000B3"
+      },
+      "surfaceTint" : {
+        "darkHex" : "#140A05CC",
+        "lightHex" : "#3D1E0ACC"
+      },
+      "textOnDestructive" : {
+        "darkHex" : "#FFFFFF",
+        "lightHex" : "#FFFFFF"
+      },
+      "textOnOverlay" : {
+        "darkHex" : "#FFF0E6",
+        "lightHex" : "#3D1E0A"
+      },
+      "textOnOverlaySecondary" : {
+        "darkHex" : "#E0C4B0",
+        "lightHex" : "#664433"
+      },
+      "textOnPrimaryCTA" : {
+        "darkHex" : "#1A0D06",
+        "lightHex" : "#FFFFFF"
+      },
+      "textOnScrim" : {
+        "darkHex" : "#FFFFFF",
+        "lightHex" : "#FFFFFF"
+      },
+      "textOnScrimSecondary" : {
+        "darkHex" : "#C7CDD4",
+        "lightHex" : "#C7CDD4"
+      },
+      "textPrimary" : {
+        "darkHex" : "#FFF0E6",
+        "lightHex" : "#3D1E0A"
+      },
+      "textSecondary" : {
+        "darkHex" : "#E0C4B0",
+        "lightHex" : "#664433"
+      },
+      "textTertiary" : {
+        "darkHex" : "#C4A088",
+        "lightHex" : "#8B6B55"
+      },
+      "themePrimary" : {
+        "darkHex" : "#FF8C42",
+        "lightHex" : "#E85D04"
+      },
+      "themeSecondary" : {
+        "darkHex" : "#FFB87A",
+        "lightHex" : "#F5A060"
+      }
+    }
+  },
+  "layout" : {
+    "gap" : {
+      "l" : 16,
+      "m" : 12,
+      "s" : 8,
+      "xl" : 24,
+      "xs" : 4,
+      "xxl" : 32
+    },
+    "grid" : {
+      "l" : 16,
+      "m" : 12,
+      "s" : 8,
+      "xl" : 24,
+      "xs" : 4,
+      "xxl" : 32
+    },
+    "inset" : {
+      "card" : {
+        "regular" : {
+          "horizontal" : "l",
+          "vertical" : "l"
+        },
+        "roomy" : {
+          "horizontal" : "xl",
+          "vertical" : "xl"
+        },
+        "tight" : {
+          "horizontal" : "s",
+          "vertical" : "s"
+        }
+      },
+      "control" : {
+        "regular" : {
+          "horizontal" : "l",
+          "vertical" : "s"
+        },
+        "tight" : {
+          "horizontal" : "m",
+          "vertical" : "xs"
+        }
+      },
+      "listRow" : {
+        "regular" : {
+          "horizontal" : "l",
+          "vertical" : "s"
+        },
+        "tight" : {
+          "horizontal" : "m",
+          "vertical" : "xs"
+        }
+      },
+      "screen" : {
+        "regular" : {
+          "horizontal" : "m",
+          "vertical" : "l"
+        },
+        "roomy" : {
+          "horizontal" : "l",
+          "vertical" : "xl"
+        },
+        "tight" : {
+          "horizontal" : "s",
+          "vertical" : "m"
+        }
+      }
+    },
+    "scale" : {
+      "l" : 16,
+      "m" : 12,
+      "s" : 8,
+      "xl" : 24,
+      "xs" : 4,
+      "xxl" : 32
+    },
+    "touch" : {
+      "l" : 16,
+      "m" : 12,
+      "s" : 8,
+      "xl" : 24,
+      "xs" : 4,
+      "xxl" : 32
+    }
+  },
+  "surfaces" : {
+    "roles" : {
+      "appBackground" : {
+        "backgroundStyle" : {
+          "colorRole" : "background",
+          "type" : "solid"
+        },
+        "border" : {
+          "darkHex" : "#00000000",
+          "lightHex" : "#00000000"
+        },
+        "borderWidth" : 0,
+        "cornerRadius" : 0,
+        "shadowOffsetX" : 0,
+        "shadowOffsetY" : 0,
+        "shadowOpacity" : 0,
+        "shadowRadius" : 0,
+        "surfaceDepthEffect" : {
+          "type" : "noEffect"
+        }
+      },
+      "card" : {
+        "backgroundStyle" : {
+          "colorRole" : "surfaceBase",
+          "type" : "solid"
+        },
+        "border" : {
+          "darkHex" : "#4D3020",
+          "lightHex" : "#F0D4C0"
+        },
+        "borderWidth" : 2,
+        "cornerRadius" : 16,
+        "shadowOffsetX" : 0,
+        "shadowOffsetY" : 0,
+        "shadowOpacity" : 0,
+        "shadowRadius" : 0,
+        "surfaceDepthEffect" : {
+          "strength" : 0.08,
+          "type" : "highlightAndIndent"
+        }
+      },
+      "cardElevated" : {
+        "backgroundStyle" : {
+          "colorRole" : "surfaceBase",
+          "type" : "solid"
+        },
+        "border" : {
+          "darkHex" : "#4D302080",
+          "lightHex" : "#F0D4C080"
+        },
+        "borderWidth" : 2,
+        "cornerRadius" : 16,
+        "shadowOffsetX" : 0,
+        "shadowOffsetY" : 8,
+        "shadowOpacity" : 0.2,
+        "shadowRadius" : 16,
+        "surfaceDepthEffect" : {
+          "strength" : 0.15,
+          "type" : "highlightAndIndent"
+        }
+      },
+      "cardSecondary" : {
+        "backgroundStyle" : {
+          "colorRole" : "surfaceCardSecondary",
+          "type" : "solid"
+        },
+        "border" : {
+          "darkHex" : "#4D3020",
+          "lightHex" : "#F0D4C0"
+        },
+        "borderWidth" : 2,
+        "cornerRadius" : 14,
+        "shadowOffsetX" : 0,
+        "shadowOffsetY" : 0,
+        "shadowOpacity" : 0,
+        "shadowRadius" : 0,
+        "surfaceDepthEffect" : {
+          "strength" : 0.05,
+          "type" : "highlightAndIndent"
+        }
+      },
+      "chrome" : {
+        "backgroundStyle" : {
+          "material" : "thin",
+          "tintColorRole" : "surfaceBase",
+          "tintOpacity" : 0.1,
+          "type" : "material"
+        },
+        "border" : {
+          "darkHex" : "#00000000",
+          "lightHex" : "#00000000"
+        },
+        "borderWidth" : 0,
+        "cornerRadius" : 0,
+        "shadowOffsetX" : 0,
+        "shadowOffsetY" : 0,
+        "shadowOpacity" : 0,
+        "shadowRadius" : 0,
+        "surfaceDepthEffect" : {
+          "type" : "noEffect"
+        }
+      },
+      "floatingPanel" : {
+        "backgroundStyle" : {
+          "fallbackColorRole" : "surfaceBase",
+          "fallbackMaterial" : "thick",
+          "type" : "glass"
+        },
+        "border" : {
+          "darkHex" : "#FFFFFF20",
+          "lightHex" : "#FFFFFF40"
+        },
+        "borderWidth" : 1,
+        "cornerRadius" : 20,
+        "shadowOffsetX" : 0,
+        "shadowOffsetY" : 16,
+        "shadowOpacity" : 0.3,
+        "shadowRadius" : 32,
+        "surfaceDepthEffect" : {
+          "type" : "noEffect"
+        }
+      },
+      "floatingWidget" : {
+        "backgroundStyle" : {
+          "fallbackColorRole" : "surfaceBase",
+          "fallbackMaterial" : "thick",
+          "type" : "glass"
+        },
+        "border" : {
+          "darkHex" : "#00000000",
+          "lightHex" : "#00000000"
+        },
+        "borderWidth" : 0,
+        "cornerRadius" : 20,
+        "shadowOffsetX" : 0,
+        "shadowOffsetY" : 6,
+        "shadowOpacity" : 0.18,
+        "shadowRadius" : 12,
+        "surfaceDepthEffect" : {
+          "type" : "noEffect"
+        }
+      },
+      "overlayPopover" : {
+        "backgroundStyle" : {
+          "material" : "thick",
+          "tintColorRole" : "surfaceBase",
+          "tintOpacity" : 0.2,
+          "type" : "material"
+        },
+        "border" : {
+          "darkHex" : "#4D302060",
+          "lightHex" : "#F0D4C060"
+        },
+        "borderWidth" : 1.5,
+        "cornerRadius" : 14,
+        "shadowOffsetX" : 0,
+        "shadowOffsetY" : 10,
+        "shadowOpacity" : 0.25,
+        "shadowRadius" : 20,
+        "surfaceDepthEffect" : {
+          "type" : "noEffect"
+        }
+      },
+      "overlayScrim" : {
+        "backgroundStyle" : {
+          "colorRole" : "surfaceScrim",
+          "type" : "solid"
+        },
+        "border" : {
+          "darkHex" : "#00000000",
+          "lightHex" : "#00000000"
+        },
+        "borderWidth" : 0,
+        "cornerRadius" : 0,
+        "shadowOffsetX" : 0,
+        "shadowOffsetY" : 0,
+        "shadowOpacity" : 0,
+        "shadowRadius" : 0,
+        "surfaceDepthEffect" : {
+          "type" : "noEffect"
+        }
+      },
+      "overlaySheet" : {
+        "backgroundStyle" : {
+          "material" : "thick",
+          "tintColorRole" : "surfaceTint",
+          "tintOpacity" : 0.15,
+          "type" : "material"
+        },
+        "border" : {
+          "darkHex" : "#00000000",
+          "lightHex" : "#00000000"
+        },
+        "borderWidth" : 0,
+        "cornerRadius" : 0,
+        "shadowOffsetX" : 0,
+        "shadowOffsetY" : 0,
+        "shadowOpacity" : 0,
+        "shadowRadius" : 0,
+        "surfaceDepthEffect" : {
+          "type" : "noEffect"
+        }
+      }
+    }
+  },
+  "typography" : {
+    "roles" : {
+      "bodySecondary_m" : {
+        "colorRole" : "textSecondary",
+        "design" : "default",
+        "isUppercased" : false,
+        "letterSpacing" : 0,
+        "lineSpacing" : 2,
+        "pointSize" : 17,
+        "relativeTo" : "body",
+        "weight" : "medium"
+      },
+      "body_m" : {
+        "colorRole" : "textPrimary",
+        "design" : "default",
+        "isUppercased" : false,
+        "letterSpacing" : 0,
+        "lineSpacing" : 2,
+        "pointSize" : 17,
+        "relativeTo" : "body",
+        "weight" : "medium"
+      },
+      "callout_ms" : {
+        "colorRole" : "textSecondary",
+        "design" : "default",
+        "isUppercased" : false,
+        "letterSpacing" : 0,
+        "lineSpacing" : 0,
+        "pointSize" : 16,
+        "relativeTo" : "callout",
+        "weight" : "regular"
+      },
+      "caption2_s" : {
+        "colorRole" : "textTertiary",
+        "design" : "default",
+        "isUppercased" : false,
+        "letterSpacing" : 0,
+        "lineSpacing" : 0,
+        "pointSize" : 11,
+        "relativeTo" : "caption2",
+        "weight" : "regular"
+      },
+      "caption_s" : {
+        "colorRole" : "textTertiary",
+        "design" : "default",
+        "isUppercased" : false,
+        "letterSpacing" : 0,
+        "lineSpacing" : 0,
+        "pointSize" : 12,
+        "relativeTo" : "caption",
+        "weight" : "regular"
+      },
+      "footnote_s" : {
+        "colorRole" : "textTertiary",
+        "design" : "default",
+        "isUppercased" : false,
+        "letterSpacing" : 0,
+        "lineSpacing" : 0,
+        "pointSize" : 13,
+        "relativeTo" : "footnote",
+        "weight" : "regular"
+      },
+      "headline_m" : {
+        "colorRole" : "textPrimary",
+        "design" : "default",
+        "isUppercased" : false,
+        "letterSpacing" : 0,
+        "lineSpacing" : 0,
+        "pointSize" : 17,
+        "relativeTo" : "headline",
+        "weight" : "bold"
+      },
+      "largeTitle_xxl" : {
+        "colorRole" : "textPrimary",
+        "design" : "default",
+        "isUppercased" : false,
+        "letterSpacing" : -1,
+        "lineSpacing" : 4,
+        "pointSize" : 38,
+        "relativeTo" : "largeTitle",
+        "weight" : "black"
+      },
+      "monoCode_m" : {
+        "colorRole" : "textPrimary",
+        "design" : "monospaced",
+        "isUppercased" : false,
+        "letterSpacing" : 0.3,
+        "lineSpacing" : 0,
+        "pointSize" : 17,
+        "relativeTo" : "body",
+        "weight" : "regular",
+        "width" : "condensed"
+      },
+      "primaryButtonTitle_m" : {
+        "colorRole" : "textPrimary",
+        "design" : "default",
+        "isUppercased" : false,
+        "letterSpacing" : 0,
+        "lineSpacing" : 0,
+        "pointSize" : 17,
+        "relativeTo" : "headline",
+        "weight" : "heavy"
+      },
+      "quaternaryButtonTitle_m" : {
+        "colorRole" : "textPrimary",
+        "design" : "default",
+        "isUppercased" : false,
+        "letterSpacing" : 0,
+        "lineSpacing" : 0,
+        "pointSize" : 17,
+        "relativeTo" : "body",
+        "weight" : "medium"
+      },
+      "secondaryButtonTitle_m" : {
+        "colorRole" : "textPrimary",
+        "design" : "default",
+        "isUppercased" : false,
+        "letterSpacing" : 0,
+        "lineSpacing" : 0,
+        "pointSize" : 17,
+        "relativeTo" : "headline",
+        "weight" : "bold"
+      },
+      "subheadline_ms" : {
+        "colorRole" : "textSecondary",
+        "design" : "default",
+        "isUppercased" : false,
+        "letterSpacing" : 0,
+        "lineSpacing" : 0,
+        "pointSize" : 15,
+        "relativeTo" : "subheadline",
+        "weight" : "regular"
+      },
+      "tertiaryButtonTitle_m" : {
+        "colorRole" : "textPrimary",
+        "design" : "default",
+        "isUppercased" : false,
+        "letterSpacing" : 0,
+        "lineSpacing" : 0,
+        "pointSize" : 17,
+        "relativeTo" : "headline",
+        "weight" : "bold"
+      },
+      "title2_l" : {
+        "colorRole" : "textPrimary",
+        "design" : "default",
+        "isUppercased" : false,
+        "letterSpacing" : 0,
+        "lineSpacing" : 2,
+        "pointSize" : 24,
+        "relativeTo" : "title2",
+        "weight" : "bold"
+      },
+      "title3_ml" : {
+        "colorRole" : "textPrimary",
+        "design" : "default",
+        "isUppercased" : false,
+        "letterSpacing" : 0,
+        "lineSpacing" : 2,
+        "pointSize" : 20,
+        "relativeTo" : "title3",
+        "weight" : "bold"
+      },
+      "title_xl" : {
+        "colorRole" : "textPrimary",
+        "design" : "default",
+        "isUppercased" : false,
+        "letterSpacing" : -0.5,
+        "lineSpacing" : 3,
+        "pointSize" : 30,
+        "relativeTo" : "title",
+        "weight" : "heavy"
+      }
+    }
+  },
+  "visual" : {
+    "radii" : {
+      "large" : 20,
+      "medium" : 12,
+      "pill" : 999,
+      "small" : 8
+    },
+    "shadows" : {
+      "medium" : 6,
+      "none" : 0,
+      "small" : 2
+    }
+  }
+}
