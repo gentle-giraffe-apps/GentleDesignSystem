@@ -28,7 +28,7 @@ struct GentleJSONEncodableTests {
 
         let data = try spec.encodedJSONData()
 
-        #expect(data.count > 0)
+        #expect(data.isEmpty == false)
 
         // Should be parseable
         let decoded = try GentleDesignSystemSpec.fromJSONData(data)
