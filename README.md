@@ -429,12 +429,13 @@ GentleDesignSystem exposes ergonomic APIs while keeping logic centralized.
   ```swift
 Text("Hello")
     .gentleText(.headline_m)
-```
+  ```
 
   Internally:
-    - Resolves typography via `GentleTheme`
-    - Applies font, width, design, spacing, color
-    - Honors Dynamic Type automatically
+  - Resolves typography via `GentleTheme`
+  - Applies font, width, design, spacing, color
+  - Honors Dynamic Type automatically
+
 </details>
 
 <details>
@@ -452,6 +453,7 @@ Text("Hello")
   - Borders or shadows
 
   The role-based API avoids "magic numbers" leaking into views.
+
 </details>
 
 <details>
@@ -467,17 +469,19 @@ Button("Save") { }
   - Fully theme-driven
   - Support configurable animations
   - Easily extendable for new roles
+
 </details>
 
 ---
 
 ## 5. Theme Management & Persistence
 
-For apps that need runtime theme editing or persistence:
+<details>
+  <summary><strong>Runtime editing, persistence, and stores</strong></summary>
 
-### GentleThemeManager
+  GentleThemeManager
 
-```swift
+  ```swift
 @main
 struct MyApp: App {
     @State private var manager = GentleThemeManager(theme: .default)
@@ -491,11 +495,11 @@ struct MyApp: App {
         }
     }
 }
-```
+  ```
 
-### Using the Manager
+  Using the Manager
 
-```swift
+  ```swift
 @GentleThemeManagerRuntime private var manager
 
 // Save current theme to disk
@@ -507,16 +511,18 @@ try manager.load()
 // Get bindings for editing
 manager.typographyBinding(for: .body_m)
 manager.colorBinding(for: .primaryCTA)
-```
+  ```
 
-### Persistence
+  Persistence
 
-`GentleFileThemeSpecStore` handles JSON persistence to Application Support:
+  `GentleFileThemeSpecStore` handles JSON persistence to Application Support:
 
-```swift
+  ```swift
 let store = GentleFileThemeSpecStore(fileName: "my-theme.json")
 let manager = GentleThemeManager(theme: .default, store: store)
-```
+  ```
+
+</details>
 
 ---
 
