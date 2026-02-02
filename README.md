@@ -606,8 +606,9 @@ ForEach(presets, id: \.name) { preset in
 
 <details>
   <summary><strong>Typography roles</strong></summary>
+  
   <br/>
-  17 semantic text roles organized by size ramp (xxl > xl > l > ml > m > ms > s): 
+  17 semantic text roles organized by size ramp (xxl > xl > l > ml > m > ms > s):  
   <br/>
 
 | Ramp | Roles |
@@ -627,9 +628,12 @@ ForEach(presets, id: \.name) { preset in
 
 <details>
   <summary><strong>Button roles & animations</strong></summary>
-  <br/>
+  
+  **Button Roles**
+
   `primary` · `secondary` · `tertiary` · `quaternary` · `destructive` 
-  <br/>
+  
+  **Button Animations**
 
 | Animation | Description |
 |-----------|-------------|
