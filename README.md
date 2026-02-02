@@ -3,11 +3,11 @@
 <img src="Docs/README_assets/GentleDesignSystem.png" width="400" />
 
 [![CI](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/branch/main/graph/badge.svg)](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem)
 [![Swift](https://img.shields.io/badge/Swift-6.0–6.2-orange.svg)](https://swift.org)
 ![iOS](https://img.shields.io/badge/iOS-18.0+-blue?logo=apple)
 ![Platform](https://img.shields.io/badge/Platform-iPhone%20%7C%20iPad-lightgrey)
 ![SPM](https://img.shields.io/badge/SPM-Compatible-success)
-[![Coverage](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/branch/main/graph/badge.svg)](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem) 
 [![DeepSource Static Analysis](https://img.shields.io/badge/DeepSource-Static%20Analysis-0A2540?logo=deepsource&logoColor=white)](https://deepsource.io/) 
 [![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=active+issues&show_trend=true)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/) 
 ![Commit activity](https://img.shields.io/github/commit-activity/y/gentle-giraffe-apps/GentleDesignSystem)
@@ -99,24 +99,21 @@ VStack {
 
 ## Quality & Tooling
 
-This project enforces quality gates via CI and static analysis:
+<details>
+  <summary><strong>CI, static analysis, and coverage details</strong></summary>
 
-- **CI:** All commits to `main` must pass GitHub Actions checks
-- **Static analysis:** DeepSource runs on every commit to `main`.  
-  The badge indicates the current number of outstanding static analysis issues.
-- **Test coverage:** Codecov reports line coverage for the `main` branch
+  This project enforces quality gates via CI and static analysis:
 
-<sub><strong>Codecov Snapshot</strong></sub><br/>
-<a href="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem">
-  <img
-    src="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/graphs/icicle.svg"
-    height="72"
-    style="max-width: 420px;"
-    alt="Codecov coverage history icicle chart"
-  />
-</a>
+  - **CI:** All commits to `main` must pass GitHub Actions checks
+  - **Static analysis:** DeepSource runs on every commit
+  - **Test coverage:** Codecov reports line coverage
 
-These checks are intended to keep the design system safe to evolve over time.
+  <sub><strong>Codecov Snapshot</strong></sub><br/>
+  <a href="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem">
+    <img src="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/graphs/icicle.svg" height="72" />
+  </a>
+
+</details>
 
 ---
 
@@ -130,68 +127,72 @@ GentleDesignSystem is intentionally structured around **three layers**:
 
 This separation keeps design intent clear, runtime behavior predictable, and future evolution safe.
 
-### System Architecture
+<details>
+  <summary><strong>System Architecture (diagram)</strong></summary>
 
-```mermaid
-flowchart TB
-    subgraph Tokens["Token Layer (Design-Time)"]
-        Spec[GentleDesignSystemSpec]
-        Spec --> Colors[GentleColorTokens]
-        Spec --> Typography[GentleTypographyTokens]
-        Spec --> Layout[GentleLayoutTokens]
-        Spec --> Visual[GentleVisualTokens]
-        Spec --> Buttons[GentleButtonTokens]
-        Spec --> Surfaces[GentleSurfaceTokens]
-    end
+  ```mermaid
+  flowchart TB
+      subgraph Tokens["Token Layer (Design-Time)"]
+          Spec[GentleDesignSystemSpec]
+          Spec --> Colors[GentleColorTokens]
+          Spec --> Typography[GentleTypographyTokens]
+          Spec --> Layout[GentleLayoutTokens]
+          Spec --> Visual[GentleVisualTokens]
+          Spec --> Buttons[GentleButtonTokens]
+          Spec --> Surfaces[GentleSurfaceTokens]
+      end
 
-    subgraph Runtime["Runtime Layer"]
-        Theme[GentleTheme]
-        Manager[GentleThemeManager]
-        Store[GentleFileThemeSpecStore]
-        Manager --> Theme
-        Store -.->|load/save| Manager
-    end
+      subgraph Runtime["Runtime Layer"]
+          Theme[GentleTheme]
+          Manager[GentleThemeManager]
+          Store[GentleFileThemeSpecStore]
+          Manager --> Theme
+          Store -.->|load/save| Manager
+      end
 
-    subgraph SwiftUI["SwiftUI Layer"]
-        Root[GentleThemeRoot]
-        Env[Environment Values .gentleTheme]
-        Modifiers[View Modifiers]
-        Root --> Env
-        Env --> Modifiers
-    end
+      subgraph SwiftUI["SwiftUI Layer"]
+          Root[GentleThemeRoot]
+          Env[Environment Values .gentleTheme]
+          Modifiers[View Modifiers]
+          Root --> Env
+          Env --> Modifiers
+      end
 
-    Tokens --> Runtime
-    Runtime --> SwiftUI
-```
+      Tokens --> Runtime
+      Runtime --> SwiftUI
+  ```
+</details>
 
-### Data Flow
+<details>
+  <summary><strong>Data Flow (diagram)</strong></summary>
 
-```mermaid
-flowchart TB
-    JSON[(JSON File)] -->|load| Store[GentleFileThemeSpecStore]
-    Store --> Manager[GentleThemeManager]
-    Manager --> Theme[GentleTheme]
-    Theme --> Resolve{Resolution}
+  ```mermaid
+  flowchart TB
+      JSON[(JSON File)] -->|load| Store[GentleFileThemeSpecStore]
+      Store --> Manager[GentleThemeManager]
+      Manager --> Theme[GentleTheme]
+      Theme --> Resolve{Resolution}
 
-    Resolve -->|ColorScheme| ResolvedColor[Color]
-    Resolve -->|ContentSizeCategory| ResolvedFont[Font]
+      Resolve -->|ColorScheme| ResolvedColor[Color]
+      Resolve -->|ContentSizeCategory| ResolvedFont[Font]
 
-    ResolvedColor --> View[SwiftUI View]
-    ResolvedFont --> View
+      ResolvedColor --> View[SwiftUI View]
+      ResolvedFont --> View
 
-    View -->|.gentleText| Text
-    View -->|.gentleButton| Button
-    View -->|.gentleSurface| Surface
-```
+      View -->|.gentleText| Text
+      View -->|.gentleButton| Button
+      View -->|.gentleSurface| Surface
+  ```
+</details>
 
-### Data Model
+<details>
+  <summary><strong>Data Model (spec structure)</strong></summary>
 
-The design system is defined by a single JSON-friendly specification
-(`GentleDesignSystemSpec`). The diagram below shows the structure of that
-spec and how token groups are organized.
+  The design system is defined by a single JSON-friendly specification
+  (`GentleDesignSystemSpec`).
 
-```
-GentleDesignSystemSpec
+  ```text
+  GentleDesignSystemSpec
 │
 ├── colors: GentleColorTokens
 │       │
@@ -293,7 +294,8 @@ GentleDesignSystemSpec
                         ├── shadowOpacity: Double
                         ├── shadowOffsetX: Double
                         └── shadowOffsetY: Double
-```
+  ```
+</details>
 
 > **Why roles instead of direct values?**  
 > Roles provide stable identifiers that allow themes to evolve safely over time.
@@ -317,17 +319,20 @@ The token layer defines *what* your design system means — not how it is render
 | **Buttons** | `GentleButtonRole`, `GentleButtonRoleSpec`, `GentleButtonTokens`, `GentleButtonAnimationRole` |
 | **Surfaces** | `GentleSurfaceRole`, `GentleSurfaceRoleSpec`, `GentleSurfaceTokens` |
 
-All tokens are:
-- `Codable`
-- `Sendable`
-- JSON-friendly
+<details>
+  <summary><strong>Token guarantees & base spec</strong></summary>
 
-This makes it easy to:
-- Persist themes
-- Load themes remotely
-- Share tokens across platforms later
+  All tokens are:
+  - `Codable`
+  - `Sendable`
+  - JSON-friendly
 
-```swift
+  This makes it easy to:
+  - Persist themes
+  - Load themes remotely
+  - Share tokens across platforms later
+
+  ```swift
 public struct GentleDesignSystemSpec: Codable, Sendable {
     public var specVersion: String
     public var colors: GentleColorTokens
@@ -337,7 +342,8 @@ public struct GentleDesignSystemSpec: Codable, Sendable {
     public var buttons: GentleButtonTokens
     public var surfaces: GentleSurfaceTokens
 }
-```
+  ```
+</details>
 
 The default theme (`.default`) is simply one concrete spec.
 
@@ -368,9 +374,10 @@ This ensures:
 
 ### Property Wrappers
 
-For convenient access to the theme in views:
+<details>
+  <summary><strong>Runtime access helpers</strong></summary>
 
-```swift
+  ```swift
 // Access resolved theme values
 @GentleDesignRuntime private var design
 
@@ -378,7 +385,8 @@ For convenient access to the theme in views:
 design.color(.textPrimary)    // Color for current scheme
 design.layout.stack.regular   // CGFloat spacing value
 design.buttons                // Button tokens
-```
+  ```
+</details>
 
 ---
 
@@ -413,57 +421,67 @@ This avoids:
 
 ## 4. Modifiers & View Extensions
 
-GentleDesignSystem exposes *ergonomic APIs* while keeping logic centralized.
+GentleDesignSystem exposes ergonomic APIs while keeping logic centralized.
 
-### Text
+<details>
+  <summary><strong>Text modifiers</strong></summary>
 
-```swift
+  ```swift
 Text("Hello")
     .gentleText(.headline_m)
-```
+  ```
 
-Internally:
-- Resolves typography via `GentleTheme`
-- Applies font, width, design, spacing, color
-- Honors Dynamic Type automatically
+  Internally:
+  - Resolves typography via `GentleTheme`
+  - Applies font, width, design, spacing, color
+  - Honors Dynamic Type automatically
 
-### Surfaces
+</details>
 
-```swift
-VStack { ... }
+<details>
+  <summary><strong>Surfaces</strong></summary>
+
+  ```swift
+  VStack { ... }
     .gentleSurface(.card)
-```
+  ```
 
-Surfaces apply:
-- Background color
-- Padding (when appropriate)
-- Corner radius
-- Borders or shadows
+  Surfaces apply:
+  - Background color
+  - Padding (when appropriate)
+  - Corner radius
+  - Borders or shadows
 
-The role-based API avoids "magic numbers" leaking into views.
+  The role-based API avoids "magic numbers" leaking into views.
 
-### Buttons
+</details>
 
-```swift
+<details>
+  <summary><strong>Buttons</strong></summary>
+
+  ```swift
 Button("Save") { }
     .gentleButton(.primary)
-```
+  ```
 
-Buttons are:
-- Styled via `ButtonStyle`
-- Fully theme-driven
-- Support configurable animations
-- Easily extendable for new roles
+  Buttons are:
+  - Styled via `ButtonStyle`
+  - Fully theme-driven
+  - Support configurable animations
+  - Easily extendable for new roles
+
+</details>
 
 ---
 
 ## 5. Theme Management & Persistence
 
-For apps that need runtime theme editing or persistence:
+<details>
+  <summary><strong>Runtime editing, persistence, and stores</strong></summary>
+  
+  **GentleThemeManager**
 
-### GentleThemeManager
-
-```swift
+  ```swift
 @main
 struct MyApp: App {
     @State private var manager = GentleThemeManager(theme: .default)
@@ -477,11 +495,11 @@ struct MyApp: App {
         }
     }
 }
-```
+  ```
 
-### Using the Manager
+  **Using the Manager**
 
-```swift
+  ```swift
 @GentleThemeManagerRuntime private var manager
 
 // Save current theme to disk
@@ -493,16 +511,18 @@ try manager.load()
 // Get bindings for editing
 manager.typographyBinding(for: .body_m)
 manager.colorBinding(for: .primaryCTA)
-```
+  ```
 
-### Persistence
+  **Persistence**
 
-`GentleFileThemeSpecStore` handles JSON persistence to Application Support:
+  `GentleFileThemeSpecStore` handles JSON persistence to Application Support:
 
-```swift
+  ```swift
 let store = GentleFileThemeSpecStore(fileName: "my-theme.json")
 let manager = GentleThemeManager(theme: .default, store: store)
-```
+  ```
+
+</details>
 
 ---
 
@@ -510,9 +530,10 @@ let manager = GentleThemeManager(theme: .default, store: store)
 
 GentleDesignSystem includes 9 built-in theme presets, each designed for different use cases and aesthetics.
 
-### Accessing Presets
+<details>
+  <summary><strong>Available theme presets</strong></summary>
 
-```swift
+  ```swift
 // Get all available presets
 let presets = GentleDesignSystemSpec.allPresets
 
@@ -523,9 +544,7 @@ let presets = GentleDesignSystemSpec.allPresets
 // - purpose: When to use this preset
 // - systemImageString: SF Symbol name for UI
 // - spec: The actual GentleDesignSystemSpec
-```
-
-### Available Presets
+  ```
 
 | Preset | Summary | Best For |
 |--------|---------|----------|
@@ -538,6 +557,8 @@ let presets = GentleDesignSystemSpec.allPresets
 | **Bold Orange** | Vibrant, energetic with strong presence | Apps that motivate action |
 | **Elegant Purple** | Sophisticated, luxurious with rich tones | Lifestyle, creative, premium apps |
 | **Compact Mint** | Dense, efficient with fresh accents | Data-rich interfaces |
+
+</details>
 
 ### Using Presets
 
@@ -555,7 +576,10 @@ if let editorialPreset = GentleDesignSystemSpec.allPresets.first(where: { $0.nam
 
 The demo app includes a `ThemePickerView` that displays all presets as interactive cards. Each card previews the preset's typography and colors using the preset's own theme:
 
-```swift
+<details>
+  <summary><strong>Building a theme picker</strong></summary>
+
+  ```swift
 ForEach(presets, id: \.name) { preset in
     let previewTheme = GentleTheme(
         defaultSpec: preset.spec,
@@ -571,15 +595,21 @@ ForEach(presets, id: \.name) { preset in
         }
     }
 }
-```
+  ```
+
+</details>
+
 
 ---
 
 ## Available Tokens
 
-### Typography Roles
-
-17 semantic text roles organized by size ramp (xxl > xl > l > ml > m > ms > s):
+<details>
+  <summary><strong>Typography roles</strong></summary>
+  
+  <br/>
+  17 semantic text roles organized by size ramp (xxl > xl > l > ml > m > ms > s):  
+  <br/>
 
 | Ramp | Roles |
 |------|-------|
@@ -591,13 +621,19 @@ ForEach(presets, id: \.name) { preset in
 | MS | `callout_ms`, `subheadline_ms` |
 | S | `footnote_s`, `caption_s`, `caption2_s` |
 
-Each role resolves to a `GentleTypographyRoleSpec` containing: `pointSize`, `weight`, `design`, `width`, `relativeTo`, `lineSpacing`, `letterSpacing`, `isUppercased`, and `colorRole`.
+  Each role resolves to a `GentleTypographyRoleSpec` containing: `pointSize`, `weight`, `design`, `width`, `relativeTo`, `lineSpacing`, `letterSpacing`, `isUppercased`, and `colorRole`.
 
-### Button Roles
+</details>
 
-`primary` · `secondary` · `tertiary` · `quaternary` · `destructive`
 
-### Button Animation Roles
+<details>
+  <summary><strong>Button roles & animations</strong></summary>
+  
+  **Button Roles**
+
+  `primary` · `secondary` · `tertiary` · `quaternary` · `destructive` 
+  
+  **Button Animations**
 
 | Animation | Description |
 |-----------|-------------|
@@ -608,11 +644,16 @@ Each role resolves to a `GentleTypographyRoleSpec` containing: `pointSize`, `wei
 | `bouncy` | Bouncy spring animation |
 | `springBack` | Shrinks on press, springs back past original size before settling |
 
-### Surface Roles
+</details>
 
-`appBackground` · `card` · `cardElevated` · `cardSecondary` · `chrome` · `overlaySheet` · `overlayPopover` · `overlayScrim` · `floatingPanel` · `floatingWidget`
+<details>
+  <summary><strong>Surface roles</strong></summary>
+  `appBackground` · `card` · `cardElevated` · `cardSecondary` · `chrome` · `overlaySheet` · `overlayPopover` · `overlayScrim` · `floatingPanel` · `floatingWidget`
+</details>
 
-### Color Roles
+
+<details>
+  <summary><strong>Color roles</strong></summary>
 
 | Category | Roles |
 |----------|-------|
@@ -624,13 +665,19 @@ Each role resolves to a `GentleTypographyRoleSpec` containing: `pointSize`, `wei
 Use semantic groupings: `GentleColorRole.textRoles`, `.surfaceRoles`, `.actionRoles`, `.themeRoles`
 Use membership checks: `role.isTextRole`, `.isSurfaceRole`, `.isActionRole`, `.isThemeRole`
 
-### Spacing Tokens
+</details>
 
-`xs` (4) · `s` (8) · `m` (12) · `l` (16) · `xl` (24) · `xxl` (32)
+<details>
+  <summary><strong>Spacing & radius tokens</strong></summary>
 
-### Radius Tokens
+  **Spacing Tokens**
+  `xs` (4) · `s` (8) · `m` (12) · `l` (16) · `xl` (24) · `xxl` (32)
 
-`small` (8) · `medium` (12) · `large` (20) · `pill` (999)
+
+  **Radius Tokens**
+  `small` (8) · `medium` (12) · `large` (20) · `pill` (999)  
+
+</details>
 
 ---
 
