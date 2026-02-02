@@ -3,11 +3,11 @@
 <img src="Docs/README_assets/GentleDesignSystem.png" width="400" />
 
 [![CI](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/gentle-giraffe-apps/GentleDesignSystem/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/branch/main/graph/badge.svg)](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem)
 [![Swift](https://img.shields.io/badge/Swift-6.0–6.2-orange.svg)](https://swift.org)
 ![iOS](https://img.shields.io/badge/iOS-18.0+-blue?logo=apple)
 ![Platform](https://img.shields.io/badge/Platform-iPhone%20%7C%20iPad-lightgrey)
 ![SPM](https://img.shields.io/badge/SPM-Compatible-success)
-[![Coverage](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/branch/main/graph/badge.svg)](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem) 
 [![DeepSource Static Analysis](https://img.shields.io/badge/DeepSource-Static%20Analysis-0A2540?logo=deepsource&logoColor=white)](https://deepsource.io/) 
 [![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=active+issues&show_trend=true)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/) 
 ![Commit activity](https://img.shields.io/github/commit-activity/y/gentle-giraffe-apps/GentleDesignSystem)
@@ -130,68 +130,72 @@ GentleDesignSystem is intentionally structured around **three layers**:
 
 This separation keeps design intent clear, runtime behavior predictable, and future evolution safe.
 
-### System Architecture
+<details>
+  <summary><strong>System Architecture (diagram)</strong></summary>
 
-```mermaid
-flowchart TB
-    subgraph Tokens["Token Layer (Design-Time)"]
-        Spec[GentleDesignSystemSpec]
-        Spec --> Colors[GentleColorTokens]
-        Spec --> Typography[GentleTypographyTokens]
-        Spec --> Layout[GentleLayoutTokens]
-        Spec --> Visual[GentleVisualTokens]
-        Spec --> Buttons[GentleButtonTokens]
-        Spec --> Surfaces[GentleSurfaceTokens]
-    end
+  ```mermaid
+  flowchart TB
+      subgraph Tokens["Token Layer (Design-Time)"]
+          Spec[GentleDesignSystemSpec]
+          Spec --> Colors[GentleColorTokens]
+          Spec --> Typography[GentleTypographyTokens]
+          Spec --> Layout[GentleLayoutTokens]
+          Spec --> Visual[GentleVisualTokens]
+          Spec --> Buttons[GentleButtonTokens]
+          Spec --> Surfaces[GentleSurfaceTokens]
+      end
 
-    subgraph Runtime["Runtime Layer"]
-        Theme[GentleTheme]
-        Manager[GentleThemeManager]
-        Store[GentleFileThemeSpecStore]
-        Manager --> Theme
-        Store -.->|load/save| Manager
-    end
+      subgraph Runtime["Runtime Layer"]
+          Theme[GentleTheme]
+          Manager[GentleThemeManager]
+          Store[GentleFileThemeSpecStore]
+          Manager --> Theme
+          Store -.->|load/save| Manager
+      end
 
-    subgraph SwiftUI["SwiftUI Layer"]
-        Root[GentleThemeRoot]
-        Env[Environment Values .gentleTheme]
-        Modifiers[View Modifiers]
-        Root --> Env
-        Env --> Modifiers
-    end
+      subgraph SwiftUI["SwiftUI Layer"]
+          Root[GentleThemeRoot]
+          Env[Environment Values .gentleTheme]
+          Modifiers[View Modifiers]
+          Root --> Env
+          Env --> Modifiers
+      end
 
-    Tokens --> Runtime
-    Runtime --> SwiftUI
-```
+      Tokens --> Runtime
+      Runtime --> SwiftUI
+  ```
+</details>
 
-### Data Flow
+<details>
+  <summary><strong>Data Flow (diagram)</strong></summary>
 
-```mermaid
-flowchart TB
-    JSON[(JSON File)] -->|load| Store[GentleFileThemeSpecStore]
-    Store --> Manager[GentleThemeManager]
-    Manager --> Theme[GentleTheme]
-    Theme --> Resolve{Resolution}
+  ```mermaid
+  flowchart TB
+      JSON[(JSON File)] -->|load| Store[GentleFileThemeSpecStore]
+      Store --> Manager[GentleThemeManager]
+      Manager --> Theme[GentleTheme]
+      Theme --> Resolve{Resolution}
 
-    Resolve -->|ColorScheme| ResolvedColor[Color]
-    Resolve -->|ContentSizeCategory| ResolvedFont[Font]
+      Resolve -->|ColorScheme| ResolvedColor[Color]
+      Resolve -->|ContentSizeCategory| ResolvedFont[Font]
 
-    ResolvedColor --> View[SwiftUI View]
-    ResolvedFont --> View
+      ResolvedColor --> View[SwiftUI View]
+      ResolvedFont --> View
 
-    View -->|.gentleText| Text
-    View -->|.gentleButton| Button
-    View -->|.gentleSurface| Surface
-```
+      View -->|.gentleText| Text
+      View -->|.gentleButton| Button
+      View -->|.gentleSurface| Surface
+  ```
+</details>
 
-### Data Model
+<details>
+  <summary><strong>Data Model (spec structure)</strong></summary>
 
-The design system is defined by a single JSON-friendly specification
-(`GentleDesignSystemSpec`). The diagram below shows the structure of that
-spec and how token groups are organized.
+  The design system is defined by a single JSON-friendly specification
+  (`GentleDesignSystemSpec`).
 
-```
-GentleDesignSystemSpec
+  ```text
+  GentleDesignSystemSpec
 │
 ├── colors: GentleColorTokens
 │       │
@@ -293,7 +297,8 @@ GentleDesignSystemSpec
                         ├── shadowOpacity: Double
                         ├── shadowOffsetX: Double
                         └── shadowOffsetY: Double
-```
+  ```
+</details>
 
 > **Why roles instead of direct values?**  
 > Roles provide stable identifiers that allow themes to evolve safely over time.
