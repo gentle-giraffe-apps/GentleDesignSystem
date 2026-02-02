@@ -478,8 +478,8 @@ Button("Save") { }
 
 <details>
   <summary><strong>Runtime editing, persistence, and stores</strong></summary>
-
-  GentleThemeManager
+  <br/>
+  **GentleThemeManager**
 
   ```swift
 @main
@@ -497,7 +497,7 @@ struct MyApp: App {
 }
   ```
 
-  Using the Manager
+  **Using the Manager**
 
   ```swift
 @GentleThemeManagerRuntime private var manager
@@ -513,7 +513,7 @@ manager.typographyBinding(for: .body_m)
 manager.colorBinding(for: .primaryCTA)
   ```
 
-  Persistence
+  **Persistence**
 
   `GentleFileThemeSpecStore` handles JSON persistence to Application Support:
 
@@ -530,8 +530,6 @@ let manager = GentleThemeManager(theme: .default, store: store)
 
 GentleDesignSystem includes 9 built-in theme presets, each designed for different use cases and aesthetics.
 
-### Accessing Presets
-
 ```swift
 // Get all available presets
 let presets = GentleDesignSystemSpec.allPresets
@@ -545,7 +543,8 @@ let presets = GentleDesignSystemSpec.allPresets
 // - spec: The actual GentleDesignSystemSpec
 ```
 
-### Available Presets
+<details>
+  <summary><strong>Available theme presets</strong></summary>
 
 | Preset | Summary | Best For |
 |--------|---------|----------|
@@ -558,6 +557,8 @@ let presets = GentleDesignSystemSpec.allPresets
 | **Bold Orange** | Vibrant, energetic with strong presence | Apps that motivate action |
 | **Elegant Purple** | Sophisticated, luxurious with rich tones | Lifestyle, creative, premium apps |
 | **Compact Mint** | Dense, efficient with fresh accents | Data-rich interfaces |
+
+</details>
 
 ### Using Presets
 
@@ -575,7 +576,10 @@ if let editorialPreset = GentleDesignSystemSpec.allPresets.first(where: { $0.nam
 
 The demo app includes a `ThemePickerView` that displays all presets as interactive cards. Each card previews the preset's typography and colors using the preset's own theme:
 
-```swift
+<details>
+  <summary><strong>Building a theme picker</strong></summary>
+
+  ```swift
 ForEach(presets, id: \.name) { preset in
     let previewTheme = GentleTheme(
         defaultSpec: preset.spec,
@@ -591,15 +595,19 @@ ForEach(presets, id: \.name) { preset in
         }
     }
 }
-```
+  ```
+
+</details>
+
 
 ---
 
 ## Available Tokens
 
-### Typography Roles
-
-17 semantic text roles organized by size ramp (xxl > xl > l > ml > m > ms > s):
+<details>
+  <summary><strong>Typography roles</strong></summary>
+  <br/>
+  17 semantic text roles organized by size ramp (xxl > xl > l > ml > m > ms > s):
 
 | Ramp | Roles |
 |------|-------|
@@ -611,13 +619,15 @@ ForEach(presets, id: \.name) { preset in
 | MS | `callout_ms`, `subheadline_ms` |
 | S | `footnote_s`, `caption_s`, `caption2_s` |
 
-Each role resolves to a `GentleTypographyRoleSpec` containing: `pointSize`, `weight`, `design`, `width`, `relativeTo`, `lineSpacing`, `letterSpacing`, `isUppercased`, and `colorRole`.
+  Each role resolves to a `GentleTypographyRoleSpec` containing: `pointSize`, `weight`, `design`, `width`, `relativeTo`, `lineSpacing`, `letterSpacing`, `isUppercased`, and `colorRole`.
 
-### Button Roles
+</details>
 
-`primary` · `secondary` · `tertiary` · `quaternary` · `destructive`
 
-### Button Animation Roles
+<details>
+  <summary><strong>Button roles & animations</strong></summary>
+  <br/>
+  `primary` · `secondary` · `tertiary` · `quaternary` · `destructive`
 
 | Animation | Description |
 |-----------|-------------|
@@ -628,12 +638,16 @@ Each role resolves to a `GentleTypographyRoleSpec` containing: `pointSize`, `wei
 | `bouncy` | Bouncy spring animation |
 | `springBack` | Shrinks on press, springs back past original size before settling |
 
-### Surface Roles
+</details>
 
-`appBackground` · `card` · `cardElevated` · `cardSecondary` · `chrome` · `overlaySheet` · `overlayPopover` · `overlayScrim` · `floatingPanel` · `floatingWidget`
+<details>
+  <summary><strong>Surface roles</strong></summary>
+  `appBackground` · `card` · `cardElevated` · `cardSecondary` · `chrome` · `overlaySheet` · `overlayPopover` · `overlayScrim` · `floatingPanel` · `floatingWidget`
+</details>
 
-### Color Roles
 
+<details>
+  <summary><strong>Color roles</strong></summary>
 | Category | Roles |
 |----------|-------|
 | Text (9) | `textPrimary`, `textSecondary`, `textTertiary`, `textOnPrimaryCTA`, `textOnDestructive`, `textOnOverlay`, `textOnOverlaySecondary`, `textOnScrim`, `textOnScrimSecondary` |
@@ -643,6 +657,8 @@ Each role resolves to a `GentleTypographyRoleSpec` containing: `pointSize`, `wei
 
 Use semantic groupings: `GentleColorRole.textRoles`, `.surfaceRoles`, `.actionRoles`, `.themeRoles`
 Use membership checks: `role.isTextRole`, `.isSurfaceRole`, `.isActionRole`, `.isThemeRole`
+
+</details>
 
 ### Spacing Tokens
 
