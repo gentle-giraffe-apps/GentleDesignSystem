@@ -608,7 +608,8 @@ ForEach(presets, id: \.name) { preset in
   <summary><strong>Typography roles</strong></summary>
   <br/>
   17 semantic text roles organized by size ramp (xxl > xl > l > ml > m > ms > s):
-
+  <br/>
+  
 | Ramp | Roles |
 |------|-------|
 | XXL | `largeTitle_xxl` |
@@ -628,6 +629,7 @@ ForEach(presets, id: \.name) { preset in
   <summary><strong>Button roles & animations</strong></summary>
   <br/>
   `primary` · `secondary` · `tertiary` · `quaternary` · `destructive`
+  <br/>
 
 | Animation | Description |
 |-----------|-------------|
@@ -648,6 +650,7 @@ ForEach(presets, id: \.name) { preset in
 
 <details>
   <summary><strong>Color roles</strong></summary>
+
 | Category | Roles |
 |----------|-------|
 | Text (9) | `textPrimary`, `textSecondary`, `textTertiary`, `textOnPrimaryCTA`, `textOnDestructive`, `textOnOverlay`, `textOnOverlaySecondary`, `textOnScrim`, `textOnScrimSecondary` |
