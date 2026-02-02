@@ -99,24 +99,21 @@ VStack {
 
 ## Quality & Tooling
 
-This project enforces quality gates via CI and static analysis:
+<details>
+  <summary><strong>CI, static analysis, and coverage details</strong></summary>
 
-- **CI:** All commits to `main` must pass GitHub Actions checks
-- **Static analysis:** DeepSource runs on every commit to `main`.  
-  The badge indicates the current number of outstanding static analysis issues.
-- **Test coverage:** Codecov reports line coverage for the `main` branch
+  This project enforces quality gates via CI and static analysis:
 
-<sub><strong>Codecov Snapshot</strong></sub><br/>
-<a href="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem">
-  <img
-    src="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/graphs/icicle.svg"
-    height="72"
-    style="max-width: 420px;"
-    alt="Codecov coverage history icicle chart"
-  />
-</a>
+  - **CI:** All commits to `main` must pass GitHub Actions checks
+  - **Static analysis:** DeepSource runs on every commit
+  - **Test coverage:** Codecov reports line coverage
 
-These checks are intended to keep the design system safe to evolve over time.
+  <sub><strong>Codecov Snapshot</strong></sub><br/>
+  <a href="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem">
+    <img src="https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/graphs/icicle.svg" height="72" />
+  </a>
+
+</details>
 
 ---
 
@@ -322,17 +319,20 @@ The token layer defines *what* your design system means — not how it is render
 | **Buttons** | `GentleButtonRole`, `GentleButtonRoleSpec`, `GentleButtonTokens`, `GentleButtonAnimationRole` |
 | **Surfaces** | `GentleSurfaceRole`, `GentleSurfaceRoleSpec`, `GentleSurfaceTokens` |
 
-All tokens are:
-- `Codable`
-- `Sendable`
-- JSON-friendly
+<details>
+  <summary><strong>Token guarantees & base spec</strong></summary>
 
-This makes it easy to:
-- Persist themes
-- Load themes remotely
-- Share tokens across platforms later
+  All tokens are:
+  - `Codable`
+  - `Sendable`
+  - JSON-friendly
 
-```swift
+  This makes it easy to:
+  - Persist themes
+  - Load themes remotely
+  - Share tokens across platforms later
+
+  ```swift
 public struct GentleDesignSystemSpec: Codable, Sendable {
     public var specVersion: String
     public var colors: GentleColorTokens
@@ -342,7 +342,8 @@ public struct GentleDesignSystemSpec: Codable, Sendable {
     public var buttons: GentleButtonTokens
     public var surfaces: GentleSurfaceTokens
 }
-```
+  ```
+</details>
 
 The default theme (`.default`) is simply one concrete spec.
 
@@ -373,9 +374,10 @@ This ensures:
 
 ### Property Wrappers
 
-For convenient access to the theme in views:
+<details>
+  <summary><strong>Runtime access helpers</strong></summary>
 
-```swift
+  ```swift
 // Access resolved theme values
 @GentleDesignRuntime private var design
 
@@ -383,7 +385,8 @@ For convenient access to the theme in views:
 design.color(.textPrimary)    // Color for current scheme
 design.layout.stack.regular   // CGFloat spacing value
 design.buttons                // Button tokens
-```
+  ```
+</details>
 
 ---
 
@@ -418,47 +421,53 @@ This avoids:
 
 ## 4. Modifiers & View Extensions
 
-GentleDesignSystem exposes *ergonomic APIs* while keeping logic centralized.
+GentleDesignSystem exposes ergonomic APIs while keeping logic centralized.
 
-### Text
+<details>
+  <summary><strong>Text modifiers</strong></summary>
 
-```swift
+  ```swift
 Text("Hello")
     .gentleText(.headline_m)
 ```
 
-Internally:
-- Resolves typography via `GentleTheme`
-- Applies font, width, design, spacing, color
-- Honors Dynamic Type automatically
+  Internally:
+    - Resolves typography via `GentleTheme`
+    - Applies font, width, design, spacing, color
+    - Honors Dynamic Type automatically
+</details>
 
-### Surfaces
+<details>
+  <summary><strong>Surfaces</strong></summary>
 
-```swift
-VStack { ... }
+  ```swift
+  VStack { ... }
     .gentleSurface(.card)
-```
+  ```
 
-Surfaces apply:
-- Background color
-- Padding (when appropriate)
-- Corner radius
-- Borders or shadows
+  Surfaces apply:
+  - Background color
+  - Padding (when appropriate)
+  - Corner radius
+  - Borders or shadows
 
-The role-based API avoids "magic numbers" leaking into views.
+  The role-based API avoids "magic numbers" leaking into views.
+</details>
 
-### Buttons
+<details>
+  <summary><strong>Buttons</strong></summary>
 
-```swift
+  ```swift
 Button("Save") { }
     .gentleButton(.primary)
-```
+  ```
 
-Buttons are:
-- Styled via `ButtonStyle`
-- Fully theme-driven
-- Support configurable animations
-- Easily extendable for new roles
+  Buttons are:
+  - Styled via `ButtonStyle`
+  - Fully theme-driven
+  - Support configurable animations
+  - Easily extendable for new roles
+</details>
 
 ---
 
