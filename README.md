@@ -478,7 +478,7 @@ Button("Save") { }
 
 <details>
   <summary><strong>Runtime editing, persistence, and stores</strong></summary>
-  <br/>
+  
   **GentleThemeManager**
 
   ```swift
@@ -530,7 +530,10 @@ let manager = GentleThemeManager(theme: .default, store: store)
 
 GentleDesignSystem includes 9 built-in theme presets, each designed for different use cases and aesthetics.
 
-```swift
+<details>
+  <summary><strong>Available theme presets</strong></summary>
+
+  ```swift
 // Get all available presets
 let presets = GentleDesignSystemSpec.allPresets
 
@@ -541,10 +544,7 @@ let presets = GentleDesignSystemSpec.allPresets
 // - purpose: When to use this preset
 // - systemImageString: SF Symbol name for UI
 // - spec: The actual GentleDesignSystemSpec
-```
-
-<details>
-  <summary><strong>Available theme presets</strong></summary>
+  ```
 
 | Preset | Summary | Best For |
 |--------|---------|----------|
@@ -607,9 +607,9 @@ ForEach(presets, id: \.name) { preset in
 <details>
   <summary><strong>Typography roles</strong></summary>
   <br/>
-  17 semantic text roles organized by size ramp (xxl > xl > l > ml > m > ms > s):
+  17 semantic text roles organized by size ramp (xxl > xl > l > ml > m > ms > s): 
   <br/>
-  
+
 | Ramp | Roles |
 |------|-------|
 | XXL | `largeTitle_xxl` |
@@ -628,7 +628,7 @@ ForEach(presets, id: \.name) { preset in
 <details>
   <summary><strong>Button roles & animations</strong></summary>
   <br/>
-  `primary` · `secondary` · `tertiary` · `quaternary` · `destructive`
+  `primary` · `secondary` · `tertiary` · `quaternary` · `destructive` 
   <br/>
 
 | Animation | Description |
@@ -663,13 +663,17 @@ Use membership checks: `role.isTextRole`, `.isSurfaceRole`, `.isActionRole`, `.i
 
 </details>
 
-### Spacing Tokens
+<details>
+  <summary><strong>Spacing & radius tokens</strong></summary>
 
-`xs` (4) · `s` (8) · `m` (12) · `l` (16) · `xl` (24) · `xxl` (32)
+  **Spacing Tokens**
+  `xs` (4) · `s` (8) · `m` (12) · `l` (16) · `xl` (24) · `xxl` (32)
 
-### Radius Tokens
 
-`small` (8) · `medium` (12) · `large` (20) · `pill` (999)
+  **Radius Tokens**
+  `small` (8) · `medium` (12) · `large` (20) · `pill` (999)  
+
+</details>
 
 ---
 
