@@ -13,6 +13,8 @@
 ![Commit activity](https://img.shields.io/github/commit-activity/y/gentle-giraffe-apps/GentleDesignSystem)
 ![Last commit](https://img.shields.io/github/last-commit/gentle-giraffe-apps/GentleDesignSystem)
 
+> 🌍 **Language** · Canonical docs in English · [Español](Docs/README.es.md) · [Português (Brasil)](Docs/README.pt-BR.md) · [日本語](Docs/README.ja.md)
+
 ### TLDR
 
 Quickly standardize text, buttons, and surfaces with a unified design system.
