@@ -71,7 +71,7 @@ Theme:    themePrimary, themeSecondary
 - `GentleColorRole.surfaceRoles` - container/background/border colors (6)
 - `GentleColorRole.actionRoles` - interactive element colors (2)
 - `GentleColorRole.themeRoles` - brand/accent colors (2)
-- `GentleColorRole.surfaceBackgroundRoles` - subset valid for surface backgrounds (4): `background`, `surfaceBase`, `surfaceCardSecondary`, `surfaceOverlay`
+- `GentleColorRole.surfaceBackgroundRoles` - subset valid for surface backgrounds (4): `background`, `surfaceBase`, `surfaceCardSecondary`, `surfaceTint`
 
 Use `role.isTextRole`, `role.isSurfaceRole`, `role.isActionRole`, `role.isThemeRole`, or `role.isSurfaceBackgroundRole` for membership checks.
 

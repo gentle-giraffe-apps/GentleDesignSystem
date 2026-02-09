@@ -33,7 +33,7 @@
 | `GentleSurfaceBackgroundStyle` | Surface background type: .solid(colorRole:), .material(material:tintColorRole:tintOpacity:), .glass(fallbackMaterial:fallbackColorRole:) |
 | `GentleAppleMaterial` | Apple's blur materials: noMaterial, ultraThin, thin, regular, thick, ultraThick, bar |
 | `GentleSurfaceDepthEffect` | Surface depth effects: noEffect, highlightAndIndent(strength:) |
-| `GentleVisualEffect` | Legacy visual effect type (appBackground, surface, surfaceOverlay) |
+| `GentleVisualEffect` | Visual effect type (appBackground, surface, surfaceOverlay) |
 | `GentleInsetRole` | Padding intent (4 roles) |
 | `GentleGapIntent` | Spacing intent (7 levels) |
 

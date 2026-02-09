@@ -2,16 +2,15 @@
 
 ## Build Commands
 
+> **Always build for the iOS Simulator.** This package depends on UIKit, so bare `swift build` will fail on macOS. Use `xcodebuild` with a simulator destination for all build and test commands.
+
 ### Package
 ```bash
-# Build package
-swift build
-
-# Build for release
-swift build -c release
+# Build package (iOS Simulator)
+xcodebuild build -scheme GentleDesignSystem -destination 'platform=iOS Simulator,name=iPhone 16' -quiet
 
 # Clean build
-swift package clean && swift build
+xcodebuild clean build -scheme GentleDesignSystem -destination 'platform=iOS Simulator,name=iPhone 16' -quiet
 ```
 
 ### Tests
