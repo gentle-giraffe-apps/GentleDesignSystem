@@ -107,7 +107,6 @@ public struct GentleDesignStudioView: View {
                                 } label: {
                                     Label("Export PDF", systemImage: "doc.richtext")
                                 }
-                                .disabled(exportPDFURL == nil)
                             } label: {
                                 Image(systemName: "square.and.arrow.up")
                                     .gentleText(.title3_ml)
@@ -173,7 +172,7 @@ public struct GentleDesignStudioView: View {
                             ProgressView("Preparing PDF export…")
                                 .presentationDetents([.height(260)])
                                 .presentationDragIndicator(.visible)
-                                .task { await refreshExportURLs() }
+                                .task { await generatePDFExport() }
                         }
 
                     case .exportMenu:
@@ -190,7 +189,11 @@ public struct GentleDesignStudioView: View {
             print("themeManager.exportURL error: \(error)")
             exportJSONURL = nil
         }
+    }
 
+    @MainActor
+    private func generatePDFExport() async {
+        exportPDFURL = nil
         do {
             exportPDFURL = try themeManager.exportPDFURL()
         } catch {

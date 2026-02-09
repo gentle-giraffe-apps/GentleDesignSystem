@@ -132,7 +132,7 @@ design.color(.textPrimary)      // Color for current scheme
 design.color(.primaryCTA)       // Color
 
 // Convenience colors
-design.surface                  // color(.surface)
+design.surfaceBase              // color(.surfaceBase)
 design.background               // color(.background)
 design.borderSubtle             // color(.borderSubtle)
 design.textPrimary              // color(.textPrimary)
@@ -269,8 +269,8 @@ let jsonData = try spec.encodedJSONData()
 let jsonString = try spec.encodedJSONString()
 
 // Decoding
-let spec = try GentleDesignSystemSpec(jsonData: data)
-let spec = try GentleDesignSystemSpec(jsonString: string)
+let spec = try GentleDesignSystemSpec.fromJSONData(data)
+let spec = try GentleDesignSystemSpec.fromJSONString(string)
 ```
 
 ---

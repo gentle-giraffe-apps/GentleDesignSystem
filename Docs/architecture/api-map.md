@@ -476,7 +476,7 @@ typealias GentleTouchTokens = GentleSpacingScaleTokens
 ### GentleSurfaceRole (enum: String, Codable, Sendable, CaseIterable)
 ```
 Cases: appBackground, card, cardElevated, cardSecondary, chrome,
-       overlaySheet, overlayPopover, floatingPanel, floatingWidget
+       overlaySheet, overlayPopover, overlayScrim, floatingPanel, floatingWidget
 
 var displayName: String
 var subtitle: String

@@ -21,6 +21,7 @@ public enum GentlePDFExportError: Error, LocalizedError {
 
 // MARK: - PDF Exporter
 
+@MainActor
 public enum GentlePDFExporter {
 
     // MARK: - Layout Constants
@@ -541,27 +542,23 @@ public enum GentlePDFExporter {
     }
 
     /// Renders a surface using SwiftUI and captures it as a UIImage
-    /// Note: This must be called from the main thread since ImageRenderer requires it
     private static func renderSurfaceWithSwiftUI(spec: GentleDesignSystemSpec, role: GentleSurfaceRole, size: CGSize) -> UIImage? {
-        // Use assumeIsolated since PDF rendering happens on main thread via UIGraphicsPDFRenderer
-        return MainActor.assumeIsolated {
-            let theme = GentleTheme(defaultSpec: spec, editableSpec: spec)
+        let theme = GentleTheme(defaultSpec: spec, editableSpec: spec)
 
-            // Create a SwiftUI view that renders the surface with a gradient background to show the blur
-            let surfaceView = SurfacePreviewView(role: role, size: size)
+        // Create a SwiftUI view that renders the surface with a gradient background to show the blur
+        let surfaceView = SurfacePreviewView(role: role, size: size)
 
-            // Use ImageRenderer to capture the view
-            let renderer = ImageRenderer(content:
-                GentleThemeRoot(theme: theme) {
-                    surfaceView
-                }
-                .environment(\.colorScheme, .light)
-            )
+        // Use ImageRenderer to capture the view
+        let renderer = ImageRenderer(content:
+            GentleThemeRoot(theme: theme) {
+                surfaceView
+            }
+            .environment(\.colorScheme, .light)
+        )
 
-            renderer.scale = 8.0 // 8x scale for crisp PDF output
+        renderer.scale = 8.0 // 8x scale for crisp PDF output
 
-            return renderer.uiImage
-        }
+        return renderer.uiImage
     }
 
     // MARK: - Colors Section
