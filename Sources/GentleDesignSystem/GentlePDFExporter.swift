@@ -117,7 +117,15 @@ public enum GentlePDFExporter {
 
         let tempDir = FileManager.default.temporaryDirectory
         let timestamp = formattedTimestamp()
-        let fileName = "GentleDesignSystem_\(timestamp).pdf"
+        let safeName: String
+        if let themeName, !themeName.isEmpty {
+            safeName = themeName.replacingOccurrences(of: "/", with: "_")
+                .replacingOccurrences(of: ":", with: "_")
+                .replacingOccurrences(of: "\\", with: "_")
+        } else {
+            safeName = "GentleDesignSystem"
+        }
+        let fileName = "\(safeName)_\(timestamp).pdf"
         let url = tempDir.appendingPathComponent(fileName)
 
         do {
@@ -162,7 +170,7 @@ public enum GentlePDFExporter {
         var y = startY
 
         // Section title
-        y = drawSectionTitle("Typography", in: cgContext, at: y)
+        y = drawSectionTitle("Typography", in: cgContext, at: y, spec: spec)
         y += 12
 
         // Draw container card
@@ -236,7 +244,7 @@ public enum GentlePDFExporter {
         var y = startY
 
         // Section title
-        y = drawSectionTitle("Buttons", in: cgContext, at: y)
+        y = drawSectionTitle("Buttons", in: cgContext, at: y, spec: spec)
         y += 12
 
         // Container card - sized for 17pt button text
@@ -369,7 +377,7 @@ public enum GentlePDFExporter {
         var y = startY
 
         // Section title
-        y = drawSectionTitle("Surfaces", in: cgContext, at: y)
+        y = drawSectionTitle("Surfaces", in: cgContext, at: y, spec: spec)
         y += 12
 
         // Filter out appBackground since it's not really a card-style surface
@@ -556,7 +564,7 @@ public enum GentlePDFExporter {
             .environment(\.colorScheme, .light)
         )
 
-        renderer.scale = 8.0 // 8x scale for crisp PDF output
+        renderer.scale = 3.0 // 3x scale for crisp PDF output
 
         return renderer.uiImage
     }
@@ -567,7 +575,7 @@ public enum GentlePDFExporter {
         var y = startY
 
         // Section title
-        y = drawSectionTitle("Colors", in: cgContext, at: y)
+        y = drawSectionTitle("Colors", in: cgContext, at: y, spec: spec)
         y += 12
 
         let roles = GentleColorRole.allCases
@@ -661,11 +669,11 @@ public enum GentlePDFExporter {
 
     // MARK: - Helpers
 
-    private static func drawSectionTitle(_ title: String, in cgContext: CGContext, at y: CGFloat) -> CGFloat {
+    private static func drawSectionTitle(_ title: String, in cgContext: CGContext, at y: CGFloat, spec: GentleDesignSystemSpec) -> CGFloat {
         let font = UIFont.systemFont(ofSize: sectionTitleFontSize, weight: .bold)
         let attrs: [NSAttributedString.Key: Any] = [
             .font: font,
-            .foregroundColor: UIColor.black
+            .foregroundColor: colorFromSpec(spec, role: .textPrimary)
         ]
         let attrString = NSAttributedString(string: title, attributes: attrs)
         attrString.draw(at: CGPoint(x: margin, y: y))
@@ -751,7 +759,7 @@ public enum GentlePDFExporter {
         return font
     }
 
-    private static func formattedTimestamp() -> String {
+    static func formattedTimestamp() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd_HHmmss"
         return formatter.string(from: Date())

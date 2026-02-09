@@ -30,6 +30,7 @@ public struct GentleDesignStudioView: View {
     @State private var exportJSONURL: URL?
     @State private var exportPDFURL: URL?
     @State private var showRevertAlert = false
+    @State private var exportError: String?
     @GentleDesignRuntime private var design
     @GentleThemeManagerRuntime private var themeManager
 
@@ -43,7 +44,6 @@ public struct GentleDesignStudioView: View {
             NavigationStack {
                 studioContent
             }
-            .task { await refreshExportURLs() }
             .alert("Revert Changes?", isPresented: $showRevertAlert) {
                 Button("Cancel", role: .cancel) { }
                 Button("Revert", role: .destructive) {
@@ -54,7 +54,6 @@ public struct GentleDesignStudioView: View {
             }
         } else {
             studioContent
-                .task { await refreshExportURLs() }
                 .alert("Revert Changes?", isPresented: $showRevertAlert) {
                     Button("Cancel", role: .cancel) { }
                     Button("Revert", role: .destructive) {
@@ -96,11 +95,11 @@ public struct GentleDesignStudioView: View {
 
                             Menu {
                                 Button {
+                                    exportJSONURL = nil
                                     activeSheet = .shareJSON
                                 } label: {
                                     Label("Export JSON", systemImage: "doc.text")
                                 }
-                                .disabled(exportJSONURL == nil)
 
                                 Button {
                                     activeSheet = .sharePDF
@@ -179,6 +178,14 @@ public struct GentleDesignStudioView: View {
                         EmptyView()
                     }
                 }
+                .alert("Export Error", isPresented: Binding(
+                    get: { exportError != nil },
+                    set: { if !$0 { exportError = nil } }
+                )) {
+                    Button("OK", role: .cancel) { exportError = nil }
+                } message: {
+                    Text(exportError ?? "An unknown error occurred.")
+                }
     }
 
     @MainActor
@@ -186,7 +193,7 @@ public struct GentleDesignStudioView: View {
         do {
             exportJSONURL = try themeManager.exportURL()
         } catch {
-            print("themeManager.exportURL error: \(error)")
+            exportError = error.localizedDescription
             exportJSONURL = nil
         }
     }
@@ -197,7 +204,7 @@ public struct GentleDesignStudioView: View {
         do {
             exportPDFURL = try themeManager.exportPDFURL()
         } catch {
-            print("themeManager.exportPDFURL error: \(error)")
+            exportError = error.localizedDescription
             exportPDFURL = nil
         }
     }
