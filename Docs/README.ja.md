@@ -1,4 +1,5 @@
-<img align="right" src="README_assets/Typography.gif" width="360" />
+<img align="right" src="README_assets/typography_light.gif#gh-light-mode-only" width="360" />
+<img align="right" src="README_assets/typography_dark.gif#gh-dark-mode-only" width="360" />
 
 <img src="README_assets/GentleDesignSystem.png" width="400" />
 
