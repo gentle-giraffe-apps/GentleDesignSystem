@@ -7,7 +7,6 @@
 [![Coverage](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem/branch/main/graph/badge.svg)](https://codecov.io/gh/gentle-giraffe-apps/GentleDesignSystem)
 [![Swift](https://img.shields.io/badge/Swift-6.1+-orange.svg)](https://swift.org)
 ![iOS](https://img.shields.io/badge/iOS-18.0+-blue?logo=apple)
-![Platform](https://img.shields.io/badge/Platform-iPhone%20%7C%20iPad-lightgrey)
 ![SPM](https://img.shields.io/badge/SPM-Compatible-success)
 [![DeepSource Static Analysis](https://img.shields.io/badge/DeepSource-Static%20Analysis-0A2540?logo=deepsource&logoColor=white)](https://deepsource.io/) 
 [![DeepSource](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem.svg/?label=active+issues&show_trend=true)](https://app.deepsource.com/gh/gentle-giraffe-apps/GentleDesignSystem/) 
