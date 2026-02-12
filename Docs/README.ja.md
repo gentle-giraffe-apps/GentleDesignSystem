@@ -13,7 +13,7 @@
 ![Commit activity](https://img.shields.io/github/commit-activity/y/gentle-giraffe-apps/GentleDesignSystem)
 ![Last commit](https://img.shields.io/github/last-commit/gentle-giraffe-apps/GentleDesignSystem)
 
-> 🌍 **言語** · 正式ドキュメントは英語 · [English](../README.md) · [Español](README.es.md) · [Português (Brasil)](README.pt-BR.md)
+> 🌍 **言語** · 正式ドキュメントは英語 · [English](../README.md) · [Español](README.es.md) · [Português (Brasil)](README.pt-BR.md) · [简体中文](README.zh-CN.md) · [한국어](README.ko.md) · [Русский](README.ru.md)
 
 ### 概要
 
