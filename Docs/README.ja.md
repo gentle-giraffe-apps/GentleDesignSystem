@@ -287,7 +287,6 @@ GentleDesignSystemは意図的に**3つのレイヤー**で構成されていま
                         │       ├── .solid(colorRole: GentleColorRole)
                         │       ├── .material(material:, tintColorRole:, tintOpacity:)
                         │       └── .glass(fallbackMaterial:, fallbackColorRole:)
-                        ├── surfaceDepthEffect: GentleSurfaceDepthEffect
                         ├── border: GentleColorPair
                         ├── cornerRadius: Double
                         ├── borderWidth: Double

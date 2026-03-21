@@ -288,7 +288,6 @@ This separation keeps design intent clear, runtime behavior predictable, and fut
                         │       ├── .solid(colorRole: GentleColorRole)
                         │       ├── .material(material:, tintColorRole:, tintOpacity:)
                         │       └── .glass(fallbackMaterial:, fallbackColorRole:)
-                        ├── surfaceDepthEffect: GentleSurfaceDepthEffect
                         ├── border: GentleColorPair
                         ├── cornerRadius: Double
                         ├── borderWidth: Double

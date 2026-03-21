@@ -952,46 +952,6 @@ struct SurfaceRoleEditorSheet: View {
                         }
                     }
 
-                    // Surface Depth section - hidden when glass is selected
-                    if !binding.wrappedValue.backgroundStyle.isGlass {
-                        Section("Surface Depth") {
-                            Toggle("Enabled", isOn: Binding(
-                                get: { binding.wrappedValue.surfaceDepthEffect.hasEffect },
-                                set: { enabled in
-                                    if enabled {
-                                        let currentStrength = binding.wrappedValue.surfaceDepthEffect.strength
-                                        let strength = currentStrength > 0 ? currentStrength : 0.1
-                                        binding.wrappedValue.surfaceDepthEffect = .highlightAndIndent(strength: strength)
-                                    } else {
-                                        binding.wrappedValue.surfaceDepthEffect = .noEffect
-                                    }
-                                }
-                            ))
-
-                            if binding.wrappedValue.surfaceDepthEffect.hasEffect {
-                                VStack(alignment: .leading, spacing: 6) {
-                                    HStack {
-                                        Text("Strength")
-                                        Spacer()
-                                        Text(String(format: "%.0f%%", binding.wrappedValue.surfaceDepthEffect.strength * 100))
-                                            .monospacedDigit()
-                                            .foregroundStyle(.secondary)
-                                    }
-                                    Slider(
-                                        value: Binding(
-                                            get: { binding.wrappedValue.surfaceDepthEffect.strength },
-                                            set: { newStrength in
-                                                binding.wrappedValue.surfaceDepthEffect = .highlightAndIndent(strength: newStrength)
-                                            }
-                                        ),
-                                        in: 0...0.2,
-                                        step: 0.01
-                                    )
-                                }
-                            }
-                        }
-                    }
-
                     Section("Border") {
                         SurfaceColorPairRow(name: "Border Color", binding: binding.border)
                     }

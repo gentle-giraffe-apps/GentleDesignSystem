@@ -145,7 +145,6 @@ Step-by-step guides for common modifications.
    ```swift
    GentleSurfaceRole.myNewSurface.rawValue: .init(
        backgroundStyle: .solid(colorRole: .surfaceBase),
-       surfaceDepthEffect: .noEffect,
        border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
        cornerRadius: 12,
        borderWidth: 1,

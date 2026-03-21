@@ -411,7 +411,6 @@ struct EditSessionGentleTypesTests {
         let border = GentleColorPair(lightHex: "#FFFFFF", darkHex: "#000000")
         var spec = GentleSurfaceRoleSpec(
             backgroundStyle: .solid(colorRole: .surfaceBase),
-            surfaceDepthEffect: .noEffect,
             border: border,
             cornerRadius: 12,
             borderWidth: 0,

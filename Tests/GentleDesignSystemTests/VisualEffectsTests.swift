@@ -580,15 +580,12 @@ struct GentleSurfaceRoleSpecTests {
         #expect(spec.shadowOpacity == 0)
         #expect(spec.shadowOffsetX == 0)
         #expect(spec.shadowOffsetY == 0)
-        #expect(spec.surfaceDepthEffect == .noEffect)
-        #expect(spec.surfaceDepthEffect.strength == 0)
     }
 
     @Test("Surface role spec with all properties")
     func testSurfaceRoleSpecAllProperties() {
         let spec = GentleSurfaceRoleSpec(
             backgroundStyle: .material(material: .thin, tintColorRole: .surfaceBase, tintOpacity: 0.15),
-            surfaceDepthEffect: .highlightAndIndent(strength: 0.5),
             border: GentleColorPair(lightHex: "#E5E7EB", darkHex: "#374151"),
             cornerRadius: 24,
             borderWidth: 0.5,
@@ -610,8 +607,6 @@ struct GentleSurfaceRoleSpecTests {
         } else {
             Issue.record("Expected material background style")
         }
-        #expect(spec.surfaceDepthEffect.hasEffect)
-        #expect(spec.surfaceDepthEffect.strength == 0.5)
     }
 
     @Test("Surface role spec is codable")
