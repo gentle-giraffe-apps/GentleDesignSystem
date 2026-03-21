@@ -499,15 +499,6 @@ var displayName: String
 var swiftUIMaterial: Material?  // iOS 15+
 ```
 
-### GentleSurfaceDepthEffect (enum: Codable, Sendable, Equatable)
-```
-Cases: noEffect, highlightAndIndent(strength: CGFloat)
-
-var displayName: String
-var strength: CGFloat
-var hasEffect: Bool
-```
-
 ### GentleSurfaceBackgroundStyle (enum: Codable, Sendable, Equatable)
 ```
 Cases: solid(colorRole: GentleColorRole)
@@ -522,7 +513,6 @@ var isSolid: Bool
 ### GentleSurfaceRoleSpec (struct: Codable, Sendable, Equatable)
 ```
 var backgroundStyle: GentleSurfaceBackgroundStyle
-var surfaceDepthEffect: GentleSurfaceDepthEffect
 var border: GentleColorPair
 var cornerRadius: Double
 var borderWidth: Double
@@ -531,7 +521,7 @@ var shadowOpacity: Double
 var shadowOffsetX: Double
 var shadowOffsetY: Double
 
-init(backgroundStyle:surfaceDepthEffect:border:cornerRadius:borderWidth:shadowRadius:shadowOpacity:shadowOffsetX:shadowOffsetY:)
+init(backgroundStyle:border:cornerRadius:borderWidth:shadowRadius:shadowOpacity:shadowOffsetX:shadowOffsetY:)
 ```
 
 ### GentleSurfaceTokens (struct: Codable, Sendable)

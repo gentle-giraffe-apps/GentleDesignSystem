@@ -1,5 +1,5 @@
 {
-  "_specVersion" : "0.6.0",
+  "_specVersion" : "0.7.0",
   "buttons" : {
     "animations" : {
       "bouncy" : {
@@ -279,10 +279,7 @@
         "shadowOffsetX" : 0,
         "shadowOffsetY" : 0,
         "shadowOpacity" : 0,
-        "shadowRadius" : 0,
-        "surfaceDepthEffect" : {
-          "type" : "noEffect"
-        }
+        "shadowRadius" : 0
       },
       "card" : {
         "backgroundStyle" : {
@@ -298,11 +295,7 @@
         "shadowOffsetX" : 0,
         "shadowOffsetY" : 0,
         "shadowOpacity" : 0,
-        "shadowRadius" : 0,
-        "surfaceDepthEffect" : {
-          "strength" : 0.02,
-          "type" : "highlightAndIndent"
-        }
+        "shadowRadius" : 0
       },
       "cardElevated" : {
         "backgroundStyle" : {
@@ -318,11 +311,7 @@
         "shadowOffsetX" : 0,
         "shadowOffsetY" : 2,
         "shadowOpacity" : 0.08,
-        "shadowRadius" : 4,
-        "surfaceDepthEffect" : {
-          "strength" : 0.04,
-          "type" : "highlightAndIndent"
-        }
+        "shadowRadius" : 4
       },
       "cardSecondary" : {
         "backgroundStyle" : {
@@ -338,11 +327,7 @@
         "shadowOffsetX" : 0,
         "shadowOffsetY" : 0,
         "shadowOpacity" : 0,
-        "shadowRadius" : 0,
-        "surfaceDepthEffect" : {
-          "strength" : 0.02,
-          "type" : "highlightAndIndent"
-        }
+        "shadowRadius" : 0
       },
       "chrome" : {
         "backgroundStyle" : {
@@ -360,10 +345,7 @@
         "shadowOffsetX" : 0,
         "shadowOffsetY" : 0,
         "shadowOpacity" : 0,
-        "shadowRadius" : 0,
-        "surfaceDepthEffect" : {
-          "type" : "noEffect"
-        }
+        "shadowRadius" : 0
       },
       "floatingPanel" : {
         "backgroundStyle" : {
@@ -380,10 +362,7 @@
         "shadowOffsetX" : 0,
         "shadowOffsetY" : 6,
         "shadowOpacity" : 0.15,
-        "shadowRadius" : 12,
-        "surfaceDepthEffect" : {
-          "type" : "noEffect"
-        }
+        "shadowRadius" : 12
       },
       "floatingWidget" : {
         "backgroundStyle" : {
@@ -400,10 +379,7 @@
         "shadowOffsetX" : 0,
         "shadowOffsetY" : 2,
         "shadowOpacity" : 0.1,
-        "shadowRadius" : 4,
-        "surfaceDepthEffect" : {
-          "type" : "noEffect"
-        }
+        "shadowRadius" : 4
       },
       "overlayPopover" : {
         "backgroundStyle" : {
@@ -421,10 +397,7 @@
         "shadowOffsetX" : 0,
         "shadowOffsetY" : 4,
         "shadowOpacity" : 0.12,
-        "shadowRadius" : 8,
-        "surfaceDepthEffect" : {
-          "type" : "noEffect"
-        }
+        "shadowRadius" : 8
       },
       "overlayScrim" : {
         "backgroundStyle" : {
@@ -440,10 +413,7 @@
         "shadowOffsetX" : 0,
         "shadowOffsetY" : 0,
         "shadowOpacity" : 0,
-        "shadowRadius" : 0,
-        "surfaceDepthEffect" : {
-          "type" : "noEffect"
-        }
+        "shadowRadius" : 0
       },
       "overlaySheet" : {
         "backgroundStyle" : {
@@ -461,10 +431,7 @@
         "shadowOffsetX" : 0,
         "shadowOffsetY" : 0,
         "shadowOpacity" : 0,
-        "shadowRadius" : 0,
-        "surfaceDepthEffect" : {
-          "type" : "noEffect"
-        }
+        "shadowRadius" : 0
       }
     }
   },

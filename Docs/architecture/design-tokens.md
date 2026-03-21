@@ -104,7 +104,6 @@ Each surface role is defined by a `GentleSurfaceRoleSpec` containing:
   - `.solid(colorRole:)` - solid color
   - `.material(material:tintColorRole:tintOpacity:)` - Apple blur material
   - `.glass(fallbackMaterial:fallbackColorRole:)` - iOS 26+ liquid glass
-- `surfaceDepthEffect`: `GentleSurfaceDepthEffect` (noEffect, highlightAndIndent)
 - Plus border, corner radius, and shadow properties
 
 ## Adding a New Token

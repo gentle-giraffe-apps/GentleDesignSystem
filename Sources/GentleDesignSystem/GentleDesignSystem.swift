@@ -5,7 +5,7 @@ import Observation
 import UIKit
 
 public enum GentleDesignSystemSpecVersion {
-    public static let current = "0.6.0" // surface roles: composable properties (colorRole, appleMaterial, useGlass, specularEffect, specularStrength)
+    public static let current = "0.7.0" // removed GentleSurfaceDepthEffect for performance
 }
 
 // MARK: - Roles

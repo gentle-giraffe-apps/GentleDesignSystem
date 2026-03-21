@@ -288,7 +288,6 @@ GentleDesignSystem은 **세 개의 레이어**를 중심으로 의도적으로 �
                         │       ├── .solid(colorRole: GentleColorRole)
                         │       ├── .material(material:, tintColorRole:, tintOpacity:)
                         │       └── .glass(fallbackMaterial:, fallbackColorRole:)
-                        ├── surfaceDepthEffect: GentleSurfaceDepthEffect
                         ├── border: GentleColorPair
                         ├── cornerRadius: Double
                         ├── borderWidth: Double

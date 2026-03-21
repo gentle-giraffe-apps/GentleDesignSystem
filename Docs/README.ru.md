@@ -288,7 +288,6 @@ GentleDesignSystem намеренно построен вокруг **трёх �
                         │       ├── .solid(colorRole: GentleColorRole)
                         │       ├── .material(material:, tintColorRole:, tintOpacity:)
                         │       └── .glass(fallbackMaterial:, fallbackColorRole:)
-                        ├── surfaceDepthEffect: GentleSurfaceDepthEffect
                         ├── border: GentleColorPair
                         ├── cornerRadius: Double
                         ├── borderWidth: Double
