@@ -477,6 +477,19 @@ struct ButtonPreviewCardContent: View {
     }
 }
 
+/// Button style with a subtle scale animation that works for all surface types including glass
+struct SurfaceCardButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: configuration.isPressed)
+    }
+}
+
+extension ButtonStyle where Self == SurfaceCardButtonStyle {
+    static var surfaceCard: SurfaceCardButtonStyle { .init() }
+}
+
 struct ButtonPreviewCardStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         // This is a workaround - we need to rebuild content with isPressed
@@ -703,57 +716,14 @@ public struct GentleDesignSurfacesSection: View {
         }
     }
 
+    @ViewBuilder
     private func surfaceCard(for role: GentleSurfaceRole) -> some View {
-        Button {
-            editingRole = role
-        } label: {
-            ZStack {
-                // Miniature mock UI content (visible through blur/glass effects)
-                HStack(spacing: 0) {
-                    VStack(alignment: .leading, spacing: 3) {
-                        HStack(spacing: 4) {
-                            Circle().fill(design.color(.themePrimary)).frame(width: 10, height: 10)
-                            Text("Primary")
-                                .font(.system(size: 8))
-                        }
-                        HStack(spacing: 4) {
-                            Circle().fill(design.color(.themeSecondary)).frame(width: 10, height: 10)
-                            Text("Secondary")
-                                .font(.system(size: 8))
-                        }
-                        HStack(spacing: 4) {
-                            Circle().fill(design.color(.primaryCTA)).frame(width: 10, height: 10)
-                            Text("CTA")
-                                .font(.system(size: 8))
-                        }
-                    }
-                    .padding(.leading, 8)
+        let isSolid = theme.surfaces.roleSpec(for: role).backgroundStyle.isSolid
 
-                    Spacer()
-
-                    // Mini mesh gradient
-                    MeshGradient(
-                        width: 3,
-                        height: 3,
-                        points: [
-                            [0.0, 0.0], [0.5, 0.0], [1.0, 0.0],
-                            [0.0, 0.5], [0.5, 0.5], [1.0, 0.5],
-                            [0.0, 1.0], [0.5, 1.0], [1.0, 1.0]
-                        ],
-                        colors: [
-                            .red, .purple, .indigo,
-                            .orange, .pink, .blue,
-                            .yellow, .green, .cyan
-                        ]
-                    )
-                    .frame(width: 40, height: 40)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .padding(.trailing, 8)
-                }
-                .padding(.vertical, 8)
-                .frame(maxWidth: .infinity)
-
-                // Surface content on top
+        if isSolid {
+            Button {
+                editingRole = role
+            } label: {
                 VStack(alignment: .leading, spacing: design.layout.stack.tight) {
                     Text(role.displayName)
                         .gentleText(.caption_s, colorRole: textColorRole(for: role))
@@ -765,8 +735,70 @@ public struct GentleDesignSurfacesSection: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .gentleSurface(role, inset: .card, showTappableHint: true)
             }
+            .buttonStyle(.surfaceCard)
+        } else {
+            // Glass/material surfaces: show mock content behind to demonstrate translucency
+            Button {
+                editingRole = role
+            } label: {
+                ZStack {
+                    HStack(spacing: 0) {
+                        VStack(alignment: .leading, spacing: 3) {
+                            HStack(spacing: 4) {
+                                Circle().fill(design.color(.themePrimary)).frame(width: 10, height: 10)
+                                Text("Primary")
+                                    .font(.system(size: 8))
+                            }
+                            HStack(spacing: 4) {
+                                Circle().fill(design.color(.themeSecondary)).frame(width: 10, height: 10)
+                                Text("Secondary")
+                                    .font(.system(size: 8))
+                            }
+                            HStack(spacing: 4) {
+                                Circle().fill(design.color(.primaryCTA)).frame(width: 10, height: 10)
+                                Text("CTA")
+                                    .font(.system(size: 8))
+                            }
+                        }
+                        .padding(.leading, 8)
+
+                        Spacer()
+
+                        MeshGradient(
+                            width: 3,
+                            height: 3,
+                            points: [
+                                [0.0, 0.0], [0.5, 0.0], [1.0, 0.0],
+                                [0.0, 0.5], [0.5, 0.5], [1.0, 0.5],
+                                [0.0, 1.0], [0.5, 1.0], [1.0, 1.0]
+                            ],
+                            colors: [
+                                .red, .purple, .indigo,
+                                .orange, .pink, .blue,
+                                .yellow, .green, .cyan
+                            ]
+                        )
+                        .frame(width: 40, height: 40)
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .padding(.trailing, 8)
+                    }
+                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity)
+
+                    VStack(alignment: .leading, spacing: design.layout.stack.tight) {
+                        Text(role.displayName)
+                            .gentleText(.caption_s, colorRole: textColorRole(for: role))
+                            .fontWeight(.semibold)
+
+                        Text(role.subtitle)
+                            .gentleText(.caption2_s, colorRole: secondaryTextColorRole(for: role))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .gentleSurface(role, inset: .card, showTappableHint: true)
+                }
+            }
+            .buttonStyle(.surfaceCard)
         }
-        .buttonStyle(.plain)
     }
 
     /// Returns the appropriate primary text color role for displaying text on a given surface
